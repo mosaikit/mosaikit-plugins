@@ -1,0 +1,30 @@
+id = "com.mosaikit.tasks"
+name = "Attività"
+version = "0.3.0"
+description = "Attività con scadenza e priorità, assegnabili condividendole"
+
+[contribution]
+icon = "✅"
+label = "Attività"
+
+[[resources]]
+name = "tasks"
+label = "Attività"
+title_field = "title"
+fields = [
+  { key = "title", label = "Titolo", kind = "text", required = true },
+  { key = "due", label = "Scadenza", kind = "date" },
+  { key = "priority", label = "Priorità", kind = "choice", options = ["bassa", "media", "alta"] },
+  { key = "done", label = "Fatto", kind = "bool" },
+  { key = "completed_on", label = "Completata il", kind = "date", hidden = true },
+]
+
+[ui]
+entry = "index.html"
+
+[permissions]
+hooks = ["tasks"]
+
+[[kpi]]
+view = "kpi_tasks_status"
+label = "Stato delle attività"

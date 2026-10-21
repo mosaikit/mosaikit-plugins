@@ -1,0 +1,35 @@
+{
+  "name": "mosaikit-plugins",
+  "private": true,
+  "description": "UI dei plugin ufficiali di Mosaikit (npm workspaces)",
+  "workspaces": [
+    "notes/ui",
+    "tasks/ui",
+    "contacts/ui",
+    "maps/ui",
+    "static-site/ui",
+    "files/ui"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "oxlint . --deny-warnings"
+  },
+  "dependencies": {
+    "@mosaikit/plugin-api": "file:../mosaikit/ui/plugin-api",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "oxlint": "^1.89.0",
+    "typescript": "~7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5",
+    "happy-dom": "^21.0.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,14 @@
+id = "com.mosaikit.files"
+name = "File"
+version = "0.3.0"
+description = "File e cartelle condivisibili, con anteprima, zip e link pubblici"
+
+[contribution]
+icon = "📁"
+label = "File"
+
+[ui]
+entry = "index.html"
+
+[permissions]
+files = true

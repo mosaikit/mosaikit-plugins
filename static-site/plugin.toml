@@ -1,0 +1,31 @@
+id = "com.mosaikit.static-site"
+name = "Siti statici"
+version = "0.3.0"
+description = "Pubblica siti statici da archivi zip, condivisibili e con link pubblici"
+
+[contribution]
+icon = "🌐"
+label = "Siti statici"
+
+[[resources]]
+name = "sites"
+label = "Siti"
+title_field = "name"
+fields = [
+  { key = "name", label = "Nome", kind = "text", required = true },
+  { key = "description", label = "Descrizione", kind = "text", multiline = true },
+  { key = "zip_name", label = "Zip caricato", kind = "text", hidden = true },
+  { key = "entry", label = "Pagina iniziale", kind = "text", hidden = true },
+  { key = "files", label = "File", kind = "number", hidden = true },
+  { key = "size", label = "Dimensione (byte)", kind = "number", hidden = true },
+]
+
+[ui]
+entry = "index.html"
+
+[permissions]
+content = true
+
+[[kpi]]
+view = "kpi_sites"
+label = "Siti pubblicati"

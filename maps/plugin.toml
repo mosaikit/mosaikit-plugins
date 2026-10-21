@@ -1,0 +1,31 @@
+id = "com.mosaikit.maps"
+name = "Mappe"
+version = "0.4.0"
+description = "Catalogo di mappe GeoLibre: configurazione salvata nel progetto .geolibre.json"
+
+[contribution]
+icon = "🗺"
+label = "Mappe"
+
+[[resources]]
+name = "maps"
+label = "Mappe"
+title_field = "name"
+fields = [
+  { key = "name", label = "Nome", kind = "text", required = true },
+  { key = "description", label = "Descrizione", kind = "text", multiline = true },
+  { key = "config", label = "Configurazione (.geolibre.json)", kind = "text", multiline = true, hidden = true },
+  { key = "layers", label = "Livelli", kind = "number", hidden = true },
+]
+
+[ui]
+entry = "index.html"
+public_view = "public.html"
+
+[permissions]
+hooks = ["maps"]
+frame_src = ["https://web.geolibre.app"]
+
+[[kpi]]
+view = "kpi_maps"
+label = "Mappe e livelli"

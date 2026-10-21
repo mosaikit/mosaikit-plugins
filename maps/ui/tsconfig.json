@@ -1,0 +1,7 @@
+{
+  "extends": "../../../mosaikit/ui/plugin-api/tsconfig.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src"]
+}

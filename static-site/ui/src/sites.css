@@ -1,0 +1,32 @@
+/* Stili del plugin Siti statici, sopra @mosaikit/plugin-api/style.css. */
+.msks { max-width: 1180px; }
+.msks .msk-filter { width: 260px; }
+.msks td.mono { font-family: var(--font-mono); font-size: 11px; color: var(--dim); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msks td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.msks td a.open { color: var(--fg); font-weight: 600; text-decoration: none; cursor: pointer; }
+.msks td a.open:hover { color: var(--acc); }
+.msks .rowacts { white-space: nowrap; width: 1%; }
+.msks .rowacts .msk-btn { margin-right: 4px; }
+.msks .editbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+.msks .sv-title { font-size: 18px; font-weight: 700; }
+.msks .grow { flex: 1; }
+.msks .show-only { display: flex; gap: 8px; flex-wrap: wrap; }
+.msks [hidden] { display: none !important; }
+.msks a.msk-btn { text-decoration: none; display: inline-block; }
+.msks .siteform { max-width: 660px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px 24px; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35); }
+.msks .frow { margin-bottom: 14px; }
+.msks .frow > label { display: block; font-size: 12px; color: var(--dim); margin-bottom: 5px; }
+.msks .frow.required > label { color: var(--fg); font-weight: 600; }
+.msks .req { color: var(--err); }
+.msks .frow label.drop { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 16px; border: 1.5px dashed var(--line); border-radius: 12px; background: var(--panel2); cursor: pointer; text-align: center; transition: border-color 0.15s, background 0.15s; color: var(--fg); font-weight: 400; }
+.msks .drop:hover, .msks .drop.over { border-color: var(--acc); background: var(--acc-soft); }
+.msks .drop .big { font-size: 26px; line-height: 1; }
+.msks .drop .fname { font-family: var(--font-mono); font-size: 12px; color: var(--acc); }
+.msks .drop .sub { font-size: 12px; color: var(--dim); }
+.msks .drop input { display: none; }
+.msks .hint { font-size: 12px; color: var(--dim); margin: 6px 0 0; line-height: 1.5; }
+.msks .hint code { font-family: var(--font-mono); font-size: 11px; background: var(--panel2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; color: var(--acc); }
+.msks .form-actions { display: flex; gap: 10px; margin-top: 18px; }
+.msks .sframe { width: 100%; height: calc(100vh - 150px); min-height: 420px; border: 1px solid var(--line); border-radius: 12px; background: #fff; display: block; }
+.msks .msg { color: var(--dim); font-family: var(--font-mono); font-size: 12px; margin-top: 10px; min-height: 1em; }
+.msks .msg.err { color: var(--err); }

@@ -1,0 +1,27 @@
+# Plugin ufficiali di Mosaikit. Progetto separato da mosaikit (cartella accanto):
+# la logica dipende solo dall'SDK, le UI solo da @mosaikit/plugin-api.
+[workspace]
+resolver = "2"
+members = [
+    # plugin con logica WASM (aggiornato da `cargo xtask plugin new`)
+    "notes",
+    "tasks",
+    "contacts",
+    "maps",
+]
+
+[workspace.package]
+edition = "2021"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.dependencies]
+mosaikit-plugin-sdk = { path = "../mosaikit/crates/plugin-sdk" }
+
+# i plugin WASM: dimensione piu' che velocita'
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = "symbols"
