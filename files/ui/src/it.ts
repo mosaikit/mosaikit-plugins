@@ -100,7 +100,7 @@ export const IT: Record<string, string> = {
   'The folder already has items with these names.': 'Nella cartella ci sono già elementi con questi nomi.',
   'The folders will be deleted with all their content.': 'Le cartelle verranno eliminate con tutto il loro contenuto.',
   'The items are already in this folder': 'Gli elementi sono già in questa cartella',
-  'This cannot be undone.': 'L’operazione non può essere annullata.',
+  'They stay in the Trash for a while: you can restore them from there.': 'Restano per un po’ nel Cestino: da lì puoi ripristinarli.',
   'This folder is empty': 'Questa cartella è vuota',
   'Today, {time}': 'Oggi, {time}',
   Upload: 'Carica',

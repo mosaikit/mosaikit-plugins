@@ -528,7 +528,7 @@ export class FileManager {
       (items.length === 1 ? t('Delete “{name}”?', { name: items[0].name }) : t('Delete {n} items?', { n: items.length })) +
       (dirs ? ' ' + t('The folders will be deleted with all their content.') : '') +
       ' ' +
-      t('This cannot be undone.')
+      t('They stay in the Trash for a while: you can restore them from there.')
     let ok = false
     try {
       ok = await this.msk.confirm(text)
