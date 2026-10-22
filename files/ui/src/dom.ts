@@ -1,4 +1,5 @@
-// Costruzione del DOM senza innerHTML: i nomi dei file entrano solo come testo.
+// Building of the DOM without innerHTML: the names of the files go in only as text.
+import { t } from './i18n.ts'
 import { ext, kindColor, kindOf, type Kind } from './util.ts'
 
 type Child = Node | string | number | null | undefined | false
@@ -34,7 +35,7 @@ function svgEl(tag: string, attrs: Record<string, string | number>): SVGElement 
   return el
 }
 
-// tracciati delle icone di interfaccia (stroke): solo costanti
+// paths of the interface icons (stroke): constants only
 const PATHS = {
   upload: ['M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16'],
   folderPlus: ['M3 7.5a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 10.5v5m-2.5-2.5h5'],
@@ -64,7 +65,7 @@ const PATHS = {
 
 export type IconName = keyof typeof PATHS
 
-/** Icona di interfaccia. */
+/** Interface icon. */
 export function svg(name: IconName, cls = ''): SVGElement {
   const s = svgEl('svg', {
     class: 'si' + (cls ? ' ' + cls : ''),
@@ -80,7 +81,7 @@ export function svg(name: IconName, cls = ''): SVGElement {
   return s
 }
 
-/** Icona del tipo di file (cartella o foglio con l'estensione). */
+/** Icon of the kind of file (folder, or sheet with the extension). */
 export function fileIcon(e: { name: string; is_dir: boolean }, big = false): SVGElement {
   const size = big ? 64 : 22
   const s = svgEl('svg', { class: 'ic', width: size, height: size, viewBox: '0 0 24 24', 'aria-hidden': 'true' })
@@ -108,10 +109,10 @@ export function fileIcon(e: { name: string; is_dir: boolean }, big = false): SVG
 }
 
 export function spinner(): HTMLElement {
-  return h('div', { class: 'fm-spin', role: 'status', 'aria-label': 'Caricamento' })
+  return h('div', { class: 'fm-spin', role: 'status', 'aria-label': t('Loading') })
 }
 
-/** Scarica un Blob con un nome (object URL revocato dopo). */
+/** Downloads a Blob with a name (object URL revoked afterwards). */
 export function saveBlob(blob: Blob, name: string) {
   const u = URL.createObjectURL(blob)
   const a = h('a', { href: u, download: name, style: 'display:none' })

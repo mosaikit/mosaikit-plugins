@@ -1,4 +1,4 @@
-// Piccolo costruttore di DOM: niente innerHTML con dati dei record.
+// Small DOM builder: no innerHTML with data of the records.
 
 type Child = Node | string | null | undefined | false
 

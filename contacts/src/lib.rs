@@ -1,4 +1,4 @@
-//! Plugin Contatti: email in minuscolo e validate, telefono ripulito.
+//! Contacts plugin: lower-case, validated emails and cleaned-up phone numbers.
 
 use mosaikit_plugin_sdk::prelude::*;
 
@@ -19,10 +19,10 @@ fn normalize(ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     let email = v.str("email").trim().to_lowercase();
     if !email.is_empty() {
         if !valid_email(&email) {
-            return Err(Error::msg(format!("email non valida: {email}")));
+            return Err(Error::msg(format!("invalid email: {email}")));
         }
         if email != v.str("email") {
-            ctx.log("contacts: email normalizzata");
+            ctx.log("contacts: email normalized");
         }
         v.set("email", email);
     }
@@ -47,30 +47,30 @@ mod tests {
     use mosaikit_plugin_sdk::testing::MockHost;
 
     #[test]
-    fn email_normalizzata_e_telefono_ripulito() {
+    fn email_normalized_and_phone_cleaned() {
         let v = MockHost::new()
             .hook(
                 &__msk_registry(),
                 "before_create",
                 "contacts",
-                json!({ "name": "A", "email": " Mario.Rossi@Esempio.IT ", "phone": "+39 333-123 456" }),
+                json!({ "name": "A", "email": " Mario.Rossi@Example.COM ", "phone": "+39 333-123 456" }),
             )
             .unwrap()
             .unwrap();
-        assert_eq!(v.str("email"), "mario.rossi@esempio.it");
+        assert_eq!(v.str("email"), "mario.rossi@example.com");
         assert_eq!(v.str("phone"), "+39333123456");
     }
 
     #[test]
-    fn email_non_valida_rifiutata() {
+    fn invalid_email_refused() {
         let e = MockHost::new()
             .hook(
                 &__msk_registry(),
                 "before_create",
                 "contacts",
-                json!({ "name": "A", "email": "nonvalida" }),
+                json!({ "name": "A", "email": "notvalid" }),
             )
             .unwrap_err();
-        assert!(e.contains("email non valida"));
+        assert!(e.contains("invalid email"));
     }
 }

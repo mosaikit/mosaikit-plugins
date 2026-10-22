@@ -1,32 +1,31 @@
-// UI del plugin Siti statici.
+// UI of the Static sites plugin.
 //
-// Un sito e' uno zip con index.html. Il record CRUD (`sites`) ne conserva nome,
-// descrizione e i dati del caricamento (zip, pagina iniziale, file, byte); i
-// file stanno nell'area contenuti della risorsa (permesso `content`): l'host
-// estrae lo zip con `msk.content.upload(id, zip)`, che sostituisce l'intero
-// contenuto, e "Apri" chiede con `msk.content.url(id)` un URL temporaneo
-// della pagina iniziale sull'origine dei contenuti, mostrato in un iframe
-// sandboxato. Eliminando la riga il server elimina anche i file.
-// Flussi: lista / nuovo (nome + zip) / modifica (nome e/o zip) / apri /
-// condividi / elimina, nel rispetto di `my_level` di ogni riga
-// (read = Apri; write = anche Modifica; manage = anche Condividi ed Elimina).
+// A site is a zip with an index.html. The CRUD record (`sites`) keeps its name,
+// description and the data of the upload (zip, start page, files, bytes); the
+// files are in the content area of the resource (permission `content`): the host
+// extracts the zip with `msk.content.upload(id, zip)`, which replaces the whole
+// content, and "Open" asks with `msk.content.url(id)` for a temporary URL of the
+// start page on the origin of the contents, shown in a sandboxed iframe.
+// Deleting the row, the server deletes the files too.
+// Flows: list / new (name + zip) / edit (name and/or zip) / open / share /
+// delete, respecting the `my_level` of every row
+// (read = Open; write = also Edit; manage = also Share and Delete).
 
 import '@mosaikit/plugin-api/style.css'
 import './sites.css'
 import { connect, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
+import { followHost, t } from './i18n.ts'
 import { hasIndexHtml, zipEntryNames } from './zipnames.ts'
 
-const RESOURCE = 'sites' // nome della risorsa nel manifest
-const TITLE = 'Siti statici'
-const NO_INDEX = 'lo zip non contiene un file index.html'
+const RESOURCE = 'sites' // name of the resource in the manifest
 
 const app = document.getElementById('app')!
 
 connect()
   .then(mount)
   .catch((e) => {
-    app.textContent = 'Impossibile avviare la UI del plugin: ' + errText(e)
+    app.textContent = t('Could not start the UI of the plugin: {error}', { error: errText(e) })
   })
 
 type View = 'list' | 'edit' | 'show'
@@ -57,13 +56,15 @@ function fmtDate(iso: string | undefined): string {
 }
 
 function mount(msk: Msk) {
+  followHost(msk)
   const crud = msk.crud(RESOURCE)
+  const NO_INDEX = t('the zip does not contain an index.html file')
 
   const state = {
     rows: [] as Row[],
     view: 'list' as View,
-    editId: null as string | null, // id riga in edit/show; null = nuovo sito
-    file: null as File | null, // zip scelto nel form
+    editId: null as string | null, // id of the row in edit/show; null = new site
+    file: null as File | null, // zip chosen in the form
     filter: '',
     busy: false,
     siteUrl: '',
@@ -71,30 +72,30 @@ function mount(msk: Msk) {
 
   // ---------- DOM ----------
 
-  const filter = h('input', { type: 'search', class: 'msk-filter', placeholder: 'Filtra…', 'aria-label': 'Filtra i siti' })
-  const btnNew = h('button', { type: 'button', class: 'msk-btn' }, '＋ Nuovo sito')
+  const filter = h('input', { type: 'search', class: 'msk-filter', placeholder: t('Filter…'), 'aria-label': t('Filter the sites') })
+  const btnNew = h('button', { type: 'button', class: 'msk-btn' }, t('＋ New site'))
   const rowcount = h('span', { class: 'msk-count' })
   const tbody = h('tbody')
   const listMsg = h('div', { class: 'msg', role: 'status' })
-  const COLS = ['Nome', 'Pagina iniziale', 'File', 'Dimensione', 'Aggiornato', 'Proprietario', 'Azioni']
+  const COLS = ['Name', 'Start page', 'Files', 'Size', 'Updated', 'Owner', 'Actions']
   const listView = h(
     'div',
     { class: 'listview' },
-    h('h2', { class: 'msk-h2' }, TITLE),
+    h('h2', { class: 'msk-h2' }, t('Static sites')),
     h('div', { class: 'msk-toolbar' }, filter, btnNew, h('span', { class: 'grow' }), rowcount),
-    h('div', { class: 'msk-tablewrap' }, h('table', { class: 'msk-table' }, h('thead', {}, h('tr', {}, ...COLS.map((t) => h('th', {}, t)))), tbody)),
+    h('div', { class: 'msk-tablewrap' }, h('table', { class: 'msk-table' }, h('thead', {}, h('tr', {}, ...COLS.map((c) => h('th', {}, t(c))))), tbody)),
     listMsg,
   )
 
-  const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, '⬅ Lista siti')
+  const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of sites'))
   const svTitle = h('span', { class: 'sv-title' })
-  const btnReload = h('button', { type: 'button', class: 'msk-btn ghost', title: 'Ricarica il sito' }, '↻ Ricarica')
-  const aTab = h('a', { class: 'msk-btn ghost', target: '_blank', rel: 'noopener noreferrer', title: 'Apri in una nuova scheda' }, '↗ Nuova scheda')
-  const btnModify = h('button', { type: 'button', class: 'msk-btn ghost' }, '✏ Modifica')
+  const btnReload = h('button', { type: 'button', class: 'msk-btn ghost', title: t('Reload the site') }, t('↻ Reload'))
+  const aTab = h('a', { class: 'msk-btn ghost', target: '_blank', rel: 'noopener noreferrer', title: t('Open in a new tab') }, t('↗ New tab'))
+  const btnModify = h('button', { type: 'button', class: 'msk-btn ghost' }, t('✏ Edit'))
   const showOnly = h('span', { class: 'show-only' }, btnReload, aTab, btnModify)
 
-  const inName = h('input', { id: 'msks-name', type: 'text', placeholder: 'es. Documentazione progetto' })
-  const inDesc = h('textarea', { id: 'msks-desc', rows: '3', placeholder: 'A cosa serve il sito (facoltativo)' })
+  const inName = h('input', { id: 'msks-name', type: 'text', placeholder: t('e.g. Project documentation') })
+  const inDesc = h('textarea', { id: 'msks-desc', rows: '3', placeholder: t('What the site is for (optional)') })
   const inZip = h('input', { type: 'file', accept: '.zip,application/zip,application/x-zip-compressed' })
   const fname = h('span', { class: 'fname' })
   const drop = h(
@@ -103,25 +104,25 @@ function mount(msk: Msk) {
     inZip,
     h('span', { class: 'big' }, '📦'),
     fname,
-    h('span', { class: 'sub' }, 'trascina qui lo zip oppure clicca per sceglierlo'),
+    h('span', { class: 'sub' }, t('drag the zip here or click to choose it')),
   )
   const zipReq = h('b', { class: 'req' }, '*')
   const zipHint = h('div', { class: 'hint' })
-  const btnSave = h('button', { type: 'button', class: 'msk-btn' }, '💾 Salva')
-  const btnCancel = h('button', { type: 'button', class: 'msk-btn ghost' }, 'Annulla')
+  const btnSave = h('button', { type: 'button', class: 'msk-btn' }, t('💾 Save'))
+  const btnCancel = h('button', { type: 'button', class: 'msk-btn ghost' }, t('Cancel'))
   const formMsg = h('div', { class: 'msg', role: 'status' })
   const siteForm = h(
     'div',
     { class: 'siteform' },
-    h('div', { class: 'frow required' }, h('label', { for: 'msks-name' }, 'Nome ', h('b', { class: 'req' }, '*')), inName),
-    h('div', { class: 'frow' }, h('label', { for: 'msks-desc' }, 'Descrizione'), inDesc),
-    h('div', { class: 'frow' }, h('label', {}, 'Archivio zip ', zipReq), drop, zipHint),
+    h('div', { class: 'frow required' }, h('label', { for: 'msks-name' }, t('Name') + ' ', h('b', { class: 'req' }, '*')), inName),
+    h('div', { class: 'frow' }, h('label', { for: 'msks-desc' }, t('Description')), inDesc),
+    h('div', { class: 'frow' }, h('label', {}, t('Zip archive') + ' ', zipReq), drop, zipHint),
     h('div', { class: 'form-actions' }, btnSave, btnCancel),
     formMsg,
   )
   const sframe = h('iframe', {
     class: 'sframe',
-    title: 'Sito statico',
+    title: t('Static site'),
     sandbox: 'allow-scripts allow-forms allow-popups allow-modals allow-downloads',
   })
 
@@ -137,7 +138,7 @@ function mount(msk: Msk) {
   }
   const findRow = (id: string | null) => (id == null ? undefined : state.rows.find((r) => r.id === id))
 
-  // ---------- lista ----------
+  // ---------- list ----------
 
   function renderRows() {
     const f = state.filter.trim().toLowerCase()
@@ -147,13 +148,13 @@ function mount(msk: Msk) {
         v.toLowerCase().includes(f),
       )
     })
-    rowcount.textContent = shown.length + (shown.length === 1 ? ' sito' : ' siti')
+    rowcount.textContent = shown.length === 1 ? t('1 site') : t('{n} sites', { n: shown.length })
     if (!shown.length) {
       tbody.replaceChildren(
         h(
           'tr',
           {},
-          h('td', { class: 'empty', colspan: String(COLS.length) }, state.rows.length ? 'nessun sito corrisponde al filtro' : 'nessun sito: caricane uno con ＋ Nuovo sito'),
+          h('td', { class: 'empty', colspan: String(COLS.length) }, state.rows.length ? t('no site matches the filter') : t('no site: upload one with ＋ New site')),
         ),
       )
       return
@@ -163,15 +164,15 @@ function mount(msk: Msk) {
         const ok = hasSite(r)
         const nameCell = h('td', {})
         if (ok) {
-          const a = h('a', { class: 'open', href: '#', title: 'Apri il sito' }, valOf(r, 'name'))
+          const a = h('a', { class: 'open', href: '#', title: t('Open the site') }, valOf(r, 'name'))
           a.addEventListener('click', (ev) => {
             ev.preventDefault()
             void openShow(r.id)
           })
           nameCell.append(a)
         } else nameCell.append(valOf(r, 'name'))
-        if (r.shared) nameCell.append(h('span', { class: 'msk-badge acc' }, 'condivisa'))
-        if (r.my_level === 'read') nameCell.append(h('span', { class: 'msk-badge' }, 'sola lettura'))
+        if (r.shared) nameCell.append(h('span', { class: 'msk-badge acc' }, t('shared')))
+        if (r.my_level === 'read') nameCell.append(h('span', { class: 'msk-badge' }, t('read only')))
         if (valOf(r, 'description')) nameCell.title = valOf(r, 'description')
 
         const acts = h('td', { class: 'rowacts' })
@@ -180,16 +181,16 @@ function mount(msk: Msk) {
           b.addEventListener('click', fn)
           acts.append(b)
         }
-        btn('👁 Apri', 'ghost', () => void openShow(r.id), !ok)
-        if (canWrite(r)) btn('✏ Modifica', 'ghost', () => openEdit(r.id))
-        if (canManage(r)) btn('👥 Condividi', 'ghost', () => void share(r.id))
-        if (canManage(r)) btn('🗑 Elimina', 'danger', () => void del(r.id))
+        btn(t('👁 Open'), 'ghost', () => void openShow(r.id), !ok)
+        if (canWrite(r)) btn(t('✏ Edit'), 'ghost', () => openEdit(r.id))
+        if (canManage(r)) btn(t('👥 Share'), 'ghost', () => void share(r.id))
+        if (canManage(r)) btn(t('🗑 Delete'), 'danger', () => void del(r.id))
 
         return h(
           'tr',
           { class: 'data-row' },
           nameCell,
-          h('td', { class: 'mono', title: valOf(r, 'zip_name') }, ok ? valOf(r, 'entry') : 'zip da caricare'),
+          h('td', { class: 'mono', title: valOf(r, 'zip_name') }, ok ? valOf(r, 'entry') : t('zip to upload')),
           h('td', { class: 'num' }, valOf(r, 'files') || '—'),
           h('td', { class: 'num' }, valOf(r, 'size') ? fmtSize(r.values.size) : '—'),
           h('td', { class: 'num' }, fmtDate(r.updated_at)),
@@ -210,7 +211,7 @@ function mount(msk: Msk) {
     }
   }
 
-  // ---------- cambio vista ----------
+  // ---------- change of view ----------
 
   function showView(view: View) {
     state.view = view
@@ -248,7 +249,7 @@ function mount(msk: Msk) {
     const row = id != null ? findRow(id) : undefined
     if (row && !canWrite(row)) return
     state.editId = row ? row.id : null
-    svTitle.textContent = row ? 'Modifica: ' + valOf(row, 'name') : 'Nuovo sito'
+    svTitle.textContent = row ? t('Edit: {name}', { name: valOf(row, 'name') }) : t('New site')
     inName.value = row ? valOf(row, 'name') : ''
     inDesc.value = row ? valOf(row, 'description') : ''
     inZip.value = ''
@@ -257,17 +258,17 @@ function mount(msk: Msk) {
     zipReq.hidden = current
     if (current) {
       zipHint.replaceChildren(
-        'Lascia vuoto per mantenere il sito attuale (',
+        t('Leave empty to keep the current site ('),
         code(valOf(row, 'zip_name') || valOf(row, 'entry')),
-        `, ${valOf(row, 'files') || '?'} file). Un nuovo zip sostituisce tutti i file del sito.`,
+        t(', {n} files). A new zip replaces all the files of the site.', { n: valOf(row, 'files') || '?' }),
       )
     } else {
       zipHint.replaceChildren(
-        'Lo zip deve contenere un ',
+        t('The zip must contain an '),
         code('index.html'),
-        ', anche dentro una cartella: viene usato quello meno annidato. Usa link relativi (',
+        t(', also inside a folder: the least nested one is used. Use relative links ('),
         code('css/style.css'),
-        ', non ',
+        t(', not '),
         code('/css/style.css'),
         ').',
       )
@@ -282,12 +283,12 @@ function mount(msk: Msk) {
     const row = findRow(id)
     if (!row) return
     if (!hasSite(row)) {
-      msg('questo sito non ha file' + (canWrite(row) ? ': usa Modifica per caricare lo zip' : ''), 'list', true)
+      msg(canWrite(row) ? t('this site has no files: use Edit to upload the zip') : t('this site has no files'), 'list', true)
       return
     }
     msg('')
     try {
-      // URL temporaneo sull'origine dei contenuti: l'iframe non ha credenziali
+      // temporary URL on the origin of the contents: the iframe has no credentials
       const url = await msk.content.url(id)
       state.editId = id
       svTitle.textContent = valOf(row, 'name')
@@ -296,11 +297,11 @@ function mount(msk: Msk) {
       sframe.src = url
       aTab.href = url
     } catch (e) {
-      msg('impossibile aprire il sito: ' + errText(e), 'list', true)
+      msg(t('could not open the site: {error}', { error: errText(e) }), 'list', true)
     }
   }
 
-  /** Ricarica con un URL nuovo: quello vecchio potrebbe essere scaduto. */
+  /** Reloads with a new URL: the old one may have expired. */
   async function reload() {
     if (state.view !== 'show' || state.editId == null) return
     try {
@@ -308,7 +309,7 @@ function mount(msk: Msk) {
       state.siteUrl = url
       aTab.href = url
     } catch {
-      /* si riprova con l'URL che c'e' */
+      /* try again with the URL at hand */
     }
     if (state.siteUrl) sframe.src = state.siteUrl
   }
@@ -318,7 +319,7 @@ function mount(msk: Msk) {
     showView('list')
   }
 
-  // ---------- azioni ----------
+  // ---------- actions ----------
 
   function infoValues(file: File, info: SiteInfo) {
     return { zip_name: file.name, entry: info.entry || '', files: Number(info.files) || 0, size: Number(info.size) || 0 }
@@ -331,23 +332,23 @@ function mount(msk: Msk) {
     const description = inDesc.value
     const file = state.file
     const row = state.editId != null ? findRow(state.editId) : undefined
-    if (!name) return msg("il nome e' obbligatorio", 'form', true)
-    if (!file && !(row && hasSite(row))) return msg('scegli lo zip con il sito', 'form', true)
-    if (file && !/\.zip$/i.test(file.name)) return msg('il file deve essere un .zip', 'form', true)
+    if (!name) return msg(t('the name is required'), 'form', true)
+    if (!file && !(row && hasSite(row))) return msg(t('choose the zip with the site'), 'form', true)
+    if (file && !/\.zip$/i.test(file.name)) return msg(t('the file must be a .zip'), 'form', true)
 
     setBusy(true)
     try {
-      // Controllo preventivo sui nomi dello zip: un caricamento senza
-      // index.html sostituirebbe i file di un sito esistente.
+      // Check of the names in the zip beforehand: an upload without an
+      // index.html would replace the files of an existing site.
       if (file) {
         const names = await zipEntryNames(file)
         if (names && !hasIndexHtml(names)) throw new Error(NO_INDEX)
-        msg(`caricamento ed estrazione di ${file.name}…`, 'form')
-      } else msg('salvataggio…', 'form')
+        msg(t('uploading and extracting {name}…', { name: file.name }), 'form')
+      } else msg(t('saving…'), 'form')
 
       if (!row) {
-        // nuovo: prima la riga, poi il contenuto; se il contenuto non va,
-        // la riga appena creata si elimina (niente siti vuoti)
+        // new: first the row, then the content; if the content fails,
+        // the row just created is deleted (no empty sites)
         const created = await crud.create({ name, description })
         try {
           const info = await msk.content.upload(created.id, file!)
@@ -358,19 +359,19 @@ function mount(msk: Msk) {
           throw e
         }
       } else if (file) {
-        // stesso id: il nuovo zip sostituisce l'intero contenuto
+        // same id: the new zip replaces the whole content
         const info = await msk.content.upload(row.id, file)
         await crud.update(row.id, { name, description, ...infoValues(file, info) })
         if (!info.entry) {
           await load()
-          throw new Error(NO_INDEX + ': il sito va ricaricato con uno zip valido')
+          throw new Error(NO_INDEX + ': ' + t('upload the site again with a valid zip'))
         }
       } else {
         await crud.update(row.id, { name, description })
       }
       setBusy(false)
       showView('list')
-      msg(row ? 'sito aggiornato' : 'sito creato')
+      msg(row ? t('site updated') : t('site created'))
       await load()
     } catch (e) {
       setBusy(false)
@@ -391,19 +392,19 @@ function mount(msk: Msk) {
   async function del(id: string) {
     const row = findRow(id)
     if (!row) return
-    if (!(await msk.confirm(`Eliminare il sito "${valOf(row, 'name')}" e tutti i suoi file?`))) return
+    if (!(await msk.confirm(t('Delete the site "{name}" and all its files?', { name: valOf(row, 'name') })))) return
     msg('')
     try {
-      // il server elimina anche il contenuto
+      // the server deletes the content too
       await crud.remove(id)
-      msg('sito eliminato')
+      msg(t('site deleted'))
       await load()
     } catch (e) {
       msg(errText(e), 'list', true)
     }
   }
 
-  // ---------- eventi ----------
+  // ---------- events ----------
 
   filter.addEventListener('input', () => {
     state.filter = filter.value
@@ -432,7 +433,7 @@ function mount(msk: Msk) {
     if (f) setFile(f)
   })
 
-  // ---------- avvio ----------
+  // ---------- start ----------
 
   showView('list')
   void load()

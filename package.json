@@ -1,7 +1,7 @@
 {
   "name": "mosaikit-plugins",
   "private": true,
-  "description": "UI dei plugin ufficiali di Mosaikit (npm workspaces)",
+  "description": "UIs of the official plugins of Mosaikit (npm workspaces)",
   "workspaces": [
     "notes/ui",
     "tasks/ui",

@@ -1,4 +1,4 @@
-/* Stili del plugin Siti statici, sopra @mosaikit/plugin-api/style.css. */
+/* Styles of the Static sites plugin, on top of @mosaikit/plugin-api/style.css. */
 .msks { max-width: 1180px; }
 .msks .msk-filter { width: 260px; }
 .msks td.mono { font-family: var(--font-mono); font-size: 11px; color: var(--dim); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

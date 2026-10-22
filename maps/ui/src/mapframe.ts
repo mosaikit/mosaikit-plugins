@@ -1,36 +1,37 @@
-// MapFrame: iframe GeoLibre + ponte di stato (stesso schema di Sestante,
-// src/web/src/components/MapFrame.tsx). Usato dall'editor (index.html) e dalla
-// vista dei link pubblici (public.html).
+// MapFrame: GeoLibre iframe + state bridge (the same scheme as Sestante,
+// src/web/src/components/MapFrame.tsx). Used by the editor (index.html) and by the
+// view of the public links (public.html).
 //
-// ── Il ponte usato ──────────────────────────────────────────────────────────
-// GeoLibre espone due ponti postMessage. L'API embed v2 (`{v:2, type, payload}`)
-// comanda la mappa ma non sa *leggere* il progetto. Il ponte di stato
-// `geolibre:*`, attivo con `?embed=1`, invece lo trasporta:
+// ── The bridge in use ───────────────────────────────────────────────────────
+// GeoLibre exposes two postMessage bridges. The embed API v2 (`{v:2, type, payload}`)
+// drives the map but cannot *read* the project. The state bridge `geolibre:*`,
+// on with `?embed=1`, carries it instead:
 //   app -> host:  geolibre:ready | geolibre:state {project} | geolibre:error
 //   host -> app:  geolibre:request-state | geolibre:load-project {project}
-// `geolibre:state` arriva a ogni cambiamento dello store (debounce 250 ms).
-// Qui "host" e' la UI del plugin (a sua volta in un iframe di Mosaikit): il
-// ponte GeoLibre e il ponte verso Mosaikit sono indipendenti, e ogni
-// messaggio si riconosce da origine e finestra di provenienza.
+// `geolibre:state` arrives at every change of the store (debounce 250 ms).
+// Here "host" is the UI of the plugin (itself in an iframe of Mosaikit): the
+// GeoLibre bridge and the bridge to Mosaikit are independent, and every
+// message is recognized by its origin and source window.
 //
-// ── Perché tre fasi e non "carica al ready" ─────────────────────────────────
-// Un `load-project` inviato troppo presto viene applicato e poi sovrascritto
-// dall'avvio dell'app: il livello compare e sparisce, e se quello stato vuoto
-// si salva il lavoro e' perso. Quindi:
-//   probing    — solo `request-state` (innocuo), ripetuto: la prima risposta
-//                certifica che l'avvio e' concluso;
-//   restoring  — `load-project` + richiesta di conferma; la conferma si fa
-//                sugli id dei livelli (GeoLibre normalizza il JSON), con
-//                nuovi tentativi fino a un tetto;
-//   live       — solo da qui gli snapshot vengono salvati.
-// Per 5 s dopo il ripristino, uno snapshot che perde i livelli ripristinati e'
-// letto come sovrascrittura dell'avvio: non si salva e si ricarica.
+// ── Why three phases and not "load at ready" ────────────────────────────────
+// A `load-project` sent too early is applied and then overwritten by the start
+// of the app: the layer shows up and disappears, and if that empty state is
+// saved the work is lost. So:
+//   probing    — only `request-state` (harmless), repeated: the first answer
+//                proves the start is over;
+//   restoring  — `load-project` + request of a confirmation; the confirmation
+//                checks the ids of the layers (GeoLibre normalizes the JSON),
+//                with new attempts up to a ceiling;
+//   live       — only from here the snapshots are saved.
+// For 5 s after the restore, a snapshot that loses the restored layers is read
+// as the start overwriting them: it is not saved and the project is loaded again.
 
-/** Istanza GeoLibre da incorporare. Hosted = zero configurazione; per una
- * istanza self-hosted basta cambiare questo (e `frame_src` nel manifest). */
+import { getLang, t } from './i18n.ts'
+
+/** GeoLibre instance to embed. Hosted = no configuration; for a self-hosted
+ * instance change this (and `frame_src` in the manifest). */
 export const GEOLIBRE_URL = 'https://web.geolibre.app/'
 const THEME = 'dark'
-const LOCALE = 'it'
 
 const PROBE_INTERVAL_MS = 600
 const PROBE_MAX_ATTEMPTS = 25
@@ -46,22 +47,22 @@ const GEOLIBRE_ORIGIN = (() => {
   }
 })()
 
-/** Progetto GeoLibre (.geolibre.json): qui interessano solo i livelli. */
+/** GeoLibre project (.geolibre.json): only the layers matter here. */
 export type Project = { layers?: unknown[]; [k: string]: unknown }
 
 export type Phase = 'closed' | 'probing' | 'restoring' | 'live'
 
 export interface MapFrameOptions {
-  /** stato del ponte ("connessione a GeoLibre…", "GeoLibre connesso"...) */
+  /** state of the bridge ("connecting to GeoLibre…", "GeoLibre connected"...) */
   onStatus?: (text: string) => void
-  /** errori riportati da GeoLibre */
+  /** errors reported by GeoLibre */
   onError?: (text: string) => void
 }
 
 /**
- * Identificativi dei livelli, ordinati: la firma con cui si riconosce se un
- * ripristino ha attecchito. Il JSON non si puo' confrontare perche' GeoLibre
- * lo normalizza al caricamento; gli id dei livelli sopravvivono.
+ * Ids of the layers, sorted: the signature that tells whether a restore took.
+ * The JSON cannot be compared because GeoLibre normalizes it when loading; the
+ * ids of the layers survive.
  */
 export function layerIds(project: unknown): string[] {
   const layers = project && typeof project === 'object' ? (project as Project).layers : undefined
@@ -79,14 +80,14 @@ function containsAll(arrived: string[], wanted: string[]): boolean {
 export class MapFrame {
   readonly iframe: HTMLIFrameElement
   private _phase: Phase = 'closed'
-  /** ultimo progetto noto */
+  /** last known project */
   private _project: Project | null = null
   private restoreAttempts = 0
   private restoreTarget: string[] = []
   private guardUntil = 0
   private probeTimer: ReturnType<typeof setInterval> | undefined
   private confirmTimer: ReturnType<typeof setTimeout> | undefined
-  /** chiamato solo sugli snapshot da persistere (fase live) */
+  /** called only on the snapshots to persist (live phase) */
   private onChange: ((project: Project) => void) | null = null
   private disposed = false
   private readonly listener = (ev: MessageEvent) => this.onBridgeMessage(ev)
@@ -118,19 +119,19 @@ export class MapFrame {
     if (win && GEOLIBRE_ORIGIN) win.postMessage(message, GEOLIBRE_ORIGIN)
   }
 
-  /** Sonda innocua: chiede uno snapshot e fa conoscere al ponte la nostra origine. */
+  /** Harmless probe: asks for a snapshot and lets the bridge know our origin. */
   private probe() {
     if (this._phase !== 'probing') return
     this.post({ type: 'geolibre:request-state' })
   }
 
-  /** Spinge il progetto salvato e programma la richiesta di conferma. */
+  /** Pushes the saved project and schedules the request of a confirmation. */
   private restore() {
     const project = this._project
     if (!project || this.restoreAttempts >= RESTORE_MAX_ATTEMPTS) {
-      // Oltre il tetto si smette di litigare con l'app: meglio una mappa vuota
-      // visibile che un ciclo di ricaricamenti. Il progetto resta nel record.
-      if (project) console.warn(`[maps] ripristino non confermato dopo ${RESTORE_MAX_ATTEMPTS} tentativi`)
+      // Past the ceiling we stop fighting the app: better a visible empty map
+      // than a loop of reloads. The project stays in the record.
+      if (project) console.warn(`[maps] restore not confirmed after ${RESTORE_MAX_ATTEMPTS} attempts`)
       this._phase = 'live'
       return
     }
@@ -145,17 +146,18 @@ export class MapFrame {
   private frameSource(readOnly: boolean): string {
     const url = new URL(GEOLIBRE_URL, window.location.href)
     url.searchParams.set('theme', THEME)
-    url.searchParams.set('lang', LOCALE)
-    url.searchParams.set('locale', LOCALE)
-    // Attiva il ponte di stato: senza, il progetto non si legge ne' si ricarica.
+    // GeoLibre in the language of the host
+    url.searchParams.set('lang', getLang())
+    url.searchParams.set('locale', getLang())
+    // Turns on the state bridge: without it the project is neither read nor loaded again.
     url.searchParams.set('embed', '1')
     if (readOnly) url.searchParams.set('layout', 'viewer')
     return url.toString()
   }
 
   /**
-   * Apre GeoLibre e ripristina `project`. `onChange` riceve gli snapshot da
-   * salvare (solo in fase live); `null` = sola lettura senza salvataggi.
+   * Opens GeoLibre and restores `project`. `onChange` receives the snapshots to
+   * save (only in the live phase); `null` = read only, without saving.
    */
   open(project: Project | null, readOnly: boolean, onChange: ((project: Project) => void) | null) {
     if (this.disposed) return
@@ -166,15 +168,15 @@ export class MapFrame {
     this.restoreTarget = []
     this.guardUntil = 0
     this.onChange = onChange
-    this.status('connessione a GeoLibre…')
+    this.status(t('connecting to GeoLibre…'))
 
-    // `geolibre:ready` arriva una volta sola e puo' sfuggire: si sonda a ripetizione.
+    // `geolibre:ready` arrives only once and can be missed: we probe again and again.
     let attempts = 0
     this.probeTimer = setInterval(() => {
       attempts += 1
       if (this._phase !== 'probing' || attempts > PROBE_MAX_ATTEMPTS) {
         clearInterval(this.probeTimer)
-        if (this._phase === 'probing') this.status('GeoLibre non risponde: verifica rete o ad-blocker')
+        if (this._phase === 'probing') this.status(t('GeoLibre does not answer: check the network or the ad blocker'))
         return
       }
       this.probe()
@@ -195,9 +197,9 @@ export class MapFrame {
   }
 
   /**
-   * Inserisce un livello nel progetto vivo e lo ricarica (`load-project` e'
-   * l'unico ingresso del ponte di stato). Rifiuta prima della fase `live`: il
-   * progetto in mano non e' ancora quello definitivo e verrebbe sovrascritto.
+   * Adds a layer to the live project and loads it again (`load-project` is the
+   * only way in of the state bridge). Refused before the `live` phase: the
+   * project at hand is not the final one yet and would be overwritten.
    */
   addLayer(layer: unknown): boolean {
     if (this._phase !== 'live') return false
@@ -206,13 +208,13 @@ export class MapFrame {
     const next: Project = { ...current, layers: [...layers, layer] }
     this._project = next
     this.post({ type: 'geolibre:load-project', project: next })
-    // Si persiste subito: lo snapshot che tornera' lo confermera' e basta.
+    // Persisted at once: the snapshot coming back will just confirm it.
     this.onChange?.(next)
     return true
   }
 
   private onBridgeMessage(ev: MessageEvent) {
-    // Due controlli: l'origine attesa e che il messaggio venga dal nostro iframe.
+    // Two checks: the expected origin, and that the message comes from our iframe.
     if (ev.origin !== GEOLIBRE_ORIGIN) return
     if (ev.source !== this.iframe.contentWindow) return
     if (this._phase === 'closed') return
@@ -220,21 +222,21 @@ export class MapFrame {
     if (!data || typeof data !== 'object' || typeof data.type !== 'string') return
 
     if (data.type === 'geolibre:ready') {
-      this.status('GeoLibre connesso')
+      this.status(t('GeoLibre connected'))
       this.probe()
       return
     }
     if (data.type === 'geolibre:error') {
-      this.opts.onError?.('GeoLibre: ' + (typeof data.message === 'string' && data.message ? data.message : 'errore sconosciuto'))
+      this.opts.onError?.('GeoLibre: ' + (typeof data.message === 'string' && data.message ? data.message : t('unknown error')))
       return
     }
     if (data.type !== 'geolibre:state' || !('project' in data)) return
-    this.status('GeoLibre connesso')
+    this.status(t('GeoLibre connected'))
     const project = data.project as Project
     const arrived = layerIds(project)
 
     if (this._phase === 'probing') {
-      // Prima risposta: l'avvio dell'app e' concluso.
+      // First answer: the start of the app is over.
       const wanted = layerIds(this._project)
       if (wanted.length > 0 && !containsAll(arrived, wanted)) {
         this.restore()
@@ -251,16 +253,16 @@ export class MapFrame {
         this._phase = 'live'
         this.guardUntil = Date.now() + RESTORE_GUARD_MS
         this._project = project
-        // Non si persiste: e' il progetto gia' salvato.
+        // Not persisted: it is the project already saved.
         return
       }
-      // I nostri livelli non ci sono: l'avvio li ha sovrascritti. Si riprova.
+      // Our layers are not there: the start overwrote them. Try again.
       this.restore()
       return
     }
 
-    // live, ancora sotto sorveglianza: la perdita dei livelli appena
-    // ripristinati non e' una scelta dell'utente, e' l'avvio dell'app.
+    // live, still under watch: losing the layers just restored is not a choice
+    // of the user, it is the start of the app.
     if (Date.now() < this.guardUntil && this.restoreTarget.length > 0 && !containsAll(arrived, this.restoreTarget)) {
       this.restore()
       return
@@ -270,7 +272,7 @@ export class MapFrame {
     this.onChange?.(project)
   }
 
-  /** Stacca il ponte e ferma i timer (la pagina sta per chiudersi). */
+  /** Detaches the bridge and stops the timers (the page is about to close). */
   dispose() {
     if (this.disposed) return
     this.disposed = true
@@ -282,7 +284,7 @@ export class MapFrame {
   }
 }
 
-/** Progetto salvato nel campo `config`; `null` se vuoto o non valido. */
+/** Project saved in the `config` field; `null` if empty or invalid. */
 export function parseProject(raw: unknown): Project | null {
   const s = raw == null ? '' : String(raw)
   if (!s.trim()) return null
@@ -290,7 +292,7 @@ export function parseProject(raw: unknown): Project | null {
     const p: unknown = JSON.parse(s)
     return p && typeof p === 'object' && !Array.isArray(p) ? (p as Project) : null
   } catch (e) {
-    console.error('[maps] config non valida nel record', e)
+    console.error('[maps] invalid config in the record', e)
     return null
   }
 }

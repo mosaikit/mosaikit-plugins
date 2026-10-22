@@ -1,22 +1,22 @@
 id = "com.mosaikit.tasks"
-name = "Attività"
-version = "0.3.0"
-description = "Attività con scadenza e priorità, assegnabili condividendole"
+name = "Tasks"
+version = "0.4.0"
+description = "Tasks with due date and priority, assigned by sharing them"
 
 [contribution]
 icon = "✅"
-label = "Attività"
+label = "Tasks"
 
 [[resources]]
 name = "tasks"
-label = "Attività"
+label = "Tasks"
 title_field = "title"
 fields = [
-  { key = "title", label = "Titolo", kind = "text", required = true },
-  { key = "due", label = "Scadenza", kind = "date" },
-  { key = "priority", label = "Priorità", kind = "choice", options = ["bassa", "media", "alta"] },
-  { key = "done", label = "Fatto", kind = "bool" },
-  { key = "completed_on", label = "Completata il", kind = "date", hidden = true },
+  { key = "title", label = "Title", kind = "text", required = true },
+  { key = "due", label = "Due", kind = "date" },
+  { key = "priority", label = "Priority", kind = "choice", options = ["low", "medium", "high"] },
+  { key = "done", label = "Done", kind = "bool" },
+  { key = "completed_on", label = "Completed on", kind = "date", hidden = true },
 ]
 
 [ui]
@@ -27,4 +27,19 @@ hooks = ["tasks"]
 
 [[kpi]]
 view = "kpi_tasks_status"
+label = "Status of the tasks"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Attività"
+description = "Attività con scadenza e priorità, assegnabili condividendole"
+label = "Attività"
+
+[i18n.it.resources.tasks]
+label = "Attività"
+fields = { title = "Titolo", due = "Scadenza", priority = "Priorità", done = "Fatto", completed_on = "Completata il" }
+options.priority = { low = "bassa", medium = "media", high = "alta" }
+
+[i18n.it.kpi.kpi_tasks_status]
 label = "Stato delle attività"
+columns = { completed = "completate", open = "aperte", overdue = "scadute" }

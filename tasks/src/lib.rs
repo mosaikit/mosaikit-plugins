@@ -1,9 +1,9 @@
-//! Plugin Attività: data di completamento automatica e priorità di default.
+//! Tasks plugin: automatic completion date and default priority.
 
 use mosaikit_plugin_sdk::prelude::*;
 
-/// La data arriva dal kernel nel contesto? No: il guest non ha orologio. La
-/// data di completamento si calcola in SQL (`current_date`) via `db.query`.
+/// Does the date come from the kernel in the context? No: the guest has no clock. The
+/// completion date is computed in SQL (`current_date`) through `db.query`.
 fn today(ctx: &Ctx) -> Result<String> {
     let row = ctx.db().query_one("select current_date::text as d", &[])?;
     Ok(row
@@ -14,14 +14,14 @@ fn today(ctx: &Ctx) -> Result<String> {
 fn normalize(ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     let mut v = hook.values.clone();
     if v.str("priority").is_empty() {
-        v.set("priority", "media");
+        v.set("priority", "medium");
     }
     let was_done = hook.previous.as_ref().is_some_and(|p| p.bool("done"));
     match (v.bool("done"), was_done) {
         (true, false) => {
             v.set("completed_on", today(ctx)?);
-            if v.str("priority") == "alta" {
-                ctx.log("tasks: completata un'attività ad alta priorità");
+            if v.str("priority") == "high" {
+                ctx.log("tasks: a high priority task was completed");
             }
         }
         (false, _) => v.set("completed_on", Value::Null),
@@ -37,7 +37,7 @@ fn normalize(ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     Ok(Some(v))
 }
 
-/// Attività aperte con scadenza passata, visibili all'utente.
+/// Open tasks past their due date, visible to the user.
 fn overdue(ctx: &Ctx, _args: Value) -> Result<Value> {
     let rows = ctx.db().query(
         "select resource_id::text as id, title, due::text as due, priority from tasks
@@ -62,7 +62,7 @@ mod tests {
     }
 
     #[test]
-    fn completamento_imposta_la_data() {
+    fn completion_sets_the_date() {
         let v = host()
             .hook(
                 &__msk_registry(),
@@ -73,11 +73,11 @@ mod tests {
             .unwrap()
             .unwrap();
         assert_eq!(v.str("completed_on"), "2026-10-20");
-        assert_eq!(v.str("priority"), "media");
+        assert_eq!(v.str("priority"), "medium");
     }
 
     #[test]
-    fn riapertura_azzera_la_data() {
+    fn reopening_clears_the_date() {
         let v = host()
             .hook(
                 &__msk_registry(),

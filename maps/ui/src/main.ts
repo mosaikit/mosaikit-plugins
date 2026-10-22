@@ -1,38 +1,37 @@
-// UI del plugin Mappe: catalogo di mappe GeoLibre.
+// UI of the Maps plugin: catalog of GeoLibre maps.
 //
-// CRUD di mappe GeoLibre con lo stesso schema di Sestante (screens/Editor.tsx).
-// L'iframe GeoLibre e il ponte di stato (fasi probing/restoring/live, guardia
-// dopo il ripristino) stanno in `mapframe.ts`, condiviso con la vista pubblica.
+// CRUD of GeoLibre maps with the same scheme as Sestante (screens/Editor.tsx).
+// The GeoLibre iframe and the state bridge (probing/restoring/live phases, guard
+// after the restore) are in `mapframe.ts`, shared with the public view.
 //
-// ── Persistenza ─────────────────────────────────────────────────────────────
-// Come in Sestante la mappa si crea subito ("Mappa senza titolo") e poi si
-// salva da sola: ogni snapshot `live` va nel campo `config` con 1 s di
-// accorpamento, nome e descrizione con 700 ms. L'aggiornamento CRUD e'
-// parziale (si fonde con i valori esistenti), ma ogni salvataggio porta
-// comunque nome, descrizione e config: l'ultimo scritto e' sempre lo stato
-// completo dell'editor. Il campo `layers` lo calcola il server dalla config.
+// ── Persistence ─────────────────────────────────────────────────────────────
+// As in Sestante the map is created at once ("Untitled map") and then saves
+// itself: every `live` snapshot goes into the `config` field with 1 s of
+// batching, name and description with 700 ms. The CRUD update is partial (it
+// merges with the existing values), but every save carries name, description
+// and config anyway: the last one written is always the whole state of the
+// editor. The server computes the `layers` field from the config.
 //
-// ── File GeoJSON ────────────────────────────────────────────────────────────
-// Per i livelli aperti dal selettore di file *di GeoLibre*, il ponte scarta la
-// geometria (`metadata.localFileReloadable`): alla riapertura la mappa sarebbe
-// vuota. I file si aggiungono quindi da qui, come livello `type: "geojson"`
-// con la geometria incorporata nel progetto (tetto 4 MB). Il modo "per URL" di
-// Sestante qui non si usa: gli URL temporanei di Mosaikit scadono e GeoLibre
-// hosted in https non puo' leggere da un Mosaikit in http (mixed content).
+// ── GeoJSON files ───────────────────────────────────────────────────────────
+// For the layers opened from the file picker *of GeoLibre*, the bridge drops the
+// geometry (`metadata.localFileReloadable`): when opened again the map would be
+// empty. So files are added from here, as a `type: "geojson"` layer with the
+// geometry embedded in the project (ceiling 4 MB). The "by URL" way of Sestante
+// is not used here: the temporary URLs of Mosaikit expire, and GeoLibre hosted
+// on https cannot read from a Mosaikit on http (mixed content).
 //
-// ── Permessi ────────────────────────────────────────────────────────────────
-// Ogni riga porta `my_level`: read = solo Apri; write = anche Modifica;
-// manage = anche Condividi ed Elimina.
+// ── Permissions ─────────────────────────────────────────────────────────────
+// Every row carries `my_level`: read = Open only; write = also Edit;
+// manage = also Share and Delete.
 
 import '@mosaikit/plugin-api/style.css'
 import './maps.css'
 import { connect, type Msk, type Row } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
+import { followHost, t } from './i18n.ts'
 import { MapFrame, parseProject, type Project } from './mapframe.ts'
 
-const RESOURCE = 'maps' // nome della risorsa nel manifest
-const TITLE = 'Mappe'
-const UNTITLED = 'Mappa senza titolo'
+const RESOURCE = 'maps' // name of the resource in the manifest
 
 const PROJECT_SAVE_DELAY_MS = 1000
 const META_SAVE_DELAY_MS = 700
@@ -43,7 +42,7 @@ const app = document.getElementById('app')!
 connect()
   .then(mount)
   .catch((e) => {
-    app.textContent = 'Impossibile avviare la UI del plugin: ' + errText(e)
+    app.textContent = t('Could not start the UI of the plugin: {error}', { error: errText(e) })
   })
 
 type View = 'list' | 'edit' | 'show'
@@ -60,7 +59,7 @@ function newLayerId(): string {
   return 'lyr-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10)
 }
 
-// ---------- dati GeoJSON ----------
+// ---------- GeoJSON data ----------
 
 const GEOJSON_TYPES = [
   'FeatureCollection', 'Feature', 'GeometryCollection', 'Point', 'MultiPoint',
@@ -72,11 +71,11 @@ function isGeoJson(v: unknown): boolean {
 }
 
 /**
- * Livello GeoLibre da un GeoJSON. `type` deve valere esattamente "geojson"
- * (non il tipo geometrico): altrimenti il livello compare in legenda ma non
- * viene mai disegnato. `metadata` resta vuoto di proposito: i contrassegni
- * `localFileReloadable`/`externalNativeLayer` farebbero scartare la geometria.
- * Lo stile e' minimo: GeoLibre completa il resto alla normalizzazione.
+ * GeoLibre layer from a GeoJSON. `type` must be exactly "geojson" (not the
+ * geometry type): otherwise the layer shows in the legend but is never drawn.
+ * `metadata` stays empty on purpose: the `localFileReloadable`/`externalNativeLayer`
+ * marks would make the geometry be dropped. The style is minimal: GeoLibre
+ * completes the rest when normalizing.
  */
 function buildLayer(id: string, name: string, geojson: unknown) {
   return {
@@ -101,7 +100,9 @@ function buildLayer(id: string, name: string, geojson: unknown) {
 }
 
 function mount(msk: Msk) {
+  followHost(msk)
   const crud = msk.crud(RESOURCE)
+  const UNTITLED = t('Untitled map')
 
   const state = {
     rows: [] as Row[],
@@ -111,15 +112,15 @@ function mount(msk: Msk) {
 
   // ---------- DOM ----------
 
-  const filter = h('input', { type: 'search', class: 'msk-filter', placeholder: 'Filtra…', 'aria-label': 'Filtra le mappe' })
-  const btnNew = h('button', { type: 'button', class: 'msk-btn' }, '＋ Nuova mappa')
+  const filter = h('input', { type: 'search', class: 'msk-filter', placeholder: t('Filter…'), 'aria-label': t('Filter the maps') })
+  const btnNew = h('button', { type: 'button', class: 'msk-btn' }, t('＋ New map'))
   const rowcount = h('span', { class: 'msk-count' })
   const tbody = h('tbody')
   const listMsg = h('div', { class: 'msg', role: 'status' })
   const listView = h(
     'div',
     { class: 'listview' },
-    h('h2', { class: 'msk-h2' }, TITLE),
+    h('h2', { class: 'msk-h2' }, t('Maps')),
     h('div', { class: 'msk-toolbar' }, filter, btnNew, h('span', { class: 'grow' }), rowcount),
     h(
       'div',
@@ -127,28 +128,28 @@ function mount(msk: Msk) {
       h(
         'table',
         { class: 'msk-table' },
-        h('thead', {}, h('tr', {}, ...['Nome', 'Descrizione', 'Livelli', 'Config', 'Proprietario', 'Azioni'].map((t) => h('th', {}, t)))),
+        h('thead', {}, h('tr', {}, ...['Name', 'Description', 'Layers', 'Config', 'Owner', 'Actions'].map((c) => h('th', {}, t(c))))),
         tbody,
       ),
     ),
     listMsg,
   )
 
-  const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, '⬅ Lista mappe')
+  const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of maps'))
   const mvTitle = h('span', { class: 'mv-title' })
-  const mvName = h('input', { type: 'text', class: 'mv-name', placeholder: 'Nome della mappa', spellcheck: 'false', 'aria-label': 'Nome della mappa' })
-  const mvDesc = h('input', { type: 'text', class: 'mv-desc', placeholder: 'Descrizione', 'aria-label': 'Descrizione' })
+  const mvName = h('input', { type: 'text', class: 'mv-name', placeholder: t('Name of the map'), spellcheck: 'false', 'aria-label': t('Name of the map') })
+  const mvDesc = h('input', { type: 'text', class: 'mv-desc', placeholder: t('Description'), 'aria-label': t('Description') })
   const saved = h('span', { class: 'saved', role: 'status' })
   const bstatus = h('span', { class: 'bstatus' })
-  const btnAddData = h('button', { type: 'button', class: 'msk-btn ghost', title: 'Aggiunge un file GeoJSON come livello salvato con la mappa' }, '＋ Aggiungi dati')
+  const btnAddData = h('button', { type: 'button', class: 'msk-btn ghost', title: t('Adds a GeoJSON file as a layer saved with the map') }, t('＋ Add data'))
   const fileInput = h('input', { type: 'file', accept: '.geojson,.json,application/geo+json,application/json', hidden: true })
-  const btnModify = h('button', { type: 'button', class: 'msk-btn ghost' }, '✏ Modifica questa mappa')
+  const btnModify = h('button', { type: 'button', class: 'msk-btn ghost' }, t('✏ Edit this map'))
   const editHint = h(
     'div',
     { class: 'hint' },
-    'Le modifiche si salvano da sole. Per aggiungere un file GeoJSON usa ',
-    h('b', {}, '＋ Aggiungi dati'),
-    ': i livelli aperti dal selettore di file di GeoLibre non vengono salvati con la mappa.',
+    t('The changes save themselves. To add a GeoJSON file use '),
+    h('b', {}, t('＋ Add data')),
+    t(': the layers opened from the file picker of GeoLibre are not saved with the map.'),
   )
   const mapMsg = h('div', { class: 'msg map-msg', role: 'status' })
 
@@ -176,16 +177,16 @@ function mount(msk: Msk) {
   }
   const findRow = (id: string | null) => (id == null ? undefined : state.rows.find((r) => r.id === id))
 
-  // ---------- editor: salvataggio automatico ----------
+  // ---------- editor: automatic saving ----------
 
   const ed = {
     id: null as string | null,
     name: '',
     description: '',
-    project: null as Project | null, // progetto da scrivere nel campo config
-    pending: false, // modifica non ancora scritta sul server
+    project: null as Project | null, // project to write in the config field
+    pending: false, // change not written to the server yet
     timer: undefined as ReturnType<typeof setTimeout> | undefined,
-    inflight: null as Promise<void> | null, // promessa del salvataggio in corso
+    inflight: null as Promise<void> | null, // promise of the save in progress
   }
 
   function setSaved(text: string, isErr = false) {
@@ -203,8 +204,8 @@ function mount(msk: Msk) {
   }
 
   /**
-   * Scrive la modifica in sospeso. I salvataggi sono in fila: un update alla
-   * volta, cosi' una risposta lenta non puo' sovrascrivere uno stato piu' nuovo.
+   * Writes the pending change. The saves are queued: one update at a time, so a
+   * slow answer cannot overwrite a newer state.
    */
   function flush(): Promise<void> {
     clearTimeout(ed.timer)
@@ -219,19 +220,19 @@ function mount(msk: Msk) {
       description: ed.description,
       config: ed.project ? JSON.stringify(ed.project) : '',
     }
-    setSaved('salvataggio…')
+    setSaved(t('saving…'))
     ed.inflight = crud.update(id, values).then(
       (row) => {
         ed.inflight = null
-        // la riga locale segue il server (anche `layers`, ricalcolato)
+        // the local row follows the server (`layers` too, computed again)
         const i = state.rows.findIndex((r) => r.id === id)
         if (i !== -1) state.rows[i] = row
-        if (ed.id === id) setSaved(ed.pending ? 'salvataggio…' : '✓ salvato')
+        if (ed.id === id) setSaved(ed.pending ? t('saving…') : t('✓ saved'))
       },
       (e: unknown) => {
         ed.inflight = null
-        ed.pending = true // si ritenta al prossimo cambiamento o all'uscita
-        if (ed.id === id) setSaved('salvataggio non riuscito: ' + errText(e), true)
+        ed.pending = true // tried again at the next change or when leaving
+        if (ed.id === id) setSaved(t('saving failed: {error}', { error: errText(e) }), true)
         throw e
       },
     )
@@ -243,7 +244,7 @@ function mount(msk: Msk) {
     scheduleSave(PROJECT_SAVE_DELAY_MS)
   }
 
-  // ---------- lista ----------
+  // ---------- list ----------
 
   function cfgSize(row: Row): string {
     const n = valOf(row, 'config').length
@@ -255,7 +256,7 @@ function mount(msk: Msk) {
     if (!valOf(row, 'config').trim()) return '—'
     const n = row.values.layers
     if (typeof n === 'number' && Number.isFinite(n)) return String(n)
-    // fallback: righe senza `layers` calcolato dal server
+    // fallback: rows without `layers` computed by the server
     const p = parseProject(row.values.config)
     return p && Array.isArray(p.layers) ? String(p.layers.length) : '—'
   }
@@ -266,10 +267,10 @@ function mount(msk: Msk) {
       if (!f) return true
       return [valOf(r, 'name'), valOf(r, 'description'), r.owner_name ?? ''].some((v) => v.toLowerCase().includes(f))
     })
-    rowcount.textContent = shown.length === 1 ? '1 mappa' : shown.length + ' mappe'
+    rowcount.textContent = shown.length === 1 ? t('1 map') : t('{n} maps', { n: shown.length })
     if (!shown.length) {
       tbody.replaceChildren(
-        h('tr', {}, h('td', { class: 'empty', colspan: '6' }, state.rows.length ? 'nessuna mappa corrisponde al filtro' : 'nessuna mappa: creane una con ＋ Nuova mappa')),
+        h('tr', {}, h('td', { class: 'empty', colspan: '6' }, state.rows.length ? t('no map matches the filter') : t('no map: create one with ＋ New map'))),
       )
       return
     }
@@ -277,8 +278,8 @@ function mount(msk: Msk) {
       ...shown.map((r) => {
         const hasCfg = !!valOf(r, 'config').trim()
         const nameCell = h('td', {}, valOf(r, 'name'))
-        if (r.shared) nameCell.append(h('span', { class: 'msk-badge acc' }, 'condivisa'))
-        if (r.my_level === 'read') nameCell.append(h('span', { class: 'msk-badge' }, 'sola lettura'))
+        if (r.shared) nameCell.append(h('span', { class: 'msk-badge acc' }, t('shared')))
+        if (r.my_level === 'read') nameCell.append(h('span', { class: 'msk-badge' }, t('read only')))
 
         const acts = h('td', { class: 'rowacts' })
         const btn = (label: string, cls: string, fn: () => void, disabled = false) => {
@@ -286,10 +287,10 @@ function mount(msk: Msk) {
           b.addEventListener('click', fn)
           acts.append(b)
         }
-        btn('👁 Apri', 'ghost', () => openShow(r.id), !hasCfg)
-        if (canWrite(r)) btn('✏ Modifica', 'ghost', () => openEdit(r.id))
-        if (canManage(r)) btn('👥 Condividi', 'ghost', () => void share(r.id))
-        if (canManage(r)) btn('🗑 Elimina', 'danger', () => void del(r.id))
+        btn(t('👁 Open'), 'ghost', () => openShow(r.id), !hasCfg)
+        if (canWrite(r)) btn(t('✏ Edit'), 'ghost', () => openEdit(r.id))
+        if (canManage(r)) btn(t('👥 Share'), 'ghost', () => void share(r.id))
+        if (canManage(r)) btn(t('🗑 Delete'), 'danger', () => void del(r.id))
 
         return h(
           'tr',
@@ -315,7 +316,7 @@ function mount(msk: Msk) {
     }
   }
 
-  // ---------- viste ----------
+  // ---------- views ----------
 
   function showView(view: View) {
     state.view = view
@@ -331,7 +332,7 @@ function mount(msk: Msk) {
     saved.hidden = isShow
     btnAddData.hidden = isShow
     editHint.hidden = isShow
-    // "Modifica questa mappa" solo a chi puo' scrivere
+    // "Edit this map" only for whoever can write
     btnModify.hidden = !isShow || !row || !canWrite(row)
   }
 
@@ -346,9 +347,9 @@ function mount(msk: Msk) {
     ed.pending = false
     mvName.value = ed.name
     mvDesc.value = ed.description
-    setSaved('✓ salvato')
+    setSaved(t('✓ saved'))
     if (valOf(row, 'config').trim() && !project) {
-      msg("la configurazione salvata non e' JSON valido: la mappa si apre vuota, e al primo salvataggio verra' sostituita", 'map', true)
+      msg(t('the saved configuration is not valid JSON: the map opens empty, and the first save will replace it'), 'map', true)
     } else msg('', 'map')
     showView('edit')
     frame.open(project, false, onProjectChange)
@@ -359,7 +360,7 @@ function mount(msk: Msk) {
     if (!row) return
     const project = parseProject(row.values.config)
     if (!project) {
-      msg('questa mappa non ha una configurazione salvata' + (canWrite(row) ? ': usa Modifica' : ''), 'list', true)
+      msg(canWrite(row) ? t('this map has no saved configuration: use Edit') : t('this map has no saved configuration'), 'list', true)
       return
     }
     ed.id = id
@@ -367,11 +368,11 @@ function mount(msk: Msk) {
     mvTitle.textContent = valOf(row, 'name')
     msg('', 'map')
     showView('show')
-    // Sola lettura: nessun salvataggio.
+    // Read only: no saving.
     frame.open(project, true, null)
   }
 
-  /** Crea subito la mappa, come Sestante, e apre l'editor. */
+  /** Creates the map at once, as Sestante does, and opens the editor. */
   async function createMap() {
     msg('')
     btnNew.disabled = true
@@ -389,7 +390,7 @@ function mount(msk: Msk) {
     }
   }
 
-  /** Alla chiusura la modifica in sospeso va scritta, non buttata. */
+  /** When closing, the pending change is written, not thrown away. */
   async function backToList() {
     const leave = () => {
       frame.close()
@@ -398,16 +399,16 @@ function mount(msk: Msk) {
       return load()
     }
     if (state.view !== 'edit') return leave()
-    frame.close() // nessuno snapshot nuovo mentre si salva
+    frame.close() // no new snapshot while saving
     try {
       await flush()
     } catch (e) {
-      const ok = await msk.confirm(`Salvataggio non riuscito (${errText(e)}).\nTornare comunque alla lista perdendo le ultime modifiche?`)
+      const ok = await msk.confirm(t('Saving failed ({error}).\nGo back to the list anyway, losing the last changes?', { error: errText(e) }))
       if (ok) {
         ed.pending = false
         return leave()
       }
-      // Si resta nell'editor: si riapre la mappa dall'ultimo stato noto.
+      // We stay in the editor: the map opens again from the last known state.
       frame.open(ed.project, false, onProjectChange)
       return
     }
@@ -427,28 +428,28 @@ function mount(msk: Msk) {
   async function del(id: string) {
     const row = findRow(id)
     if (!row) return
-    if (!(await msk.confirm(`Eliminare la mappa "${valOf(row, 'name')}"?`))) return
+    if (!(await msk.confirm(t('Delete the map "{name}"?', { name: valOf(row, 'name') })))) return
     msg('')
     try {
       await crud.remove(id)
-      msg('mappa eliminata')
+      msg(t('map deleted'))
       await load()
     } catch (e) {
       msg(errText(e), 'list', true)
     }
   }
 
-  // ---------- dati GeoJSON ----------
+  // ---------- GeoJSON data ----------
 
   async function onFileChosen(file: File | undefined) {
     if (!file || state.view !== 'edit') return
     msg('', 'map')
     if (frame.phase !== 'live') {
-      msg("la mappa non e' ancora pronta: riprova fra un istante", 'map', true)
+      msg(t('the map is not ready yet: try again in a moment'), 'map', true)
       return
     }
     if (file.size > INLINE_MAX_BYTES) {
-      msg("file troppo grande: oltre 4 MB la geometria non puo' essere salvata dentro la mappa", 'map', true)
+      msg(t('file too large: over 4 MB the geometry cannot be saved inside the map'), 'map', true)
       return
     }
     btnAddData.disabled = true
@@ -458,29 +459,29 @@ function mount(msk: Msk) {
       try {
         parsed = JSON.parse(text)
       } catch {
-        msg("il file non e' JSON valido", 'map', true)
+        msg(t('the file is not valid JSON'), 'map', true)
         return
       }
       if (!isGeoJson(parsed)) {
-        msg("il file non e' un GeoJSON", 'map', true)
+        msg(t('the file is not a GeoJSON'), 'map', true)
         return
       }
       const label = file.name.replace(/\.[^.]+$/, '') || file.name
       if (!frame.addLayer(buildLayer(newLayerId(), label, parsed))) {
-        msg("la mappa non e' ancora pronta: riprova fra un istante", 'map', true)
+        msg(t('the map is not ready yet: try again in a moment'), 'map', true)
         return
       }
-      msg(`livello "${label}" aggiunto`, 'map')
+      msg(t('layer "{name}" added', { name: label }), 'map')
     } catch (e) {
       msg(errText(e), 'map', true)
     } finally {
       btnAddData.disabled = false
-      // Senza questo, riscegliere lo stesso file non emette `change`.
+      // Without this, choosing the same file again does not emit `change`.
       fileInput.value = ''
     }
   }
 
-  // ---------- eventi ----------
+  // ---------- events ----------
 
   filter.addEventListener('input', () => {
     state.filter = filter.value
@@ -502,14 +503,14 @@ function mount(msk: Msk) {
     scheduleSave(META_SAVE_DELAY_MS)
   })
 
-  // Chiusura della pagina (l'host smonta l'iframe o si naviga altrove): si
-  // tenta di scrivere la modifica in sospeso e si stacca il ponte GeoLibre.
+  // The page closes (the host removes the iframe, or one goes elsewhere): we
+  // try to write the pending change and detach the GeoLibre bridge.
   window.addEventListener('pagehide', () => {
     flush().catch(() => {})
     frame.dispose()
   })
 
-  // ---------- avvio ----------
+  // ---------- start ----------
 
   showView('list')
   void load()

@@ -1,20 +1,20 @@
 id = "com.mosaikit.notes"
-name = "Note"
-version = "0.3.0"
-description = "Note personali, condivisibili con colleghi e gruppi"
+name = "Notes"
+version = "0.4.0"
+description = "Personal notes, shareable with colleagues and groups"
 
 [contribution]
 icon = "📝"
-label = "Note"
+label = "Notes"
 
 [[resources]]
 name = "notes"
-label = "Note"
+label = "Notes"
 title_field = "title"
 fields = [
-  { key = "title", label = "Titolo", kind = "text", required = true },
-  { key = "body", label = "Testo", kind = "text", multiline = true },
-  { key = "tag", label = "Tag", kind = "choice", options = ["personale", "lavoro", "urgente"] },
+  { key = "title", label = "Title", kind = "text", required = true },
+  { key = "body", label = "Text", kind = "text", multiline = true },
+  { key = "tag", label = "Tag", kind = "choice", options = ["personal", "work", "urgent"] },
 ]
 
 [ui]
@@ -25,4 +25,19 @@ hooks = ["notes"]
 
 [[kpi]]
 view = "kpi_notes_by_tag"
+label = "Notes by tag"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Note"
+description = "Note personali, condivisibili con colleghi e gruppi"
+label = "Note"
+
+[i18n.it.resources.notes]
+label = "Note"
+fields = { title = "Titolo", body = "Testo", tag = "Tag" }
+options.tag = { personal = "personale", work = "lavoro", urgent = "urgente" }
+
+[i18n.it.kpi.kpi_notes_by_tag]
 label = "Note per tag"
+columns = { tag = "tag", notes = "note" }

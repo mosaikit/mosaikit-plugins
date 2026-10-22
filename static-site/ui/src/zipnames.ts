@@ -1,15 +1,15 @@
-// Lettura dei soli nomi dei file di uno zip (directory centrale), senza
-// estrarre nulla: serve a rifiutare prima del caricamento uno zip senza
-// index.html, che altrimenti sostituirebbe i file di un sito esistente con
-// contenuto inservibile. Se lo zip non si sa leggere (zip64, file rovinato)
-// si ritorna null e decide il server.
+// Reads only the names of the files of a zip (central directory), without
+// extracting anything: it refuses, before the upload, a zip without index.html,
+// which would otherwise replace the files of an existing site with useless
+// content. If the zip cannot be read (zip64, damaged file) it returns null and
+// the server decides.
 
 const EOCD_SIG = 0x06054b50
 const CEN_SIG = 0x02014b50
 
 export async function zipEntryNames(file: Blob): Promise<string[] | null> {
   try {
-    // l'EOCD sta negli ultimi 22 byte + commento (max 64 KB)
+    // the EOCD is in the last 22 bytes + comment (max 64 KB)
     const tailLen = Math.min(file.size, 22 + 0xffff)
     const tail = new DataView(await file.slice(file.size - tailLen).arrayBuffer())
     let eocd = -1
@@ -42,7 +42,7 @@ export async function zipEntryNames(file: Blob): Promise<string[] | null> {
   }
 }
 
-/** C'e' un index.html (a qualunque livello)? */
+/** Is there an index.html (at any level)? */
 export function hasIndexHtml(names: string[]): boolean {
   return names.some((p) => {
     const base = p.replace(/\\/g, '/').split('/').pop() ?? ''

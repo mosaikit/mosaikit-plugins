@@ -1,21 +1,21 @@
 id = "com.mosaikit.contacts"
-name = "Contatti"
-version = "0.3.0"
-description = "Rubrica condivisibile, con email normalizzate e validate"
+name = "Contacts"
+version = "0.4.0"
+description = "Shareable address book, with normalized and validated emails"
 
 [contribution]
 icon = "👥"
-label = "Contatti"
+label = "Contacts"
 
 [[resources]]
 name = "contacts"
-label = "Contatti"
+label = "Contacts"
 title_field = "name"
 fields = [
-  { key = "name", label = "Nome", kind = "text", required = true },
+  { key = "name", label = "Name", kind = "text", required = true },
   { key = "email", label = "Email", kind = "text" },
-  { key = "phone", label = "Telefono", kind = "text" },
-  { key = "company", label = "Azienda", kind = "choice", options = ["Interna", "Cliente", "Partner", "Fornitore"] },
+  { key = "phone", label = "Phone", kind = "text" },
+  { key = "company", label = "Company", kind = "choice", options = ["Internal", "Customer", "Partner", "Supplier"] },
 ]
 
 [ui]
@@ -26,4 +26,19 @@ hooks = ["contacts"]
 
 [[kpi]]
 view = "kpi_contacts_by_company"
+label = "Contacts by kind of company"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Contatti"
+description = "Rubrica condivisibile, con email normalizzate e validate"
+label = "Contatti"
+
+[i18n.it.resources.contacts]
+label = "Contatti"
+fields = { name = "Nome", email = "Email", phone = "Telefono", company = "Azienda" }
+options.company = { Internal = "Interna", Customer = "Cliente", Partner = "Partner", Supplier = "Fornitore" }
+
+[i18n.it.kpi.kpi_contacts_by_company]
 label = "Contatti per tipo di azienda"
+columns = { company = "azienda", contacts = "contatti" }

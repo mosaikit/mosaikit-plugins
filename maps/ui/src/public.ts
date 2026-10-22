@@ -1,11 +1,12 @@
-// Vista dei link pubblici di una mappa: titolo e GeoLibre in sola lettura
-// (`layout=viewer`) che ripristina il progetto salvato. Nessun salvataggio:
-// il ponte di stato si usa solo per il ripristino (onChange = null).
+// View of the public links of a map: title and GeoLibre read only
+// (`layout=viewer`), which restores the saved project. No saving: the state
+// bridge is used only for the restore (onChange = null).
 
 import '@mosaikit/plugin-api/style.css'
 import './maps.css'
 import { connect, type Msk, type PublicResource } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
+import { followHost, t } from './i18n.ts'
 import { MapFrame, parseProject } from './mapframe.ts'
 
 const app = document.getElementById('app')!
@@ -14,14 +15,15 @@ app.classList.add('mskm', 'public')
 connect()
   .then(mount)
   .catch((e) => {
-    app.textContent = 'Impossibile aprire la mappa: ' + errText(e)
+    app.textContent = t('Could not open the map: {error}', { error: errText(e) })
   })
 
 async function mount(msk: Msk) {
+  followHost(msk)
   let res: PublicResource | undefined = msk.publicResource
   if (!res?.values) res = await msk.publicGet()
   const values = res?.values ?? {}
-  const name = (values.name == null ? '' : String(values.name)) || res?.title || 'Mappa'
+  const name = (values.name == null ? '' : String(values.name)) || res?.title || t('Map')
   const description = values.description == null ? '' : String(values.description)
   document.title = name
 
@@ -42,7 +44,7 @@ async function mount(msk: Msk) {
 
   const project = parseProject(values.config)
   if (!project) {
-    mapMsg.textContent = 'questa mappa non ha una configurazione salvata'
+    mapMsg.textContent = t('this map has no saved configuration')
     return
   }
   app.append(frame.iframe)

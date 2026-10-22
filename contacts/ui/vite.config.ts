@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 
-// UI del plugin: percorsi relativi (servita da /ui/<id>/ sull'origine dei plugin)
+// UI of the plugin: relative paths (served from /ui/<id>/ on the origin of the plugins)
 export default defineConfig({
   base: './',
-  // plugin-api arriva da ../mosaikit via symlink: le sue dipendenze si risolvono da qui
+  // plugin-api comes from ../mosaikit through a symlink: its dependencies resolve from here
   resolve: { preserveSymlinks: true },
   build: { outDir: 'dist', emptyOutDir: true, sourcemap: true },
 })

@@ -1,21 +1,21 @@
 id = "com.mosaikit.maps"
-name = "Mappe"
-version = "0.4.0"
-description = "Catalogo di mappe GeoLibre: configurazione salvata nel progetto .geolibre.json"
+name = "Maps"
+version = "0.5.0"
+description = "Catalog of GeoLibre maps: configuration saved in the .geolibre.json project"
 
 [contribution]
 icon = "🗺"
-label = "Mappe"
+label = "Maps"
 
 [[resources]]
 name = "maps"
-label = "Mappe"
+label = "Maps"
 title_field = "name"
 fields = [
-  { key = "name", label = "Nome", kind = "text", required = true },
-  { key = "description", label = "Descrizione", kind = "text", multiline = true },
-  { key = "config", label = "Configurazione (.geolibre.json)", kind = "text", multiline = true, hidden = true },
-  { key = "layers", label = "Livelli", kind = "number", hidden = true },
+  { key = "name", label = "Name", kind = "text", required = true },
+  { key = "description", label = "Description", kind = "text", multiline = true },
+  { key = "config", label = "Configuration (.geolibre.json)", kind = "text", multiline = true, hidden = true },
+  { key = "layers", label = "Layers", kind = "number", hidden = true },
 ]
 
 [ui]
@@ -28,4 +28,18 @@ frame_src = ["https://web.geolibre.app"]
 
 [[kpi]]
 view = "kpi_maps"
+label = "Maps and layers"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Mappe"
+description = "Catalogo di mappe GeoLibre: configurazione salvata nel progetto .geolibre.json"
+label = "Mappe"
+
+[i18n.it.resources.maps]
+label = "Mappe"
+fields = { name = "Nome", description = "Descrizione", config = "Configurazione (.geolibre.json)", layers = "Livelli" }
+
+[i18n.it.kpi.kpi_maps]
 label = "Mappe e livelli"
+columns = { maps = "mappe", layers = "livelli" }

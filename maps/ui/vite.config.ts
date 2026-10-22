@@ -3,11 +3,11 @@ import { defineConfig } from 'vite'
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url))
 
-// UI del plugin: percorsi relativi (servita da /ui/<id>/ sull'origine dei plugin).
-// Due pagine: l'app (index.html) e la vista dei link pubblici (public.html).
+// UI of the plugin: relative paths (served from /ui/<id>/ on the origin of the plugins).
+// Two pages: the app (index.html) and the view of the public links (public.html).
 export default defineConfig({
   base: './',
-  // plugin-api arriva da ../mosaikit via symlink: le sue dipendenze si risolvono da qui
+  // plugin-api comes from ../mosaikit through a symlink: its dependencies resolve from here
   resolve: { preserveSymlinks: true },
   build: {
     outDir: 'dist',

@@ -1,4 +1,4 @@
-//! Plugin Mappe: valida il progetto GeoLibre e ne conta i livelli (per i KPI).
+//! Maps plugin: validates the GeoLibre project and counts its layers (for the KPIs).
 
 use mosaikit_plugin_sdk::prelude::*;
 
@@ -8,16 +8,16 @@ fn check_config(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     let mut v = hook.values.clone();
     let raw = v.str("config");
     if raw.len() > MAX_CONFIG_BYTES {
-        return Err(Error::msg("configurazione oltre 8 MB"));
+        return Err(Error::msg("configuration over 8 MB"));
     }
     let layers = if raw.trim().is_empty() {
         0
     } else {
         let project: Value = serde_json_from_str(&raw)
-            .map_err(|e| Error::msg(format!("configurazione non JSON: {e}")))?;
+            .map_err(|e| Error::msg(format!("configuration is not JSON: {e}")))?;
         if !project.is_object() {
             return Err(Error::msg(
-                "la configurazione deve essere un progetto GeoLibre (oggetto JSON)",
+                "the configuration must be a GeoLibre project (JSON object)",
             ));
         }
         project
@@ -43,7 +43,7 @@ mod tests {
     use mosaikit_plugin_sdk::testing::MockHost;
 
     #[test]
-    fn conta_i_livelli() {
+    fn counts_the_layers() {
         let cfg = json!({ "layers": [{ "id": "a" }, { "id": "b" }] }).to_string();
         let v = MockHost::new()
             .hook(
@@ -68,15 +68,15 @@ mod tests {
     }
 
     #[test]
-    fn configurazione_non_valida() {
+    fn invalid_configuration() {
         let e = MockHost::new()
             .hook(
                 &__msk_registry(),
                 "before_create",
                 "maps",
-                json!({ "name": "m", "config": "{rotta" }),
+                json!({ "name": "m", "config": "{broken" }),
             )
             .unwrap_err();
-        assert!(e.contains("non JSON"));
+        assert!(e.contains("not JSON"));
     }
 }

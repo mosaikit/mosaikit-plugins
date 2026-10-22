@@ -1,23 +1,23 @@
 id = "com.mosaikit.static-site"
-name = "Siti statici"
-version = "0.3.0"
-description = "Pubblica siti statici da archivi zip, condivisibili e con link pubblici"
+name = "Static sites"
+version = "0.4.0"
+description = "Publishes static sites from zip archives, shareable and with public links"
 
 [contribution]
 icon = "🌐"
-label = "Siti statici"
+label = "Static sites"
 
 [[resources]]
 name = "sites"
-label = "Siti"
+label = "Sites"
 title_field = "name"
 fields = [
-  { key = "name", label = "Nome", kind = "text", required = true },
-  { key = "description", label = "Descrizione", kind = "text", multiline = true },
-  { key = "zip_name", label = "Zip caricato", kind = "text", hidden = true },
-  { key = "entry", label = "Pagina iniziale", kind = "text", hidden = true },
-  { key = "files", label = "File", kind = "number", hidden = true },
-  { key = "size", label = "Dimensione (byte)", kind = "number", hidden = true },
+  { key = "name", label = "Name", kind = "text", required = true },
+  { key = "description", label = "Description", kind = "text", multiline = true },
+  { key = "zip_name", label = "Uploaded zip", kind = "text", hidden = true },
+  { key = "entry", label = "Start page", kind = "text", hidden = true },
+  { key = "files", label = "Files", kind = "number", hidden = true },
+  { key = "size", label = "Size (bytes)", kind = "number", hidden = true },
 ]
 
 [ui]
@@ -28,4 +28,18 @@ content = true
 
 [[kpi]]
 view = "kpi_sites"
+label = "Published sites"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Siti statici"
+description = "Pubblica siti statici da archivi zip, condivisibili e con link pubblici"
+label = "Siti statici"
+
+[i18n.it.resources.sites]
+label = "Siti"
+fields = { name = "Nome", description = "Descrizione", zip_name = "Zip caricato", entry = "Pagina iniziale", files = "File", size = "Dimensione (byte)" }
+
+[i18n.it.kpi.kpi_sites]
 label = "Siti pubblicati"
+columns = { sites = "siti", files = "file", bytes = "byte" }

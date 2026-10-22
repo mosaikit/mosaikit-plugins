@@ -1,10 +1,10 @@
-// File manager: navigazione per id, selezione multipla, azioni secondo il livello di permesso.
+// File manager: navigation by id, multiple selection, actions according to the level of permission.
 import type { FileEntry, Listing, Msk } from '@mosaikit/plugin-api'
 import { choiceDialog, closeDialog, dialogOpen, nameList, pickFolder, promptDialog } from './dialogs.ts'
 import { fileIcon, h, saveBlob, spinner, svg, type IconName } from './dom.ts'
+import { locale, t } from './i18n.ts'
 import { closeViewer, loadPreview, openViewer, viewerOpen, type Preview } from './preview.ts'
 import {
-  LEVEL_LABEL,
   THUMB_MAX,
   atLeast,
   errMsg,
@@ -13,6 +13,7 @@ import {
   freeName,
   kindLabel,
   kindOf,
+  levelLabel,
   plural,
   previewable,
   previewMode,
@@ -117,7 +118,7 @@ export class FileManager {
     private readonly el: HTMLElement,
     private readonly msk: Msk,
   ) {
-    this.search = h('input', { type: 'search', placeholder: 'Cerca in questa cartella', 'aria-label': 'Cerca in questa cartella' })
+    this.search = h('input', { type: 'search', placeholder: t('Search in this folder'), 'aria-label': t('Search in this folder') })
     this.search.addEventListener('input', () => {
       this.filter = this.search.value
       this.render()
@@ -131,12 +132,12 @@ export class FileManager {
       }
       ev.stopPropagation()
     })
-    this.viewSeg = h('div', { class: 'fm-seg', role: 'group', 'aria-label': 'Vista' })
+    this.viewSeg = h('div', { class: 'fm-seg', role: 'group', 'aria-label': t('View') })
     this.headActs = h('div', { class: 'fm-headacts' })
-    this.crumbs = h('nav', { class: 'fm-crumbs', 'aria-label': 'Percorso' })
+    this.crumbs = h('nav', { class: 'fm-crumbs', 'aria-label': t('Path') })
     this.bar = h('div', { class: 'fm-bar' })
     this.main = h('div', { class: 'fm-main' })
-    this.side = h('aside', { class: 'fm-side', 'aria-label': 'Dettagli' })
+    this.side = h('aside', { class: 'fm-side', 'aria-label': t('Details') })
     this.status = h('div', { class: 'fm-status' })
     this.progress = h('div', { class: 'fm-progress', 'aria-live': 'polite' })
     this.picker = h('input', { type: 'file', multiple: true, hidden: true })
@@ -151,7 +152,7 @@ export class FileManager {
       h(
         'div',
         { class: 'fm-head' },
-        h('div', { class: 'fm-title' }, h('h2', { class: 'msk-h2' }, 'File'), msk.user ? h('span', { class: 'msk-badge' }, msk.user.name || msk.user.username) : null),
+        h('div', { class: 'fm-title' }, h('h2', { class: 'msk-h2' }, t('Files')), msk.user ? h('span', { class: 'msk-badge' }, msk.user.name || msk.user.username) : null),
         h('div', { class: 'grow' }),
         h('label', { class: 'fm-search' }, svg('search'), this.search),
         this.viewSeg,
@@ -186,7 +187,7 @@ export class FileManager {
     this.el.replaceChildren()
   }
 
-  // ------------------------------------------------------------------ dati
+  // ------------------------------------------------------------------ data
 
   private get me(): string | undefined {
     return this.msk.user?.id
@@ -212,13 +213,13 @@ export class FileManager {
     try {
       localStorage.setItem(PREF_KEY, JSON.stringify(this.prefs))
     } catch {
-      // storage non disponibile
+      // storage not available
     }
   }
 
   private folderName(): string {
     const p = this.listing?.path
-    return p && p.length ? p[p.length - 1].name : 'I miei file'
+    return p && p.length ? p[p.length - 1].name : t('My files')
   }
 
   private sharedWithMe(e: FileEntry): boolean {
@@ -242,7 +243,7 @@ export class FileManager {
     } catch (e) {
       if (my !== this.loadSeq) return
       if (parent !== null) {
-        this.msk.toast('Cartella non disponibile: ' + errMsg(e), true)
+        this.msk.toast(t('Folder not available: {error}', { error: errMsg(e) }), true)
         this.loading = false
         return this.go(null)
       }
@@ -250,7 +251,7 @@ export class FileManager {
       this.entries = []
     }
     this.loading = false
-    this.sideKey = '' // dettagli da ridisegnare (nomi, livelli)
+    this.sideKey = '' // details to draw again (names, levels)
     this.render()
   }
 
@@ -266,7 +267,7 @@ export class FileManager {
     try {
       history.replaceState(null, '', id ? '#f=' + id : location.pathname + location.search)
     } catch {
-      // cronologia non disponibile
+      // history not available
     }
     void this.refresh(false)
   }
@@ -277,7 +278,7 @@ export class FileManager {
     this.go(p.length >= 2 ? p[p.length - 2].id : null)
   }
 
-  // --------------------------------------------------------------- azioni
+  // -------------------------------------------------------------- actions
 
   private selectionActions(items: FileEntry[]): Action[] {
     const out: Action[] = []
@@ -285,32 +286,32 @@ export class FileManager {
     const one = items.length === 1 ? items[0] : null
     const allManage = items.every((e) => atLeast(e.my_level, 'manage'))
     if (one) {
-      if (one.is_dir) out.push({ id: 'open', label: 'Apri', icon: 'open', kbd: 'Invio', primary: true })
-      else if (previewable(one)) out.push({ id: 'open', label: 'Anteprima', icon: 'eye', kbd: 'Invio', primary: true })
-      if (!one.is_dir) out.push({ id: 'tab', label: 'Apri in una nuova scheda', icon: 'external' })
+      if (one.is_dir) out.push({ id: 'open', label: t('Open'), icon: 'open', kbd: t('Enter'), primary: true })
+      else if (previewable(one)) out.push({ id: 'open', label: t('Preview'), icon: 'eye', kbd: t('Enter'), primary: true })
+      if (!one.is_dir) out.push({ id: 'tab', label: t('Open in a new tab'), icon: 'external' })
     }
     const anyDir = items.some((e) => e.is_dir)
-    out.push({ id: 'download', label: one?.is_dir ? 'Scarica zip' : anyDir ? 'Scarica (zip per le cartelle)' : 'Scarica', icon: one?.is_dir ? 'zip' : 'download' })
-    if (one && atLeast(one.my_level, 'write')) out.push({ id: 'rename', label: 'Rinomina', icon: 'edit', kbd: 'F2' })
-    if (allManage) out.push({ id: 'move', label: 'Sposta in…', icon: 'move' })
-    out.push({ id: 'copy', label: 'Copia in…', icon: 'copy' })
-    if (this.canCreate) out.push({ id: 'duplicate', label: 'Duplica qui', icon: 'copy' })
-    if (one && atLeast(one.my_level, 'manage')) out.push({ id: 'share', label: 'Condividi', icon: 'share' })
-    if (allManage) out.push({ id: 'delete', label: 'Elimina', icon: 'trash', danger: true, kbd: 'Canc' })
+    out.push({ id: 'download', label: one?.is_dir ? t('Download zip') : anyDir ? t('Download (zip for the folders)') : t('Download'), icon: one?.is_dir ? 'zip' : 'download' })
+    if (one && atLeast(one.my_level, 'write')) out.push({ id: 'rename', label: t('Rename'), icon: 'edit', kbd: 'F2' })
+    if (allManage) out.push({ id: 'move', label: t('Move to…'), icon: 'move' })
+    out.push({ id: 'copy', label: t('Copy to…'), icon: 'copy' })
+    if (this.canCreate) out.push({ id: 'duplicate', label: t('Duplicate here'), icon: 'copy' })
+    if (one && atLeast(one.my_level, 'manage')) out.push({ id: 'share', label: t('Share'), icon: 'share' })
+    if (allManage) out.push({ id: 'delete', label: t('Delete'), icon: 'trash', danger: true, kbd: t('Del') })
     return out
   }
 
   private folderActions(): Action[] {
     const out: Action[] = []
     if (this.canCreate) {
-      out.push({ id: 'upload', label: 'Carica file', icon: 'upload', primary: true })
-      out.push({ id: 'mkdir', label: 'Nuova cartella', icon: 'folderPlus' })
+      out.push({ id: 'upload', label: t('Upload files'), icon: 'upload', primary: true })
+      out.push({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' })
     }
-    if (this.entries.length) out.push({ id: 'selall', label: 'Seleziona tutto', icon: 'check', kbd: 'Ctrl+A' })
-    out.push({ id: 'refresh', label: 'Aggiorna', icon: 'refresh' })
+    if (this.entries.length) out.push({ id: 'selall', label: t('Select all'), icon: 'check', kbd: 'Ctrl+A' })
+    out.push({ id: 'refresh', label: t('Refresh'), icon: 'refresh' })
     if (this.parent !== null) {
-      out.push({ id: 'zipcwd', label: 'Scarica cartella (.zip)', icon: 'zip' })
-      if (atLeast(this.listing?.my_level, 'manage')) out.push({ id: 'sharecwd', label: 'Condividi cartella', icon: 'share' })
+      out.push({ id: 'zipcwd', label: t('Download folder (.zip)'), icon: 'zip' })
+      if (atLeast(this.listing?.my_level, 'manage')) out.push({ id: 'sharecwd', label: t('Share folder'), icon: 'share' })
     }
     return out
   }
@@ -339,7 +340,7 @@ export class FileManager {
         this.transferDialog(items, 'copy')
         break
       case 'duplicate':
-        void this.transfer(items, this.parent, 'copy', 'qui')
+        void this.transfer(items, this.parent, 'copy', '')
         break
       case 'share':
         if (one) void this.share(one.id)
@@ -412,17 +413,17 @@ export class FileManager {
     })
   }
 
-  /** Nuova scheda aperta subito (gesto dell'utente), poi indirizzata all'URL temporaneo. */
+  /** New tab opened at once (gesture of the user), then sent to the temporary URL. */
   private openTab(e: FileEntry) {
     const w = window.open('', '_blank')
     if (!w) {
-      this.msk.toast('Il browser ha bloccato la nuova scheda', true)
+      this.msk.toast(t('The browser blocked the new tab'), true)
       return
     }
     try {
       w.opener = null
     } catch {
-      // ignora
+      // ignore
     }
     this.msk.files.url(e.id).then(
       (url) => {
@@ -457,12 +458,12 @@ export class FileManager {
   }
 
   private report(errors: string[], okText?: string) {
-    if (errors.length) this.msk.toast(errors.length === 1 ? errors[0] : `${errors.length} errori: ${errors[0]}`, true)
+    if (errors.length) this.msk.toast(errors.length === 1 ? errors[0] : t('{n} errors: {first}', { n: errors.length, first: errors[0] }), true)
     else if (okText) this.msk.toast(okText)
   }
 
   private async downloadZip(id: string, name: string) {
-    this.msk.toast(`Preparo lo zip di “${name}”…`)
+    this.msk.toast(t('Preparing the zip of “{name}”…', { name }))
     saveBlob(await this.msk.files.zip(id), name + '.zip')
   }
 
@@ -470,7 +471,7 @@ export class FileManager {
     const errs = await this.seq(items, async (e) => {
       if (e.is_dir) return this.downloadZip(e.id, e.name)
       const url = await this.msk.files.url(e.id, true)
-      // servito come allegato: il browser scarica senza lasciare la pagina
+      // served as an attachment: the browser downloads without leaving the page
       const a = h('a', { href: url, style: 'display:none' })
       document.body.append(a)
       a.click()
@@ -483,15 +484,15 @@ export class FileManager {
     if (!this.canCreate) return
     const parent = this.parent
     promptDialog({
-      title: 'Nuova cartella',
+      title: t('New folder'),
       icon: 'folderPlus',
-      label: 'Nome della cartella',
-      value: 'Nuova cartella',
-      ok: 'Crea',
-      validate: (v) => (this.entries.some((e) => e.name === v) ? 'esiste già un elemento con questo nome' : ''),
+      label: t('Name of the folder'),
+      value: t('New folder'),
+      ok: t('Create'),
+      validate: (v) => (this.entries.some((e) => e.name === v) ? t('an item with this name already exists') : ''),
       run: async (name) => {
         const d = await this.msk.files.mkdir(name, parent)
-        this.msk.toast(`Cartella “${name}” creata`)
+        this.msk.toast(t('Folder “{name}” created', { name }))
         if (this.parent === parent) {
           this.sel = new Set([d.id])
           this.anchor = d.id
@@ -503,17 +504,17 @@ export class FileManager {
 
   private rename(e: FileEntry) {
     promptDialog({
-      title: 'Rinomina',
+      title: t('Rename'),
       icon: 'edit',
-      label: e.is_dir ? 'Nuovo nome della cartella' : 'Nuovo nome del file',
+      label: e.is_dir ? t('New name of the folder') : t('New name of the file'),
       value: e.name,
-      ok: 'Rinomina',
+      ok: t('Rename'),
       selectBase: !e.is_dir,
-      validate: (v) => (v !== e.name && this.entries.some((x) => x.name === v && x.parent_id === e.parent_id) ? 'esiste già un elemento con questo nome' : ''),
+      validate: (v) => (v !== e.name && this.entries.some((x) => x.name === v && x.parent_id === e.parent_id) ? t('an item with this name already exists') : ''),
       run: async (name) => {
         if (name === e.name) return
         await this.msk.files.rename(e.id, name)
-        this.msk.toast(`Rinominato in “${name}”`)
+        this.msk.toast(t('Renamed to “{name}”', { name }))
         await this.refresh()
       },
     })
@@ -523,11 +524,11 @@ export class FileManager {
     items = items.filter((e) => atLeast(e.my_level, 'manage'))
     if (!items.length) return
     const dirs = items.some((e) => e.is_dir)
-    const what = items.length === 1 ? `“${items[0].name}”` : `${items.length} elementi`
     const text =
-      `Eliminare ${what}?` +
-      (dirs ? ' Le cartelle verranno eliminate con tutto il loro contenuto.' : '') +
-      " L'operazione non può essere annullata."
+      (items.length === 1 ? t('Delete “{name}”?', { name: items[0].name }) : t('Delete {n} items?', { n: items.length })) +
+      (dirs ? ' ' + t('The folders will be deleted with all their content.') : '') +
+      ' ' +
+      t('This cannot be undone.')
     let ok = false
     try {
       ok = await this.msk.confirm(text)
@@ -536,18 +537,19 @@ export class FileManager {
     }
     if (!ok) return
     const errs = await this.seq(items, (e) => this.msk.files.remove(e.id))
-    this.report(errs, items.length === 1 ? `“${items[0].name}” eliminato` : plural(items.length, 'elemento eliminato', 'elementi eliminati'))
+    this.report(errs, items.length === 1 ? t('“{name}” deleted', { name: items[0].name }) : plural(items.length, 'item deleted', 'items deleted'))
     await this.refresh()
   }
 
   private transferDialog(items: FileEntry[], mode: 'move' | 'copy') {
     if (!items.length) return
     if (mode === 'move' && !items.every((e) => atLeast(e.my_level, 'manage'))) return
-    const what = items.length === 1 ? `“${items[0].name}”` : `${items.length} elementi`
+    const one = items.length === 1
+    const title = mode === 'move' ? (one ? 'Move “{name}”' : 'Move {n} items') : one ? 'Copy “{name}”' : 'Copy {n} items'
     pickFolder(this.msk, {
-      title: (mode === 'move' ? 'Sposta ' : 'Copia ') + what,
+      title: t(title, { name: items[0].name, n: items.length }),
       icon: mode === 'move' ? 'move' : 'copy',
-      ok: mode === 'move' ? 'Sposta qui' : 'Copia qui',
+      ok: mode === 'move' ? t('Move here') : t('Copy here'),
       start: this.parent,
       blocked: new Set(items.filter((e) => e.is_dir).map((e) => e.id)),
       source: this.parent,
@@ -562,13 +564,16 @@ export class FileManager {
   private async transfer(items: FileEntry[], dest: string | null, mode: 'move' | 'copy', destName: string) {
     if (!items.length) return
     const errs = await this.seq(items, (e) => (mode === 'move' ? this.msk.files.move(e.id, dest) : this.msk.files.copy(e.id, dest)))
-    const what = items.length === 1 ? `“${items[0].name}”` : `${items.length} elementi`
-    const verb = (mode === 'move' ? 'spostat' : 'copiat') + (items.length === 1 ? 'o' : 'i')
-    this.report(errs, `${what} ${verb} ${dest === this.parent ? 'qui' : `in “${destName}”`}`)
+    const DONE = {
+      move: { one: ['“{name}” moved here', '“{name}” moved to “{dest}”'], many: ['{n} items moved here', '{n} items moved to “{dest}”'] },
+      copy: { one: ['“{name}” copied here', '“{name}” copied to “{dest}”'], many: ['{n} items copied here', '{n} items copied to “{dest}”'] },
+    }
+    const done = DONE[mode][items.length === 1 ? 'one' : 'many'][dest === this.parent ? 0 : 1]
+    this.report(errs, t(done, { name: items[0].name, n: items.length, dest: destName }))
     await this.refresh()
   }
 
-  /** Carica file (solo file, non cartelle) in `dest`, chiedendo cosa fare con i nomi gia' presenti. */
+  /** Uploads files (files only, not folders) into `dest`, asking what to do with the names already there. */
   async upload(files: File[], dest: string | null, known?: FileEntry[]) {
     if (!files.length) return
     let existing = known
@@ -577,9 +582,9 @@ export class FileManager {
       try {
         const l = await this.msk.files.list(dest)
         existing = l.entries
-        destName = l.path.length ? l.path[l.path.length - 1].name : 'I miei file'
+        destName = l.path.length ? l.path[l.path.length - 1].name : t('My files')
         if (!atLeast(l.my_level, 'write')) {
-          this.msk.toast(`Non hai il permesso di caricare file in “${destName}”`, true)
+          this.msk.toast(t('You do not have the permission to upload files to “{dest}”', { dest: destName }), true)
           return
         }
       } catch (e) {
@@ -592,17 +597,18 @@ export class FileManager {
     let choice: string | null = 'keep'
     if (clash.length) {
       choice = await choiceDialog({
-        title: clash.length === 1 ? `“${clash[0].name}” esiste già` : `${clash.length} file esistono già`,
+        title: clash.length === 1 ? t('“{name}” already exists', { name: clash[0].name }) : t('{n} files already exist', { n: clash.length }),
         icon: 'info',
         body: [
-          (clash.length === 1 ? 'Nella cartella c’è già un elemento con questo nome.' : 'Nella cartella ci sono già elementi con questi nomi.') +
-            ' Vuoi sostituirli, mantenere entrambe le versioni o saltarli?',
+          (clash.length === 1 ? t('The folder already has an item with this name.') : t('The folder already has items with these names.')) +
+            ' ' +
+            t('Do you want to replace them, keep both versions or skip them?'),
           nameList(clash.map((f) => ({ name: f.name, is_dir: !!byName.get(f.name)?.is_dir }))),
         ],
         choices: [
-          { id: 'skip', label: 'Salta' },
-          { id: 'keep', label: 'Mantieni entrambi' },
-          { id: 'replace', label: 'Sostituisci', cls: '' },
+          { id: 'skip', label: t('Skip') },
+          { id: 'keep', label: t('Keep both') },
+          { id: 'replace', label: t('Replace'), cls: '' },
         ],
       })
       if (!choice) return
@@ -615,7 +621,7 @@ export class FileManager {
       let replace = false
       if (old || taken.has(name)) {
         if (choice === 'skip') continue
-        // una cartella omonima non si sostituisce con un file
+        // a folder with the same name is not replaced by a file
         if (choice === 'replace' && old && !old.is_dir && !jobs.some((j) => j.name === name)) replace = true
         else name = freeName(f.name, taken)
       }
@@ -647,8 +653,9 @@ export class FileManager {
       }
     })
     setTimeout(() => box.remove(), 600)
-    const where = dest === this.parent ? '' : ` in “${destName}”`
-    this.report(errs, (jobs.length === 1 ? `“${jobs[0].name}” caricato` : plural(jobs.length, 'file caricato', 'file caricati')) + where)
+    const here = dest === this.parent
+    const up = jobs.length === 1 ? (here ? '“{name}” uploaded' : '“{name}” uploaded to “{dest}”') : here ? '{n} files uploaded' : '{n} files uploaded to “{dest}”'
+    this.report(errs, t(up, { name: jobs[0].name, n: jobs.length, dest: destName }))
     if (dest === this.parent) {
       this.sel = new Set(uploaded)
       await this.refresh()
@@ -657,7 +664,7 @@ export class FileManager {
     }
   }
 
-  // ------------------------------------------------------------ selezione
+  // ------------------------------------------------------------ selection
 
   private click(id: string, ev: { shiftKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; toggle?: boolean }) {
     const ids = this.sorted().map((e) => e.id)
@@ -698,13 +705,13 @@ export class FileManager {
       }
       return b
     }
-    this.viewSeg.replaceChildren(seg('list', 'list', 'Elenco'), seg('grid', 'grid', 'Griglia'))
-    const refresh = h('button', { type: 'button', class: 'msk-btn ghost mini icon', title: 'Aggiorna', 'aria-label': 'Aggiorna' }, svg('refresh'))
+    this.viewSeg.replaceChildren(seg('list', 'list', t('List')), seg('grid', 'grid', t('Grid')))
+    const refresh = h('button', { type: 'button', class: 'msk-btn ghost mini icon', title: t('Refresh'), 'aria-label': t('Refresh') }, svg('refresh'))
     refresh.onclick = () => this.act('refresh')
     const acts: HTMLElement[] = [refresh]
     if (this.canCreate) {
-      acts.push(this.button({ id: 'mkdir', label: 'Nuova cartella', icon: 'folderPlus' }))
-      acts.push(this.button({ id: 'upload', label: 'Carica', icon: 'upload', primary: true }, true))
+      acts.push(this.button({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' }))
+      acts.push(this.button({ id: 'upload', label: t('Upload'), icon: 'upload', primary: true }, true))
     }
     this.headActs.replaceChildren(...acts)
   }
@@ -744,10 +751,10 @@ export class FileManager {
       this.dragIds = null
       const copy = ev.ctrlKey || ev.altKey
       if (!copy && !items.every((e) => atLeast(e.my_level, 'manage'))) {
-        this.msk.toast('Non hai il permesso di spostare questi elementi', true)
+        this.msk.toast(t('You do not have the permission to move these items'), true)
         return
       }
-      const name = dest === null ? 'I miei file' : (this.byId(dest)?.name ?? this.listing?.path.find((p) => p.id === dest)?.name ?? '')
+      const name = dest === null ? t('My files') : (this.byId(dest)?.name ?? this.listing?.path.find((p) => p.id === dest)?.name ?? '')
       void this.transfer(items, dest, copy ? 'copy' : 'move', name)
     })
   }
@@ -759,16 +766,16 @@ export class FileManager {
       b.onclick = () => {
         if (!cur) this.go(id)
       }
-      // la radice e' sempre scrivibile; per gli antenati decide il server
+      // the root is always writable; for the ancestors the server decides
       this.dropTarget(b, id, id === null || !cur || this.canCreate)
       return b
     }
-    const up = h('button', { type: 'button', class: 'msk-btn ghost mini icon', title: 'Cartella superiore (Backspace)', 'aria-label': 'Cartella superiore', disabled: this.parent === null }, svg('up'))
+    const up = h('button', { type: 'button', class: 'msk-btn ghost mini icon', title: t('Parent folder (Backspace)'), 'aria-label': t('Parent folder'), disabled: this.parent === null }, svg('up'))
     up.onclick = () => this.goUp()
-    const nodes: HTMLElement[] = [up, crumb(null, 'I miei file', this.parent === null)]
+    const nodes: HTMLElement[] = [up, crumb(null, t('My files'), this.parent === null)]
     path.forEach((p, i) => nodes.push(h('span', { class: 'fm-sep' }, '›'), crumb(p.id, p.name, i === path.length - 1)))
     if (this.listing && this.parent !== null && this.listing.my_level !== 'manage') {
-      nodes.push(h('span', { class: 'msk-badge' }, this.listing.my_level === 'read' ? 'sola lettura' : 'modifica'))
+      nodes.push(h('span', { class: 'msk-badge' }, this.listing.my_level === 'read' ? t('read only') : t('edit')))
     }
     this.crumbs.replaceChildren(...nodes)
   }
@@ -781,15 +788,15 @@ export class FileManager {
         h(
           'span',
           { class: 'hint' },
-          'Seleziona un elemento per i dettagli · doppio clic per aprire · tasto destro per il menu' + (this.canCreate ? ' · trascina qui i file per caricarli' : ''),
+          t('Select an item for the details · double click to open · right click for the menu') + (this.canCreate ? ' · ' + t('drag files here to upload them') : ''),
         ),
       )
       return
     }
-    const clear = h('button', { type: 'button', class: 'msk-btn ghost mini icon', title: 'Annulla selezione (Esc)', 'aria-label': 'Annulla selezione' }, svg('x'))
+    const clear = h('button', { type: 'button', class: 'msk-btn ghost mini icon', title: t('Clear the selection (Esc)'), 'aria-label': t('Clear the selection') }, svg('x'))
     clear.onclick = () => this.act('clear')
     this.bar.replaceChildren(
-      h('span', { class: 'count' }, plural(items.length, 'selezionato', 'selezionati')),
+      h('span', { class: 'count' }, plural(items.length, 'item selected', 'items selected')),
       ...this.selectionActions(items).map((a) => this.button(a)),
       h('div', { class: 'grow' }),
       clear,
@@ -798,7 +805,7 @@ export class FileManager {
 
   private checkbox(id: string): HTMLButtonElement {
     const on = this.sel.has(id)
-    const b = h('button', { type: 'button', class: 'chk' + (on ? ' on' : ''), role: 'checkbox', 'aria-checked': String(on), 'aria-label': 'Seleziona' }, svg('check'))
+    const b = h('button', { type: 'button', class: 'chk' + (on ? ' on' : ''), role: 'checkbox', 'aria-checked': String(on), 'aria-label': t('Select') }, svg('check'))
     b.addEventListener('click', (ev) => {
       ev.stopPropagation()
       this.click(id, { toggle: true, shiftKey: ev.shiftKey })
@@ -808,8 +815,8 @@ export class FileManager {
   }
 
   private badges(e: FileEntry): (HTMLElement | null)[] {
-    if (this.sharedWithMe(e)) return [h('span', { class: 'msk-badge acc', title: 'Condiviso con te' }, 'Condiviso da ' + e.owner_name)]
-    if (e.shared && e.owner_id === this.me) return [h('span', { class: 'msk-badge', title: 'Condiviso con altri' }, svg('users'), 'Condiviso')]
+    if (this.sharedWithMe(e)) return [h('span', { class: 'msk-badge acc', title: t('Shared with you') }, t('Shared by {name}', { name: e.owner_name }))]
+    if (e.shared && e.owner_id === this.me) return [h('span', { class: 'msk-badge', title: t('Shared with others') }, svg('users'), t('Shared'))]
     return []
   }
 
@@ -839,7 +846,7 @@ export class FileManager {
       this.dragIds = [...this.sel]
       ev.dataTransfer?.setData(DRAG_TYPE, JSON.stringify(this.dragIds))
       if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'copyMove'
-      // niente render durante il drag: ricreare la sorgente annullerebbe dragend
+      // no render during the drag: recreating the source would cancel dragend
       this.main.querySelectorAll<HTMLElement>('[data-id]').forEach((r) => r.classList.toggle('sel', this.sel.has(r.dataset.id!)))
     })
     el.addEventListener('dragend', () => {
@@ -850,34 +857,34 @@ export class FileManager {
 
   private renderMain() {
     const list = this.sorted()
-    const dropzone = h('div', { class: 'fm-dropzone' }, svg('upload'), h('span', null, `Rilascia per caricare in “${this.folderName()}”`))
+    const dropzone = h('div', { class: 'fm-dropzone' }, svg('upload'), h('span', null, t('Drop to upload to “{name}”', { name: this.folderName() })))
     let content: HTMLElement | HTMLElement[]
     if (this.loading && !this.listing) {
       content = Array.from({ length: 6 }, (_, s) =>
         h('div', { class: 'fm-skel' }, h('i', { style: 'width:22px;height:22px;border-radius:6px' }), h('i', { style: `width:${30 + ((s * 13) % 40)}%` })),
       )
     } else if (this.loadError) {
-      content = h('div', { class: 'fm-empty' }, h('b', null, 'Impossibile leggere la cartella'), h('span', { class: 'err' }, this.loadError))
+      content = h('div', { class: 'fm-empty' }, h('b', null, t('Could not read the folder')), h('span', { class: 'err' }, this.loadError))
     } else if (!list.length) {
       if (this.filter) {
-        content = h('div', { class: 'fm-empty' }, h('div', { class: 'big' }, svg('search')), h('b', null, 'Nessun risultato'), h('span', null, `Nessun elemento contiene “${this.filter}”`))
+        content = h('div', { class: 'fm-empty' }, h('div', { class: 'big' }, svg('search')), h('b', null, t('No result')), h('span', null, t('No item contains “{text}”', { text: this.filter })))
       } else {
         content = h(
           'div',
           { class: 'fm-empty' },
           h('div', { class: 'big' }, svg(this.canCreate ? 'upload' : 'open')),
-          h('b', null, this.parent === null ? 'Non hai ancora file' : 'Questa cartella è vuota'),
+          h('b', null, this.parent === null ? t('You have no files yet') : t('This folder is empty')),
           this.canCreate
             ? [
-                h('span', null, 'Trascina qui dei file oppure'),
+                h('span', null, t('Drag files here or')),
                 h(
                   'div',
                   { class: 'row' },
-                  this.button({ id: 'upload', label: 'Carica file', icon: 'upload', primary: true }, true),
-                  this.button({ id: 'mkdir', label: 'Nuova cartella', icon: 'folderPlus' }),
+                  this.button({ id: 'upload', label: t('Upload files'), icon: 'upload', primary: true }, true),
+                  this.button({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' }),
                 ),
               ]
-            : h('span', null, 'Hai accesso in sola lettura'),
+            : h('span', null, t('You have read-only access')),
         )
       }
     } else if (this.prefs.view === 'grid') {
@@ -892,8 +899,8 @@ export class FileManager {
             this.checkbox(e.id),
             h('div', { class: 'th' }, thumb ? h('img', { src: thumb, alt: '', draggable: 'false' }) : fileIcon(e, true)),
             h('div', { class: 'nm2' }, e.name),
-            h('div', { class: 'meta' }, e.is_dir ? 'Cartella' : fmtSize(e.size)),
-            this.sharedWithMe(e) ? h('div', { class: 'meta acc' }, 'Condiviso da ' + e.owner_name) : null,
+            h('div', { class: 'meta' }, e.is_dir ? t('Folder') : fmtSize(e.size)),
+            this.sharedWithMe(e) ? h('div', { class: 'meta acc' }, t('Shared by {name}', { name: e.owner_name })) : null,
           )
           this.bindItem(card, e)
           return card
@@ -903,7 +910,7 @@ export class FileManager {
     } else {
       const allOn = list.every((e) => this.sel.has(e.id))
       const someOn = !allOn && list.some((e) => this.sel.has(e.id))
-      const all = h('button', { type: 'button', class: 'chk' + (allOn ? ' on' : someOn ? ' part' : ''), role: 'checkbox', 'aria-checked': allOn ? 'true' : someOn ? 'mixed' : 'false', 'aria-label': 'Seleziona tutto' }, someOn ? null : svg('check'))
+      const all = h('button', { type: 'button', class: 'chk' + (allOn ? ' on' : someOn ? ' part' : ''), role: 'checkbox', 'aria-checked': allOn ? 'true' : someOn ? 'mixed' : 'false', 'aria-label': t('Select all') }, someOn ? null : svg('check'))
       all.onclick = (ev) => {
         ev.stopPropagation()
         this.sel = allOn ? new Set() : new Set(list.map((e) => e.id))
@@ -939,7 +946,7 @@ export class FileManager {
       content = h(
         'table',
         { class: 'fm-table' },
-        h('thead', null, h('tr', null, h('th', { class: 'c-chk' }, all), th('name', 'Nome'), th('kind', 'Tipo', 'c-kind'), h('th', { class: 'c-owner' }, 'Proprietario'), th('modified', 'Modificato', 'c-date'), th('size', 'Dimensione', 'c-size'))),
+        h('thead', null, h('tr', null, h('th', { class: 'c-chk' }, all), th('name', t('Name')), th('kind', t('Kind'), 'c-kind'), h('th', { class: 'c-owner' }, t('Owner')), th('modified', t('Modified'), 'c-date'), th('size', t('Size'), 'c-size'))),
         h(
           'tbody',
           null,
@@ -950,7 +957,7 @@ export class FileManager {
               h('td', { class: 'c-chk' }, this.checkbox(e.id)),
               h('td', null, h('div', { class: 'nm' }, fileIcon(e), h('span', { class: 'n' + (e.is_dir ? ' is-dir' : ''), title: e.name }, e.name), ...this.badges(e))),
               h('td', { class: 'c-kind' }, kindLabel(e)),
-              h('td', { class: 'c-owner' }, e.owner_id === this.me ? 'io' : e.owner_name),
+              h('td', { class: 'c-owner' }, e.owner_id === this.me ? t('me') : e.owner_name),
               h('td', { class: 'c-date', title: fmtDate(e.modified, true) }, fmtDate(e.modified)),
               h('td', { class: 'c-size' }, e.is_dir ? '—' : fmtSize(e.size)),
             )
@@ -968,13 +975,13 @@ export class FileManager {
     const dirs = this.entries.length - files.length
     const visible = this.sorted().length
     this.status.replaceChildren(
-      h('span', null, `${plural(dirs, 'cartella', 'cartelle')} · ${plural(files.length, 'file', 'file')}`),
+      h('span', null, `${plural(dirs, 'folder', 'folders')} · ${plural(files.length, 'file', 'files')}`),
       h('span', null, fmtSize(files.reduce((s, e) => s + e.size, 0))),
-      ...(this.filter ? [h('span', null, `filtro: ${visible} visibili`)] : []),
+      ...(this.filter ? [h('span', null, t('filter: {n} visible', { n: visible }))] : []),
     )
   }
 
-  // ------------------------------------------------------- pannello dettagli
+  // --------------------------------------------------------- details panel
 
   private setDetail(d: FileManager['detail']) {
     this.detail?.preview?.dispose()
@@ -1047,28 +1054,28 @@ export class FileManager {
     const mode = previewMode(e)
     let pv: HTMLElement
     if (!mode) pv = h('div', { class: 'pv plain' }, fileIcon(e, true))
-    else if (d?.error) pv = h('div', { class: 'pv plain' }, h('div', { class: 'err' }, 'Anteprima non disponibile', h('br'), h('small', null, d.error)))
+    else if (d?.error) pv = h('div', { class: 'pv plain' }, h('div', { class: 'err' }, t('Preview not available'), h('br'), h('small', null, d.error)))
     else if (!d?.preview) pv = h('div', { class: 'pv plain' }, spinner())
     else {
-      const zoom = h('button', { type: 'button', class: 'msk-btn ghost mini' }, svg('eye'), 'Apri')
+      const zoom = h('button', { type: 'button', class: 'msk-btn ghost mini' }, svg('eye'), t('Open'))
       zoom.onclick = () => this.view(e)
       pv = h('div', { class: 'pv' + (mode === 'text' ? ' text' : '') }, d.preview.node, h('div', { class: 'zoom' }, zoom))
     }
     const m = d?.preview?.meta ?? {}
-    const owner = e.owner_id === this.me ? 'Tu' : e.owner_name
+    const owner = e.owner_id === this.me ? t('You') : e.owner_name
     return [
       pv,
       h('div', { class: 'hd' }, h('div', { class: 'n' }, e.name), h('div', { class: 'k' }, kindLabel(e)), ...this.badges(e)),
       this.dl([
-        ['Dimensione', e.is_dir ? null : fmtSize(e.size) + (e.size >= 1024 ? ` (${e.size.toLocaleString('it-IT')} B)` : '')],
-        ['Risoluzione', m.dims],
-        ['Righe', m.lines != null ? m.lines.toLocaleString('it-IT') + (m.truncated ? '+' : '') : null],
-        ['Durata', m.duration],
-        ['Creato', fmtDate(e.created, true)],
-        ['Modificato', fmtDate(e.modified, true)],
-        ['Proprietario', owner],
-        ['Il tuo permesso', LEVEL_LABEL[e.my_level]],
-        ['Condiviso', e.shared ? 'Sì' : 'No'],
+        [t('Size'), e.is_dir ? null : fmtSize(e.size) + (e.size >= 1024 ? ` (${e.size.toLocaleString(locale())} B)` : '')],
+        [t('Resolution'), m.dims],
+        [t('Lines'), m.lines != null ? m.lines.toLocaleString(locale()) + (m.truncated ? '+' : '') : null],
+        [t('Duration'), m.duration],
+        [t('Created'), fmtDate(e.created, true)],
+        [t('Modified'), fmtDate(e.modified, true)],
+        [t('Owner'), owner],
+        [t('Your permission'), levelLabel(e.my_level)],
+        [t('Shared'), e.shared ? t('Yes') : t('No')],
       ]),
       this.acts(this.selectionActions([e])),
     ]
@@ -1079,8 +1086,8 @@ export class FileManager {
     const sz = items.reduce((s, e) => s + (e.is_dir ? 0 : e.size), 0)
     return [
       h('div', { class: 'pv plain' }, h('div', { class: 'fm-stack' }, ...items.slice(0, 3).map((e, i) => h('div', { style: `left:${i * 10}px;top:${i * 8}px` }, fileIcon(e, true))))),
-      h('div', { class: 'hd' }, h('div', { class: 'n' }, plural(items.length, 'elemento selezionato', 'elementi selezionati')), h('div', { class: 'k' }, `${plural(nd, 'cartella', 'cartelle')} · ${plural(items.length - nd, 'file', 'file')}`)),
-      this.dl([['Dimensione dei file', fmtSize(sz) + (nd ? ' + cartelle' : '')]]),
+      h('div', { class: 'hd' }, h('div', { class: 'n' }, plural(items.length, 'item selected', 'items selected')), h('div', { class: 'k' }, `${plural(nd, 'folder', 'folders')} · ${plural(items.length - nd, 'file', 'files')}`)),
+      this.dl([[t('Size of the files'), fmtSize(sz) + (nd ? ' + ' + t('folders') : '')]]),
       this.acts(this.selectionActions(items)),
     ]
   }
@@ -1089,17 +1096,17 @@ export class FileManager {
     const lvl = this.listing?.my_level
     return [
       h('div', { class: 'pv plain' }, fileIcon({ name: '', is_dir: true }, true)),
-      h('div', { class: 'hd' }, h('div', { class: 'n' }, this.folderName()), h('div', { class: 'k' }, 'Cartella corrente')),
+      h('div', { class: 'hd' }, h('div', { class: 'n' }, this.folderName()), h('div', { class: 'k' }, t('Current folder'))),
       this.dl([
-        ['Elementi', String(this.entries.length)],
-        ['Condivisi con te', this.parent === null ? String(this.entries.filter((e) => this.sharedWithMe(e)).length) : null],
-        ['Il tuo permesso', this.parent !== null && lvl ? LEVEL_LABEL[lvl] : null],
+        [t('Items'), String(this.entries.length)],
+        [t('Shared with you'), this.parent === null ? String(this.entries.filter((e) => this.sharedWithMe(e)).length) : null],
+        [t('Your permission'), this.parent !== null && lvl ? levelLabel(lvl) : null],
       ]),
       this.acts(this.folderActions().filter((a) => a.id !== 'selall' && a.id !== 'refresh')),
     ]
   }
 
-  // ------------------------------------------------------------ miniature
+  // ----------------------------------------------------------- thumbnails
 
   private clearThumbs() {
     for (const u of this.thumbs.values()) if (u) URL.revokeObjectURL(u)
@@ -1132,7 +1139,7 @@ export class FileManager {
           th?.replaceChildren(h('img', { src: u, alt: '', draggable: 'false' }))
         })
         .catch(() => {
-          // resta l'icona
+          // the icon stays
         })
         .finally(() => {
           this.thumbBusy--
@@ -1141,7 +1148,7 @@ export class FileManager {
     }
   }
 
-  // ---------------------------------------------------------- menu contesto
+  // --------------------------------------------------------- context menu
 
   private openMenu(x: number, y: number, background: boolean) {
     this.closeMenu()
@@ -1194,7 +1201,7 @@ export class FileManager {
     this.main.classList.remove('dragover')
   }
 
-  /** Solo file: le cartelle trascinate dal desktop vengono scartate. */
+  /** Files only: folders dragged from the desktop are left out. */
   private droppedFiles(ev: DragEvent): File[] {
     const dt = ev.dataTransfer
     if (!dt) return []
@@ -1212,7 +1219,7 @@ export class FileManager {
     } else {
       out.push(...dt.files)
     }
-    if (skipped) this.msk.toast(skipped === 1 ? 'Le cartelle non si possono caricare: trascina i file' : `${skipped} cartelle ignorate: si possono caricare solo file`, true)
+    if (skipped) this.msk.toast(skipped === 1 ? t('Folders cannot be uploaded: drag the files') : t('{n} folders ignored: only files can be uploaded', { n: skipped }), true)
     return out
   }
 
@@ -1260,7 +1267,7 @@ export class FileManager {
     })
   }
 
-  // --------------------------------------------------------------- tastiera
+  // ------------------------------------------------------------- keyboard
 
   private readonly onKey = (ev: KeyboardEvent) => {
     if (viewerOpen() || dialogOpen()) return
@@ -1273,7 +1280,7 @@ export class FileManager {
     }
     const t = ev.target as HTMLElement | null
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return
-    // con il focus su un pulsante, Invio e spazio lo attivano
+    // with the focus on a button, Enter and space activate it
     if (t?.tagName === 'BUTTON' && (ev.key === 'Enter' || ev.key === ' ')) return
     const list = this.sorted()
     const items = this.selected()
