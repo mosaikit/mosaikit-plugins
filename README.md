@@ -11,6 +11,7 @@ logic depends only on the SDK (`mosaikit-plugin-sdk`), the UIs only on `@mosaiki
 | Maps | `com.mosaikit.maps` | Catalog of GeoLibre maps, with public links |
 | Static sites | `com.mosaikit.static-site` | Static sites published from zip archives |
 | Files | `com.mosaikit.files` | Files and folders with preview and zip |
+| Note review | `com.mosaikit.note-review` | Sample extension of Notes: the Reviewed fields, the Mark as reviewed action and a Review tab with the history of the reviews |
 
 ## Build and test
 

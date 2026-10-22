@@ -1,0 +1,4 @@
+{
+  "extends": "../../../mosaikit/ui/plugin-api/tsconfig.json",
+  "include": ["src"]
+}

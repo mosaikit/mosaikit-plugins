@@ -8,7 +8,8 @@
     "contacts/ui",
     "maps/ui",
     "static-site/ui",
-    "files/ui"
+    "files/ui",
+    "note-review/ui"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
