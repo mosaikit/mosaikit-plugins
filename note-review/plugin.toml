@@ -1,0 +1,42 @@
+# Sample extension of Notes (docs/architecture.md, "Extensions"): it adds to the notes a "Reviewed"
+# field, who reviewed them, and an action to mark them as reviewed. No logic and no pages of its own:
+# the kernel keeps the values, Notes shows them (mountCrud of @mosaikit/plugin-api does it by itself).
+id = "com.mosaikit.note-review"
+name = "Note review"
+version = "0.1.0"
+description = "Marks notes as reviewed, with who did it"
+kind = "extension"
+icon = "badge-check"
+
+[contribution]
+icon = "✔"
+label = "Note review"
+
+[extends]
+plugin = "com.mosaikit.notes"
+min_version = "0.4.0"
+
+[[extension.fields]]
+resource = "notes"
+key = "reviewed"
+label = "Reviewed"
+kind = "bool"
+
+[[extension.fields]]
+resource = "notes"
+key = "reviewed_by"
+label = "Reviewed by"
+kind = "text"
+
+[[extension.actions]]
+resource = "notes"
+key = "mark_reviewed"
+label = "Mark as reviewed"
+set = { reviewed = true, reviewed_by = "$user" }
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Revisione delle note"
+description = "Segna le note come revisionate, con chi lo ha fatto"
+label = "Revisione delle note"
+extension = { fields = { reviewed = "Revisionata", reviewed_by = "Revisionata da" }, actions = { mark_reviewed = "Segna come revisionata" } }
