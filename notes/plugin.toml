@@ -1,6 +1,6 @@
 id = "com.mosaikit.notes"
 name = "Notes"
-version = "0.4.1"
+version = "0.4.2"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "notebook-pen"
@@ -30,11 +30,19 @@ hooks = ["notes"]
 view = "kpi_notes_by_tag"
 label = "Notes by tag"
 
+# The key of a translation service: the platform, the tenant or the person sets it in Keys of outside
+# services; the logic reads the one in use (notes.translation_ready).
+[[service_keys]]
+id = "translate"
+label = "Translation service"
+description = "Translation of the notes into other languages"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 name = "Note"
 description = "Note personali, condivisibili con colleghi e gruppi"
 label = "Note"
+service_keys = { translate = { label = "Servizio di traduzione", description = "Traduzione delle note in altre lingue" } }
 
 [i18n.it.resources.notes]
 label = "Note"

@@ -1,4 +1,4 @@
-//! Notes plugin: default tag at creation and count by tag.
+//! Notes plugin: default tag at creation, count by tag, whether a translation service is set.
 
 use mosaikit_plugin_sdk::prelude::*;
 
@@ -23,9 +23,18 @@ fn count_by_tag(ctx: &Ctx, _args: Value) -> Result<Value> {
     Ok(Value::Array(rows))
 }
 
+/// Whether a key of the translation service (`[[service_keys]]` of the manifest) is in use for the
+/// caller: their own, the tenant's or the platform's. The key itself never leaves the logic.
+fn translation_ready(ctx: &Ctx, _args: Value) -> Result<Value> {
+    Ok(json!({ "ready": ctx.service_key("translate")?.is_some() }))
+}
+
 mosaikit_plugin_sdk::plugin! {
     hooks: { "notes.before_create" => before_create },
-    commands: { "notes.count_by_tag" => count_by_tag },
+    commands: {
+        "notes.count_by_tag" => count_by_tag,
+        "notes.translation_ready" => translation_ready,
+    },
 }
 
 #[cfg(test)]
@@ -54,6 +63,19 @@ mod tests {
             )
             .unwrap();
         assert_eq!(keep, None);
+    }
+
+    #[test]
+    fn translation_ready() {
+        let none = MockHost::new().on("key.get", |_| Ok(Value::Null));
+        let out = none.command(&__msk_registry(), "notes.translation_ready", json!({})).unwrap();
+        assert_eq!(out, json!({ "ready": false }));
+        let set = MockHost::new().on("key.get", |req| {
+            assert_eq!(req["service"], "translate");
+            Ok(json!("secret-key"))
+        });
+        let out = set.command(&__msk_registry(), "notes.translation_ready", json!({})).unwrap();
+        assert_eq!(out, json!({ "ready": true }), "the key never goes back");
     }
 
     #[test]
