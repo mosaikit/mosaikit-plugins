@@ -5,7 +5,8 @@ use mosaikit_plugin_sdk::prelude::*;
 const DEFAULT_TAG: &str = "personal";
 
 fn before_create(ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
-    if !hook.values.str("tag").is_empty() {
+    // the default only when the tag is not given at all: «—» chosen in the form (null) stays without a tag
+    if hook.values.0.contains_key("tag") {
         return Ok(None);
     }
     let mut v = hook.values.clone();
@@ -63,6 +64,16 @@ mod tests {
             )
             .unwrap();
         assert_eq!(keep, None);
+        // «—» in the form: no tag, on purpose
+        let none = host
+            .hook(
+                &__msk_registry(),
+                "before_create",
+                "notes",
+                json!({ "title": "x", "tag": null }),
+            )
+            .unwrap();
+        assert_eq!(none, None);
     }
 
     #[test]

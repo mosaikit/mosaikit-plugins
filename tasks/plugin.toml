@@ -14,6 +14,9 @@ label = "Tasks"
 name = "tasks"
 label = "Tasks"
 title_field = "title"
+# the Home of a person lists what is due soon; a done task is no longer due
+due_field = "due"
+done_field = "done"
 fields = [
   { key = "title", label = "Title", kind = "text", required = true },
   { key = "due", label = "Due", kind = "date" },
