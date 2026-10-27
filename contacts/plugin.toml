@@ -5,6 +5,8 @@ kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "book-user"
 description = "Shareable address book, with normalized and validated emails"
+author = "Mosaikit"
+license = "Apache-2.0"
 
 [contribution]
 icon = "👥"

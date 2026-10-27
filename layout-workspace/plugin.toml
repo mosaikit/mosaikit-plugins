@@ -3,6 +3,8 @@ name = "Workspace"
 version = "1.0.0"
 kind = "layout"
 description = "Top bar with a wide search, a drawer that opens and closes"
+author = "Mosaikit"
+license = "Apache-2.0"
 
 [contribution]
 icon = "▦"

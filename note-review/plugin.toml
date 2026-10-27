@@ -6,6 +6,8 @@ id = "com.mosaikit.note-review"
 name = "Note review"
 version = "0.2.0"
 description = "Marks notes as reviewed, with who did it and the history of the reviews"
+author = "Mosaikit"
+license = "Apache-2.0"
 kind = "extension"
 icon = "badge-check"
 

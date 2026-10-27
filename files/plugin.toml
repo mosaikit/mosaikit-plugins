@@ -5,6 +5,8 @@ kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "folder"
 description = "Shareable files and folders, with preview, zip and public links"
+author = "Mosaikit"
+license = "Apache-2.0"
 
 [contribution]
 icon = "📁"

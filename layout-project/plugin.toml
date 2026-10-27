@@ -3,6 +3,8 @@ name = "Project"
 version = "1.0.0"
 kind = "layout"
 description = "Global navigation at the left, the sidebar of the area next to it"
+author = "Mosaikit"
+license = "Apache-2.0"
 
 [contribution]
 icon = "▦"

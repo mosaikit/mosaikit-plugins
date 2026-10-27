@@ -3,6 +3,8 @@ name = "Tabs"
 version = "1.0.0"
 kind = "layout"
 description = "Apps and pages as tabs under the band, a menu for the pages of an app"
+author = "Mosaikit"
+license = "Apache-2.0"
 
 [contribution]
 icon = "▦"

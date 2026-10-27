@@ -3,6 +3,8 @@ name = "Suite"
 version = "1.0.0"
 kind = "layout"
 description = "Apps from a launcher grid, the pages of the area in a bar under the band"
+author = "Mosaikit"
+license = "Apache-2.0"
 
 [contribution]
 icon = "▦"

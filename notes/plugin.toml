@@ -1,10 +1,12 @@
 id = "com.mosaikit.notes"
 name = "Notes"
-version = "0.4.2"
+version = "0.4.3"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "notebook-pen"
 description = "Personal notes, shareable with colleagues and groups"
+author = "Mosaikit"
+license = "Apache-2.0"
 
 [contribution]
 icon = "📝"
