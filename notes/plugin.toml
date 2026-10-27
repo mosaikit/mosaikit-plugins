@@ -6,6 +6,8 @@ kind = "app"
 icon = "notebook-pen"
 description = "Personal notes, shareable with colleagues and groups"
 author = "Mosaikit"
+details = "Write notes with a title, a text and tags, keep them private or share them with colleagues and groups.\n\nEvery note has its own sharing level, a public link when you need one, and a place in the search of the platform."
+screenshots = ["list.svg", "note.svg"]
 license = "Apache-2.0"
 
 [contribution]
@@ -81,6 +83,7 @@ description = "Translation of the notes into other languages"
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
+details = "Scrivi note con titolo, testo ed etichette, tienile private o condividile con colleghi e gruppi.\n\nOgni nota ha il proprio livello di condivisione, un link pubblico quando serve e un posto nella ricerca della piattaforma."
 name = "Note"
 description = "Note personali, condivisibili con colleghi e gruppi"
 label = "Note"
