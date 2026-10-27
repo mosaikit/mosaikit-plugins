@@ -19,12 +19,12 @@
 .mskm .msg.err { color: var(--err); }
 .mskm .map-msg { margin: 0 0 8px; }
 .mskm .gframe { width: 100%; height: calc(100vh - 190px); min-height: 400px; border: 1px solid var(--line); border-radius: 12px; background: #fff; display: block; }
-/* viewing a map: the frame fills the whole area under the header, edge to edge and without rounded corners */
-#app.mskm.show { max-width: none; padding: 0; height: 100vh; display: flex; flex-direction: column; }
-.mskm.show .mapview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.mskm.show .editbar { margin: 0; padding: 8px 12px; flex: none; }
-.mskm.show .map-msg { margin: 0; padding: 0 12px; }
-.mskm.show .gframe { flex: 1; height: auto; min-height: 0; border: 0; border-radius: 0; }
+/* viewing or editing a map: the frame fills the whole area under the header, edge to edge and without rounded corners */
+#app.mskm.full { max-width: none; padding: 0; height: 100vh; display: flex; flex-direction: column; }
+.mskm.full .mapview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.mskm.full .editbar { margin: 0; padding: 8px 12px; flex: none; }
+.mskm.full .map-msg, .mskm.full .hint { margin: 0; padding: 4px 12px; }
+.mskm.full .gframe { flex: 1; height: auto; min-height: 0; border: 0; border-radius: 0; }
 
 /* public view: the map fills the page */
 .mskm.public { max-width: none; display: flex; flex-direction: column; height: calc(100vh - 48px); }

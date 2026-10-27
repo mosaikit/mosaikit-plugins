@@ -326,6 +326,8 @@ function mount(msk: Msk) {
     listView.hidden = !isList
     mapView.hidden = isList
     app.classList.toggle('show', isShow)
+    // the map (viewed or edited) fills the whole area under the header
+    app.classList.toggle('full', !isList)
     mvTitle.hidden = !isShow
     mvName.hidden = isShow
     mvDesc.hidden = isShow
