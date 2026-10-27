@@ -1,0 +1,14 @@
+# a launcher of every app and page, the pages of the area as tabs under the band
+pattern = "launcher"
+
+[band]
+brand = true
+search = "center"
+tenant = "band"
+
+[phone]
+nav = "launcher"
+
+[style]
+radius = "medium"
+density = "compact"

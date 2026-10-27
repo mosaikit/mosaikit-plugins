@@ -1,0 +1,8 @@
+/* Suite: square tiles in the launcher, a quiet bar of the pages */
+.msk-launcher-tile {
+  border-radius: 10px;
+  min-height: 72px;
+}
+.msk-tabs {
+  background-color: var(--pane);
+}

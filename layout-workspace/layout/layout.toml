@@ -1,0 +1,14 @@
+# the navigation as a drawer under a top bar with a wide search
+pattern = "drawer"
+
+[band]
+brand = true
+search = "wide"
+tenant = "band"
+
+[phone]
+nav = "drawer"
+
+[style]
+radius = "round"
+tabs = "pill"

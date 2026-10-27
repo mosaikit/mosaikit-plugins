@@ -1,0 +1,16 @@
+id = "com.mosaikit.layout-workspace"
+name = "Workspace"
+version = "1.0.0"
+kind = "layout"
+description = "Top bar with a wide search, a drawer that opens and closes"
+
+[contribution]
+icon = "▦"
+label = "Workspace"
+
+# a layout is declarative: layout/layout.toml (the arrangement of the slots), layout/layout.css (checked at
+# install and scoped under the class of the layout) and layout/images; no code runs in the shell
+[i18n.it]
+name = "Area di lavoro"
+description = "Barra in alto con una ricerca ampia, un cassetto che si apre e si chiude"
+label = "Area di lavoro"

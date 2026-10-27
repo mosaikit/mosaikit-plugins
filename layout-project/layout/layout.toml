@@ -1,0 +1,15 @@
+# global areas at the left (in the colour of the band), the sidebar of the area next to them
+pattern = "areas"
+band_image = "band.png"
+
+[band]
+brand = true
+breadcrumb = true
+search = "center"
+tenant = "nav"
+
+[phone]
+nav = "drawer"
+
+[style]
+radius = "square"

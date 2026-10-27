@@ -1,0 +1,7 @@
+/* Project: the areas as square buttons, a thin rule under the band */
+.msk-area {
+  border-radius: 4px;
+}
+.msk-band {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}

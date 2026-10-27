@@ -1,0 +1,16 @@
+id = "com.mosaikit.layout-project"
+name = "Project"
+version = "1.0.0"
+kind = "layout"
+description = "Global navigation at the left, the sidebar of the area next to it"
+
+[contribution]
+icon = "▦"
+label = "Project"
+
+# a layout is declarative: layout/layout.toml (the arrangement of the slots), layout/layout.css (checked at
+# install and scoped under the class of the layout) and layout/images; no code runs in the shell
+[i18n.it]
+name = "Progetto"
+description = "Navigazione globale a sinistra, la sidebar dell’area accanto"
+label = "Progetto"

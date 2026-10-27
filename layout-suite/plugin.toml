@@ -1,0 +1,16 @@
+id = "com.mosaikit.layout-suite"
+name = "Suite"
+version = "1.0.0"
+kind = "layout"
+description = "Apps from a launcher grid, the pages of the area in a bar under the band"
+
+[contribution]
+icon = "▦"
+label = "Suite"
+
+# a layout is declarative: layout/layout.toml (the arrangement of the slots), layout/layout.css (checked at
+# install and scoped under the class of the layout) and layout/images; no code runs in the shell
+[i18n.it]
+name = "Suite"
+description = "Le app da una griglia, le pagine dell’area in una barra sotto la banda"
+label = "Suite"

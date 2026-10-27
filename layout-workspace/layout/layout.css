@@ -1,0 +1,11 @@
+/* Workspace: a light drawer, rounded items, the active one as a pill */
+.msk-nav {
+  background-color: var(--background);
+}
+.msk-nav-item {
+  border-radius: 999px;
+  padding-left: 16px;
+}
+.msk-band {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}

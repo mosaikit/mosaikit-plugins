@@ -26,6 +26,46 @@ entry = "index.html"
 [permissions]
 hooks = ["notes"]
 
+# the pages of the app in the navigation of the shell: each layout draws them its way (a tree that
+# opens, a menu at the side of the rail, a menu under a tab); the page opens at its place (msk.at)
+[[nav]]
+id = "all"
+label = "All notes"
+icon = "notebook-pen"
+
+[[nav]]
+id = "mine"
+label = "Mine"
+icon = "star"
+
+[[nav]]
+id = "shared"
+label = "Shared with me"
+icon = "users"
+
+[[nav]]
+id = "tags"
+label = "By tag"
+icon = "tag"
+
+[[nav]]
+id = "tag_personal"
+label = "Personal"
+parent = "tags"
+place = "tag-personal"
+
+[[nav]]
+id = "tag_work"
+label = "Work"
+parent = "tags"
+place = "tag-work"
+
+[[nav]]
+id = "tag_urgent"
+label = "Urgent"
+parent = "tags"
+place = "tag-urgent"
+
 [[kpi]]
 view = "kpi_notes_by_tag"
 label = "Notes by tag"
@@ -48,6 +88,15 @@ service_keys = { translate = { label = "Servizio di traduzione", description = "
 label = "Note"
 fields = { title = "Titolo", body = "Testo", tag = "Tag" }
 options.tag = { personal = "personale", work = "lavoro", urgent = "urgente" }
+
+[i18n.it.nav]
+all = "Tutte le note"
+mine = "Le mie"
+shared = "Condivise con me"
+tags = "Per tag"
+tag_personal = "Personale"
+tag_work = "Lavoro"
+tag_urgent = "Urgente"
 
 [i18n.it.kpi.kpi_notes_by_tag]
 label = "Note per tag"

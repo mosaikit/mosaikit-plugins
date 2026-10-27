@@ -1,0 +1,16 @@
+id = "com.mosaikit.layout-tabs"
+name = "Tabs"
+version = "1.0.0"
+kind = "layout"
+description = "Apps and pages as tabs under the band, a menu for the pages of an app"
+
+[contribution]
+icon = "▦"
+label = "Tabs"
+
+# a layout is declarative: layout/layout.toml (the arrangement of the slots), layout/layout.css (checked at
+# install and scoped under the class of the layout) and layout/images; no code runs in the shell
+[i18n.it]
+name = "Schede"
+description = "App e pagine come schede sotto la banda, un menu per le pagine di un’app"
+label = "Schede"
