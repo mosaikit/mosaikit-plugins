@@ -79,13 +79,17 @@ mod tests {
     #[test]
     fn translation_ready() {
         let none = MockHost::new().on("key.get", |_| Ok(Value::Null));
-        let out = none.command(&__msk_registry(), "notes.translation_ready", json!({})).unwrap();
+        let out = none
+            .command(&__msk_registry(), "notes.translation_ready", json!({}))
+            .unwrap();
         assert_eq!(out, json!({ "ready": false }));
         let set = MockHost::new().on("key.get", |req| {
             assert_eq!(req["service"], "translate");
             Ok(json!("secret-key"))
         });
-        let out = set.command(&__msk_registry(), "notes.translation_ready", json!({})).unwrap();
+        let out = set
+            .command(&__msk_registry(), "notes.translation_ready", json!({}))
+            .unwrap();
         assert_eq!(out, json!({ "ready": true }), "the key never goes back");
     }
 
