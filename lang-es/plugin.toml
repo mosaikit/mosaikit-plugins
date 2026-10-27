@@ -3,6 +3,8 @@ name = "Spanish (Español)"
 version = "0.1.0"
 kind = "language"
 icon = "languages"
+author = "Mosaikit"
+license = "Apache-2.0"
 description = "Spanish interface: a sample language plugin with a starter set of texts (sign-in page, navigation, Notes)"
 
 [contribution]
