@@ -1,0 +1,20 @@
+id = "com.mosaikit.lang-es"
+name = "Spanish (Español)"
+version = "0.1.0"
+kind = "language"
+icon = "languages"
+description = "Spanish interface: a sample language plugin with a starter set of texts (sign-in page, navigation, Notes)"
+
+[contribution]
+icon = "🌐"
+label = "Español"
+
+# the language this plugin adds: the code and its name in that language
+[language]
+code = "es"
+name = "Español"
+
+[i18n.it]
+name = "Spagnolo (Español)"
+description = "Interfaccia in spagnolo: un plugin di lingua di esempio con un primo insieme di testi (pagina di accesso, navigazione, Note)"
+label = "Español"

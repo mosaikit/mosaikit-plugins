@@ -1,0 +1,8 @@
+name = "Notas"
+description = "Notas personales, que se pueden compartir con compañeros y grupos"
+label = "Notas"
+
+[resources.notes]
+label = "Notas"
+fields = { title = "Título", body = "Texto", tag = "Etiqueta" }
+options.tag = { personal = "personal", work = "trabajo", urgent = "urgente" }

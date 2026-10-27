@@ -1,10 +1,10 @@
 id = "com.mosaikit.static-site"
 name = "Static sites"
-version = "0.4.1"
+version = "0.5.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "globe"
-description = "Publishes static sites from zip archives, shareable and with public links"
+description = "Publishes static sites from zip archives or shows a site by its web address, shareable and with public links"
 author = "Mosaikit"
 license = "Apache-2.0"
 
@@ -23,6 +23,9 @@ fields = [
   { key = "entry", label = "Start page", kind = "text", hidden = true },
   { key = "files", label = "Files", kind = "number", hidden = true },
   { key = "size", label = "Size (bytes)", kind = "number", hidden = true },
+  { key = "url", label = "Web address", kind = "text", hidden = true, search = true },
+  { key = "framable", label = "May be framed", kind = "text", hidden = true },
+  { key = "thumbnail", label = "Thumbnail", kind = "text", hidden = true },
 ]
 
 [ui]
@@ -30,6 +33,8 @@ entry = "index.html"
 
 [permissions]
 content = true
+# shows sites by address in a frame and asks the host to look at them (framing allowed? title, picture)
+web = true
 
 [[kpi]]
 view = "kpi_sites"
@@ -38,12 +43,12 @@ label = "Published sites"
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 name = "Siti statici"
-description = "Pubblica siti statici da archivi zip, condivisibili e con link pubblici"
+description = "Pubblica siti statici da archivi zip o mostra un sito dal suo indirizzo web, condivisibili e con link pubblici"
 label = "Siti statici"
 
 [i18n.it.resources.sites]
 label = "Siti"
-fields = { name = "Nome", description = "Descrizione", zip_name = "Zip caricato", entry = "Pagina iniziale", files = "File", size = "Dimensione (byte)" }
+fields = { name = "Nome", description = "Descrizione", zip_name = "Zip caricato", entry = "Pagina iniziale", files = "File", size = "Dimensione (byte)", url = "Indirizzo web", framable = "Incorporabile", thumbnail = "Miniatura" }
 
 [i18n.it.kpi.kpi_sites]
 label = "Siti pubblicati"
