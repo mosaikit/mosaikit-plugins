@@ -366,6 +366,7 @@ function mount(msk: Msk) {
     state.view = view
     listView.hidden = view !== 'list'
     siteView.hidden = view === 'list'
+    app.classList.toggle('show', view === 'show')
     siteForm.hidden = view !== 'edit'
     const web = view === 'show' && !!findRow(state.editId) && isWeb(findRow(state.editId)!)
     sframe.hidden = view !== 'show' || web
