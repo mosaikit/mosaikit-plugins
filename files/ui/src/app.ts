@@ -153,8 +153,8 @@ export class FileManager {
       pageHead({
         title: t('Files'),
         sub: msk.user ? msk.user.name || msk.user.username : undefined,
-        actions: [this.viewSeg, this.headActs],
-        filters: [h('label', { class: 'fm-search' }, svg('search'), this.search)],
+        actions: [this.headActs],
+        filters: [this.viewSeg, h('label', { class: 'fm-search' }, svg('search'), this.search)],
       }),
       h('div', { class: 'fm-content' }, this.crumbs, this.bar, h('div', { class: 'fm-body' }, this.main, this.side), this.status),
       this.picker,
