@@ -55,51 +55,105 @@ fn translated(v: &Value) -> Option<Vec<String>> {
 /// `{ ok: true, title, body, target }`, or `{ ok: false, reason }` with `no_key`, `no_endpoint`,
 /// `key_rejected`, `service_error` or `unreachable`.
 fn translate(ctx: &Ctx, args: Value) -> Result<Value> {
-    let target = args.get("target").and_then(Value::as_str).unwrap_or_default().trim().to_lowercase();
-    if target.len() < 2 || target.len() > 8 || !target.chars().all(|c| c.is_ascii_lowercase() || c == '-') {
+    let target = args
+        .get("target")
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .trim()
+        .to_lowercase();
+    if target.len() < 2
+        || target.len() > 8
+        || !target.chars().all(|c| c.is_ascii_lowercase() || c == '-')
+    {
         return Err(Error::msg("invalid target language"));
     }
     let (title, body) = match args.get("id").and_then(Value::as_str) {
         Some(id) => {
             let row = ctx
                 .db()
-                .query_one("select title, body from notes where resource_id::text = $1", &[json!(id)])?
+                .query_one(
+                    "select title, body from notes where resource_id::text = $1",
+                    &[json!(id)],
+                )?
                 .ok_or_else(|| Error::msg("note not found"))?;
             (
-                row.get("title").and_then(Value::as_str).unwrap_or_default().to_string(),
-                row.get("body").and_then(Value::as_str).unwrap_or_default().to_string(),
+                row.get("title")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string(),
+                row.get("body")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string(),
             )
         }
-        None => (String::new(), args.get("text").and_then(Value::as_str).unwrap_or_default().to_string()),
+        None => (
+            String::new(),
+            args.get("text")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string(),
+        ),
     };
     if ctx.service_key(KEY)?.is_none() {
         return refused("no_key", "no key of the translation service is set");
     }
     let Some(address) = ctx.service_key(ENDPOINT)? else {
-        return refused("no_endpoint", "the address of the translation service is not set");
+        return refused(
+            "no_endpoint",
+            "the address of the translation service is not set",
+        );
     };
     // only the parts that have a text are sent
-    let parts: Vec<&String> = [&title, &body].into_iter().filter(|p| !p.trim().is_empty()).collect();
+    let parts: Vec<&String> = [&title, &body]
+        .into_iter()
+        .filter(|p| !p.trim().is_empty())
+        .collect();
     if parts.is_empty() {
         return Ok(json!({ "ok": true, "title": "", "body": "", "target": target }));
     }
     let payload = json!({ "q": parts, "source": "auto", "target": target, "format": "text" });
     let url = format!("{}/translate", address.trim_end_matches('/'));
-    let reply = match ctx.http().fetch_with_key("POST", &url, Some(&payload.to_string()), KEY) {
+    let reply = match ctx
+        .http()
+        .fetch_with_key("POST", &url, Some(&payload.to_string()), KEY)
+    {
         Ok(r) => r,
         Err(e) => return refused("unreachable", e.to_string()),
     };
     match reply.status {
         200..=299 => {}
-        401 | 403 => return refused("key_rejected", format!("the service answered {}", reply.status)),
+        401 | 403 => {
+            return refused(
+                "key_rejected",
+                format!("the service answered {}", reply.status),
+            )
+        }
         other => return refused("service_error", format!("the service answered {other}")),
     }
-    let Some(out) = reply.json().ok().as_ref().and_then(translated).filter(|o| o.len() == parts.len()) else {
-        return refused("service_error", "the answer of the service is not understood");
+    let Some(out) = reply
+        .json()
+        .ok()
+        .as_ref()
+        .and_then(translated)
+        .filter(|o| o.len() == parts.len())
+    else {
+        return refused(
+            "service_error",
+            "the answer of the service is not understood",
+        );
     };
     let mut it = out.into_iter();
-    let t_title = if title.trim().is_empty() { String::new() } else { it.next().unwrap_or_default() };
-    let t_body = if body.trim().is_empty() { String::new() } else { it.next().unwrap_or_default() };
+    let t_title = if title.trim().is_empty() {
+        String::new()
+    } else {
+        it.next().unwrap_or_default()
+    };
+    let t_body = if body.trim().is_empty() {
+        String::new()
+    } else {
+        it.next().unwrap_or_default()
+    };
     Ok(json!({ "ok": true, "title": t_title, "body": t_body, "target": target }))
 }
 
@@ -142,7 +196,11 @@ mod tests {
 
     fn keys(key: Option<&'static str>, endpoint: Option<&'static str>) -> MockHost {
         MockHost::new().on("key.get", move |req| {
-            let v = if req["service"] == "translate" { key } else { endpoint };
+            let v = if req["service"] == "translate" {
+                key
+            } else {
+                endpoint
+            };
             Ok(v.map_or(Value::Null, |s| json!(s)))
         })
     }
@@ -150,11 +208,22 @@ mod tests {
     #[test]
     fn translation_ready() {
         let none = keys(None, None);
-        let out = none.command(&__msk_registry(), "notes.translation_ready", json!({})).unwrap();
-        assert_eq!(out, json!({ "ready": false, "key": false, "endpoint": false }));
+        let out = none
+            .command(&__msk_registry(), "notes.translation_ready", json!({}))
+            .unwrap();
+        assert_eq!(
+            out,
+            json!({ "ready": false, "key": false, "endpoint": false })
+        );
         let set = keys(Some("secret-key"), Some("https://t.example"));
-        let out = set.command(&__msk_registry(), "notes.translation_ready", json!({})).unwrap();
-        assert_eq!(out, json!({ "ready": true, "key": true, "endpoint": true }), "the key never goes back");
+        let out = set
+            .command(&__msk_registry(), "notes.translation_ready", json!({}))
+            .unwrap();
+        assert_eq!(
+            out,
+            json!({ "ready": true, "key": true, "endpoint": true }),
+            "the key never goes back"
+        );
     }
 
     #[test]
@@ -164,10 +233,15 @@ mod tests {
             .command(&__msk_registry(), "notes.translate", args.clone())
             .unwrap();
         assert_eq!(out["reason"], "no_key");
-        let out = keys(Some("k"), None).command(&__msk_registry(), "notes.translate", args).unwrap();
+        let out = keys(Some("k"), None)
+            .command(&__msk_registry(), "notes.translate", args)
+            .unwrap();
         assert_eq!(out["reason"], "no_endpoint");
-        let bad = keys(Some("k"), Some("https://t.example"))
-            .command(&__msk_registry(), "notes.translate", json!({ "text": "x", "target": "../x" }));
+        let bad = keys(Some("k"), Some("https://t.example")).command(
+            &__msk_registry(),
+            "notes.translate",
+            json!({ "text": "x", "target": "../x" }),
+        );
         assert!(bad.is_err());
     }
 
@@ -184,17 +258,32 @@ mod tests {
                 Ok(json!({ "status": 200, "body": "{\"translatedText\":[\"Ciao\",\"Buongiorno\"]}" }))
             });
         let out = host
-            .command(&__msk_registry(), "notes.translate", json!({ "id": "n1", "target": "IT" }))
+            .command(
+                &__msk_registry(),
+                "notes.translate",
+                json!({ "id": "n1", "target": "IT" }),
+            )
             .unwrap();
-        assert_eq!(out, json!({ "ok": true, "title": "Ciao", "body": "Buongiorno", "target": "it" }));
+        assert_eq!(
+            out,
+            json!({ "ok": true, "title": "Ciao", "body": "Buongiorno", "target": "it" })
+        );
         let denied = keys(Some("k"), Some("https://t.example"))
             .on("http.fetch", |_| Ok(json!({ "status": 401, "body": "" })))
-            .command(&__msk_registry(), "notes.translate", json!({ "text": "Hi", "target": "it" }))
+            .command(
+                &__msk_registry(),
+                "notes.translate",
+                json!({ "text": "Hi", "target": "it" }),
+            )
             .unwrap();
         assert_eq!(denied["reason"], "key_rejected");
         let down = keys(Some("k"), Some("https://t.example"))
             .on("http.fetch", |_| Err("this address is not allowed".into()))
-            .command(&__msk_registry(), "notes.translate", json!({ "text": "Hi", "target": "it" }))
+            .command(
+                &__msk_registry(),
+                "notes.translate",
+                json!({ "text": "Hi", "target": "it" }),
+            )
             .unwrap();
         assert_eq!(down["reason"], "unreachable");
     }
