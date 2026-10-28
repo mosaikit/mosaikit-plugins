@@ -1,0 +1,14 @@
+/* Tasks: the items of the list and of the board. Colours come from the tokens of the host. */
+.task { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.tcheck { width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: var(--acc); cursor: pointer; }
+.tbody { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.ttitle { font-weight: 600; overflow-wrap: anywhere; }
+.task.done .ttitle { color: var(--dim); text-decoration: line-through; font-weight: 500; }
+.tmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; color: var(--dim); }
+.tdue.late { color: var(--err); font-weight: 600; }
+.msk-items.list .task { align-items: center; }
+.msk-items.list .tbody { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.msk-items.list .tbody .ttitle { flex: 1 1 200px; }
+.msk-items.list.col .task { align-items: flex-start; }
+.msk-items.list.col .tbody { flex-direction: column; align-items: flex-start; gap: 6px; }
+.msk-items.list.col .tbody .ttitle { flex: none; }

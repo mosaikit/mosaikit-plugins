@@ -1,0 +1,10 @@
+/* Notes: the cards and the reading panel. Colours come from the tokens of the host. */
+.note { display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+.ntitle { font-size: 14px; overflow-wrap: anywhere; }
+.nbody { margin: 0; font-size: 13px; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; white-space: pre-line; flex: 1; }
+.nbody.none, .nread.none { font-style: italic; }
+.nfoot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.nwho { font-size: 12px; color: var(--dim); }
+.note-read h2 { margin: 0 0 8px; font-size: 20px; line-height: 1.25; overflow-wrap: anywhere; }
+.nread { margin: 14px 0 6px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.nread.none { color: var(--dim); }
