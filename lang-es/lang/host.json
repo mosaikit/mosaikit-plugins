@@ -1882,5 +1882,11 @@
   "Identity provider of {tenant}": "Proveedor de identidad de {tenant}",
   "Languages": "Idiomas",
   "Browser": "Navegador",
-  "Plugin runtime": "Entorno de ejecución de plugins"
+  "Plugin runtime": "Entorno de ejecución de plugins",
+  "Space by app": "Espacio por app",
+  "Other apps": "Otras apps",
+  "Apps, in every tenant": "Apps, en todas las organizaciones",
+  "Items by kind": "Elementos por tipo",
+  "Figures of the apps as tables": "Cifras de las apps como tablas",
+  "{shown} loaded": "{shown} cargados"
 }
