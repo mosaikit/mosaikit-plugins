@@ -11,6 +11,7 @@
 .fm-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .fm-title { display: flex; align-items: center; gap: 8px; }
 .fm-headacts { display: flex; gap: 6px; align-items: center; }
+@media (max-width: 640px) { .fm .msk-pagehead .msk-pacts { flex-wrap: wrap; } .fm .msk-pagehead .msk-pacts > label { flex: 1 1 160px; } }
 .fm-search { position: relative; display: block; }
 .fm-search .si { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--dim); pointer-events: none; }
 .fm-search input[type='search'] { width: 230px; max-width: 46vw; padding-left: 32px; }
