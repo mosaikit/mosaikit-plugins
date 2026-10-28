@@ -1,5 +1,8 @@
 /* Styles of the Static sites plugin, on top of @mosaikit/plugin-api/style.css. */
-.msks { max-width: 1180px; }
+.msks { max-width: none; }
+/* the page has no padding of its own (the header is flush): the views that are not the list bring theirs */
+.msks > :not(.listview) { padding: 24px 28px; max-width: 1180px; }
+#app.msks.show > :not(.listview) { padding: 0; max-width: none; }
 .msks .msk-filter { width: 260px; }
 .msks td.mono { font-family: var(--font-mono); font-size: 11px; color: var(--dim); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .msks td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -68,3 +71,8 @@
 /* the list of sites fills the page under the header; the header stays */
 .msks .listview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .msks .listview[hidden] { display: none; }
+
+/* the bar of the open site is the header of the page: the same as the one of the pages of Mosaikit */
+.msks.show .editbar { margin: 0; padding: 8px 24px; min-height: 57px; box-sizing: border-box; border-bottom: 1px solid var(--line); background: var(--bg); font-family: var(--msk-font, var(--font-ui)); }
+.msks.show .sv-title { font-size: 16px; font-weight: 600; line-height: 24px; }
+@media (max-width: 640px) { .msks.show .editbar { padding: 8px 16px; } }
