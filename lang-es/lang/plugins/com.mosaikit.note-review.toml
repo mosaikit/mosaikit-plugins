@@ -2,4 +2,4 @@ name = "Revisión de notas"
 description = "Marca las notas como revisadas, con quién lo hizo y el historial de revisiones"
 label = "Revisión de notas"
 extension = { fields = { reviewed = "Revisada", reviewed_by = "Revisada por", history = "Historial de revisiones" }, actions = { mark_reviewed = "Marcar como revisada" }, tabs = { review = "Revisión" } }
-details = "Añade una pestaña Revisión a las notas de la aplicación Notas. Quien revisa marca una nota como revisada, con un comentario opcional; la pestaña muestra quién lo hizo, cuándo y el historial de las revisiones.\n\nUna extensión: solo funciona donde está instalada Notas, y su permiso decide quién puede revisar."
+details = "Añade una pestaña Revisión a las notas de la app Notas. Quien revisa marca una nota como revisada, con un comentario opcional; la pestaña muestra quién lo hizo, cuándo y el historial de las revisiones.\n\nUna extensión: solo funciona donde está instalada Notas, y su permiso decide quién puede revisar."
