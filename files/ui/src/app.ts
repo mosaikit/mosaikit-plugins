@@ -106,6 +106,7 @@ export class FileManager {
   private readonly search: HTMLInputElement
   private readonly viewSeg: HTMLElement
   private readonly headActs: HTMLElement
+  private readonly headMore: HTMLElement
   private readonly crumbs: HTMLElement
   private readonly bar: HTMLElement
   private readonly main: HTMLElement
@@ -134,6 +135,7 @@ export class FileManager {
     })
     this.viewSeg = h('div', { class: 'fm-seg', role: 'group', 'aria-label': t('View') })
     this.headActs = h('div', { class: 'fm-headacts' })
+    this.headMore = h('div', { class: 'fm-headacts' })
     this.crumbs = h('nav', { class: 'fm-crumbs', 'aria-label': t('Path') })
     this.bar = h('div', { class: 'fm-bar' })
     this.main = h('div', { class: 'fm-main' })
@@ -154,7 +156,7 @@ export class FileManager {
         title: t('Files'),
         sub: msk.user ? msk.user.name || msk.user.username : undefined,
         actions: [this.headActs],
-        filters: [this.viewSeg, h('label', { class: 'fm-search' }, svg('search'), this.search)],
+        filters: [this.viewSeg, this.headMore, h('label', { class: 'fm-search' }, svg('search'), this.search)],
       }),
       h('div', { class: 'fm-content' }, this.crumbs, this.bar, h('div', { class: 'fm-body' }, this.main, this.side), this.status),
       this.picker,
@@ -703,11 +705,14 @@ export class FileManager {
     this.viewSeg.replaceChildren(seg('list', 'list', t('List')), seg('grid', 'grid', t('Grid')))
     const refresh = h('button', { type: 'button', class: 'msk-btn ghost mini icon', title: t('Refresh'), 'aria-label': t('Refresh') }, svg('refresh'))
     refresh.onclick = () => this.act('refresh')
-    const acts: HTMLElement[] = [refresh]
+    // the primary action is the last of the row, the search just left of it; the other actions go before the search
+    const more: HTMLElement[] = [refresh]
+    const acts: HTMLElement[] = []
     if (this.canCreate) {
-      acts.push(this.button({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' }))
+      more.push(this.button({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' }))
       acts.push(this.button({ id: 'upload', label: t('Upload'), icon: 'upload', primary: true }, true))
     }
+    this.headMore.replaceChildren(...more)
     this.headActs.replaceChildren(...acts)
   }
 
