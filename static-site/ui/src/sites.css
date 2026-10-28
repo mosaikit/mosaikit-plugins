@@ -41,7 +41,7 @@
 .msks .msg.err { color: var(--err); }
 
 /* cards and thumbnails */
-.msks .layoutswitch { display: inline-flex; gap: 4px; margin-left: 10px; }
+.msks .layoutswitch { display: inline-flex; gap: 4px; }
 .msks .layoutswitch .msk-btn.on { border-color: var(--acc-line); color: var(--acc); background: var(--acc-soft); }
 .msks .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 12px; }
 .msks .card { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
