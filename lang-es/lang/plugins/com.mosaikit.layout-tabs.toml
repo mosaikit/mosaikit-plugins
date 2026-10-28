@@ -1,3 +1,4 @@
 name = "Pestañas"
 description = "Apps y páginas como pestañas bajo la banda, un menú para las páginas de una app"
 label = "Pestañas"
+details = "Aplicaciones y páginas como pestañas bajo la cabecera; un menú lista las páginas de una aplicación. Adecuado para pocas aplicaciones usadas en paralelo."

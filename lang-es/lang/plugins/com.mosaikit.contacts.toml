@@ -1,6 +1,7 @@
 name = "Contactos"
 description = "Agenda compartible, con correos normalizados y validados"
 label = "Contactos"
+details = "Una agenda compartida. Las direcciones de correo se normalizan y validan al guardar un contacto, así la agenda se mantiene limpia.\n\nComparte toda la agenda o un solo contacto con compañeros y grupos."
 
 [resources.contacts]
 label = "Contactos"

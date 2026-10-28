@@ -1,6 +1,7 @@
 name = "Mapas"
 description = "Catálogo de mapas GeoLibre: configuración guardada en el proyecto .geolibre.json"
 label = "Mapas"
+details = "Un catálogo de mapas creados con GeoLibre. Cada mapa guarda su configuración (capas, estilos, vista) en un proyecto .geolibre.json que puedes abrir, modificar y compartir.\n\nComparte un mapa con compañeros y grupos, o mantenlo privado mientras trabajas en él."
 
 [resources.maps]
 label = "Mapas"

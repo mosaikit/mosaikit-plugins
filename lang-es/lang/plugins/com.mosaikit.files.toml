@@ -1,3 +1,4 @@
 name = "Archivos"
 description = "Archivos y carpetas compartibles, con vista previa, zip y enlaces públicos"
 label = "Archivos"
+details = "Guarda archivos y carpetas, previsualízalos en el navegador, descarga una carpeta como archivo zip y compártelos.\n\nCada archivo tiene su propio nivel de compartición y se puede abrir a cualquiera con un enlace público. Los archivos cuentan en la cuota de la organización."

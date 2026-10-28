@@ -1,6 +1,7 @@
 name = "Tareas"
 description = "Tareas con fecha límite y prioridad, que se pueden asignar compartiéndolas"
 label = "Tareas"
+details = "Mantén una lista de cosas por hacer, cada una con fecha límite y prioridad.\n\nAsigna una tarea compartiéndola: quien la recibe la encuentra en su propia lista. Márcala como hecha cuando termine; las tareas hechas siguen visibles hasta que las ordenes.\n\nLas tareas son elementos de la plataforma: tienen su propio nivel de compartición, un lugar en la búsqueda y en la papelera."
 
 [resources.tasks]
 label = "Tareas"

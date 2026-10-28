@@ -1,8 +1,8 @@
 name = "Notas"
 description = "Notas personales, que se pueden compartir con compañeros y grupos"
 label = "Notas"
-details = "Escribe notas con título, texto y etiquetas, mantenlas privadas o compártelas con compañeros y grupos.\n\nCada nota tiene su propio nivel de compartición, un enlace público cuando hace falta y un lugar en la búsqueda de la plataforma."
-service_keys = { translate = { label = "Servicio de traducción", description = "Traducción de las notas a otros idiomas" } }
+details = "Escribe notas con título, texto y etiquetas, mantenlas privadas o compártelas con compañeros y grupos.\n\nCada nota tiene su propio nivel de compartición, un enlace público cuando hace falta y un lugar en la búsqueda de la plataforma.\n\nCuando el Administrador ha configurado un servicio de traducción (Sistema > Claves de servicios externos), una nota se traduce a otro idioma con un clic."
+service_keys = { translate = { label = "Servicio de traducción", description = "Clave del servicio que traduce las notas a otros idiomas" }, translate-endpoint = { label = "Dirección del servicio de traducción", description = "Dirección web del servicio que traduce las notas (por ejemplo https://translate.example.org)" } }
 
 [resources.notes]
 label = "Notas"
