@@ -147,7 +147,7 @@ function mount(msk: Msk) {
     'div',
     { class: 'listview' },
     // the header and the filter never scroll (the same header as the pages of Mosaikit); the sites do
-    pageHead({ title: t('Static sites'), sub: rowcount, actions: [layoutSwitch, btnNew], filters: [filter] }),
+    pageHead({ title: t('Static sites'), sub: rowcount, filters: [layoutSwitch, filter], actions: [btnNew] }),
     pageBody(cards, tableWrap, listMsg),
   )
 
