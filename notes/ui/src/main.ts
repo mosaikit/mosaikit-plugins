@@ -2,6 +2,7 @@
 // (English, or Italian when the host is in Italian).
 import '@mosaikit/plugin-api/style.css'
 import { connect, errText, mountCrud, type Msk, type Row } from '@mosaikit/plugin-api'
+import { translateTool } from './translate.ts'
 
 const TEXTS = {
   en: { title: 'Notes', newLabel: '＋ New note', failed: 'Could not start the UI of the plugin: ', mine: 'My notes', shared: 'Shared with me', tag: 'Tag' },
@@ -25,7 +26,7 @@ function mount(msk: Msk) {
     at === 'mine' ? row.owner_id === msk.user?.id : at === 'shared' ? row.owner_id !== msk.user?.id : tag ? row.values.tag === tag : true
   const title = () =>
     at === 'mine' ? TEXTS[lang].mine : at === 'shared' ? TEXTS[lang].shared : tag ? `${TEXTS[lang].tag}: ${TAGS[tag]?.[lang] ?? tag}` : TEXTS[lang].title
-  const open = () => mountCrud(app, msk, 'notes', { title: title(), newLabel: TEXTS[lang].newLabel, columns: ['title', 'tag'], where })
+  const open = () => mountCrud(app, msk, 'notes', { title: title(), newLabel: TEXTS[lang].newLabel, columns: ['title', 'tag'], where, detail: (row, box) => translateTool(msk, row, box, lang) })
   let off = open()
   // the view follows the host for its own texts; the title and the button are ours
   msk.onContext((ctx) => {

@@ -1,6 +1,6 @@
 id = "com.mosaikit.notes"
 name = "Notes"
-version = "0.4.2"
+version = "0.5.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "notebook-pen"
@@ -75,20 +75,32 @@ place = "tag-urgent"
 view = "kpi_notes_by_tag"
 label = "Notes by tag"
 
-# The key of a translation service: the platform, the tenant or the person sets it in Keys of outside
-# services; the logic reads the one in use (notes.translation_ready).
+# The translation of a note (command notes.translate, "Translate" in the detail of a note). The key and the
+# address of the service are set in System > Keys of outside services (the platform's or the tenant's, the key
+# also the person's own): the host adds the key to the request, the logic never reads it, and the address the
+# Administrator sets is the only one the plugin may call. A service with the API of LibreTranslate:
+# POST <address>/translate { q: [...], source, target, format } -> { translatedText: [...] }.
 [[service_keys]]
 id = "translate"
 label = "Translation service"
-description = "Translation of the notes into other languages"
+description = "Key of the service that translates the notes into other languages"
+
+[[service_keys]]
+id = "translate-endpoint"
+label = "Translation service address"
+description = "Web address of the service that translates the notes (for example https://translate.example.org)"
+address = true
+scopes = ["platform", "tenant"]
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
-details = "Scrivi note con titolo, testo ed etichette, tienile private o condividile con colleghi e gruppi.\n\nOgni nota ha il proprio livello di condivisione, un link pubblico quando serve e un posto nella ricerca della piattaforma."
+details = "Scrivi note con titolo, testo ed etichette, tienile private o condividile con colleghi e gruppi.\n\nOgni nota ha il proprio livello di condivisione, un link pubblico quando serve e un posto nella ricerca della piattaforma.
+
+Quando l’Administrator ha impostato un servizio di traduzione (Sistema > Chiavi dei servizi esterni), una nota si traduce in un’altra lingua con un clic."
 name = "Note"
 description = "Note personali, condivisibili con colleghi e gruppi"
 label = "Note"
-service_keys = { translate = { label = "Servizio di traduzione", description = "Traduzione delle note in altre lingue" } }
+service_keys = { translate = { label = "Servizio di traduzione", description = "Chiave del servizio che traduce le note in altre lingue" }, translate-endpoint = { label = "Indirizzo del servizio di traduzione", description = "Indirizzo web del servizio che traduce le note (per esempio https://translate.example.org)" } }
 
 [i18n.it.resources.notes]
 label = "Note"
