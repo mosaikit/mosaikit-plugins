@@ -1,3 +1,12 @@
 name = "Tareas"
-description = "Tareas con fecha límite y prioridad"
+description = "Tareas con fecha límite y prioridad, que se pueden asignar compartiéndolas"
 label = "Tareas"
+
+[resources.tasks]
+label = "Tareas"
+fields = { title = "Título", due = "Fecha límite", priority = "Prioridad", done = "Hecha", completed_on = "Completada el" }
+options.priority = { low = "baja", medium = "media", high = "alta" }
+
+[kpi.kpi_tasks_status]
+label = "Estado de las tareas"
+columns = { completed = "completadas", open = "abiertas", overdue = "vencidas" }

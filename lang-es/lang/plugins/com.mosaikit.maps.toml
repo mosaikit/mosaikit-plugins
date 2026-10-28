@@ -1,0 +1,11 @@
+name = "Mapas"
+description = "Catálogo de mapas GeoLibre: configuración guardada en el proyecto .geolibre.json"
+label = "Mapas"
+
+[resources.maps]
+label = "Mapas"
+fields = { name = "Nombre", description = "Descripción", config = "Configuración (.geolibre.json)", layers = "Capas" }
+
+[kpi.kpi_maps]
+label = "Mapas y capas"
+columns = { maps = "mapas", layers = "capas" }

@@ -1,0 +1,11 @@
+name = "Sitios estáticos"
+description = "Publica sitios estáticos desde archivos zip o muestra un sitio desde su dirección web, compartibles y con enlaces públicos"
+label = "Sitios estáticos"
+
+[resources.sites]
+label = "Sitios"
+fields = { name = "Nombre", description = "Descripción", zip_name = "Zip subido", entry = "Página inicial", files = "Archivos", size = "Tamaño (bytes)", url = "Dirección web", framable = "Incrustable", thumbnail = "Miniatura" }
+
+[kpi.kpi_sites]
+label = "Sitios publicados"
+columns = { sites = "sitios", files = "archivos", bytes = "bytes" }

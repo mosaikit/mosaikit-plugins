@@ -1,0 +1,12 @@
+name = "Contactos"
+description = "Agenda compartible, con correos normalizados y validados"
+label = "Contactos"
+
+[resources.contacts]
+label = "Contactos"
+fields = { name = "Nombre", email = "Correo electrónico", phone = "Teléfono", company = "Empresa" }
+options.company = { Internal = "Interna", Customer = "Cliente", Partner = "Socio", Supplier = "Proveedor" }
+
+[kpi.kpi_contacts_by_company]
+label = "Contactos por tipo de empresa"
+columns = { company = "empresa", contacts = "contactos" }
