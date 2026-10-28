@@ -5,6 +5,9 @@ kind = "layout"
 description = "Global navigation at the left, the sidebar of the area next to it"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "Global navigation in a narrow rail at the left, with the pages of the current area in a sidebar next to it. Suited to people who work mostly in one area at a time."
+screenshots = ["layout.svg"]
+homepage = "https://example.org/mosaikit/plugins/layout-project"
 
 [contribution]
 icon = "▦"
@@ -13,6 +16,7 @@ label = "Project"
 # a layout is declarative: layout/layout.toml (the arrangement of the slots), layout/layout.css (checked at
 # install and scoped under the class of the layout) and layout/images; no code runs in the shell
 [i18n.it]
+details = "Navigazione globale in una colonna stretta a sinistra, con le pagine dell’area corrente in una barra laterale accanto. Adatto a chi lavora soprattutto in un’area alla volta."
 name = "Progetto"
 description = "Navigazione globale a sinistra, la sidebar dell’area accanto"
 label = "Progetto"

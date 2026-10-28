@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="A map">
+  <rect width="640" height="360" fill="#f5f6fb"/>
+  <rect x="24" y="24" width="592" height="48" rx="8" fill="#3a6ea5"/>
+  <text x="44" y="55" font-family="sans-serif" font-size="20" fill="#fff">Municipal map</text>
+  <rect x="24" y="88" width="592" height="248" rx="10" fill="#dfe9f3" stroke="#c6d3e2"/>
+  <path d="M24 250 C120 200 200 280 300 230 S500 180 616 240 L616 336 L24 336Z" fill="#cfe3c9"/>
+  <path d="M24 300 C140 270 220 330 340 300 S520 270 616 300" stroke="#9cc3e6" stroke-width="10" fill="none"/>
+  <polygon points="220,150 330,130 400,190 340,250 240,230" fill="#444791" fill-opacity=".25" stroke="#444791" stroke-width="3"/>
+  <circle cx="470" cy="170" r="9" fill="#c0392b"/><circle cx="170" cy="260" r="9" fill="#c0392b"/><circle cx="520" cy="262" r="9" fill="#c0392b"/>
+</svg>

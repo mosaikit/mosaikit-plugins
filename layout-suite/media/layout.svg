@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Suite layout">
+  <rect width="640" height="360" fill="#f5f6fb"/>
+  <rect x="24" y="24" width="592" height="312" rx="10" fill="#fff" stroke="#d8dbe8"/>
+  <rect x="24" y="24" width="592" height="36" rx="10" fill="#444791"/>
+  <rect x="24" y="60" width="592" height="30" fill="#eef0f8"/>
+  <rect x="44" y="68" width="84" height="14" rx="7" fill="#cfd3e4"/>
+  <rect x="144" y="68" width="84" height="14" rx="7" fill="#cfd3e4"/>
+  <rect x="244" y="68" width="84" height="14" rx="7" fill="#cfd3e4"/>
+  <rect x="344" y="68" width="84" height="14" rx="7" fill="#cfd3e4"/>
+  <rect x="444" y="68" width="84" height="14" rx="7" fill="#cfd3e4"/>
+  <rect x="60" y="116" width="150" height="76" rx="12" fill="#8b90c9"/>
+  <rect x="240" y="116" width="150" height="76" rx="12" fill="#7fb8a3"/>
+  <rect x="420" y="116" width="150" height="76" rx="12" fill="#e0b26a"/>
+  <rect x="60" y="216" width="150" height="76" rx="12" fill="#d98b8b"/>
+  <rect x="240" y="216" width="150" height="76" rx="12" fill="#7aa5d6"/>
+  <rect x="420" y="216" width="150" height="76" rx="12" fill="#b39ddb"/>
+  <text x="320" y="352" text-anchor="middle" font-family="sans-serif" font-size="0"></text>
+</svg>

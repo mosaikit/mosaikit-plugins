@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Sharing a note">
+  <rect width="640" height="360" fill="#f5f6fb"/>
+  <rect x="24" y="24" width="592" height="48" rx="8" fill="#444791"/>
+  <text x="44" y="55" font-family="sans-serif" font-size="20" fill="#fff">Share “Ideas for the new site”</text>
+  <rect x="24" y="92" width="592" height="244" rx="10" fill="#fff" stroke="#d8dbe8"/>
+  <rect x="40" y="108" width="560" height="52" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="130" font-family="sans-serif" font-size="15" fill="#222">Elena Ricci</text>
+  <text x="44" y="149" font-family="sans-serif" font-size="12" fill="#6b7088">Can edit</text>
+  <rect x="548" y="123.0" width="48" height="22" rx="11" fill="#444791"/>
+  <text x="556" y="138.0" font-family="sans-serif" font-size="12" fill="#fff">Edit</text>
+  <rect x="40" y="170" width="560" height="52" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="192" font-family="sans-serif" font-size="15" fill="#222">Group: Communication</text>
+  <text x="44" y="211" font-family="sans-serif" font-size="12" fill="#6b7088">Can view</text>
+  <rect x="548" y="185.0" width="48" height="22" rx="11" fill="#6b7088"/>
+  <text x="556" y="200.0" font-family="sans-serif" font-size="12" fill="#fff">View</text>
+  <rect x="24" y="232" width="560" height="52" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="254" font-family="sans-serif" font-size="15" fill="#222">Public link</text>
+  <text x="44" y="273" font-family="sans-serif" font-size="12" fill="#6b7088">Expires in 7 days</text>
+  <rect x="548" y="247.0" width="48" height="22" rx="11" fill="#2f8f5b"/>
+  <text x="556" y="262.0" font-family="sans-serif" font-size="12" fill="#fff">Link</text>
+</svg>

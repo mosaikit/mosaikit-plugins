@@ -7,6 +7,9 @@ icon = "map"
 description = "Catalog of GeoLibre maps: configuration saved in the .geolibre.json project"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "A catalog of maps built with GeoLibre. Each map keeps its configuration (layers, styles, view) in a .geolibre.json project that you can open, edit and share.\n\nShare a map with colleagues and groups, or keep it private while you work on it."
+screenshots = ["catalog.svg", "map.svg"]
+homepage = "https://example.org/mosaikit/plugins/maps"
 
 [contribution]
 icon = "🗺"
@@ -37,6 +40,7 @@ label = "Maps and layers"
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
+details = "Un catalogo di mappe costruite con GeoLibre. Ogni mappa conserva la configurazione (livelli, stili, vista) in un progetto .geolibre.json che puoi aprire, modificare e condividere.\n\nCondividi una mappa con colleghi e gruppi, o tienila privata mentre ci lavori."
 name = "Mappe"
 description = "Catalogo di mappe GeoLibre: configurazione salvata nel progetto .geolibre.json"
 label = "Mappe"

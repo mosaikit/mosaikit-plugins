@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="A task">
+  <rect width="640" height="360" fill="#f5f6fb"/>
+  <rect x="24" y="24" width="592" height="48" rx="8" fill="#2f7d6d"/>
+  <text x="44" y="55" font-family="sans-serif" font-size="20" fill="#fff">Prepare the budget</text>
+  <rect x="24" y="92" width="592" height="244" rx="10" fill="#fff" stroke="#d8dbe8"/>
+  <g font-family="sans-serif" font-size="15" fill="#222"><text x="48" y="128" fill="#6b7088" font-size="12">DUE DATE</text><text x="48" y="150">Friday 31 October</text><text x="260" y="128" fill="#6b7088" font-size="12">PRIORITY</text><text x="260" y="150">High</text><text x="420" y="128" fill="#6b7088" font-size="12">ASSIGNED TO</text><text x="420" y="150">Marco Esposito</text><text x="48" y="196" fill="#6b7088" font-size="12">NOTES</text><text x="48" y="220">Figures of the last quarter, draft for the board.</text></g>
+  <rect x="48" y="262" width="120" height="36" rx="8" fill="#2f7d6d"/>
+  <text x="72" y="285" font-family="sans-serif" font-size="15" fill="#fff">Mark done</text>
+</svg>

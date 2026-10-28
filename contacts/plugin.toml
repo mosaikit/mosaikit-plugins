@@ -7,6 +7,9 @@ icon = "book-user"
 description = "Shareable address book, with normalized and validated emails"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "A shared address book. Email addresses are normalized and validated when you save a contact, so the book stays clean.\n\nShare the whole book or a single contact with colleagues and groups."
+screenshots = ["book.svg", "contact.svg"]
+homepage = "https://example.org/mosaikit/plugins/contacts"
 
 [contribution]
 icon = "👥"
@@ -35,6 +38,7 @@ label = "Contacts by kind of company"
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
+details = "Una rubrica condivisa. Gli indirizzi email vengono normalizzati e validati quando salvi un contatto, così la rubrica resta pulita.\n\nCondividi l’intera rubrica o un singolo contatto con colleghi e gruppi."
 name = "Contatti"
 description = "Rubrica condivisibile, con email normalizzate e validate"
 label = "Contatti"

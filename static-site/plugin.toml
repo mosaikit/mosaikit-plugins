@@ -7,6 +7,9 @@ icon = "globe"
 description = "Publishes static sites from zip archives or shows a site by its web address, shareable and with public links"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "Publish a static site from a zip archive, or show an existing site by its web address inside the platform.\n\nEvery site can be shared with colleagues and groups, and opened to anyone with a public link that you can revoke at any time. Sites are served from a separate origin, so their scripts never reach the platform."
+screenshots = ["sites.svg", "site.svg"]
+homepage = "https://example.org/mosaikit/plugins/static-site"
 
 [contribution]
 icon = "🌐"
@@ -42,6 +45,7 @@ label = "Published sites"
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
+details = "Pubblica un sito statico da un archivio zip, oppure mostra all’interno della piattaforma un sito esistente tramite il suo indirizzo web.\n\nOgni sito può essere condiviso con colleghi e gruppi e aperto a chiunque con un link pubblico che puoi revocare in qualsiasi momento. I siti sono serviti da un’origine separata, quindi i loro script non raggiungono mai la piattaforma."
 name = "Siti statici"
 description = "Pubblica siti statici da archivi zip o mostra un sito dal suo indirizzo web, condivisibili e con link pubblici"
 label = "Siti statici"

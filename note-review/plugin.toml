@@ -8,6 +8,9 @@ version = "0.2.0"
 description = "Marks notes as reviewed, with who did it and the history of the reviews"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "Adds a Review tab to the notes of the Notes app. A reviewer marks a note as reviewed, with an optional comment; the tab shows who did it, when, and the history of the reviews.\n\nAn extension: it works only where Notes is installed, and its permission decides who may review."
+screenshots = ["review.svg"]
+homepage = "https://example.org/mosaikit/plugins/note-review"
 kind = "extension"
 icon = "badge-check"
 
@@ -60,6 +63,7 @@ page = "tab.html"
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
+details = "Aggiunge una scheda Revisione alle note dell’app Note. Chi rivede segna la nota come rivista, con un commento facoltativo; la scheda mostra chi l’ha fatto, quando e la cronologia delle revisioni.\n\nUn’estensione: funziona solo dove è installata Note, e la sua autorizzazione decide chi può rivedere."
 name = "Revisione delle note"
 description = "Segna le note come revisionate, con chi lo ha fatto e la storia delle revisioni"
 label = "Revisione delle note"

@@ -7,6 +7,9 @@ icon = "folder"
 description = "Shareable files and folders, with preview, zip and public links"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "Store files and folders, preview them in the browser, download a folder as a zip archive and share them.\n\nEvery file has its own sharing level and can be opened to anyone with a public link. Files count against the quota of the tenant."
+screenshots = ["files.svg", "preview.svg"]
+homepage = "https://example.org/mosaikit/plugins/files"
 
 [contribution]
 icon = "📁"
@@ -20,6 +23,7 @@ files = true
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
+details = "Conserva file e cartelle, guardane l’anteprima nel browser, scarica una cartella come archivio zip e condividili.\n\nOgni file ha il proprio livello di condivisione e può essere aperto a chiunque con un link pubblico. I file contano nella quota dell’organizzazione."
 name = "File"
 description = "File e cartelle condivisibili, con anteprima, zip e link pubblici"
 label = "File"

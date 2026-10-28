@@ -7,6 +7,9 @@ icon = "square-check-big"
 description = "Tasks with due date and priority, assigned by sharing them"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "Keep a list of things to do, each with a due date and a priority.\n\nAssign a task by sharing it: the person who receives it finds it in their own list. Mark it done when it is finished; done tasks stay visible until you tidy them up.\n\nTasks are items of the platform: they have their own sharing level, a place in the search and in the trash."
+screenshots = ["list.svg", "task.svg"]
+homepage = "https://example.org/mosaikit/plugins/tasks"
 
 [contribution]
 icon = "✅"
@@ -39,6 +42,7 @@ label = "Status of the tasks"
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
+details = "Tieni un elenco di cose da fare, ciascuna con una scadenza e una priorità.\n\nAssegna un’attività condividendola: chi la riceve la trova nel proprio elenco. Segnala come fatta quando è finita; le attività fatte restano visibili finché non le ordini.\n\nLe attività sono elementi della piattaforma: hanno un livello di condivisione, un posto nella ricerca e nel cestino."
 name = "Attività"
 description = "Attività con scadenza e priorità, assegnabili condividendole"
 label = "Attività"

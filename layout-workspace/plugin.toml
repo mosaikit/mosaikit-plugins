@@ -5,6 +5,9 @@ kind = "layout"
 description = "Top bar with a wide search, a drawer that opens and closes"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "A top bar with a wide search field and a drawer that opens and closes. Suited to people who search more than they browse."
+screenshots = ["layout.svg"]
+homepage = "https://example.org/mosaikit/plugins/layout-workspace"
 
 [contribution]
 icon = "▦"
@@ -13,6 +16,7 @@ label = "Workspace"
 # a layout is declarative: layout/layout.toml (the arrangement of the slots), layout/layout.css (checked at
 # install and scoped under the class of the layout) and layout/images; no code runs in the shell
 [i18n.it]
+details = "Una barra in alto con un ampio campo di ricerca e un cassetto che si apre e si chiude. Adatto a chi cerca più di quanto sfoglia."
 name = "Area di lavoro"
 description = "Barra in alto con una ricerca ampia, un cassetto che si apre e si chiude"
 label = "Area di lavoro"

@@ -5,6 +5,9 @@ kind = "layout"
 description = "Apps and pages as tabs under the band, a menu for the pages of an app"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "Apps and pages as tabs under the band; a menu lists the pages of an app. Suited to few apps used side by side."
+screenshots = ["layout.svg"]
+homepage = "https://example.org/mosaikit/plugins/layout-tabs"
 
 [contribution]
 icon = "▦"
@@ -13,6 +16,7 @@ label = "Tabs"
 # a layout is declarative: layout/layout.toml (the arrangement of the slots), layout/layout.css (checked at
 # install and scoped under the class of the layout) and layout/images; no code runs in the shell
 [i18n.it]
+details = "App e pagine come schede sotto la fascia; un menu elenca le pagine di un’app. Adatto a poche app usate in parallelo."
 name = "Schede"
 description = "App e pagine come schede sotto la banda, un menu per le pagine di un’app"
 label = "Schede"

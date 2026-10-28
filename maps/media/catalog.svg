@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Catalog of maps">
+  <rect width="640" height="360" fill="#f5f6fb"/>
+  <rect x="24" y="24" width="592" height="48" rx="8" fill="#3a6ea5"/>
+  <text x="44" y="55" font-family="sans-serif" font-size="20" fill="#fff">Maps</text>
+  <rect x="24" y="92" width="592" height="56" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="114" font-family="sans-serif" font-size="16" fill="#222">Land registry</text>
+  <text x="44" y="133" font-family="sans-serif" font-size="12" fill="#6b7088">Saved in the project .geolibre.json</text>
+  <rect x="24" y="160" width="592" height="56" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="182" font-family="sans-serif" font-size="16" fill="#222">Cycle paths</text>
+  <text x="44" y="201" font-family="sans-serif" font-size="12" fill="#6b7088">Shared with Mobility</text>
+  <rect x="24" y="228" width="592" height="56" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="250" font-family="sans-serif" font-size="16" fill="#222">Flood areas 2026</text>
+  <text x="44" y="269" font-family="sans-serif" font-size="12" fill="#6b7088">Private</text>
+</svg>

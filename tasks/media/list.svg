@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="List of tasks">
+  <rect width="640" height="360" fill="#f5f6fb"/>
+  <rect x="24" y="24" width="592" height="48" rx="8" fill="#2f7d6d"/>
+  <text x="44" y="55" font-family="sans-serif" font-size="20" fill="#fff">Tasks</text>
+  <rect x="24" y="88" width="592" height="50" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <rect x="40" y="104.0" width="18" height="18" rx="4" fill="#fff" stroke="#9aa0b8"/>
+  <text x="72" y="110" font-family="sans-serif" font-size="16" fill="#222">Prepare the budget</text>
+  <text x="72" y="129" font-family="sans-serif" font-size="12" fill="#6b7088">Due Friday</text>
+  <rect x="548" y="102.0" width="48" height="22" rx="11" fill="#c0392b"/>
+  <text x="556" y="117.0" font-family="sans-serif" font-size="12" fill="#fff">High</text>
+  <rect x="24" y="148" width="592" height="50" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <rect x="40" y="164.0" width="18" height="18" rx="4" fill="#2f8f5b" stroke="#9aa0b8"/>
+  <path d="M44 173.0 l4 4 l7 -9" stroke="#fff" stroke-width="2.5" fill="none"/>
+  <text x="72" y="170" font-family="sans-serif" font-size="16" fill="#222">Call the supplier</text>
+  <text x="72" y="189" font-family="sans-serif" font-size="12" fill="#6b7088">Done</text>
+  <rect x="556" y="162.0" width="40" height="22" rx="11" fill="#6b7088"/>
+  <text x="564" y="177.0" font-family="sans-serif" font-size="12" fill="#fff">Low</text>
+  <rect x="24" y="208" width="592" height="50" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <rect x="40" y="224.0" width="18" height="18" rx="4" fill="#fff" stroke="#9aa0b8"/>
+  <text x="72" y="230" font-family="sans-serif" font-size="16" fill="#222">Review the minutes</text>
+  <text x="72" y="249" font-family="sans-serif" font-size="12" fill="#6b7088">Due next week</text>
+  <rect x="532" y="222.0" width="64" height="22" rx="11" fill="#2f7d6d"/>
+  <text x="540" y="237.0" font-family="sans-serif" font-size="12" fill="#fff">Normal</text>
+  <rect x="24" y="268" width="592" height="50" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <rect x="40" y="284.0" width="18" height="18" rx="4" fill="#fff" stroke="#9aa0b8"/>
+  <text x="72" y="290" font-family="sans-serif" font-size="16" fill="#222">Book the meeting room</text>
+  <text x="72" y="309" font-family="sans-serif" font-size="12" fill="#6b7088">Due tomorrow</text>
+  <rect x="548" y="282.0" width="48" height="22" rx="11" fill="#c0392b"/>
+  <text x="556" y="297.0" font-family="sans-serif" font-size="12" fill="#fff">High</text>
+</svg>

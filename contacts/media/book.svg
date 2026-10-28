@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Address book">
+  <rect width="640" height="360" fill="#f5f6fb"/>
+  <rect x="24" y="24" width="592" height="48" rx="8" fill="#7b4fa3"/>
+  <text x="44" y="55" font-family="sans-serif" font-size="20" fill="#fff">Contacts</text>
+  <rect x="24" y="88" width="592" height="50" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="110" font-family="sans-serif" font-size="16" fill="#222">Elena Ricci</text>
+  <text x="44" y="129" font-family="sans-serif" font-size="12" fill="#6b7088">elena.ricci@example.test</text>
+  <rect x="24" y="148" width="592" height="50" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="170" font-family="sans-serif" font-size="16" fill="#222">Marco Esposito</text>
+  <text x="44" y="189" font-family="sans-serif" font-size="12" fill="#6b7088">marco.esposito@example.test</text>
+  <rect x="24" y="208" width="592" height="50" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="230" font-family="sans-serif" font-size="16" fill="#222">Sara Greco</text>
+  <text x="44" y="249" font-family="sans-serif" font-size="12" fill="#6b7088">sara.greco@example.test</text>
+  <rect x="24" y="268" width="592" height="50" rx="8" fill="#fff" stroke="#d8dbe8"/>
+  <text x="44" y="290" font-family="sans-serif" font-size="16" fill="#222">Luca Bianchi</text>
+  <text x="44" y="309" font-family="sans-serif" font-size="12" fill="#6b7088">luca.bianchi@example.test</text>
+</svg>

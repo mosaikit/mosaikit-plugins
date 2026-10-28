@@ -7,7 +7,8 @@ icon = "notebook-pen"
 description = "Personal notes, shareable with colleagues and groups"
 author = "Mosaikit"
 details = "Write notes with a title, a text and tags, keep them private or share them with colleagues and groups.\n\nEvery note has its own sharing level, a public link when you need one, and a place in the search of the platform."
-screenshots = ["list.svg", "note.svg"]
+screenshots = ["list.svg", "note.svg", "share.svg"]
+homepage = "https://example.org/mosaikit/plugins/notes"
 license = "Apache-2.0"
 
 [contribution]

@@ -5,6 +5,9 @@ kind = "language"
 icon = "languages"
 author = "Mosaikit"
 license = "Apache-2.0"
+details = "Spanish interface for the sign-in page, the navigation and the Notes app. It is a sample language plugin with a starter set of texts: whatever is not translated stays in English.\n\nUse it as a starting point for another language."
+screenshots = ["signin.svg", "notes.svg"]
+homepage = "https://example.org/mosaikit/plugins/lang-es"
 description = "Spanish interface: a sample language plugin with a starter set of texts (sign-in page, navigation, Notes)"
 
 [contribution]
@@ -17,6 +20,7 @@ code = "es"
 name = "Español"
 
 [i18n.it]
+details = "Interfaccia in spagnolo per la pagina di accesso, la navigazione e l’app Note. È un plugin di lingua di esempio con un primo insieme di testi: ciò che non è tradotto resta in inglese.\n\nUsalo come punto di partenza per un’altra lingua."
 name = "Spagnolo (Español)"
 description = "Interfaccia in spagnolo: un plugin di lingua di esempio con un primo insieme di testi (pagina di accesso, navigazione, Note)"
 label = "Español"
