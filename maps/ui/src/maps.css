@@ -30,3 +30,7 @@
 .mskm.public { max-width: none; display: flex; flex-direction: column; height: calc(100vh - 48px); }
 .mskm.public .gframe { flex: 1; height: auto; min-height: 300px; }
 @media (max-width: 640px) { .mskm.public { height: calc(100vh - 32px); } }
+
+/* the list of maps fills the page under the header; the header stays */
+.mskm .listview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.mskm .listview[hidden] { display: none; }

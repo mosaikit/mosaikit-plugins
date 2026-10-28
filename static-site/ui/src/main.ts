@@ -19,7 +19,7 @@
 
 import '@mosaikit/plugin-api/style.css'
 import './sites.css'
-import { connect, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
+import { connect, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
 import { followHost, t } from './i18n.ts'
 import { hasIndexHtml, zipEntryNames } from './zipnames.ts'
@@ -146,11 +146,9 @@ function mount(msk: Msk) {
   const listView = h(
     'div',
     { class: 'listview' },
-    h('h2', { class: 'msk-h2' }, t('Static sites')),
-    h('div', { class: 'msk-toolbar' }, filter, btnNew, h('span', { class: 'grow' }), rowcount, layoutSwitch),
-    cards,
-    tableWrap,
-    listMsg,
+    // the header and the filter never scroll (the same header as the pages of Mosaikit); the sites do
+    pageHead({ title: t('Static sites'), sub: rowcount, actions: [layoutSwitch, btnNew], filters: [filter] }),
+    pageBody(cards, tableWrap, listMsg),
   )
 
   const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of sites'))

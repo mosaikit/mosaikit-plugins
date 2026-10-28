@@ -26,7 +26,7 @@
 
 import '@mosaikit/plugin-api/style.css'
 import './maps.css'
-import { connect, type Msk, type Row } from '@mosaikit/plugin-api'
+import { connect, pageBody, pageHead, type Msk, type Row } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
 import { followHost, t } from './i18n.ts'
 import { MapFrame, parseProject, type Project } from './mapframe.ts'
@@ -120,19 +120,21 @@ function mount(msk: Msk) {
   const listView = h(
     'div',
     { class: 'listview' },
-    h('h2', { class: 'msk-h2' }, t('Maps')),
-    h('div', { class: 'msk-toolbar' }, filter, btnNew, h('span', { class: 'grow' }), rowcount),
-    h(
-      'div',
-      { class: 'msk-tablewrap' },
+    // the header and the filter never scroll (the same header as the pages of Mosaikit); the table does
+    pageHead({ title: t('Maps'), sub: rowcount, actions: [btnNew], filters: [filter] }),
+    pageBody(
       h(
-        'table',
-        { class: 'msk-table' },
-        h('thead', {}, h('tr', {}, ...['Name', 'Description', 'Layers', 'Config', 'Owner', 'Actions'].map((c) => h('th', {}, t(c))))),
-        tbody,
+        'div',
+        { class: 'msk-tablewrap' },
+        h(
+          'table',
+          { class: 'msk-table' },
+          h('thead', {}, h('tr', {}, ...['Name', 'Description', 'Layers', 'Config', 'Owner', 'Actions'].map((c) => h('th', {}, t(c))))),
+          tbody,
+        ),
       ),
+      listMsg,
     ),
-    listMsg,
   )
 
   const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of maps'))

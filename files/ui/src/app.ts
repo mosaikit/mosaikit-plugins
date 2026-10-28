@@ -1,5 +1,5 @@
 // File manager: navigation by id, multiple selection, actions according to the level of permission.
-import type { FileEntry, Listing, Msk } from '@mosaikit/plugin-api'
+import { pageHead, type FileEntry, type Listing, type Msk } from '@mosaikit/plugin-api'
 import { choiceDialog, closeDialog, dialogOpen, nameList, pickFolder, promptDialog } from './dialogs.ts'
 import { fileIcon, h, saveBlob, spinner, svg, type IconName } from './dom.ts'
 import { locale, t } from './i18n.ts'
@@ -149,19 +149,14 @@ export class FileManager {
     this.root = h(
       'div',
       { class: 'fm', tabindex: -1 },
-      h(
-        'div',
-        { class: 'fm-head' },
-        h('div', { class: 'fm-title' }, h('h2', { class: 'msk-h2' }, t('Files')), msk.user ? h('span', { class: 'msk-badge' }, msk.user.name || msk.user.username) : null),
-        h('div', { class: 'grow' }),
-        h('label', { class: 'fm-search' }, svg('search'), this.search),
-        this.viewSeg,
-        this.headActs,
-      ),
-      this.crumbs,
-      this.bar,
-      h('div', { class: 'fm-body' }, this.main, this.side),
-      this.status,
+      // the header and the search never scroll (the same header as the pages of Mosaikit); the files do
+      pageHead({
+        title: t('Files'),
+        sub: msk.user ? msk.user.name || msk.user.username : undefined,
+        actions: [this.viewSeg, this.headActs],
+        filters: [h('label', { class: 'fm-search' }, svg('search'), this.search)],
+      }),
+      h('div', { class: 'fm-content' }, this.crumbs, this.bar, h('div', { class: 'fm-body' }, this.main, this.side), this.status),
       this.picker,
     )
     el.replaceChildren(this.root)

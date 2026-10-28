@@ -64,3 +64,7 @@
 .msks .thumbprev { width: 96px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); }
 .msks .noframe { max-width: 560px; margin-top: 12px; padding: 18px 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
 .msks .noframe p { margin: 0 0 12px; line-height: 1.5; }
+
+/* the list of sites fills the page under the header; the header stays */
+.msks .listview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.msks .listview[hidden] { display: none; }
