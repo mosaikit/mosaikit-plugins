@@ -285,7 +285,7 @@ export class FileManager {
     if (one) {
       if (one.is_dir) out.push({ id: 'open', label: t('Open'), icon: 'open', kbd: t('Enter'), primary: true })
       else if (previewable(one)) out.push({ id: 'open', label: t('Preview'), icon: 'eye', kbd: t('Enter'), primary: true })
-      if (!one.is_dir) out.push({ id: 'tab', label: t('Open in a new tab'), icon: 'external' })
+      if (!one.is_dir) out.push({ id: 'tab', label: t('Open in tab'), icon: 'external' })
     }
     const anyDir = items.some((e) => e.is_dir)
     out.push({ id: 'download', label: one?.is_dir ? t('Download zip') : anyDir ? t('Download (zip for the folders)') : t('Download'), icon: one?.is_dir ? 'zip' : 'download' })
@@ -373,12 +373,20 @@ export class FileManager {
     }
   }
 
-  private button(a: Action, solid = false): HTMLButtonElement {
+  /** `iconOnly`: no text, the label is the accessible name and the tooltip (selection bar). */
+  private button(a: Action, solid = false, iconOnly = false): HTMLButtonElement {
+    const tip = a.kbd ? `${a.label} (${a.kbd})` : a.label
     const b = h(
       'button',
-      { type: 'button', class: 'msk-btn mini' + (a.danger ? ' danger' : solid ? '' : ' ghost'), title: a.kbd ? `${a.label} (${a.kbd})` : null },
+      {
+        type: 'button',
+        class: 'msk-btn mini' + (a.danger ? ' danger' : solid ? '' : ' ghost') + (iconOnly ? ' icon' : ''),
+        title: iconOnly ? null : a.kbd ? tip : null,
+        'aria-label': iconOnly ? a.label : null,
+        'data-tip': iconOnly ? tip : null,
+      },
       svg(a.icon),
-      a.label,
+      iconOnly ? '' : a.label,
     )
     b.addEventListener('click', (ev) => {
       ev.stopPropagation()
@@ -793,11 +801,11 @@ export class FileManager {
       )
       return
     }
-    const clear = h('button', { type: 'button', class: 'msk-btn ghost mini icon', title: t('Clear the selection (Esc)'), 'aria-label': t('Clear the selection') }, svg('x'))
+    const clear = h('button', { type: 'button', class: 'msk-btn ghost mini icon', 'aria-label': t('Clear the selection'), 'data-tip': t('Clear the selection (Esc)') }, svg('x'))
     clear.onclick = () => this.act('clear')
     this.bar.replaceChildren(
       h('span', { class: 'count' }, plural(items.length, 'item selected', 'items selected')),
-      ...this.selectionActions(items).map((a) => this.button(a)),
+      ...this.selectionActions(items).map((a) => this.button(a, false, true)),
       h('div', { class: 'grow' }),
       clear,
     )
@@ -1012,6 +1020,13 @@ export class FileManager {
         if (this.detail?.key !== key) return p.dispose()
         this.detail.preview = p
         upd()
+        void p.start?.().catch(() => {
+          if (this.detail?.key === key) {
+            this.detail.preview = undefined
+            this.detail.error = t('Preview not available')
+            upd()
+          }
+        })
       },
       (err) => {
         if (this.detail?.key !== key) return

@@ -3,6 +3,7 @@
 import type { FileEntry, Msk } from '@mosaikit/plugin-api'
 import { fileIcon, h, spinner, svg } from './dom.ts'
 import { t } from './i18n.ts'
+import { renderPdf } from './pdf.ts'
 import { TEXT_MAX, errMsg, ext, fmtDuration, fmtSize, kindLabel, previewMode } from './util.ts'
 
 export interface PreviewMeta {
@@ -16,6 +17,8 @@ export interface Preview {
   node: HTMLElement
   meta: PreviewMeta
   dispose(): void
+  /** Work that needs the node to be in the document (PDF pages are drawn at the width of their box). */
+  start?: () => Promise<void>
 }
 
 const MIME: Record<string, string> = {
@@ -72,6 +75,11 @@ export async function loadPreview(msk: Msk, e: FileEntry, big: boolean, onMeta?:
     return { node: pre, meta, dispose() {} }
   }
 
+  if (mode === 'pdf') {
+    const v = await renderPdf(await blob.arrayBuffer(), big)
+    return { node: v.node, meta, dispose: () => v.dispose(), start: v.start }
+  }
+
   const url = URL.createObjectURL(new Blob([blob], { type: safeType(e, blob) }))
   const dispose = () => URL.revokeObjectURL(url)
   let node: HTMLElement
@@ -85,8 +93,6 @@ export async function loadPreview(msk: Msk, e: FileEntry, big: boolean, onMeta?:
       img.onerror = () => res()
     })
     node = img
-  } else if (mode === 'pdf') {
-    node = h('iframe', { src: big ? url : url + '#toolbar=0&view=FitH', title: t('PDF preview of {name}', { name: e.name }) })
   } else {
     const media = h(mode, { src: url, controls: true, preload: 'metadata' }) as HTMLMediaElement
     media.addEventListener('loadedmetadata', () => {
@@ -162,7 +168,7 @@ export function openViewer(o: ViewerOpts) {
     closeBtn.onclick = close
     const dl = h('button', { type: 'button', class: 'msk-btn ghost mini' }, svg('download'), t('Download'))
     dl.onclick = () => o.onDownload(e)
-    const tab = h('button', { type: 'button', class: 'msk-btn ghost mini' }, svg('external'), t('Open in a new tab'))
+    const tab = h('button', { type: 'button', class: 'msk-btn ghost mini' }, svg('external'), t('Open in tab'))
     tab.onclick = () => o.onOpenTab(e)
     top.replaceChildren(
       fileIcon(e),
@@ -193,6 +199,7 @@ export function openViewer(o: ViewerOpts) {
         cur = p
         const extra = p.meta.truncated ? h('div', { class: 'trunc' }, t('Showing the first {size}: download the file to see all of it', { size: fmtSize(TEXT_MAX) })) : null
         stage.replaceChildren(h('div', { class: 'media' }, p.node), ...nav, extra ?? '')
+        void p.start?.().catch((err) => my === seq && stage.replaceChildren(h('div', { class: 'err' }, t('Preview not available: {error}', { error: errMsg(err) })), ...nav))
       },
       (err) => {
         if (my !== seq) return

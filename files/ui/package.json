@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mosaikit/plugin-api": "file:../../../mosaikit/ui/plugin-api"
+    "@mosaikit/plugin-api": "file:../../../mosaikit/ui/plugin-api",
+    "pdfjs-dist": "^4.10.38"
   }
 }

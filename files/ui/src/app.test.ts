@@ -58,7 +58,7 @@ describe('FileManager', () => {
     fm = new FileManager(el, msk)
     await tick()
     ;(el.querySelector('tr.it') as HTMLElement).click()
-    const labels = [...el.querySelectorAll('.fm-bar button')].map((b) => b.textContent)
+    const labels = [...el.querySelectorAll('.fm-bar button')].map((b) => b.getAttribute('aria-label') ?? b.textContent)
     expect(labels).toContain('Download')
     expect(labels).toContain('Copy to…')
     expect(labels).not.toContain('Rename')
