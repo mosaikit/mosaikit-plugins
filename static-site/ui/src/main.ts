@@ -306,6 +306,27 @@ function mount(msk: Msk) {
       grid.set([], null, '')
       return
     }
+    cards.replaceChildren(
+      ...shown.map((r) => {
+        const open = h('button', { type: 'button', class: 'cardthumb', 'aria-label': t('Open the site') + ': ' + valOf(r, 'name'), disabled: !hasSite(r) }, thumbEl(r, 'thumb'))
+        open.addEventListener('click', () => void openShow(r.id))
+        const where = isWeb(r) ? hostOf(valOf(r, 'url')) : valOf(r, 'entry') || t('zip to upload')
+        return h(
+          'article',
+          { class: 'card', 'data-site': valOf(r, 'name') },
+          open,
+          h(
+            'div',
+            { class: 'cardbody' },
+            h('h3', { class: 'cardname' }, hasSite(r) ? nameLink(r) : valOf(r, 'name'), ...badges(r)),
+            h('p', { class: 'carddesc' }, valOf(r, 'description')),
+            h('p', { class: 'cardmeta mono' }, where),
+          ),
+          actionsOf(r, h('div', { class: 'rowacts' })),
+        )
+      }),
+    )
+
     grid.set(shown, null, emptyText)
   }
 
