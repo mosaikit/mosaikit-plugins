@@ -1,12 +1,12 @@
 id = "com.mosaikit.layout-project"
 name = "Project"
-version = "1.0.0"
+version = "1.0.1"
 kind = "layout"
 description = "Global navigation at the left, the sidebar of the area next to it"
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Global navigation in a narrow rail at the left, with the pages of the current area in a sidebar next to it. Suited to people who work mostly in one area at a time."
-screenshots = ["layout.svg"]
+screenshots = ["layout.svg", "layout-page.svg"]
 homepage = "https://example.org/mosaikit/plugins/layout-project"
 
 [contribution]

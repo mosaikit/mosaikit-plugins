@@ -1,12 +1,12 @@
 id = "com.mosaikit.layout-workspace"
 name = "Workspace"
-version = "1.0.0"
+version = "1.0.1"
 kind = "layout"
 description = "Top bar with a wide search, a drawer that opens and closes"
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "A top bar with a wide search field and a drawer that opens and closes. Suited to people who search more than they browse."
-screenshots = ["layout.svg"]
+screenshots = ["layout.svg", "layout-page.svg"]
 homepage = "https://example.org/mosaikit/plugins/layout-workspace"
 
 [contribution]

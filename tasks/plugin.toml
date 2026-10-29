@@ -1,6 +1,6 @@
 id = "com.mosaikit.tasks"
 name = "Tasks"
-version = "0.4.3"
+version = "0.4.4"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "square-check-big"

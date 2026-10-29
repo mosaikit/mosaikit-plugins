@@ -1,13 +1,13 @@
 id = "com.mosaikit.notes"
 name = "Notes"
-version = "0.7.0"
+version = "0.7.1"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "notebook-pen"
 description = "Personal notes, shareable with colleagues and groups"
 author = "Mosaikit"
 details = "Write notes as coloured post-its with a title, a text and tags of your own, resize them, keep them private or share them with colleagues and groups.\n\nEvery note has its own sharing level, a public link when you need one, and a place in the search of the platform.\n\nWhen the Administrator has set a translation service (System > Keys of outside services), a note can be translated into another language with one click."
-screenshots = ["list.svg", "note.svg", "share.svg"]
+screenshots = ["list.svg", "note.svg"]
 homepage = "https://example.org/mosaikit/plugins/notes"
 license = "Apache-2.0"
 

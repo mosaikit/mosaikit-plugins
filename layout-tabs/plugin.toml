@@ -1,12 +1,12 @@
 id = "com.mosaikit.layout-tabs"
 name = "Tabs"
-version = "1.0.0"
+version = "1.0.1"
 kind = "layout"
 description = "Apps and pages as tabs under the band, a menu for the pages of an app"
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Apps and pages as tabs under the band; a menu lists the pages of an app. Suited to few apps used side by side."
-screenshots = ["layout.svg"]
+screenshots = ["layout.svg", "layout-page.svg"]
 homepage = "https://example.org/mosaikit/plugins/layout-tabs"
 
 [contribution]

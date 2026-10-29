@@ -1,6 +1,6 @@
 id = "com.mosaikit.maps"
 name = "Maps"
-version = "0.6.0"
+version = "0.6.1"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "map"

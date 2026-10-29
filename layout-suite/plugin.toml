@@ -1,12 +1,12 @@
 id = "com.mosaikit.layout-suite"
 name = "Suite"
-version = "1.0.0"
+version = "1.0.1"
 kind = "layout"
 description = "Apps from a launcher grid, the pages of the area in a bar under the band"
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Apps from a launcher grid, like an office suite; the pages of the area sit in a bar under the band. Suited to many apps used for short moments."
-screenshots = ["layout.svg"]
+screenshots = ["layout.svg", "layout-page.svg"]
 homepage = "https://example.org/mosaikit/plugins/layout-suite"
 
 [contribution]
