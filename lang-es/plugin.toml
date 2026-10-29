@@ -1,6 +1,6 @@
 id = "com.mosaikit.lang-es"
 name = "Spanish (Español)"
-version = "0.1.5"
+version = "0.1.6"
 kind = "language"
 icon = "languages"
 author = "Mosaikit"

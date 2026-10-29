@@ -1981,5 +1981,11 @@
   "Requests to see or edit an item wait here until they are answered.": "Las solicitudes para ver o editar un elemento esperan aquí hasta que se responden.",
   "Items of the backup": "Elementos de la copia de seguridad",
   "Rows of the file": "Filas del archivo",
-  "Result of every row": "Resultado de cada fila"
+  "Result of every row": "Resultado de cada fila",
+  "Items shared with the group by its members appear here.": "Los elementos que sus miembros comparten con el grupo aparecen aquí.",
+  "The members of this group come from the identity provider.": "Los miembros de este grupo vienen del proveedor de identidad.",
+  "Add the people of the tenant who belong to this group.": "Añade a las personas de la organización que forman parte de este grupo.",
+  "The events of the last days appear here.": "Los eventos de los últimos días aparecen aquí.",
+  "What the tenant stores appears here.": "Lo que la organización guarda aparece aquí.",
+  "Use «Run now» to make the first one.": "Usa «Ejecutar ahora» para hacer la primera."
 }
