@@ -220,7 +220,11 @@ mod tests {
             )
             .unwrap()
             .unwrap();
-        assert_eq!(legacy.str("tags"), r#"["work"]"#, "the tag of an older client becomes the list");
+        assert_eq!(
+            legacy.str("tags"),
+            r#"["work"]"#,
+            "the tag of an older client becomes the list"
+        );
         let own = host
             .hook(
                 &__msk_registry(),
