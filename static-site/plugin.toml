@@ -3,7 +3,7 @@ name = "Tools"
 version = "0.5.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
-icon = "globe"
+icon = "wrench"
 description = "Publishes static sites from zip archives or shows a site by its web address, shareable and with public links"
 author = "Mosaikit"
 license = "Apache-2.0"
