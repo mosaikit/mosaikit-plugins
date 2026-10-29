@@ -1975,6 +1975,6 @@
   "An Administrator makes plugins available to the tenant.": "Un Administrador pone los plugins a disposición del inquilino.",
   "Nothing shared yet": "Aún no hay nada compartido",
   "Items you share with people, groups or a public link appear here.": "Los elementos que compartes con personas, grupos o un enlace público aparecen aquí.",
-  "Access requests and invitations to people of other tenants wait here until they are answered.": "Las solicitudes de acceso y las invitaciones a personas de otros inquilinos esperan aquí hasta que se responden.",
-  "Nothing found in the trash": "No se encontró nada en la papelera"
+  "Nothing found in the trash": "No se encontró nada en la papelera",
+  "Requests to see or edit an item wait here until they are answered.": "Las solicitudes para ver o editar un elemento esperan aquí hasta que se responden."
 }
