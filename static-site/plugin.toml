@@ -17,7 +17,7 @@ label = "Apps"
 
 [[resources]]
 name = "sites"
-label = "Sites"
+label = "Apps"
 title_field = "name"
 fields = [
   { key = "name", label = "Name", kind = "text", required = true },
@@ -41,7 +41,7 @@ web = true
 
 [[kpi]]
 view = "kpi_sites"
-label = "Published sites"
+label = "Published apps"
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
@@ -51,9 +51,9 @@ description = "Pubblica siti statici da archivi zip o mostra un sito dal suo ind
 label = "Apps"
 
 [i18n.it.resources.sites]
-label = "Siti"
+label = "App"
 fields = { name = "Nome", description = "Descrizione", zip_name = "Zip caricato", entry = "Pagina iniziale", files = "File", size = "Dimensione (byte)", url = "Indirizzo web", framable = "Incorporabile", thumbnail = "Miniatura" }
 
 [i18n.it.kpi.kpi_sites]
-label = "Siti pubblicati"
-columns = { sites = "siti", files = "file", bytes = "byte" }
+label = "App pubblicate"
+columns = { sites = "app", files = "file", bytes = "byte" }

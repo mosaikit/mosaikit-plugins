@@ -131,8 +131,8 @@ function mount(msk: Msk) {
 
   // ---------- DOM ----------
 
-  const filter = h('input', { type: 'search', class: 'msk-filter', placeholder: t('Filter…'), 'aria-label': t('Filter the sites') })
-  const btnNew = h('button', { type: 'button', class: 'msk-btn' }, t('＋ New site'))
+  const filter = h('input', { type: 'search', class: 'msk-filter', placeholder: t('Filter…'), 'aria-label': t('Filter the apps') })
+  const btnNew = h('button', { type: 'button', class: 'msk-btn' }, t('＋ New app'))
   const btnCards = h('button', { type: 'button', class: 'msk-btn ghost', 'aria-label': t('Cards'), title: t('Cards') }, '▦')
   const btnTable = h('button', { type: 'button', class: 'msk-btn ghost', 'aria-label': t('List'), title: t('List') }, '☰')
   const layoutSwitch = h('span', { class: 'layoutswitch', role: 'group', 'aria-label': t('View') }, btnCards, btnTable)
@@ -140,7 +140,7 @@ function mount(msk: Msk) {
   const rowcount = h('span', { class: 'msk-count' })
   const listMsg = h('div', { class: 'msg', role: 'status' })
   const grid = gridTable<Row>({
-    label: t('Static sites'),
+    label: t('Apps'),
     local: { step: 50, more: t('Load more'), of: (shown, total) => t('{shown} of {total}', { shown, total }) },
     decorate: (_r, tr) => {
       tr.className = 'data-row'
@@ -165,15 +165,15 @@ function mount(msk: Msk) {
     listBody,
   )
 
-  const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of sites'))
+  const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of apps'))
   const svTitle = h('span', { class: 'sv-title' })
-  const btnReload = h('button', { type: 'button', class: 'msk-btn ghost', title: t('Reload the site') }, t('↻ Reload'))
+  const btnReload = h('button', { type: 'button', class: 'msk-btn ghost', title: t('Reload the app') }, t('↻ Reload'))
   const aTab = h('a', { class: 'msk-btn ghost', target: '_blank', rel: 'noopener noreferrer', title: t('Open in a new tab') }, t('↗ New tab'))
   const btnModify = h('button', { type: 'button', class: 'msk-btn ghost' }, t('✏ Edit'))
   const showOnly = h('span', { class: 'show-only' }, btnReload, aTab, btnModify)
 
   const inName = h('input', { id: 'msks-name', type: 'text', placeholder: t('e.g. Project documentation') })
-  const inDesc = h('textarea', { id: 'msks-desc', rows: '3', placeholder: t('What the site is for (optional)') })
+  const inDesc = h('textarea', { id: 'msks-desc', rows: '3', placeholder: t('What the app is for (optional)') })
   const inZip = h('input', { type: 'file', accept: '.zip,application/zip,application/x-zip-compressed' })
   const fname = h('span', { class: 'fname' })
   const drop = h(
@@ -189,12 +189,12 @@ function mount(msk: Msk) {
   const inSrcUrl = h('input', { type: 'radio', name: 'msks-src', id: 'msks-src-url', value: 'url' })
   const srcRow = h(
     'div',
-    { class: 'frow srcrow', role: 'radiogroup', 'aria-label': t('Source of the site') },
+    { class: 'frow srcrow', role: 'radiogroup', 'aria-label': t('Source of the app') },
     h('label', { class: 'radio', for: 'msks-src-zip' }, inSrcZip, ' ', t('Zip archive')),
     h('label', { class: 'radio', for: 'msks-src-url' }, inSrcUrl, ' ', t('Web address')),
   )
   const inUrl = h('input', { id: 'msks-url', type: 'url', placeholder: 'https://example.org/', autocomplete: 'off' })
-  const urlHint = h('div', { class: 'hint' }, t('The site is shown inside Mosaikit and never downloaded. If it does not allow it, it opens in a new tab.'))
+  const urlHint = h('div', { class: 'hint' }, t('The app is shown inside Mosaikit and never downloaded. If it does not allow it, it opens in a new tab.'))
   const urlRow = h('div', { class: 'frow required' }, h('label', { for: 'msks-url' }, t('Address') + ' ', h('b', { class: 'req' }, '*')), inUrl, urlHint)
   const inThumb = h('input', { id: 'msks-thumb', type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif' })
   const thumbPrev = h('img', { class: 'thumbprev', alt: '' })
@@ -204,7 +204,7 @@ function mount(msk: Msk) {
     { class: 'frow' },
     h('label', { for: 'msks-thumb' }, t('Thumbnail')),
     h('div', { class: 'thumbline' }, thumbPrev, inThumb, btnThumbClear),
-    h('div', { class: 'hint' }, t('Optional. Without one, a site given by address shows its own picture (og:image, or its first image); otherwise a placeholder.')),
+    h('div', { class: 'hint' }, t('Optional. Without one, an app given by address shows its own picture (og:image, or its first image); otherwise a placeholder.')),
   )
   const zipHint = h('div', { class: 'hint' })
   const zipRow = h('div', { class: 'frow' }, h('label', {}, t('Zip archive') + ' ', zipReq), drop, zipHint)
@@ -240,7 +240,7 @@ function mount(msk: Msk) {
   const noFrame = h(
     'div',
     { class: 'noframe', role: 'status' },
-    h('p', {}, t('This site does not allow being shown inside Mosaikit (it forbids framing). It was opened in a new tab; if nothing opened, use the button.')),
+    h('p', {}, t('This app does not allow being shown inside Mosaikit (it forbids framing). It was opened in a new tab; if nothing opened, use the button.')),
     noFrameLink,
   )
 
@@ -276,7 +276,7 @@ function mount(msk: Msk) {
         v.toLowerCase().includes(f),
       )
     })
-    rowcount.textContent = shown.length === 1 ? t('1 site') : t('{n} sites', { n: shown.length })
+    rowcount.textContent = shown.length === 1 ? t('1 app') : t('{n} apps', { n: shown.length })
     const asCards = state.layout === 'cards'
     cards.hidden = !asCards
     grid.el.hidden = asCards
@@ -285,7 +285,7 @@ function mount(msk: Msk) {
     btnTable.setAttribute('aria-pressed', String(!asCards))
     btnCards.classList.toggle('on', asCards)
     btnTable.classList.toggle('on', !asCards)
-    const emptyText = state.rows.length ? t('no site matches the filter') : t('no site: upload one with ＋ New site')
+    const emptyText = state.rows.length ? t('no app matches the filter') : t('no app: create one with ＋ New app')
     if (!shown.length) {
       cards.replaceChildren(h('p', { class: 'empty' }, emptyText))
       grid.set([], null, emptyText)
@@ -307,7 +307,7 @@ function mount(msk: Msk) {
   }
 
   function nameLink(r: Row) {
-      const a = h('a', { class: 'open', href: '#', title: t('Open the site') }, valOf(r, 'name'))
+      const a = h('a', { class: 'open', href: '#', title: t('Open the app') }, valOf(r, 'name'))
       a.addEventListener('click', (ev) => {
         ev.preventDefault()
         void openShow(r.id)
@@ -403,7 +403,7 @@ function mount(msk: Msk) {
     const row = id != null ? findRow(id) : undefined
     if (row && !canWrite(row)) return
     state.editId = row ? row.id : null
-    svTitle.textContent = row ? t('Edit: {name}', { name: valOf(row, 'name') }) : t('New site')
+    svTitle.textContent = row ? t('Edit: {name}', { name: valOf(row, 'name') }) : t('New app')
     inName.value = row ? valOf(row, 'name') : ''
     inDesc.value = row ? valOf(row, 'description') : ''
     inZip.value = ''
@@ -419,9 +419,9 @@ function mount(msk: Msk) {
     zipReq.hidden = current
     if (current) {
       zipHint.replaceChildren(
-        t('Leave empty to keep the current site ('),
+        t('Leave empty to keep the current app ('),
         code(valOf(row, 'zip_name') || valOf(row, 'entry')),
-        t(', {n} files). A new zip replaces all the files of the site.', { n: valOf(row, 'files') || '?' }),
+        t(', {n} files). A new zip replaces all the files of the app.', { n: valOf(row, 'files') || '?' }),
       )
     } else {
       zipHint.replaceChildren(
@@ -483,7 +483,7 @@ function mount(msk: Msk) {
     const row = findRow(id)
     if (!row) return
     if (!hasSite(row)) {
-      msg(canWrite(row) ? t('this site has no files: use Edit to upload the zip') : t('this site has no files'), 'list', true)
+      msg(canWrite(row) ? t('this app has no files: use Edit to upload the zip') : t('this app has no files'), 'list', true)
       return
     }
     msg('')
@@ -498,7 +498,7 @@ function mount(msk: Msk) {
       sframe.src = url
       aTab.href = url
     } catch (e) {
-      msg(t('could not open the site: {error}', { error: errText(e) }), 'list', true)
+      msg(t('could not open the app: {error}', { error: errText(e) }), 'list', true)
     }
   }
 
@@ -551,14 +551,14 @@ function mount(msk: Msk) {
       if (!name && !address) return msg(t('the name is required'), 'form', true)
     } else {
       if (!name) return msg(t('the name is required'), 'form', true)
-      if (!file && !(row && hasSite(row))) return msg(t('choose the zip with the site'), 'form', true)
+      if (!file && !(row && hasSite(row))) return msg(t('choose the zip with the app'), 'form', true)
       if (file && !/\.zip$/i.test(file.name)) return msg(t('the file must be a .zip'), 'form', true)
     }
 
     setBusy(true)
     try {
       if (web) {
-        msg(t('looking at the site…'), 'form')
+        msg(t('looking at the app…'), 'form')
         // what the host sees: may it be framed, its title, its picture. A thumbnail given by the person wins.
         const needPicture = state.thumb === undefined && !(row && thumbOf(row))
         const p = await msk.web.probe(address, needPicture)
@@ -573,7 +573,7 @@ function mount(msk: Msk) {
         else await crud.create(values)
         setBusy(false)
         showView('list')
-        msg(row ? t('site updated') : p.embeddable ? t('site created') : t('site created: it does not allow being shown inside Mosaikit, it opens in a new tab'))
+        msg(row ? t('app updated') : p.embeddable ? t('app created') : t('app created: it does not allow being shown inside Mosaikit, it opens in a new tab'))
         await load()
         return
       }
@@ -604,14 +604,14 @@ function mount(msk: Msk) {
         await crud.update(row.id, { name, description, ...pic, ...infoValues(file, info) })
         if (!info.entry) {
           await load()
-          throw new Error(NO_INDEX + ': ' + t('upload the site again with a valid zip'))
+          throw new Error(NO_INDEX + ': ' + t('upload the app again with a valid zip'))
         }
       } else {
         await crud.update(row.id, { name, description, ...pic })
       }
       setBusy(false)
       showView('list')
-      msg(row ? t('site updated') : t('site created'))
+      msg(row ? t('app updated') : t('app created'))
       await load()
     } catch (e) {
       setBusy(false)
@@ -632,12 +632,12 @@ function mount(msk: Msk) {
   async function del(id: string) {
     const row = findRow(id)
     if (!row) return
-    if (!(await msk.confirm(t('Delete the site "{name}" and all its files?', { name: valOf(row, 'name') })))) return
+    if (!(await msk.confirm(t('Delete the app "{name}" and all its files?', { name: valOf(row, 'name') })))) return
     msg('')
     try {
       // the server deletes the content too
       await crud.remove(id)
-      msg(t('site deleted'))
+      msg(t('app deleted'))
       await load()
     } catch (e) {
       msg(errText(e), 'list', true)
