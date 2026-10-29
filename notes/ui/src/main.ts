@@ -413,7 +413,7 @@ async function mount(msk: Msk) {
         notes = rows
         fill()
       },
-      headFilters: [manageBtn, filter],
+      bar: [filter, manageBtn],
       detail: (row, box) => translateTool(msk, row, box, lang === 'it' ? 'it' : 'en'),
     })
   }
