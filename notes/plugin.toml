@@ -94,7 +94,7 @@ scopes = ["platform", "tenant"]
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
-details = "Scrivi note con titolo, testo ed etichette, tienile private o condividile con colleghi e gruppi.\n\nOgni nota ha il proprio livello di condivisione, un link pubblico quando serve e un posto nella ricerca della piattaforma.\n\nQuando l’Administrator ha impostato un servizio di traduzione (Sistema > Chiavi dei servizi esterni), una nota si traduce in un’altra lingua con un clic."
+details = "Scrivi note con titolo, testo ed etichette, tienile private o condividile con colleghi e gruppi.\n\nOgni nota ha il proprio livello di condivisione, un link pubblico quando serve e un posto nella ricerca della piattaforma.\n\nQuando l’Amministratore ha impostato un servizio di traduzione (Sistema > Chiavi dei servizi esterni), una nota si traduce in un’altra lingua con un clic."
 name = "Note"
 description = "Note personali, condivisibili con colleghi e gruppi"
 label = "Note"
