@@ -131,12 +131,14 @@ function mount(msk: Msk) {
     ],
   })
   const listMsg = h('div', { class: 'msg', role: 'status' })
+  const listBody = pageBody(grid.el, listMsg)
+  listBody.classList.add('msk-tablebody')
   const listView = h(
     'div',
     { class: 'listview' },
     // the header and the filter never scroll (the same header as the pages of Mosaikit); the table does
     pageHead({ title: t('Maps'), sub: rowcount, actions: [btnNew], filters: [filter] }),
-    pageBody(grid.el, listMsg),
+    listBody,
   )
 
   const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of maps'))
