@@ -205,7 +205,7 @@
 .fm-table { display: grid; grid-template-columns: 42px minmax(0, 1fr) 140px 130px 140px 100px; grid-template-rows: auto minmax(0, 1fr); height: 100%; }
 .fm-table > thead, .fm-table > tbody, .fm-table tr { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; }
 .fm-table > thead { padding-right: 10px; border-bottom: 1px solid var(--line); background: var(--panel2); }
-.fm-table > tbody { overflow-y: scroll; align-content: start; }
+.fm-table > tbody { overflow-x: hidden; overflow-y: scroll; align-content: start; }
 .fm-table > tbody::-webkit-scrollbar { width: 10px; }
 .fm-table > tbody::-webkit-scrollbar-thumb { border-radius: 8px; background: color-mix(in srgb, var(--fg) 28%, transparent); }
 .fm-table th { position: static; display: flex; align-items: center; border-bottom: 0; }
