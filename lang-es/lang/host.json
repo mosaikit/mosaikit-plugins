@@ -1966,5 +1966,15 @@
   "The trusted registries offer nothing that is not installed yet.": "Los registros de confianza no ofrecen nada que no esté instalado.",
   "What happens here will be listed in this place.": "Lo que ocurra aquí se mostrará en este lugar.",
   "What is shared by the people of the tenant shows here.": "Aquí aparece lo que comparten las personas de la organización.",
-  "What the people share with this group shows here.": "Aquí aparece lo que las personas comparten con este grupo."
+  "What the people share with this group shows here.": "Aquí aparece lo que las personas comparten con este grupo.",
+  "No tenants yet": "Aún no hay inquilinos",
+  "A tenant is the space of an organisation: its people, apps and items.": "Un inquilino es el espacio de una organización: sus personas, apps y elementos.",
+  "Install a plugin from a .mskp file or from the catalog.": "Instala un plugin desde un archivo .mskp o desde el catálogo.",
+  "Every installed plugin is up to date.": "Todos los plugins instalados están actualizados.",
+  "Every plugin of the catalog is already installed.": "Todos los plugins del catálogo ya están instalados.",
+  "An Administrator makes plugins available to the tenant.": "Un Administrador pone los plugins a disposición del inquilino.",
+  "Nothing shared yet": "Aún no hay nada compartido",
+  "Items you share with people, groups or a public link appear here.": "Los elementos que compartes con personas, grupos o un enlace público aparecen aquí.",
+  "Access requests and invitations to people of other tenants wait here until they are answered.": "Las solicitudes de acceso y las invitaciones a personas de otros inquilinos esperan aquí hasta que se responden.",
+  "Nothing found in the trash": "No se encontró nada en la papelera"
 }
