@@ -1,12 +1,12 @@
 id = "com.mosaikit.notes"
 name = "Notes"
-version = "0.6.0"
+version = "0.7.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "notebook-pen"
 description = "Personal notes, shareable with colleagues and groups"
 author = "Mosaikit"
-details = "Write notes with a title, a text and tags, keep them private or share them with colleagues and groups.\n\nEvery note has its own sharing level, a public link when you need one, and a place in the search of the platform.\n\nWhen the Administrator has set a translation service (System > Keys of outside services), a note can be translated into another language with one click."
+details = "Write notes as coloured post-its with a title, a text and tags of your own, resize them, keep them private or share them with colleagues and groups.\n\nEvery note has its own sharing level, a public link when you need one, and a place in the search of the platform.\n\nWhen the Administrator has set a translation service (System > Keys of outside services), a note can be translated into another language with one click."
 screenshots = ["list.svg", "note.svg", "share.svg"]
 homepage = "https://example.org/mosaikit/plugins/notes"
 license = "Apache-2.0"
@@ -22,7 +22,24 @@ title_field = "title"
 fields = [
   { key = "title", label = "Title", kind = "text", required = true },
   { key = "body", label = "Text", kind = "text", multiline = true },
-  { key = "tag", label = "Tag", kind = "choice", options = ["personal", "work", "urgent"] },
+  # the first tag of the note (kept for the KPI); the tags of the note are in `tags`
+  { key = "tag", label = "Tag", kind = "text", hidden = true, search = false },
+  # a JSON list of tag names; the colour of each tag is in the resource note_tags
+  { key = "tags", label = "Tags", kind = "text", hidden = true },
+  { key = "color", label = "Colour", kind = "choice", options = ["yellow", "orange", "pink", "violet", "blue", "teal", "green", "grey"], hidden = true },
+  # size of the post-it in pixels (empty: the default size)
+  { key = "w", label = "Width", kind = "number", hidden = true },
+  { key = "h", label = "Height", kind = "number", hidden = true },
+]
+
+# The tags of a person, each with its own colour (a note keeps the names of its tags).
+[[resources]]
+name = "note_tags"
+label = "Note tags"
+title_field = "name"
+fields = [
+  { key = "name", label = "Name", kind = "text", required = true },
+  { key = "color", label = "Colour", kind = "choice", options = ["yellow", "orange", "pink", "violet", "blue", "teal", "green", "grey"] },
 ]
 
 [ui]
@@ -94,7 +111,7 @@ scopes = ["platform", "tenant"]
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
-details = "Scrivi note con titolo, testo ed etichette, tienile private o condividile con colleghi e gruppi.\n\nOgni nota ha il proprio livello di condivisione, un link pubblico quando serve e un posto nella ricerca della piattaforma.\n\nQuando l’Amministratore ha impostato un servizio di traduzione (Sistema > Chiavi dei servizi esterni), una nota si traduce in un’altra lingua con un clic."
+details = "Scrivi note come post-it colorati con titolo, testo e tag tuoi, ridimensionali, tienile private o condividile con colleghi e gruppi.\n\nOgni nota ha il proprio livello di condivisione, un link pubblico quando serve e un posto nella ricerca della piattaforma.\n\nQuando l’Amministratore ha impostato un servizio di traduzione (Sistema > Chiavi dei servizi esterni), una nota si traduce in un’altra lingua con un clic."
 name = "Note"
 description = "Note personali, condivisibili con colleghi e gruppi"
 label = "Note"
@@ -102,8 +119,13 @@ service_keys = { translate = { label = "Servizio di traduzione", description = "
 
 [i18n.it.resources.notes]
 label = "Note"
-fields = { title = "Titolo", body = "Testo", tag = "Tag" }
-options.tag = { personal = "personale", work = "lavoro", urgent = "urgente" }
+fields = { title = "Titolo", body = "Testo", tag = "Tag", tags = "Tag", color = "Colore", w = "Larghezza", h = "Altezza" }
+options.color = { yellow = "giallo", orange = "arancione", pink = "rosa", violet = "viola", blue = "blu", teal = "turchese", green = "verde", grey = "grigio" }
+
+[i18n.it.resources.note_tags]
+label = "Tag delle note"
+fields = { name = "Nome", color = "Colore" }
+options.color = { yellow = "giallo", orange = "arancione", pink = "rosa", violet = "viola", blue = "blu", teal = "turchese", green = "verde", grey = "grigio" }
 
 [i18n.it.nav]
 all = "Tutte le note"

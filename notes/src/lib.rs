@@ -1,18 +1,34 @@
-//! Notes plugin: default tag at creation, count by tag, and the translation of a note with an outside
+//! Notes plugin: default tag and colour at creation, count by tag, and the translation of a note with an outside
 //! translation service (its key and its address are set in System > Keys of outside services).
 
 use mosaikit_plugin_sdk::prelude::*;
 
 const DEFAULT_TAG: &str = "personal";
+const DEFAULT_COLOR: &str = "yellow";
 
+/// A note saved without the field `tags` gets its tags from the field `tag` (the first tag: an API client of
+/// before the post-its), or the tag `personal`; `[]` is a note without tags on purpose. A note without colour gets
+/// the first colour of the palette.
 fn before_create(ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
-    if !hook.values.str("tag").is_empty() {
-        return Ok(None);
-    }
     let mut v = hook.values.clone();
-    v.set("tag", DEFAULT_TAG);
-    ctx.log("notes: default tag applied");
-    Ok(Some(v))
+    let mut changed = false;
+    if hook.values.str("tags").is_empty() {
+        let first = match hook.values.str("tag") {
+            t if t.is_empty() => {
+                ctx.log("notes: default tag applied");
+                DEFAULT_TAG.to_string()
+            }
+            t => t,
+        };
+        v.set("tags", json!([first]).to_string());
+        v.set("tag", first);
+        changed = true;
+    }
+    if hook.values.str("color").is_empty() {
+        v.set("color", DEFAULT_COLOR);
+        changed = true;
+    }
+    Ok(changed.then_some(v))
 }
 
 /// Notes visible to the user, grouped by tag (RLS filters the rows).
@@ -182,16 +198,38 @@ mod tests {
                 json!({ "title": "x" }),
             )
             .unwrap();
-        assert_eq!(v.unwrap().str("tag"), DEFAULT_TAG);
+        let v = v.unwrap();
+        assert_eq!(v.str("tag"), DEFAULT_TAG);
+        assert_eq!(v.str("tags"), r#"["personal"]"#);
+        assert_eq!(v.str("color"), DEFAULT_COLOR);
         let keep = host
             .hook(
                 &__msk_registry(),
                 "before_create",
                 "notes",
-                json!({ "tag": "work" }),
+                json!({ "tag": "work", "tags": "[]", "color": "blue" }),
             )
             .unwrap();
-        assert_eq!(keep, None);
+        assert_eq!(keep, None, "no tags on purpose");
+        let legacy = host
+            .hook(
+                &__msk_registry(),
+                "before_create",
+                "notes",
+                json!({ "tag": "work", "color": "blue" }),
+            )
+            .unwrap()
+            .unwrap();
+        assert_eq!(legacy.str("tags"), r#"["work"]"#, "the tag of an older client becomes the list");
+        let own = host
+            .hook(
+                &__msk_registry(),
+                "before_create",
+                "notes",
+                json!({ "tags": r#"["ideas"]"#, "color": "pink" }),
+            )
+            .unwrap();
+        assert_eq!(own, None, "a note with tags of its own keeps them");
     }
 
     fn keys(key: Option<&'static str>, endpoint: Option<&'static str>) -> MockHost {

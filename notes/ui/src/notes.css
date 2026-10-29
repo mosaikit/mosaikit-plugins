@@ -8,3 +8,52 @@
 .note-read h2 { margin: 0 0 8px; font-size: 20px; line-height: 1.25; overflow-wrap: anywhere; }
 .nread { margin: 14px 0 6px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 .nread.none { color: var(--dim); }
+
+/* Tags: a chip in the colour of the tag (the colours are made from palette.ts) */
+.pi-tag { display: inline-flex; align-items: center; max-width: 100%; padding: 1px 9px; border-radius: 99px; font: inherit; font-size: 12px; line-height: 18px; background: var(--pi-bg); color: var(--pi-ink); border: 1px solid var(--pi-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+button.pi-tag { cursor: pointer; border-style: dashed; }
+button.pi-tag[aria-pressed='true'] { border-style: solid; font-weight: 700; box-shadow: 0 0 0 2px var(--acc); }
+.pi-dot { flex: none; width: 16px; height: 16px; border-radius: 50%; background: var(--pi-bg); border: 1px solid var(--pi-ink); }
+
+/* The post-it: coloured, slightly turned (always the same for a note), a soft shadow and a folded corner that is also the grip to resize it */
+.msk-item.pi { position: relative; display: flex; flex-direction: column; box-sizing: border-box; max-width: 100%; padding: 14px 14px 22px; border: 0; border-radius: 3px 3px 3px 10px; background: var(--pi-bg); color: var(--pi-ink);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12), 0 6px 14px rgba(0, 0, 0, 0.2); transform: rotate(var(--pi-tilt, 0deg)); transition: transform 0.15s, box-shadow 0.15s; }
+.msk-item.pi:hover, .msk-item.pi:focus-visible, .msk-item.pi:focus-within { transform: none; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.14), 0 12px 24px rgba(0, 0, 0, 0.28); z-index: 2; }
+.msk-item.pi:focus-visible { outline: 3px solid var(--acc); outline-offset: 3px; }
+.msk-item.pi.sel { background: var(--pi-bg); outline: 3px solid var(--acc); outline-offset: 2px; transform: none; }
+.msk-item.pi .pi-in { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow: hidden; padding-right: 18px; }
+.pi .pi-title { font-size: 15px; line-height: 1.25; overflow-wrap: anywhere; color: var(--pi-ink); }
+.pi .pi-body { margin: 0; flex: 1; min-height: 0; overflow: hidden; font-size: 13px; line-height: 1.4; color: var(--pi-ink); white-space: pre-line; overflow-wrap: anywhere; -webkit-mask-image: linear-gradient(#000 80%, transparent); mask-image: linear-gradient(#000 80%, transparent); }
+.pi .pi-body.none { font-style: italic; }
+.pi .nwho, .pi .msk-itemext { color: var(--pi-ink); }
+.pi .nfoot { flex: none; gap: 4px; }
+.pi-grip { position: absolute; right: 0; bottom: 0; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 6px 0 3px 0; cursor: nwse-resize; touch-action: none;
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.28) 50%); }
+.pi-grip:hover, .pi-grip:focus-visible { background: linear-gradient(135deg, transparent 40%, rgba(0, 0, 0, 0.45) 40%); outline-offset: 0; }
+.pi-pal { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; padding: 0; border-radius: 50%; cursor: pointer; background: transparent; border: 2px solid var(--pi-ink); opacity: 0.7; }
+.pi-pal::after { content: ''; display: block; width: 8px; height: 8px; margin: 3px auto; border-radius: 50%; background: var(--pi-ink); }
+.pi-pal:hover, .pi-pal:focus-visible { opacity: 1; }
+.pi-pop { position: absolute; top: 30px; right: 6px; z-index: 5; display: grid; grid-template-columns: repeat(4, 24px); gap: 6px; padding: 8px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35); transform: rotate(calc(var(--pi-tilt, 0deg) * -1)); }
+.pi-pop[hidden] { display: none; }
+.pi-sw { width: 24px; height: 24px; padding: 0; border-radius: 50%; cursor: pointer; background: var(--pi-bg); border: 2px solid var(--pi-ink); }
+.pi-sw[aria-pressed='true'], .pi-sw[aria-checked='true'] { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--acc); }
+.pi-swatches, .pi-choose, .pi-addrow, .pi-newrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pi-label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--dim); }
+.pi-newtag { flex: 1; min-width: 8rem; }
+.note-read .nfoot { margin-bottom: 4px; }
+@media (max-width: 640px) { .msk-items.flow { justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .msk-item.pi { transition: none; } }
+
+/* The management of the tags */
+.pi-dialog { width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 20px 22px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--fg); }
+.pi-dialog::backdrop { background: rgba(0, 0, 0, 0.55); }
+.pi-dialog h2 { margin: 0 0 6px; font-size: 18px; }
+.pi-mtext { margin: 0 0 14px; font-size: 13px; color: var(--dim); }
+.pi-newrow { margin-bottom: 14px; }
+.pi-newrow input { flex: 1; min-width: 8rem; }
+.pi-tlist { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow: auto; }
+.pi-trow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pi-trow input { flex: 1; min-width: 8rem; }
+.pi-used { font-size: 12px; color: var(--dim); min-width: 4.5rem; }
+.pi-none { color: var(--dim); font-size: 13px; }
+.pi-tagfilter { max-width: 12rem; }

@@ -5,7 +5,7 @@ logic depends only on the SDK (`mosaikit-plugin-sdk`), the UIs only on `@mosaiki
 
 | Plugin | Id | What it does |
 |---|---|---|
-| Notes | `com.mosaikit.notes` | Personal notes with a tag, shareable; pages in the navigation of the shell (`[[nav]]`: all, mine, shared with me, by tag) |
+| Notes | `com.mosaikit.notes` | Personal notes as coloured, resizable post-its (8 colours, a size kept per note) with tags of your own, each with its own colour (create, rename, recolour, delete, filter), shareable; pages in the navigation of the shell (`[[nav]]`: all, mine, shared with me, by tag) |
 | Tasks | `com.mosaikit.tasks` | Tasks with due date and priority |
 | Contacts | `com.mosaikit.contacts` | Address book with validated emails |
 | Maps | `com.mosaikit.maps` | Catalog of GeoLibre maps, with public links |

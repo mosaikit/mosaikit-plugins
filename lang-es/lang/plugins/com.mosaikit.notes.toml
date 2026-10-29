@@ -1,13 +1,18 @@
 name = "Notas"
 description = "Notas personales, que se pueden compartir con compañeros y grupos"
 label = "Notas"
-details = "Escribe notas con título, texto y etiquetas, mantenlas privadas o compártelas con compañeros y grupos.\n\nCada nota tiene su propio nivel de compartición, un enlace público cuando hace falta y un lugar en la búsqueda de la plataforma.\n\nCuando el administrador ha configurado un servicio de traducción (Sistema › Claves de servicios externos), una nota se traduce a otro idioma con un clic."
+details = "Escribe notas como post-its de colores con título, texto y etiquetas propias, cambia su tamaño, mantenlas privadas o compártelas con compañeros y grupos.\n\nCada nota tiene su propio nivel de compartición, un enlace público cuando hace falta y un lugar en la búsqueda de la plataforma.\n\nCuando el administrador ha configurado un servicio de traducción (Sistema › Claves de servicios externos), una nota se traduce a otro idioma con un clic."
 service_keys = { translate = { label = "Servicio de traducción", description = "Clave del servicio que traduce las notas a otros idiomas" }, translate-endpoint = { label = "Dirección del servicio de traducción", description = "Dirección web del servicio que traduce las notas (por ejemplo https://translate.example.org)" } }
 
 [resources.notes]
 label = "Notas"
-fields = { title = "Título", body = "Texto", tag = "Etiqueta" }
-options.tag = { personal = "personal", work = "trabajo", urgent = "urgente" }
+fields = { title = "Título", body = "Texto", tag = "Etiqueta", tags = "Etiquetas", color = "Color", w = "Ancho", h = "Alto" }
+options.color = { yellow = "amarillo", orange = "naranja", pink = "rosa", violet = "violeta", blue = "azul", teal = "turquesa", green = "verde", grey = "gris" }
+
+[resources.note_tags]
+label = "Etiquetas de las notas"
+fields = { name = "Nombre", color = "Color" }
+options.color = { yellow = "amarillo", orange = "naranja", pink = "rosa", violet = "violeta", blue = "azul", teal = "turquesa", green = "verde", grey = "gris" }
 
 [nav]
 all = "Todas las notas"
