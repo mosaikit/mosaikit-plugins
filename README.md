@@ -9,7 +9,7 @@ logic depends only on the SDK (`mosaikit-plugin-sdk`), the UIs only on `@mosaiki
 | Tasks | `com.mosaikit.tasks` | Tasks with due date and priority |
 | Contacts | `com.mosaikit.contacts` | Address book with validated emails |
 | Maps | `com.mosaikit.maps` | Catalog of GeoLibre maps, with public links |
-| Tools | `com.mosaikit.static-site` | Static sites published from zip archives |
+| Apps | `com.mosaikit.static-site` | Static sites published from zip archives |
 | Documents | `com.mosaikit.files` | Files and folders with preview and zip |
 | Note review | `com.mosaikit.note-review` | Sample extension of Notes: the Reviewed fields, the Mark as reviewed action and a Review tab with the history of the reviews |
 | Workspace, Suite, Project, Tabs | `com.mosaikit.layout-workspace`, `-suite`, `-project`, `-tabs` | Layouts of the shell (`kind = "layout"`): a drawer under a top bar with a wide search; a launcher grid with the pages of the area; global areas with the sidebar of the area; apps and pages as tabs. Declarative: `layout/layout.toml`, a checked stylesheet, images |
