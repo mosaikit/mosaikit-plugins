@@ -1,4 +1,4 @@
-// UI of the Static sites plugin.
+// UI of the Tools plugin (static sites).
 //
 // A site is a zip with an index.html. The CRUD record (`sites`) keeps its name,
 // description and the data of the upload (zip, start page, files, bytes); the
@@ -147,7 +147,7 @@ function mount(msk: Msk) {
     'div',
     { class: 'listview' },
     // the header and the filter never scroll (the same header as the pages of Mosaikit); the sites do
-    pageHead({ title: t('Static sites'), sub: rowcount, filters: [layoutSwitch, filter], actions: [btnNew] }),
+    pageHead({ title: t('Tools'), sub: rowcount, filters: [layoutSwitch, filter], actions: [btnNew] }),
     pageBody(cards, tableWrap, listMsg),
   )
 

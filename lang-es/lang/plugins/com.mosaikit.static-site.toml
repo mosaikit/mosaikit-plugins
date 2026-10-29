@@ -1,4 +1,4 @@
-name = "Sitios estáticos"
+name = "Herramientas"
 description = "Publica sitios estáticos desde archivos zip o muestra un sitio desde su dirección web, compartibles y con enlaces públicos"
 label = "Herramientas"
 details = "Publica un sitio estático desde un archivo zip, o muestra dentro de la plataforma un sitio existente a partir de su dirección web.\n\nCada sitio se puede compartir con compañeros y grupos y abrir a cualquiera con un enlace público que puedes revocar en cualquier momento. Los sitios se sirven desde un origen separado, así que sus scripts nunca llegan a la plataforma."

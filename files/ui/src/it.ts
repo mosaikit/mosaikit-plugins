@@ -31,7 +31,7 @@ export const IT: Record<string, string> = {
   Duration: 'Durata',
   Enter: 'Invio',
   File: 'File',
-  Files: 'File',
+  Documents: 'Documenti',
   Folder: 'Cartella',
   'Folder not available: {error}': 'Cartella non disponibile: {error}',
   'Folder “{name}” created': 'Cartella “{name}” creata',

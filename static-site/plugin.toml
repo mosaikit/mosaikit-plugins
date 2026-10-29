@@ -1,5 +1,5 @@
 id = "com.mosaikit.static-site"
-name = "Static sites"
+name = "Tools"
 version = "0.5.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
@@ -46,7 +46,7 @@ label = "Published sites"
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Pubblica un sito statico da un archivio zip, oppure mostra all’interno della piattaforma un sito esistente tramite il suo indirizzo web.\n\nOgni sito può essere condiviso con colleghi e gruppi e aperto a chiunque con un link pubblico che puoi revocare in qualsiasi momento. I siti sono serviti da un’origine separata, quindi i loro script non raggiungono mai la piattaforma."
-name = "Siti statici"
+name = "Strumenti"
 description = "Pubblica siti statici da archivi zip o mostra un sito dal suo indirizzo web, condivisibili e con link pubblici"
 label = "Strumenti"
 

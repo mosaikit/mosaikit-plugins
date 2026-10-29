@@ -153,7 +153,7 @@ export class FileManager {
       { class: 'fm', tabindex: -1 },
       // the header and the search never scroll (the same header as the pages of Mosaikit); the files do
       pageHead({
-        title: t('Files'),
+        title: t('Documents'),
         sub: msk.user ? msk.user.name || msk.user.username : undefined,
         actions: [this.headActs],
         filters: [this.viewSeg, this.headMore, h('label', { class: 'fm-search' }, svg('search'), this.search)],

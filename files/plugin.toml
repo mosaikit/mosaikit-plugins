@@ -1,5 +1,5 @@
 id = "com.mosaikit.files"
-name = "Files"
+name = "Documents"
 version = "0.4.1"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
@@ -24,6 +24,6 @@ files = true
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Conserva file e cartelle, guardane l’anteprima nel browser, scarica una cartella come archivio zip e condividili.\n\nOgni file ha il proprio livello di condivisione e può essere aperto a chiunque con un link pubblico. I file contano nella quota dell’organizzazione."
-name = "File"
+name = "Documenti"
 description = "File e cartelle condivisibili, con anteprima, zip e link pubblici"
 label = "Documenti"

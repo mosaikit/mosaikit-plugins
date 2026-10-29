@@ -1,4 +1,4 @@
-// Italian texts of the Static sites plugin, by English phrase (see i18n.ts).
+// Italian texts of the Tools plugin (static sites), by English phrase (see i18n.ts).
 export const IT: Record<string, string> = {
   ', also inside a folder: the least nested one is used. Use relative links (': ', anche dentro una cartella: viene usato quello meno annidato. Usa link relativi (',
   ', not ': ', non ',
@@ -25,7 +25,7 @@ export const IT: Record<string, string> = {
   'Open the site': 'Apri il sito',
   'Reload the site': 'Ricarica il sito',
   'Static site': 'Sito statico',
-  'Static sites': 'Siti statici',
+  Tools: 'Strumenti',
   'The zip must contain an ': 'Lo zip deve contenere un ',
   'What the site is for (optional)': 'A cosa serve il sito (facoltativo)',
   'Zip archive': 'Archivio zip',
