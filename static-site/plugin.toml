@@ -1,6 +1,6 @@
 id = "com.mosaikit.static-site"
 name = "Apps"
-version = "0.5.0"
+version = "0.6.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "grid"

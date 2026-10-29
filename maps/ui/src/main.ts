@@ -26,7 +26,7 @@
 
 import '@mosaikit/plugin-api/style.css'
 import './maps.css'
-import { connect, pageBody, pageHead, type Msk, type Row } from '@mosaikit/plugin-api'
+import { connect, gridTable, pageBody, pageHead, type Msk, type Row } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
 import { followHost, t } from './i18n.ts'
 import { MapFrame, parseProject, type Project } from './mapframe.ts'
@@ -115,26 +115,28 @@ function mount(msk: Msk) {
   const filter = h('input', { type: 'search', class: 'msk-filter', placeholder: t('Filter…'), 'aria-label': t('Filter the maps') })
   const btnNew = h('button', { type: 'button', class: 'msk-btn' }, t('＋ New map'))
   const rowcount = h('span', { class: 'msk-count' })
-  const tbody = h('tbody')
+  const grid = gridTable<Row>({
+    label: t('Maps'),
+    local: { step: 50, more: t('Load more'), of: (shown, total) => t('{shown} of {total}', { shown, total }) },
+    decorate: (_r, tr) => {
+      tr.className = 'data-row'
+    },
+    columns: [
+      { key: 'name', title: t('Name'), width: 'minmax(10rem,2fr)', sort: (r) => valOf(r, 'name'), cell: (r) => nameCell(r) },
+      { key: 'description', title: t('Description'), width: 'minmax(10rem,2fr)', sort: (r) => valOf(r, 'description'), className: 'desc', cell: (r) => valOf(r, 'description') },
+      { key: 'layers', title: t('Layers'), width: 'minmax(5rem,.6fr)', sort: (r) => layerCount(r), className: 'cfg', cell: (r) => layerCount(r) },
+      { key: 'config', title: t('Config'), width: 'minmax(5rem,.6fr)', sort: (r) => r.values.config ? String(r.values.config).length : 0, className: 'cfg', cell: (r) => cfgSize(r) },
+      { key: 'owner', title: t('Owner'), width: 'minmax(7rem,1fr)', sort: (r) => r.owner_name ?? '', className: 'msk-owner', cell: (r) => r.owner_name ?? '' },
+      { key: 'actions', title: t('Actions'), width: 'minmax(15rem,auto)', className: 'rowacts', cell: (r) => rowActions(r) },
+    ],
+  })
   const listMsg = h('div', { class: 'msg', role: 'status' })
   const listView = h(
     'div',
     { class: 'listview' },
     // the header and the filter never scroll (the same header as the pages of Mosaikit); the table does
     pageHead({ title: t('Maps'), sub: rowcount, actions: [btnNew], filters: [filter] }),
-    pageBody(
-      h(
-        'div',
-        { class: 'msk-tablewrap' },
-        h(
-          'table',
-          { class: 'msk-table' },
-          h('thead', {}, h('tr', {}, ...['Name', 'Description', 'Layers', 'Config', 'Owner', 'Actions'].map((c) => h('th', {}, t(c))))),
-          tbody,
-        ),
-      ),
-      listMsg,
-    ),
+    pageBody(grid.el, listMsg),
   )
 
   const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of maps'))
@@ -267,45 +269,32 @@ function mount(msk: Msk) {
     const f = state.filter.trim().toLowerCase()
     const shown = state.rows.filter((r) => {
       if (!f) return true
-      return [valOf(r, 'name'), valOf(r, 'description'), r.owner_name ?? ''].some((v) => v.toLowerCase().includes(f))
+      return [valOf(r, 'name'), valOf(r, 'description'), r.owner_name ?? '', layerCount(r), cfgSize(r)].some((v) => v.toLowerCase().includes(f))
     })
     rowcount.textContent = shown.length === 1 ? t('1 map') : t('{n} maps', { n: shown.length })
-    if (!shown.length) {
-      tbody.replaceChildren(
-        h('tr', {}, h('td', { class: 'empty', colspan: '6' }, state.rows.length ? t('no map matches the filter') : t('no map: create one with ＋ New map'))),
-      )
-      return
+    grid.set(shown, null, state.rows.length ? t('no map matches the filter') : t('no map: create one with ＋ New map'))
+  }
+
+  function nameCell(r: Row) {
+    const box = h('span', {}, valOf(r, 'name'))
+    if (r.shared) box.append(h('span', { class: 'msk-badge acc' }, t('shared')))
+    if (r.my_level === 'read') box.append(h('span', { class: 'msk-badge' }, t('read only')))
+    return box
+  }
+
+  function rowActions(r: Row) {
+    const hasCfg = !!valOf(r, 'config').trim()
+    const acts = h('span', {})
+    const btn = (label: string, cls: string, fn: () => void, disabled = false) => {
+      const b = h('button', { type: 'button', class: 'msk-btn mini ' + cls, disabled }, label)
+      b.addEventListener('click', fn)
+      acts.append(b)
     }
-    tbody.replaceChildren(
-      ...shown.map((r) => {
-        const hasCfg = !!valOf(r, 'config').trim()
-        const nameCell = h('td', {}, valOf(r, 'name'))
-        if (r.shared) nameCell.append(h('span', { class: 'msk-badge acc' }, t('shared')))
-        if (r.my_level === 'read') nameCell.append(h('span', { class: 'msk-badge' }, t('read only')))
-
-        const acts = h('td', { class: 'rowacts' })
-        const btn = (label: string, cls: string, fn: () => void, disabled = false) => {
-          const b = h('button', { type: 'button', class: 'msk-btn mini ' + cls, disabled }, label)
-          b.addEventListener('click', fn)
-          acts.append(b)
-        }
-        btn(t('👁 Open'), 'ghost', () => openShow(r.id), !hasCfg)
-        if (canWrite(r)) btn(t('✏ Edit'), 'ghost', () => openEdit(r.id))
-        if (canManage(r)) btn(t('👥 Share'), 'ghost', () => void share(r.id))
-        if (canManage(r)) btn(t('🗑 Delete'), 'danger', () => void del(r.id))
-
-        return h(
-          'tr',
-          { class: 'data-row' },
-          nameCell,
-          h('td', { class: 'desc' }, valOf(r, 'description')),
-          h('td', { class: 'cfg' }, layerCount(r)),
-          h('td', { class: 'cfg' }, cfgSize(r)),
-          h('td', { class: 'msk-owner' }, r.owner_name ?? ''),
-          acts,
-        )
-      }),
-    )
+    btn(t('👁 Open'), 'ghost', () => openShow(r.id), !hasCfg)
+    if (canWrite(r)) btn(t('✏ Edit'), 'ghost', () => openEdit(r.id))
+    if (canManage(r)) btn(t('👥 Share'), 'ghost', () => void share(r.id))
+    if (canManage(r)) btn(t('🗑 Delete'), 'danger', () => void del(r.id))
+    return acts
   }
 
   async function load() {

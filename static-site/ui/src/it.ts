@@ -17,6 +17,8 @@ export const IT: Record<string, string> = {
   Owner: 'Proprietario',
   Actions: 'Azioni',
   'Edit: {name}': 'Modifica: {name}',
+  'Load more': 'Carica altri',
+  '{shown} of {total}': '{shown} di {total}',
   'Filter the sites': 'Filtra i siti',
   'Filter…': 'Filtra…',
   'Leave empty to keep the current site (': 'Lascia vuoto per mantenere il sito attuale (',

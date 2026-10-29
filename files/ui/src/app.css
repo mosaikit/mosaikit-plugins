@@ -199,3 +199,18 @@
 .fm-main { min-height: 0; height: 100%; }
 .fm-side { top: 0; max-height: 100%; overflow: auto; }
 @media (max-width: 900px) { .fm-body { overflow: auto; align-content: start; } .fm-main { height: 60vh; flex: none; } .fm-side { position: static; } .fm-content { padding: 12px 16px; } }
+/* The table of the folder: the header row stays and ONLY the rows scroll, the scrollbar starts under the header row (the
+   same pattern as the tables of Mosaikit): header, rows and cells are a grid on the same columns (subgrid). */
+.fm-main:has(> .fm-table) { overflow: hidden; }
+.fm-table { display: grid; grid-template-columns: 42px minmax(0, 1fr) 140px 130px 140px 100px; grid-template-rows: auto minmax(0, 1fr); height: 100%; }
+.fm-table > thead, .fm-table > tbody, .fm-table tr { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; }
+.fm-table > thead { padding-right: 10px; border-bottom: 1px solid var(--line); background: var(--panel2); }
+.fm-table > tbody { overflow-y: scroll; align-content: start; }
+.fm-table > tbody::-webkit-scrollbar { width: 10px; }
+.fm-table > tbody::-webkit-scrollbar-thumb { border-radius: 8px; background: color-mix(in srgb, var(--fg) 28%, transparent); }
+.fm-table th { position: static; display: flex; align-items: center; border-bottom: 0; }
+.fm-table th.c-size, .fm-table td.c-size { width: auto; justify-content: flex-end; }
+.fm-table td { display: flex; align-items: center; min-width: 0; }
+.fm-table td.c-size { justify-content: flex-end; }
+.fm-table .c-chk { width: auto; }
+@media (max-width: 760px) { .fm-table { grid-template-columns: 42px minmax(0, 1fr) 90px; } }

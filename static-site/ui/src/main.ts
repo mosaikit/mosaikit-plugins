@@ -19,7 +19,7 @@
 
 import '@mosaikit/plugin-api/style.css'
 import './sites.css'
-import { connect, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
+import { connect, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
 import { followHost, t } from './i18n.ts'
 import { hasIndexHtml, zipEntryNames } from './zipnames.ts'
@@ -137,18 +137,32 @@ function mount(msk: Msk) {
   const btnTable = h('button', { type: 'button', class: 'msk-btn ghost', 'aria-label': t('List'), title: t('List') }, '☰')
   const layoutSwitch = h('span', { class: 'layoutswitch', role: 'group', 'aria-label': t('View') }, btnCards, btnTable)
   const cards = h('div', { class: 'cards' })
-  const tableWrap = h('div', { class: 'msk-tablewrap' })
   const rowcount = h('span', { class: 'msk-count' })
-  const tbody = h('tbody')
   const listMsg = h('div', { class: 'msg', role: 'status' })
-  const COLS = ['Thumbnail', 'Name', 'Start page', 'Files', 'Size', 'Updated', 'Owner', 'Actions']
-  tableWrap.append(h('table', { class: 'msk-table' }, h('thead', {}, h('tr', {}, ...COLS.map((c) => h('th', {}, c === 'Thumbnail' ? '' : t(c))))), tbody))
+  const grid = gridTable<Row>({
+    label: t('Static sites'),
+    local: { step: 50, more: t('Load more'), of: (shown, total) => t('{shown} of {total}', { shown, total }) },
+    decorate: (_r, tr) => {
+      tr.className = 'data-row'
+    },
+    columns: [
+      { key: 'thumb', title: '', width: '4.5rem', className: 'thumbcell', cell: (r) => thumbEl(r, 'thumbsm') },
+      { key: 'name', title: t('Name'), width: 'minmax(10rem,2fr)', sort: (r) => valOf(r, 'name'), cell: (r) => nameCellOf(r) },
+      { key: 'start', title: t('Start page'), width: 'minmax(9rem,1.6fr)', sort: (r) => startOf(r), className: 'mono', cell: (r) => startOf(r) },
+      { key: 'files', title: t('Files'), width: 'minmax(5rem,.5fr)', align: 'right', sort: (r) => Number(valOf(r, 'files')) || 0, className: 'num', cell: (r) => valOf(r, 'files') || '—' },
+      { key: 'size', title: t('Size'), width: 'minmax(5rem,.6fr)', align: 'right', sort: (r) => Number(r.values.size) || 0, className: 'num', cell: (r) => (valOf(r, 'size') ? fmtSize(r.values.size) : '—') },
+      { key: 'updated', title: t('Updated'), width: 'minmax(7rem,.8fr)', align: 'right', sort: (r) => r.updated_at ?? '', className: 'num', cell: (r) => fmtDate(r.updated_at) },
+      { key: 'owner', title: t('Owner'), width: 'minmax(7rem,.8fr)', sort: (r) => r.owner_name ?? '', className: 'msk-owner', cell: (r) => r.owner_name ?? '' },
+      { key: 'actions', title: t('Actions'), width: 'minmax(15rem,auto)', className: 'rowacts', cell: (r) => actionsOf(r, h('span', {})) },
+    ],
+  })
+  const listBody = pageBody(cards, grid.el, listMsg)
   const listView = h(
     'div',
     { class: 'listview' },
     // the header and the filter never scroll (the same header as the pages of Mosaikit); the sites do
     pageHead({ title: t('Apps'), sub: rowcount, filters: [layoutSwitch, filter], actions: [btnNew] }),
-    pageBody(cards, tableWrap, listMsg),
+    listBody,
   )
 
   const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of sites'))
@@ -265,7 +279,8 @@ function mount(msk: Msk) {
     rowcount.textContent = shown.length === 1 ? t('1 site') : t('{n} sites', { n: shown.length })
     const asCards = state.layout === 'cards'
     cards.hidden = !asCards
-    tableWrap.hidden = asCards
+    grid.el.hidden = asCards
+    listBody.classList.toggle('msk-tablebody', !asCards)
     btnCards.setAttribute('aria-pressed', String(asCards))
     btnTable.setAttribute('aria-pressed', String(!asCards))
     btnCards.classList.toggle('on', asCards)
@@ -273,23 +288,40 @@ function mount(msk: Msk) {
     const emptyText = state.rows.length ? t('no site matches the filter') : t('no site: upload one with ＋ New site')
     if (!shown.length) {
       cards.replaceChildren(h('p', { class: 'empty' }, emptyText))
-      tbody.replaceChildren(h('tr', {}, h('td', { class: 'empty', colspan: String(COLS.length) }, emptyText)))
+      grid.set([], null, emptyText)
       return
     }
-    const nameLink = (r: Row) => {
+    grid.set(shown, null, emptyText)
+  }
+
+  function startOf(r: Row) {
+    return isWeb(r) ? valOf(r, 'url') : hasSite(r) ? valOf(r, 'entry') : t('zip to upload')
+  }
+
+  function nameCellOf(r: Row) {
+    const box = h('span', { title: valOf(r, 'description') || undefined })
+    if (hasSite(r)) box.append(nameLink(r))
+    else box.append(valOf(r, 'name'))
+    box.append(...badges(r).filter((x): x is HTMLSpanElement => !!x))
+    return box
+  }
+
+  function nameLink(r: Row) {
       const a = h('a', { class: 'open', href: '#', title: t('Open the site') }, valOf(r, 'name'))
       a.addEventListener('click', (ev) => {
         ev.preventDefault()
         void openShow(r.id)
       })
       return a
-    }
-    const badges = (r: Row) => [
+  }
+  function badges(r: Row) {
+    return [
       isWeb(r) ? h('span', { class: 'msk-badge' }, t('web')) : null,
       r.shared ? h('span', { class: 'msk-badge acc' }, t('shared')) : null,
       r.my_level === 'read' ? h('span', { class: 'msk-badge' }, t('read only')) : null,
     ]
-    const actions = (r: Row, wrap: HTMLElement) => {
+  }
+  function actionsOf(r: Row, wrap: HTMLElement) {
       const btn = (label: string, cls: string, fn: () => void, disabled = false) => {
         const b = h('button', { type: 'button', class: 'msk-btn mini ' + cls, disabled }, label)
         b.addEventListener('click', fn)
@@ -300,53 +332,8 @@ function mount(msk: Msk) {
       if (canManage(r)) btn(t('👥 Share'), 'ghost', () => void share(r.id))
       if (canManage(r)) btn(t('🗑 Delete'), 'danger', () => void del(r.id))
       return wrap
-    }
-
-    cards.replaceChildren(
-      ...shown.map((r) => {
-        const open = h('button', { type: 'button', class: 'cardthumb', 'aria-label': t('Open the site') + ': ' + valOf(r, 'name'), disabled: !hasSite(r) }, thumbEl(r, 'thumb'))
-        open.addEventListener('click', () => void openShow(r.id))
-        const where = isWeb(r) ? hostOf(valOf(r, 'url')) : valOf(r, 'entry') || t('zip to upload')
-        return h(
-          'article',
-          { class: 'card', 'data-site': valOf(r, 'name') },
-          open,
-          h(
-            'div',
-            { class: 'cardbody' },
-            h('h3', { class: 'cardname' }, hasSite(r) ? nameLink(r) : valOf(r, 'name'), ...badges(r)),
-            h('p', { class: 'carddesc' }, valOf(r, 'description')),
-            h('p', { class: 'cardmeta mono' }, where),
-          ),
-          actions(r, h('div', { class: 'rowacts' })),
-        )
-      }),
-    )
-
-    tbody.replaceChildren(
-      ...shown.map((r) => {
-        const ok = hasSite(r)
-        const nameCell = h('td', {})
-        if (ok) nameCell.append(nameLink(r))
-        else nameCell.append(valOf(r, 'name'))
-        nameCell.append(...badges(r).filter((x): x is HTMLSpanElement => !!x))
-        if (valOf(r, 'description')) nameCell.title = valOf(r, 'description')
-        const start = isWeb(r) ? valOf(r, 'url') : ok ? valOf(r, 'entry') : t('zip to upload')
-        return h(
-          'tr',
-          { class: 'data-row' },
-          h('td', { class: 'thumbcell' }, thumbEl(r, 'thumbsm')),
-          nameCell,
-          h('td', { class: 'mono', title: isWeb(r) ? valOf(r, 'url') : valOf(r, 'zip_name') }, start),
-          h('td', { class: 'num' }, valOf(r, 'files') || '—'),
-          h('td', { class: 'num' }, valOf(r, 'size') ? fmtSize(r.values.size) : '—'),
-          h('td', { class: 'num' }, fmtDate(r.updated_at)),
-          h('td', { class: 'msk-owner' }, r.owner_name ?? ''),
-          actions(r, h('td', { class: 'rowacts' })),
-        )
-      }),
-    )
   }
+
 
   async function load() {
     try {

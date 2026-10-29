@@ -14,6 +14,8 @@ export const IT: Record<string, string> = {
   Owner: 'Proprietario',
   Actions: 'Azioni',
   'Filter the maps': 'Filtra le mappe',
+  'Load more': 'Carica altri',
+  '{shown} of {total}': '{shown} di {total}',
   'Filter…': 'Filtra…',
   'GeoLibre connected': 'GeoLibre connesso',
   'GeoLibre does not answer: check the network or the ad blocker': 'GeoLibre non risponde: verifica rete o ad-blocker',
