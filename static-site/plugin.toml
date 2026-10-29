@@ -12,7 +12,7 @@ screenshots = ["sites.svg", "site.svg"]
 homepage = "https://example.org/mosaikit/plugins/static-site"
 
 [contribution]
-icon = "🌐"
+icon = "🛠️"
 label = "Tools"
 
 [[resources]]
