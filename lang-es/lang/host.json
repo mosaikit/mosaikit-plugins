@@ -671,6 +671,7 @@
   "{by} created a public link to «{item}»": "{by} creó un enlace público a «{item}»",
   "You can work in {tenant} as {role}: accept or decline.": "Puedes trabajar en {tenant} como {role}: acepta o rechaza.",
   "User": "Usuario",
+  "Tenant Manager": "Gestor",
   "In {tenant}.": "En {tenant}.",
   "Whoever has the link can open the item without signing in.": "Quien tenga el enlace puede abrir el elemento sin iniciar sesión.",
   "Select: {what}": "Seleccionar: {what}",
