@@ -1,5 +1,5 @@
 // File manager: navigation by id, multiple selection, actions according to the level of permission.
-import { pageHead, type FileEntry, type Listing, type Msk } from '@mosaikit/plugin-api'
+import { emptyState, pageHead, type FileEntry, type Listing, type Msk } from '@mosaikit/plugin-api'
 import { choiceDialog, closeDialog, dialogOpen, nameList, pickFolder, promptDialog } from './dialogs.ts'
 import { fileIcon, h, saveBlob, spinner, svg, type IconName } from './dom.ts'
 import { locale, t } from './i18n.ts'
@@ -869,23 +869,15 @@ export class FileManager {
       if (this.filter) {
         content = h('div', { class: 'fm-empty' }, h('div', { class: 'big' }, svg('search')), h('b', null, t('No result')), h('span', null, t('No item contains “{text}”', { text: this.filter })))
       } else {
-        content = h(
-          'div',
-          { class: 'fm-empty' },
-          h('div', { class: 'big' }, svg(this.canCreate ? 'upload' : 'open')),
-          h('b', null, this.parent === null ? t('You have no files yet') : t('This folder is empty')),
-          this.canCreate
-            ? [
-                h('span', null, t('Drag files here or')),
-                h(
-                  'div',
-                  { class: 'row' },
-                  this.button({ id: 'upload', label: t('Upload files'), icon: 'upload', primary: true }, true),
-                  this.button({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' }),
-                ),
-              ]
-            : h('span', null, t('You have read-only access')),
-        )
+        const here = this.parent === null
+        const es = emptyState({
+          art: 'documents',
+          title: here ? t('You have no files yet') : t('This folder is empty'),
+          text: this.canCreate ? t('Drag files here, or use the buttons below.') : t('You have read-only access'),
+          actions: this.canCreate ? [this.button({ id: 'upload', label: t('Upload files'), icon: 'upload', primary: true }, true), this.button({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' })] : [],
+        })
+        es.classList.add('fm-empty')
+        content = es
       }
     } else if (this.prefs.view === 'grid') {
       content = h(

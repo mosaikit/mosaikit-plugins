@@ -1,6 +1,6 @@
 id = "com.mosaikit.contacts"
 name = "Contacts"
-version = "0.4.1"
+version = "0.4.2"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "book-user"

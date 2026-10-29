@@ -5,9 +5,9 @@ import './contacts.css'
 import { avatar, chip, connect, el, errText, mountCrud, type CrudView, type ItemCtx, type Msk } from '@mosaikit/plugin-api'
 
 const TEXTS = {
-  en: { title: 'Contacts', newLabel: '＋ New contact', cards: 'Cards', failed: 'Could not start the UI of the plugin: ', noName: 'Unnamed' },
-  it: { title: 'Contatti', newLabel: '＋ Nuovo contatto', cards: 'Schede', failed: 'Impossibile avviare la UI del plugin: ', noName: 'Senza nome' },
-  es: { title: 'Contactos', newLabel: '＋ Nuevo contacto', cards: 'Fichas', failed: 'No se pudo iniciar la interfaz del plugin: ', noName: 'Sin nombre' },
+  en: { title: 'Contacts', newLabel: '＋ New contact', cards: 'Cards', emptyTitle: 'No contacts yet', emptyText: 'Add the people and companies you work with.', failed: 'Could not start the UI of the plugin: ', noName: 'Unnamed' },
+  it: { title: 'Contatti', newLabel: '＋ Nuovo contatto', cards: 'Schede', emptyTitle: 'Ancora nessun contatto', emptyText: 'Aggiungi le persone e le aziende con cui lavori.', failed: 'Impossibile avviare la UI del plugin: ', noName: 'Senza nome' },
+  es: { title: 'Contactos', newLabel: '＋ Nuevo contacto', cards: 'Fichas', emptyTitle: 'Todavía no hay contactos', emptyText: 'Añade las personas y empresas con las que trabajas.', failed: 'No se pudo iniciar la interfaz del plugin: ', noName: 'Sin nombre' },
 }
 
 const langOf = (l: string | undefined): keyof typeof TEXTS => {
@@ -50,7 +50,7 @@ function mount(msk: Msk) {
     )
   }
   const views = (): CrudView[] => [{ key: 'cards', label: TEXTS[lang].cards, kind: 'cards', item: card }]
-  const open = () => mountCrud(app, msk, 'contacts', { title: TEXTS[lang].title, newLabel: TEXTS[lang].newLabel, columns: ['name', 'email', 'phone', 'company'], views: views(), reader })
+  const open = () => mountCrud(app, msk, 'contacts', { title: TEXTS[lang].title, newLabel: TEXTS[lang].newLabel, empty: { art: 'contacts', title: TEXTS[lang].emptyTitle, text: TEXTS[lang].emptyText }, columns: ['name', 'email', 'phone', 'company'], views: views(), reader })
   let off = open()
   // the view follows the host for its own texts; the title and the button are ours
   msk.onContext((ctx) => {

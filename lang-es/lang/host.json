@@ -1954,5 +1954,17 @@
   "Order of the server": "Orden del servidor",
   "Shared with the group": "Compartido con el grupo",
   "Sort by": "Ordenar por",
-  "Filter the services": "Filtrar los servicios"
+  "Filter the services": "Filtrar los servicios",
+  "A backup keeps the database, the contents and the plugins in one file.": "Una copia de seguridad guarda la base de datos, los contenidos y los plugins en un solo archivo.",
+  "A tenant is an organization with its own people, apps and data.": "Una organización tiene sus propias personas, apps y datos.",
+  "Add people to the group to share with all of them at once.": "Añade personas al grupo para compartir con todas a la vez.",
+  "Clear filters": "Borrar los filtros",
+  "Every plugin is up to date.": "Todos los plugins están al día.",
+  "Plugins add apps, services and extensions to the platform.": "Los plugins añaden apps, servicios y extensiones a la plataforma.",
+  "Requests, invitations and news for you arrive here.": "Aquí llegan solicitudes, invitaciones y novedades para ti.",
+  "The Administrator decides which plugins a tenant can use.": "El Administrador decide qué plugins puede usar una organización.",
+  "The trusted registries offer nothing that is not installed yet.": "Los registros de confianza no ofrecen nada que no esté instalado.",
+  "What happens here will be listed in this place.": "Lo que ocurra aquí se mostrará en este lugar.",
+  "What is shared by the people of the tenant shows here.": "Aquí aparece lo que comparten las personas de la organización.",
+  "What the people share with this group shows here.": "Aquí aparece lo que las personas comparten con este grupo."
 }

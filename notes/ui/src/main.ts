@@ -6,9 +6,9 @@ import { chip, connect, el, errText, mountCrud, type CrudView, type ItemCtx, typ
 import { translateTool } from './translate.ts'
 
 const TEXTS = {
-  en: { title: 'Notes', all: 'All notes', newLabel: '＋ New note', cards: 'Cards', failed: 'Could not start the UI of the plugin: ', mine: 'My notes', shared: 'Shared with me', tag: 'Tag', sharedBy: 'Shared by {n}', empty: 'No text', untitled: 'Untitled' },
-  it: { title: 'Note', all: 'Tutte le note', newLabel: '＋ Nuova nota', cards: 'Schede', failed: 'Impossibile avviare la UI del plugin: ', mine: 'Le mie note', shared: 'Condivise con me', tag: 'Tag', sharedBy: 'Condivisa da {n}', empty: 'Nessun testo', untitled: 'Senza titolo' },
-  es: { title: 'Notas', all: 'Todas las notas', newLabel: '＋ Nueva nota', cards: 'Fichas', failed: 'No se pudo iniciar la interfaz del plugin: ', mine: 'Mis notas', shared: 'Compartidas conmigo', tag: 'Etiqueta', sharedBy: 'Compartida por {n}', empty: 'Sin texto', untitled: 'Sin título' },
+  en: { title: 'Notes', all: 'All notes', newLabel: '＋ New note', cards: 'Cards', emptyTitle: 'No notes yet', emptyText: 'Write the first note: it stays yours until you share it.', failed: 'Could not start the UI of the plugin: ', mine: 'My notes', shared: 'Shared with me', tag: 'Tag', sharedBy: 'Shared by {n}', empty: 'No text', untitled: 'Untitled' },
+  it: { title: 'Note', all: 'Tutte le note', newLabel: '＋ Nuova nota', cards: 'Schede', emptyTitle: 'Ancora nessuna nota', emptyText: 'Scrivi la prima nota: resta tua finché non la condividi.', failed: 'Impossibile avviare la UI del plugin: ', mine: 'Le mie note', shared: 'Condivise con me', tag: 'Tag', sharedBy: 'Condivisa da {n}', empty: 'Nessun testo', untitled: 'Senza titolo' },
+  es: { title: 'Notas', all: 'Todas las notas', newLabel: '＋ Nueva nota', cards: 'Fichas', emptyTitle: 'Todavía no hay notas', emptyText: 'Escribe la primera nota: es tuya hasta que la compartas.', failed: 'No se pudo iniciar la interfaz del plugin: ', mine: 'Mis notas', shared: 'Compartidas conmigo', tag: 'Etiqueta', sharedBy: 'Compartida por {n}', empty: 'Sin texto', untitled: 'Sin título' },
 }
 const TAGS: Record<string, { en: string; it: string; es: string }> = {
   personal: { en: 'personal', it: 'personale', es: 'personal' },
@@ -50,7 +50,7 @@ function mount(msk: Msk) {
     )
   }
   const views = (): CrudView[] => [{ key: 'cards', label: TEXTS[lang].cards, kind: 'cards', item: card }]
-  const open = () => mountCrud(app, msk, 'notes', { title: TEXTS[lang].title, section: section(), newLabel: TEXTS[lang].newLabel, columns: ['title', 'tag'], where, views: views(), reader, detail: (row, box) => translateTool(msk, row, box, lang === 'it' ? 'it' : 'en') })
+  const open = () => mountCrud(app, msk, 'notes', { title: TEXTS[lang].title, section: section(), newLabel: TEXTS[lang].newLabel, empty: { art: 'notes', title: TEXTS[lang].emptyTitle, text: TEXTS[lang].emptyText }, columns: ['title', 'tag'], where, views: views(), reader, detail: (row, box) => translateTool(msk, row, box, lang === 'it' ? 'it' : 'en') })
   let off = open()
   // the view follows the host for its own texts; the title and the button are ours
   msk.onContext((ctx) => {

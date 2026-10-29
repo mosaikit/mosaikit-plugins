@@ -19,7 +19,7 @@
 
 import '@mosaikit/plugin-api/style.css'
 import './sites.css'
-import { connect, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
+import { connect, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
 import { followHost, t } from './i18n.ts'
 import { hasIndexHtml, zipEntryNames } from './zipnames.ts'
@@ -156,7 +156,9 @@ function mount(msk: Msk) {
       { key: 'actions', title: t('Actions'), width: 'minmax(15rem,auto)', className: 'rowacts', cell: (r) => actionsOf(r, h('span', {})) },
     ],
   })
-  const listBody = pageBody(cards, grid.el, listMsg)
+  const emptyBox = h('div', { class: 'msk-emptybox' })
+  emptyBox.hidden = true
+  const listBody = pageBody(cards, grid.el, emptyBox, listMsg)
   const listView = h(
     'div',
     { class: 'listview' },
@@ -286,9 +288,22 @@ function mount(msk: Msk) {
     btnCards.classList.toggle('on', asCards)
     btnTable.classList.toggle('on', !asCards)
     const emptyText = state.rows.length ? t('no app matches the filter') : t('no app: create one with ＋ New app')
+    emptyBox.hidden = shown.length > 0
     if (!shown.length) {
-      cards.replaceChildren(h('p', { class: 'empty' }, emptyText))
-      grid.set([], null, emptyText)
+      const newApp = h('button', { type: 'button', class: 'msk-btn ghost' }, t('＋ New app'))
+      newApp.addEventListener('click', () => btnNew.click())
+      emptyBox.replaceChildren(
+        state.rows.length
+          ? filteredEmpty(emptyText, t('Clear filters'), () => {
+              filter.value = ''
+              filter.dispatchEvent(new Event('input'))
+            })
+          : emptyState({ art: 'apps', title: t('No apps yet'), text: t('Publish a static site from a zip, or show a web address.'), actions: btnNew.hidden ? [] : [newApp] }),
+      )
+      cards.hidden = true
+      grid.el.hidden = true
+      cards.replaceChildren()
+      grid.set([], null, '')
       return
     }
     grid.set(shown, null, emptyText)

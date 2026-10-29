@@ -5,9 +5,9 @@ import './tasks.css'
 import { chip, connect, el, errText, mountCrud, type CrudView, type ItemCtx, type Msk, type Row } from '@mosaikit/plugin-api'
 
 const TEXTS = {
-  en: { title: 'Tasks', newLabel: '＋ New task', list: 'List', board: 'Board', overdue: 'Overdue', open: 'Open', done: 'Done', due: 'Due {d}', mark: 'Mark as done: {t}', reopen: 'Reopen: {t}', done_on: 'Done {d}', failed: 'Could not start the UI of the plugin: ' },
-  it: { title: 'Attività', newLabel: '＋ Nuova attività', list: 'Elenco', board: 'Bacheca', overdue: 'In ritardo', open: 'Aperte', done: 'Fatte', due: 'Scade {d}', mark: 'Segna come fatta: {t}', reopen: 'Riapri: {t}', done_on: 'Fatta il {d}', failed: 'Impossibile avviare la UI del plugin: ' },
-  es: { title: 'Tareas', newLabel: '＋ Nueva tarea', list: 'Lista', board: 'Tablero', overdue: 'Atrasadas', open: 'Abiertas', done: 'Hechas', due: 'Vence {d}', mark: 'Marcar como hecha: {t}', reopen: 'Reabrir: {t}', done_on: 'Hecha el {d}', failed: 'No se pudo iniciar la interfaz del plugin: ' },
+  en: { title: 'Tasks', newLabel: '＋ New task', list: 'List', board: 'Board', overdue: 'Overdue', open: 'Open', done: 'Done', due: 'Due {d}', mark: 'Mark as done: {t}', reopen: 'Reopen: {t}', done_on: 'Done {d}', emptyTitle: 'No tasks yet', emptyText: 'Add what has to be done and when.', failed: 'Could not start the UI of the plugin: ' },
+  it: { title: 'Attività', newLabel: '＋ Nuova attività', list: 'Elenco', board: 'Bacheca', overdue: 'In ritardo', open: 'Aperte', done: 'Fatte', due: 'Scade {d}', mark: 'Segna come fatta: {t}', reopen: 'Riapri: {t}', done_on: 'Fatta il {d}', emptyTitle: 'Ancora nessuna attività', emptyText: 'Aggiungi cosa c’è da fare e per quando.', failed: 'Impossibile avviare la UI del plugin: ' },
+  es: { title: 'Tareas', newLabel: '＋ Nueva tarea', list: 'Lista', board: 'Tablero', overdue: 'Atrasadas', open: 'Abiertas', done: 'Hechas', due: 'Vence {d}', mark: 'Marcar como hecha: {t}', reopen: 'Reabrir: {t}', done_on: 'Hecha el {d}', emptyTitle: 'Todavía no hay tareas', emptyText: 'Añade lo que hay que hacer y para cuándo.', failed: 'No se pudo iniciar la interfaz del plugin: ' },
 }
 type L = keyof typeof TEXTS
 
@@ -61,7 +61,7 @@ function mount(msk: Msk) {
       ],
     },
   ]
-  const open = () => mountCrud(app, msk, 'tasks', { title: tr().title, newLabel: tr().newLabel, columns: ['title', 'due', 'priority', 'done'], views: views() })
+  const open = () => mountCrud(app, msk, 'tasks', { title: tr().title, newLabel: tr().newLabel, empty: { art: 'tasks', title: tr().emptyTitle, text: tr().emptyText }, columns: ['title', 'due', 'priority', 'done'], views: views() })
   let off = open()
   // the view follows the host for its own texts; the title and the button are ours
   msk.onContext((ctx) => {

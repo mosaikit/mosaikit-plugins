@@ -59,6 +59,7 @@ export const IT: Record<string, string> = {
   'Next (→)': 'Successivo (→)',
   No: 'No',
   'No item contains “{text}”': 'Nessun elemento contiene “{text}”',
+  'Drag files here, or use the buttons below.': 'Trascina qui i file, oppure usa i pulsanti qui sotto.',
   'No result': 'Nessun risultato',
   'No subfolder': 'Nessuna sottocartella',
   Open: 'Apri',

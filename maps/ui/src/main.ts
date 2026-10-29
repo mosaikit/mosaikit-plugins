@@ -26,7 +26,7 @@
 
 import '@mosaikit/plugin-api/style.css'
 import './maps.css'
-import { connect, gridTable, pageBody, pageHead, type Msk, type Row } from '@mosaikit/plugin-api'
+import { connect, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
 import { followHost, t } from './i18n.ts'
 import { MapFrame, parseProject, type Project } from './mapframe.ts'
@@ -131,7 +131,9 @@ function mount(msk: Msk) {
     ],
   })
   const listMsg = h('div', { class: 'msg', role: 'status' })
-  const listBody = pageBody(grid.el, listMsg)
+  const emptyBox = h('div', { class: 'msk-emptybox' })
+  emptyBox.hidden = true
+  const listBody = pageBody(grid.el, emptyBox, listMsg)
   listBody.classList.add('msk-tablebody')
   const listView = h(
     'div',
@@ -274,7 +276,22 @@ function mount(msk: Msk) {
       return [valOf(r, 'name'), valOf(r, 'description'), r.owner_name ?? '', layerCount(r), cfgSize(r)].some((v) => v.toLowerCase().includes(f))
     })
     rowcount.textContent = shown.length === 1 ? t('1 map') : t('{n} maps', { n: shown.length })
-    grid.set(shown, null, state.rows.length ? t('no map matches the filter') : t('no map: create one with ＋ New map'))
+    const none = shown.length === 0
+    grid.el.hidden = none
+    emptyBox.hidden = !none
+    if (none) {
+      const newMap = h('button', { type: 'button', class: 'msk-btn ghost' }, t('＋ New map'))
+      newMap.addEventListener('click', () => btnNew.click())
+      emptyBox.replaceChildren(
+        state.rows.length
+          ? filteredEmpty(t('no map matches the filter'), t('Clear filters'), () => {
+              filter.value = ''
+              filter.dispatchEvent(new Event('input'))
+            })
+          : emptyState({ art: 'maps', title: t('No maps yet'), text: t('Create a map to show your data on a map.'), actions: btnNew.hidden ? [] : [newMap] }),
+      )
+    }
+    grid.set(shown, null, '')
   }
 
   function nameCell(r: Row) {

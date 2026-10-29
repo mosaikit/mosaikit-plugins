@@ -214,3 +214,4 @@
 .fm-table td.c-size { justify-content: flex-end; }
 .fm-table .c-chk { width: auto; }
 @media (max-width: 760px) { .fm-table { grid-template-columns: 42px minmax(0, 1fr) 90px; } }
+.fm-empty.msk-emptystate { padding: 24px; gap: 8px; color: var(--fg); }
