@@ -1,0 +1,4 @@
+name = "Español"
+description = "Interfaz en español: un plugin de idioma de ejemplo con un conjunto inicial de textos (página de acceso, navegación, Notas)"
+label = "Español"
+details = "Interfaz en español para la página de acceso, la navegación y la app Notas. Es un plugin de idioma de ejemplo con un conjunto inicial de textos: lo que no está traducido queda en inglés.\n\nÚsalo como punto de partida para otro idioma."

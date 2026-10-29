@@ -159,6 +159,7 @@ function mount(msk: Msk) {
   const emptyBox = h('div', { class: 'msk-emptybox' })
   emptyBox.hidden = true
   const listBody = pageBody(cards, grid.el, emptyBox, listMsg)
+  listBody.classList.add('msk-tablebody')
   const listView = h(
     'div',
     { class: 'listview' },
@@ -282,7 +283,6 @@ function mount(msk: Msk) {
     const asCards = state.layout === 'cards'
     cards.hidden = !asCards
     grid.el.hidden = asCards
-    listBody.classList.toggle('msk-tablebody', !asCards)
     btnCards.setAttribute('aria-pressed', String(asCards))
     btnTable.setAttribute('aria-pressed', String(!asCards))
     btnCards.classList.toggle('on', asCards)
