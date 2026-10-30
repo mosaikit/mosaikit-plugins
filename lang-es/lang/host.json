@@ -1987,5 +1987,7 @@
   "Add the people of the tenant who belong to this group.": "Añade a las personas de la organización que forman parte de este grupo.",
   "The events of the last days appear here.": "Los eventos de los últimos días aparecen aquí.",
   "What the tenant stores appears here.": "Lo que la organización guarda aparece aquí.",
-  "Use «Run now» to make the first one.": "Usa «Ejecutar ahora» para hacer la primera."
+  "Use «Run now» to make the first one.": "Usa «Ejecutar ahora» para hacer la primera.",
+  "Runs code compiled at run time": "Ejecuta código compilado en tiempo de ejecución",
+  "yes (sensitive: its page may use eval and WebAssembly compilation)": "sí (sensible: su página puede usar eval y compilación de WebAssembly)"
 }
