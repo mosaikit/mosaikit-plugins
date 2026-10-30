@@ -1,13 +1,22 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import type { FileEntry } from '@mosaikit/plugin-api'
 import { setLang } from './i18n.ts'
-import { atLeast, fmtDate, fmtSize, freeName, isConflict, kindLabel, previewMode, sortEntries, validName } from './util.ts'
+import { atLeast, growFor, fmtDate, fmtSize, freeName, isConflict, kindLabel, previewMode, sortEntries, validName } from './util.ts'
 
 function entry(name: string, is_dir = false, size = 0, modified = '2026-01-01T00:00:00Z'): FileEntry {
   return { id: name, name, is_dir, size, mime: '', created: modified, modified, owner_id: 'u', owner_name: 'anna', my_level: 'manage', shared: false, parent_id: null }
 }
 
 afterEach(() => setLang('en'))
+
+describe('growFor', () => {
+  it('keeps the drawn count when the item is drawn and adds whole pages up to it otherwise', () => {
+    expect(growFor(100, 99)).toBe(100)
+    expect(growFor(100, 100)).toBe(200)
+    expect(growFor(100, 4999)).toBe(5000)
+    expect(growFor(200, 100)).toBe(200)
+  })
+})
 
 describe('freeName', () => {
   it('adds (n) before the extension and skips the names taken', () => {

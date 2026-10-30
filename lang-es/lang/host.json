@@ -1977,5 +1977,8 @@
   "Nothing shared yet": "Aún no hay nada compartido",
   "Items you share with people, groups or a public link appear here.": "Los elementos que compartes con personas, grupos o un enlace público aparecen aquí.",
   "Nothing found in the trash": "No se encontró nada en la papelera",
-  "Requests to see or edit an item wait here until they are answered.": "Las solicitudes para ver o editar un elemento esperan aquí hasta que se responden."
+  "Requests to see or edit an item wait here until they are answered.": "Las solicitudes para ver o editar un elemento esperan aquí hasta que se responden.",
+  "Items of the backup": "Elementos de la copia de seguridad",
+  "Rows of the file": "Filas del archivo",
+  "Result of every row": "Resultado de cada fila"
 }

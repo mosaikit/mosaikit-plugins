@@ -1,6 +1,6 @@
 id = "com.mosaikit.files"
 name = "Documents"
-version = "0.5.2"
+version = "0.5.3"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "folder"

@@ -67,6 +67,31 @@ describe('FileManager', () => {
     expect(labels).not.toContain('Share')
   })
 
+  it('draws a big folder a page at a time and keeps the selection on all of it', async () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const many = Array.from({ length: 5000 }, (_, i) => entry(`f${i}`, `file-${String(i).padStart(4, '0')}.txt`))
+    const { msk } = fake(many)
+    const t0 = performance.now()
+    fm = new FileManager(el, msk)
+    await tick()
+    expect(performance.now() - t0).toBeLessThan(3000)
+    expect(el.querySelectorAll('tr.it').length).toBe(100)
+    expect(el.querySelector('.fm-foot .msk-count')!.textContent).toBe('100 of 5000 items')
+    // the button draws the next page
+    ;(el.querySelector('.fm-foot button') as HTMLButtonElement).click()
+    expect(el.querySelectorAll('tr.it').length).toBe(200)
+    // Ctrl+A selects the whole folder, drawn or not
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', ctrlKey: true, bubbles: true }))
+    expect(el.querySelector('.fm-bar .count')!.textContent).toBe('5000 items selected')
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    // the arrows go on past the drawn rows: the next page is drawn up to the focused one
+    ;(el.querySelectorAll('tr.it')[199] as HTMLElement).click()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+    expect(el.querySelectorAll('tr.it').length).toBe(300)
+    expect(el.querySelector('tr.it.sel .n')!.textContent).toBe('file-0200.txt')
+  })
+
   it('uploads a file with a conflict choosing "keep both"', async () => {
     const el = document.createElement('div')
     document.body.append(el)

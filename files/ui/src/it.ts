@@ -43,6 +43,8 @@ export const IT: Record<string, string> = {
   Lines: 'Righe',
   List: 'Elenco',
   Loading: 'Caricamento',
+  'Load more': 'Carica altri',
+  '{shown} of {total} items': '{shown} di {total} elementi',
   Modified: 'Modificato',
   'Move here': 'Sposta qui',
   'Move to…': 'Sposta in…',

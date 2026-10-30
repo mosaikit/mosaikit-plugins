@@ -11,9 +11,11 @@ import {
   fmtDate,
   fmtSize,
   freeName,
+  growFor,
   kindLabel,
   kindOf,
   levelLabel,
+  PAGE,
   plural,
   previewable,
   previewMode,
@@ -95,6 +97,10 @@ export class FileManager {
 
   private detail: { key: string; preview?: Preview; error?: string } | null = null
   private sideKey = ''
+  /** how many of the sorted items are drawn (a page at a time); starts again when the folder, filter, sort or view changes */
+  private shown = PAGE
+  private pageKey = ''
+  private pager: IntersectionObserver | null = null
   private thumbs = new Map<string, string>()
   private thumbQueue: FileEntry[] = []
   private thumbBusy = 0
@@ -863,8 +869,44 @@ export class FileManager {
     if (e.is_dir) this.dropTarget(el, e.id, atLeast(e.my_level, 'write'))
   }
 
+  /** The part of the folder that scrolls: the rows of the table, or the pane itself with the cards. */
+  private scroller(): HTMLElement {
+    return this.main.querySelector<HTMLElement>(':scope > .fm-table > tbody') ?? this.main
+  }
+
+  /** The foot of the drawn items: «Load more» while there are more, and «N of N» once all of a long folder is drawn. */
+  private foot(shown: number, total: number): HTMLElement | null {
+    if (total <= PAGE) return null
+    const more = shown < total
+    return h(
+      'div',
+      { class: 'msk-morebar fm-foot' },
+      h('span', { class: 'msk-count' }, t('{shown} of {total} items', { shown, total })),
+      more ? h('button', { type: 'button', class: 'msk-btn ghost msk-more', onclick: () => this.more() }, t('Load more')) : null,
+    )
+  }
+
+  /** The next page (or up to the item at `index`): drawn again with the scroll position kept. */
+  private more(index = -1) {
+    const total = this.sorted().length
+    if (this.shown >= total && index < 0) return
+    this.shown = Math.min(total, index >= 0 ? growFor(this.shown, index) : this.shown + PAGE)
+    this.renderMain()
+  }
+
   private renderMain() {
-    const list = this.sorted()
+    const full = this.sorted()
+    const key = `${this.parent}|${this.filter}|${this.prefs.sortKey}${this.prefs.sortDir}|${this.prefs.view}`
+    const sameView = key === this.pageKey
+    if (!sameView) {
+      this.pageKey = key
+      this.shown = PAGE
+    }
+    const keepTop = sameView ? this.scroller().scrollTop : 0
+    this.pager?.disconnect()
+    this.pager = null
+    const list = full.slice(0, this.shown)
+    const foot = this.foot(list.length, full.length)
     const dropzone = h('div', { class: 'fm-dropzone' }, svg('upload'), h('span', null, t('Drop to upload to “{name}”', { name: this.folderName() })))
     let content: HTMLElement | HTMLElement[]
     if (this.loading && !this.listing) {
@@ -873,7 +915,7 @@ export class FileManager {
       )
     } else if (this.loadError) {
       content = h('div', { class: 'fm-empty' }, h('b', null, t('Could not read the folder')), h('span', { class: 'err' }, this.loadError))
-    } else if (!list.length) {
+    } else if (!full.length) {
       if (this.filter) {
         content = h('div', { class: 'fm-empty' }, h('div', { class: 'big' }, svg('search')), h('b', null, t('No result')), h('span', null, t('No item contains “{text}”', { text: this.filter })))
       } else {
@@ -888,7 +930,7 @@ export class FileManager {
         content = es
       }
     } else if (this.prefs.view === 'grid') {
-      content = h(
+      content = [h(
         'div',
         { class: 'fm-grid' },
         ...list.map((e) => {
@@ -905,15 +947,16 @@ export class FileManager {
           this.bindItem(card, e)
           return card
         }),
-      )
+      )]
+      if (foot) content.push(foot)
       this.loadThumbs(list)
     } else {
-      const allOn = list.every((e) => this.sel.has(e.id))
-      const someOn = !allOn && list.some((e) => this.sel.has(e.id))
+      const allOn = full.every((e) => this.sel.has(e.id))
+      const someOn = !allOn && full.some((e) => this.sel.has(e.id))
       const all = h('button', { type: 'button', class: 'chk' + (allOn ? ' on' : someOn ? ' part' : ''), role: 'checkbox', 'aria-checked': allOn ? 'true' : someOn ? 'mixed' : 'false', 'aria-label': t('Select all') }, someOn ? null : svg('check'))
       all.onclick = (ev) => {
         ev.stopPropagation()
-        this.sel = allOn ? new Set() : new Set(list.map((e) => e.id))
+        this.sel = allOn ? new Set() : new Set(full.map((e) => e.id))
         this.render()
       }
       const th = (key: SortKey, label: string, cls = '') => {
@@ -964,10 +1007,19 @@ export class FileManager {
             this.bindItem(tr, e)
             return tr
           }),
+          foot ? h('tr', { class: 'fm-footrow', 'data-foot': '' }, h('td', { class: 'foot' }, foot)) : null,
         ),
       )
     }
     this.main.replaceChildren(...(Array.isArray(content) ? content : [content]), dropzone)
+    const sc = this.scroller()
+    if (keepTop) sc.scrollTop = keepTop
+    // more comes as the foot nears the end of what scrolls (the button stays for the keyboard)
+    const el = this.main.querySelector('.fm-foot')
+    if (el && list.length < full.length && typeof IntersectionObserver !== 'undefined') {
+      this.pager = new IntersectionObserver((e) => e.some((x) => x.isIntersecting) && this.more(), { root: sc, rootMargin: '200px' })
+      this.pager.observe(el)
+    }
   }
 
   private renderStatus() {
@@ -1329,6 +1381,8 @@ export class FileManager {
       const step = horiz ? (key === 'ArrowLeft' ? -1 : 1) : key === 'ArrowUp' ? -cols : cols
       const i = list.findIndex((e) => e.id === this.anchor)
       const ni = i < 0 ? 0 : Math.max(0, Math.min(list.length - 1, i + step))
+      // the item may not be drawn yet: draw the pages up to it, then select it
+      if (ni >= this.shown) this.shown = Math.min(list.length, growFor(this.shown, ni))
       this.click(list[ni].id, { shiftKey: ev.shiftKey })
       this.main.querySelector(`[data-id="${CSS.escape(list[ni].id)}"]`)?.scrollIntoView({ block: 'nearest' })
     }

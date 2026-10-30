@@ -161,6 +161,14 @@ export function levelLabel(l: Level): string {
   return t(LEVEL_LABEL[l])
 }
 
+/** Rows or cards drawn at a time: a folder is drawn a page at a time and the next page comes as the foot scrolls into view. */
+export const PAGE = 100
+
+/** How many items to draw so that the item at `index` is drawn: the current count, or the next whole pages up to it. */
+export function growFor(shown: number, index: number, step = PAGE): number {
+  return index < shown ? shown : (Math.floor(index / step) + 1) * step
+}
+
 /** Error as text (the errors of the bridge are already messages of the server). */
 export function errMsg(e: unknown): string {
   let m = e instanceof Error ? e.message : String(e)
