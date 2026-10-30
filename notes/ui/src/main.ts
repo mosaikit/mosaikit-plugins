@@ -151,6 +151,8 @@ async function mount(msk: Msk) {
       box.style.height = `${s.h}px`
       return s
     }
+    // the size of the last key press is saved after a pause; a drag that ends first must not be overwritten by it
+    let timer: ReturnType<typeof setTimeout> | undefined
     const grip = el('button', { type: 'button', class: 'pi-grip', 'aria-label': T().resize, title: T().resize })
     grip.addEventListener('pointerdown', (e) => {
       e.preventDefault()
@@ -163,13 +165,13 @@ async function mount(msk: Msk) {
         grip.removeEventListener('pointermove', move)
         grip.removeEventListener('pointerup', up)
         grip.removeEventListener('pointercancel', up)
+        clearTimeout(timer)
         if (last.w !== w0 || last.h !== h0) commit(last.w, last.h)
       }
       grip.addEventListener('pointermove', move)
       grip.addEventListener('pointerup', up)
       grip.addEventListener('pointercancel', up)
     })
-    let timer: ReturnType<typeof setTimeout> | undefined
     box.addEventListener('keydown', (e) => {
       if (!e.altKey || e.ctrlKey || e.metaKey) return
       const s = resizedBy(e.key, box.offsetWidth, box.offsetHeight, e.shiftKey)
