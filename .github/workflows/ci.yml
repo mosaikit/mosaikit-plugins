@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# mosaikit and mosaikit-plugins stay side by side as locally:
+#   $GITHUB_WORKSPACE/mosaikit, $GITHUB_WORKSPACE/mosaikit-plugins
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      CARGO_TERM_COLOR: always
+    defaults:
+      run:
+        working-directory: mosaikit-plugins
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: mosaikit-plugins
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/mosaikit
+          path: mosaikit
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: mosaikit-plugins
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: logic (WASM plugins)
+        run: cargo test
+      - run: npm ci --no-audit --no-fund
+      - name: UIs
+        run: npm run typecheck && npm run lint && npm test && npm run build
