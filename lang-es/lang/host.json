@@ -1209,6 +1209,7 @@
   "Log kept, in days": "Registro conservado, en días",
   "Older events are deleted": "Los eventos más antiguos se eliminan",
   "errors.trash_not_found": "Elemento no encontrado en la papelera",
+  "errors.sort_unknown": "Esta lista no se puede ordenar por esa columna",
   "errors.trash_parent_deleted": "El elemento está dentro de otro elemento de la papelera: restaura primero ese",
   "errors.trash_plugin_missing": "La app del elemento ya no está instalada",
   "Retention": "Retención",
