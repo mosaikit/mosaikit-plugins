@@ -19,7 +19,10 @@ fn normalize(ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     let email = v.str("email").trim().to_lowercase();
     if !email.is_empty() {
         if !valid_email(&email) {
-            return Err(Error::msg(format!("invalid email: {email}")));
+            return Err(Error::coded(
+                "email_invalid",
+                format!("invalid email: {email}"),
+            ));
         }
         if email != v.str("email") {
             ctx.log("contacts: email normalized");
