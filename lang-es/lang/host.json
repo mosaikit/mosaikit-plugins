@@ -1993,5 +1993,8 @@
   "errors.plugin_incompatible": "Este plugin no funciona con esta versión de Mosaikit. En Plugins > Actualizaciones se ven las versiones que acepta.",
   "This plugin was built for a newer plugin API than this Mosaikit speaks. Ask the Administrator to update Mosaikit.": "Este plugin se creó para una API de plugins más reciente que la de este Mosaikit. Pide al Administrador que actualice Mosaikit.",
   "Built for plugin API {wanted}; this Mosaikit speaks API {have}.": "Creado para la API de plugins {wanted}; este Mosaikit usa la API {have}.",
-  "Works with Mosaikit {wanted}; this is {have}.": "Funciona con Mosaikit {wanted}; este es {have}."
+  "Works with Mosaikit {wanted}; this is {have}.": "Funciona con Mosaikit {wanted}; este es {have}.",
+  "Reads the files of the person who uses it": "Lee los archivos de quien lo usa",
+  "yes (sensitive: its logic reads the Files area with the permissions of the caller)": "sí (sensible: su lógica lee el área de Archivos con los permisos de quien la llama)",
+  "Reads the files you can see": "Lee los archivos que puedes ver"
 }
