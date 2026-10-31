@@ -1989,5 +1989,9 @@
   "What the tenant stores appears here.": "Lo que la organización guarda aparece aquí.",
   "Use «Run now» to make the first one.": "Usa «Ejecutar ahora» para hacer la primera.",
   "Runs code compiled at run time": "Ejecuta código compilado en tiempo de ejecución",
-  "yes (sensitive: its page may use eval and WebAssembly compilation)": "sí (sensible: su página puede usar eval y compilación de WebAssembly)"
+  "yes (sensitive: its page may use eval and WebAssembly compilation)": "sí (sensible: su página puede usar eval y compilación de WebAssembly)",
+  "errors.plugin_incompatible": "Este plugin no funciona con esta versión de Mosaikit. En Plugins > Actualizaciones se ven las versiones que acepta.",
+  "This plugin was built for a newer plugin API than this Mosaikit speaks. Ask the Administrator to update Mosaikit.": "Este plugin se creó para una API de plugins más reciente que la de este Mosaikit. Pide al Administrador que actualice Mosaikit.",
+  "Built for plugin API {wanted}; this Mosaikit speaks API {have}.": "Creado para la API de plugins {wanted}; este Mosaikit usa la API {have}.",
+  "Works with Mosaikit {wanted}; this is {have}.": "Funciona con Mosaikit {wanted}; este es {have}."
 }
