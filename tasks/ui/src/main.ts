@@ -55,9 +55,9 @@ function mount(msk: Msk) {
       kind: 'board',
       item,
       columns: [
-        { key: 'overdue', label: (l) => TEXTS[l].overdue, match: isOverdue },
-        { key: 'open', label: (l) => TEXTS[l].open, match: (r) => !isDone(r) && !isOverdue(r) },
-        { key: 'done', label: (l) => TEXTS[l].done, match: isDone },
+        { key: 'overdue', label: (l) => TEXTS[langOf(l)].overdue, match: isOverdue },
+        { key: 'open', label: (l) => TEXTS[langOf(l)].open, match: (r) => !isDone(r) && !isOverdue(r) },
+        { key: 'done', label: (l) => TEXTS[langOf(l)].done, match: isDone },
       ],
     },
   ]
