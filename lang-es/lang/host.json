@@ -2041,5 +2041,14 @@
   "Searches the people and groups": "Busca entre las personas y los grupos",
   "yes (sensitive: it lists the names and usernames of the people and groups of the tenant to whoever may share in it)": "sí (sensible: lista los nombres y usuarios de las personas y los grupos de la organización a quien puede compartir)",
   "Searches the people of the tenant": "Busca entre las personas de la organización",
-  "Open the apps of {name}": "Abrir las apps de {name}"
+  "Open the apps of {name}": "Abrir las apps de {name}",
+  "Read only": "Solo lectura",
+  "Edit mode": "Modo de edición",
+  "Editing: switch to view": "Editando: cambiar a visualización",
+  "Viewing: switch to edit": "Viendo: cambiar a edición",
+  "People connected: {n}": "Personas conectadas: {n}",
+  "and {n} more: {names}": "y {n} más: {names}",
+  "Open the comments": "Abrir los comentarios",
+  "Close the comments": "Cerrar los comentarios",
+  "Comments": "Comentarios"
 }
