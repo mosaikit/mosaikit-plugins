@@ -616,7 +616,7 @@
   "Shared with the people of the tenant": "Compartido con las personas de la organización",
   "Sign-in codes and urgent notifications": "Códigos de inicio de sesión y notificaciones urgentes",
   "Sites that may embed public pages": "Sitios que pueden incrustar páginas públicas",
-  "Sites that may show the public pages (public links) inside their own pages. Without sites, nobody may.": "Sitios que pueden mostrar las páginas públicas (enlaces públicos) dentro de sus propias páginas. Sin sitios, nadie puede.",
+  "Sites that may show the public pages (public links) inside their own pages, besides the static sites of this installation, which always may.": "Sitios que pueden mostrar las páginas públicas (enlaces públicos) dentro de sus propias páginas, además de los sitios estáticos de esta instalación, que siempre pueden.",
   "Square, at least 32 px": "Cuadrado, de al menos 32 px",
   "Tenants may choose their theme": "Las organizaciones pueden elegir su tema",
   "Tenants may customize it": "Las organizaciones pueden personalizarlo",
