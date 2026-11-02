@@ -2029,5 +2029,10 @@
   "Delete all the data of {plugin} and run its migrations again?": "¿Eliminar todos los datos de {plugin} y ejecutar de nuevo sus migraciones?",
   "Deletes the tables and the items of this plugin in every tenant, then runs its migrations again from the first one. The plugin stays loaded from its folder.": "Elimina las tablas y los elementos de este plugin en cada organización y luego ejecuta de nuevo sus migraciones desde la primera. El plugin sigue cargado desde su carpeta.",
   "A migration changed after it ran: a reset is the way to apply it.": "Una migración cambió después de ejecutarse: para aplicarla hay que restablecer los datos.",
-  "Reset the data of this plugin": "Restablecer los datos de este plugin"
+  "Reset the data of this plugin": "Restablecer los datos de este plugin",
+  "Public commands": "Comandos públicos",
+  "Let the page of a public link run the commands a plugin declares for it (read only). They can use the outside services of the organisation, so leave this off unless you need it.": "Permite que la página de un enlace público ejecute los comandos que un plugin declara para ello (solo lectura). Pueden usar los servicios externos de la organización: déjalo desactivado si no lo necesitas.",
+  "Commands open to public links": "Comandos abiertos a los enlaces públicos",
+  "yes (sensitive: anyone who holds a public link may run them, read only, on the shared item)": "sí (sensible: cualquiera que tenga un enlace público puede ejecutarlos, en solo lectura, sobre el elemento compartido)",
+  "Runs commands for public links": "Ejecuta comandos para los enlaces públicos"
 }
