@@ -2037,5 +2037,6 @@
   "Runs commands for public links": "Ejecuta comandos para los enlaces públicos",
   "Commands a background run may call": "Comandos que una ejecución en segundo plano puede llamar",
   "yes (sensitive: a service of a distribution calls them as the person who started a run, even after they have signed out)": "sí (sensible: un servicio de una distribución los llama como la persona que inició una ejecución, incluso después de que haya cerrado la sesión)",
-  "Runs commands for background runs": "Ejecuta comandos para ejecuciones en segundo plano"
+  "Runs commands for background runs": "Ejecuta comandos para ejecuciones en segundo plano",
+  "Open the apps of {name}": "Abrir las apps de {name}"
 }
