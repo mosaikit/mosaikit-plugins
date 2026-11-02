@@ -2038,5 +2038,8 @@
   "Commands a background run may call": "Comandos que una ejecución en segundo plano puede llamar",
   "yes (sensitive: a service of a distribution calls them as the person who started a run, even after they have signed out)": "sí (sensible: un servicio de una distribución los llama como la persona que inició una ejecución, incluso después de que haya cerrado la sesión)",
   "Runs commands for background runs": "Ejecuta comandos para ejecuciones en segundo plano",
+  "Searches the people and groups": "Busca entre las personas y los grupos",
+  "yes (sensitive: it lists the names and usernames of the people and groups of the tenant to whoever may share in it)": "sí (sensible: lista los nombres y usuarios de las personas y los grupos de la organización a quien puede compartir)",
+  "Searches the people of the tenant": "Busca entre las personas de la organización",
   "Open the apps of {name}": "Abrir las apps de {name}"
 }
