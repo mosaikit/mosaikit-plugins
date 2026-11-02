@@ -2034,5 +2034,8 @@
   "Let the page of a public link run the commands a plugin declares for it (read only). They can use the outside services of the organisation, so leave this off unless you need it.": "Permite que la página de un enlace público ejecute los comandos que un plugin declara para ello (solo lectura). Pueden usar los servicios externos de la organización: déjalo desactivado si no lo necesitas.",
   "Commands open to public links": "Comandos abiertos a los enlaces públicos",
   "yes (sensitive: anyone who holds a public link may run them, read only, on the shared item)": "sí (sensible: cualquiera que tenga un enlace público puede ejecutarlos, en solo lectura, sobre el elemento compartido)",
-  "Runs commands for public links": "Ejecuta comandos para los enlaces públicos"
+  "Runs commands for public links": "Ejecuta comandos para los enlaces públicos",
+  "Commands a background run may call": "Comandos que una ejecución en segundo plano puede llamar",
+  "yes (sensitive: a service of a distribution calls them as the person who started a run, even after they have signed out)": "sí (sensible: un servicio de una distribución los llama como la persona que inició una ejecución, incluso después de que haya cerrado la sesión)",
+  "Runs commands for background runs": "Ejecuta comandos para ejecuciones en segundo plano"
 }
