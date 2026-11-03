@@ -134,6 +134,8 @@
   "It applies only to you, at once. The theme is chosen by whoever manages the tenant.": "Se aplica solo a ti, de inmediato. El tema lo elige quien gestiona la organización.",
   "The language of the interface and of the apps.": "El idioma de la interfaz y de las apps.",
   "Open at start": "Abrir al iniciar",
+  "Names under the icons": "Nombres bajo los iconos",
+  "In the closed sidebar. Off: only the icons, the name shows as a tooltip.": "En la barra lateral cerrada. Desactivado: solo los iconos, el nombre aparece como sugerencia.",
   "Otherwise only the icons, with the name below": "Si no, solo los iconos, con el nombre debajo",
   "Apps in the sidebar": "Apps en la barra lateral",
   "The ones turned off stay in Home and in the search.": "Las desactivadas quedan en Inicio y en la búsqueda.",
