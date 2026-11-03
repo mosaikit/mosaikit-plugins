@@ -170,10 +170,6 @@ function mount(msk: Msk) {
 
   const btnBack = h('button', { type: 'button', class: 'msk-btn ghost' }, t('⬅ List of sites'))
   const svTitle = h('span', { class: 'sv-title' })
-  const btnReload = h('button', { type: 'button', class: 'msk-btn ghost', title: t('Reload the site') }, t('↻ Reload'))
-  const aTab = h('a', { class: 'msk-btn ghost', target: '_blank', rel: 'noopener noreferrer', title: t('Open in a new tab') }, t('↗ New tab'))
-  const btnModify = h('button', { type: 'button', class: 'msk-btn ghost' }, t('✏ Edit'))
-  const showOnly = h('span', { class: 'show-only' }, btnReload, aTab, btnModify)
 
   const inName = h('input', { id: 'msks-name', type: 'text', placeholder: t('e.g. Project documentation') })
   const inDesc = h('textarea', { id: 'msks-desc', rows: '3', placeholder: t('What the site is for (optional)') })
@@ -247,7 +243,8 @@ function mount(msk: Msk) {
     noFrameLink,
   )
 
-  const siteView = h('div', { class: 'siteview' }, h('div', { class: 'editbar' }, btnBack, svTitle, h('span', { class: 'grow' }), showOnly), siteForm, sframe, webFrame, noFrame)
+  const editbar = h('div', { class: 'editbar' }, btnBack, svTitle)
+  const siteView = h('div', { class: 'siteview' }, editbar, siteForm, sframe, webFrame, noFrame)
 
   app.classList.add('msks')
   app.replaceChildren(listView, siteView)
@@ -393,14 +390,18 @@ function mount(msk: Msk) {
     sframe.hidden = view !== 'show' || web
     webFrame.hidden = !web
     noFrame.hidden = true
-    showOnly.hidden = view !== 'show'
-    const row = findRow(state.editId)
-    btnModify.hidden = !row || !canWrite(row)
+    // viewing a site: no bar of its own, the frame fills the area under the navbar; the way back is the
+    // back button of the contextual band (the list row keeps Open, Edit, Share and Delete)
+    editbar.hidden = view === 'show'
+    if (view === 'show') {
+      msk.band.set({ back: { label: t('Back to the list of sites'), onClick: backToList } })
+    } else {
+      msk.band.reset()
+    }
     if (view !== 'show') {
       sframe.src = 'about:blank'
       webFrame.src = 'about:blank'
       state.siteUrl = ''
-      aTab.removeAttribute('href')
     }
   }
 
@@ -493,7 +494,6 @@ function mount(msk: Msk) {
     showView('show')
     state.siteUrl = url
     webFrame.src = url
-    aTab.href = url
     // looked at again: the site may have changed its mind since it was saved
     try {
       const p = await msk.web.probe(url)
@@ -511,7 +511,6 @@ function mount(msk: Msk) {
     webFrame.hidden = true
     noFrame.hidden = false
     noFrameLink.href = url
-    aTab.href = url
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
@@ -532,28 +531,9 @@ function mount(msk: Msk) {
       showView('show')
       state.siteUrl = url
       sframe.src = url
-      aTab.href = url
-    } catch (e) {
+      } catch (e) {
       msg(t('could not open the site: {error}', { error: errText(e) }), 'list', true)
     }
-  }
-
-  /** Reloads with a new URL: the old one may have expired. */
-  async function reload() {
-    if (state.view !== 'show' || state.editId == null) return
-    const cur = findRow(state.editId)
-    if (cur && isWeb(cur)) {
-      if (!webFrame.hidden) webFrame.src = valOf(cur, 'url')
-      return
-    }
-    try {
-      const url = await msk.content.url(state.editId)
-      state.siteUrl = url
-      aTab.href = url
-    } catch {
-      /* try again with the URL at hand */
-    }
-    if (state.siteUrl) sframe.src = state.siteUrl
   }
 
   function backToList() {
@@ -690,8 +670,6 @@ function mount(msk: Msk) {
   btnBack.addEventListener('click', backToList)
   btnCancel.addEventListener('click', backToList)
   btnSave.addEventListener('click', () => void save())
-  btnModify.addEventListener('click', () => openEdit(state.editId))
-  btnReload.addEventListener('click', () => void reload())
   inName.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') void save()
   })

@@ -13,7 +13,6 @@
 .msks .editbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
 .msks .sv-title { font-size: 18px; font-weight: 700; }
 .msks .grow { flex: 1; }
-.msks .show-only { display: flex; gap: 8px; flex-wrap: wrap; }
 .msks [hidden] { display: none !important; }
 .msks a.msk-btn { text-decoration: none; display: inline-block; }
 .msks .siteform { max-width: 660px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px 24px; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35); }
