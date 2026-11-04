@@ -21,7 +21,7 @@ import '@mosaikit/plugin-api/style.css'
 import './sites.css'
 import { connect, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
-import { followHost, t } from './i18n.ts'
+import { followHost, reloadIfStale, t } from './i18n.ts'
 import { hasIndexHtml, zipEntryNames } from './zipnames.ts'
 
 const RESOURCE = 'sites' // name of the resource in the manifest
@@ -132,7 +132,7 @@ function writeOpen(v: OpenSite | null) {
 }
 
 function mount(msk: Msk) {
-  followHost(msk)
+  followHost(msk, () => state.view === 'show')   // a site that is open changes language by itself
   const restore = readOpen()
   const crud = msk.crud(RESOURCE)
   const NO_INDEX = t('the zip does not contain an index.html file')
@@ -442,6 +442,7 @@ function mount(msk: Msk) {
     } else {
       msk.band.reset()
     }
+    if (view === 'list') reloadIfStale()
     if (view !== 'show') {
       writeOpen(null)
       sframe.src = 'about:blank'

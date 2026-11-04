@@ -35,10 +35,22 @@ export function plural(n: number, one: string, many: string): string {
   return n + ' ' + t(n === 1 ? one : many)
 }
 
-/** Takes the language of the host; when it changes the page reloads (the UI is built once). */
-export function followHost(msk: Msk) {
+let stale = false
+
+/**
+ * Takes the language of the host; when it changes the page reloads (the UI is built once). With `busy()`
+ * true (a site is open: it changes language by itself) the reload waits for `reloadIfStale()`.
+ */
+export function followHost(msk: Msk, busy: () => boolean = () => false) {
   setLang(msk.context?.lang ?? (typeof navigator === 'undefined' ? undefined : navigator.language))
   msk.onContext((ctx) => {
-    if (pick(ctx.lang) !== lang) location.reload()
+    if (pick(ctx.lang) === lang) return
+    stale = true
+    if (!busy()) location.reload()
   })
+}
+
+/** Reloads the page if the host changed language while the reload was held back. */
+export function reloadIfStale() {
+  if (stale) location.reload()
 }
