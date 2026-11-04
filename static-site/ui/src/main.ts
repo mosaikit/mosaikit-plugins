@@ -227,6 +227,22 @@ function mount(msk: Msk) {
     title: t('Static site'),
     sandbox: 'allow-scripts allow-forms allow-popups allow-modals allow-downloads',
   })
+  // Language and theme of Mosaikit reach a site of ours by postMessage, with the envelope of the
+  // plugins: { msk: 1, event: "context", data: { lang, mode } }. The site says { msk: 1, event: "ready" }
+  // when it can listen; they also go in the address (?lang=&theme=), so the first paint is right.
+  const siteContext = () => ({ lang: msk.context?.lang ?? 'it', mode: msk.context?.mode ?? 'dark' })
+  const sendContext = () => sframe.contentWindow?.postMessage({ msk: 1, event: 'context', data: siteContext() }, '*')
+  window.addEventListener('message', (e) => {
+    if (e.source === sframe.contentWindow && e.data?.msk === 1 && e.data.event === 'ready') sendContext()
+  })
+  msk.onContext(() => sendContext())
+  const withContext = (url: string) => {
+    const u = new URL(url, location.href)
+    const c = siteContext()
+    u.searchParams.set('lang', c.lang)
+    u.searchParams.set('theme', c.mode)
+    return u.toString()
+  }
   // a site given by address is another origin: it may keep its own scripts, forms and storage
   const webFrame = h('iframe', {
     class: 'sframe',
@@ -530,7 +546,7 @@ function mount(msk: Msk) {
       svTitle.textContent = valOf(row, 'name')
       showView('show')
       state.siteUrl = url
-      sframe.src = url
+      sframe.src = withContext(url)
       } catch (e) {
       msg(t('could not open the site: {error}', { error: errText(e) }), 'list', true)
     }
