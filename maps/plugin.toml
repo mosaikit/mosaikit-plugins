@@ -11,6 +11,10 @@ details = "A catalog of maps built with GeoLibre. Each map keeps its configurati
 screenshots = ["catalog.svg", "map.svg"]
 homepage = "https://example.org/mosaikit/plugins/maps"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "🗺"
 label = "Maps"

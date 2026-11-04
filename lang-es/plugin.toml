@@ -10,6 +10,10 @@ screenshots = ["signin.svg", "notes.svg"]
 homepage = "https://example.org/mosaikit/plugins/lang-es"
 description = "Spanish interface: a sample language plugin with a starter set of texts (sign-in page, navigation, Notes)"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "🌐"
 label = "Español"

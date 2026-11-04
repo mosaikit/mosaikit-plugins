@@ -9,6 +9,10 @@ details = "Apps and pages as tabs under the band; a menu lists the pages of an a
 screenshots = ["layout.svg", "layout-page.svg"]
 homepage = "https://example.org/mosaikit/plugins/layout-tabs"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "▦"
 label = "Tabs"

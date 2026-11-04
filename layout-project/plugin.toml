@@ -9,6 +9,10 @@ details = "Global navigation in a narrow rail at the left, with the pages of the
 screenshots = ["layout.svg", "layout-page.svg"]
 homepage = "https://example.org/mosaikit/plugins/layout-project"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "▦"
 label = "Project"

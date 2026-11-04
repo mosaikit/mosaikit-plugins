@@ -11,6 +11,10 @@ details = "A shared address book. Email addresses are normalized and validated w
 screenshots = ["book.svg", "contact.svg"]
 homepage = "https://example.org/mosaikit/plugins/contacts"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "👥"
 label = "Contacts"

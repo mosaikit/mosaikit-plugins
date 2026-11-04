@@ -11,6 +11,10 @@ details = "Store files and folders, preview them in the browser, download a fold
 screenshots = ["files.svg", "preview.svg"]
 homepage = "https://example.org/mosaikit/plugins/files"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "📁"
 label = "Documents"

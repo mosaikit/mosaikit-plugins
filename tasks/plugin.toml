@@ -11,6 +11,10 @@ details = "Keep a list of things to do, each with a due date and a priority.\n\n
 screenshots = ["list.svg", "task.svg"]
 homepage = "https://example.org/mosaikit/plugins/tasks"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "✅"
 label = "Tasks"
