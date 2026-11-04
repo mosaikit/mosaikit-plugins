@@ -110,8 +110,30 @@ function fmtDate(iso: string | undefined): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`
 }
 
+// The site that is open and its view, kept for the session: a change of language loads this page again
+// (the UI is built once), and the site opens again where it was.
+const OPEN_KEY = 'msks.open'
+type OpenSite = { id: string; hash: string }
+function readOpen(): OpenSite | null {
+  try {
+    const v = JSON.parse(sessionStorage.getItem(OPEN_KEY) ?? 'null')
+    return v && typeof v.id === 'string' ? { id: v.id, hash: typeof v.hash === 'string' ? v.hash : '' } : null
+  } catch {
+    return null
+  }
+}
+function writeOpen(v: OpenSite | null) {
+  try {
+    if (v) sessionStorage.setItem(OPEN_KEY, JSON.stringify(v))
+    else sessionStorage.removeItem(OPEN_KEY)
+  } catch {
+    /* not kept */
+  }
+}
+
 function mount(msk: Msk) {
   followHost(msk)
+  const restore = readOpen()
   const crud = msk.crud(RESOURCE)
   const NO_INDEX = t('the zip does not contain an index.html file')
 
@@ -233,14 +255,20 @@ function mount(msk: Msk) {
   const siteContext = () => ({ lang: msk.context?.lang ?? 'it', mode: msk.context?.mode ?? 'dark' })
   const sendContext = () => sframe.contentWindow?.postMessage({ msk: 1, event: 'context', data: siteContext() }, '*')
   window.addEventListener('message', (e) => {
-    if (e.source === sframe.contentWindow && e.data?.msk === 1 && e.data.event === 'ready') sendContext()
+    if (e.source !== sframe.contentWindow || e.data?.msk !== 1) return
+    if (e.data.event === 'ready') sendContext()
+    // the view of the site, to open it again where it was
+    if (e.data.event === 'state' && typeof e.data.data?.hash === 'string' && state.view === 'show' && state.editId) {
+      writeOpen({ id: state.editId, hash: e.data.data.hash })
+    }
   })
   msk.onContext(() => sendContext())
-  const withContext = (url: string) => {
+  const withContext = (url: string, hash = '') => {
     const u = new URL(url, location.href)
     const c = siteContext()
     u.searchParams.set('lang', c.lang)
     u.searchParams.set('theme', c.mode)
+    u.hash = hash
     return u.toString()
   }
   // a site given by address is another origin: it may keep its own scripts, forms and storage
@@ -415,6 +443,7 @@ function mount(msk: Msk) {
       msk.band.reset()
     }
     if (view !== 'show') {
+      writeOpen(null)
       sframe.src = 'about:blank'
       webFrame.src = 'about:blank'
       state.siteUrl = ''
@@ -530,7 +559,7 @@ function mount(msk: Msk) {
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
-  async function openShow(id: string) {
+  async function openShow(id: string, hash = '') {
     const row = findRow(id)
     if (!row) return
     if (!hasSite(row)) {
@@ -546,7 +575,8 @@ function mount(msk: Msk) {
       svTitle.textContent = valOf(row, 'name')
       showView('show')
       state.siteUrl = url
-      sframe.src = withContext(url)
+      sframe.src = withContext(url, hash)
+      writeOpen({ id, hash })
       } catch (e) {
       msg(t('could not open the site: {error}', { error: errText(e) }), 'list', true)
     }
@@ -742,5 +772,7 @@ function mount(msk: Msk) {
   // ---------- start ----------
 
   showView('list')
-  void load()
+  void load().then(() => {
+    if (restore) void openShow(restore.id, restore.hash)
+  })
 }
