@@ -9,6 +9,10 @@ details = "A top bar with a wide search field and a drawer that opens and closes
 screenshots = ["layout.svg", "layout-page.svg"]
 homepage = "https://example.org/mosaikit/plugins/layout-workspace"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "▦"
 label = "Workspace"

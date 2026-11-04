@@ -11,6 +11,10 @@ screenshots = ["list.svg", "note.svg"]
 homepage = "https://example.org/mosaikit/plugins/notes"
 license = "Apache-2.0"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "📝"
 label = "Notes"

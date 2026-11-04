@@ -11,6 +11,10 @@ details = "Publish a static site from a zip archive, or show an existing site by
 screenshots = ["sites.svg", "site.svg"]
 homepage = "https://example.org/mosaikit/plugins/static-site"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "▦"
 label = "Sites"

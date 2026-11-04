@@ -9,6 +9,10 @@ details = "Apps from a launcher grid, like an office suite; the pages of the are
 screenshots = ["layout.svg", "layout-page.svg"]
 homepage = "https://example.org/mosaikit/plugins/layout-suite"
 
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
 [contribution]
 icon = "▦"
 label = "Suite"
