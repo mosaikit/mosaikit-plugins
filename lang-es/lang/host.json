@@ -2052,5 +2052,9 @@
   "and {n} more: {names}": "y {n} más: {names}",
   "Open the comments": "Abrir los comentarios",
   "Close the comments": "Cerrar los comentarios",
-  "Comments": "Comentarios"
+  "Comments": "Comentarios",
+  "Version {v}": "Versión {v}",
+  "Version of the product": "Versión del producto",
+  "Base": "Base",
+  "Powered by Mosaikit {v}": "Con la tecnología de Mosaikit {v}"
 }
