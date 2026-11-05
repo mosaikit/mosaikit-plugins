@@ -2081,5 +2081,6 @@
   "Pause": "Pausar",
   "Resume": "Reanudar",
   "Delete this schedule? Its history is deleted with it.": "¿Eliminar esta programación? Su historial se elimina con ella.",
-  "Resumed": "Reanudada"
+  "Resumed": "Reanudada",
+  "Calls what other plugins contribute": "Llama a lo que otros plugins aportan"
 }
