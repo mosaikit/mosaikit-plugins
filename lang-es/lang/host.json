@@ -2082,5 +2082,7 @@
   "Resume": "Reanudar",
   "Delete this schedule? Its history is deleted with it.": "¿Eliminar esta programación? Su historial se elimina con ella.",
   "Resumed": "Reanudada",
-  "Calls what other plugins contribute": "Llama a lo que otros plugins aportan"
+  "Calls what other plugins contribute": "Llama a lo que otros plugins aportan",
+  "Shows pages of other plugins": "Muestra páginas de otros plugins",
+  "yes (sensitive: {list}, in frames of its pages)": "sí (sensible: {list}, en marcos de sus páginas)"
 }
