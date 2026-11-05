@@ -2056,5 +2056,11 @@
   "Version {v}": "Versión {v}",
   "Version of the product": "Versión del producto",
   "Base": "Base",
-  "Powered by Mosaikit {v}": "Con la tecnología de Mosaikit {v}"
+  "Powered by Mosaikit {v}": "Con la tecnología de Mosaikit {v}",
+  "No comments yet.": "Aún no hay comentarios.",
+  "Write a comment": "Escribe un comentario",
+  "Send": "Enviar",
+  "Lists the items of: {list}": "Lista los elementos de: {list}",
+  "Lists the items of other plugins": "Lista los elementos de otros plugins",
+  "yes (sensitive: {list}, with the permissions of the caller)": "sí (sensible: {list}, con los permisos de quien la usa)"
 }
