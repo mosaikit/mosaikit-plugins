@@ -227,6 +227,18 @@ function mount(msk: Msk) {
     title: t('Static site'),
     sandbox: 'allow-scripts allow-forms allow-popups allow-modals allow-downloads',
   })
+  // Language and mode of the host go to the site in the frame: it asks with `ready` when it starts and gets
+  // `context` back, and again at every change (the same envelope the plugin UIs receive).
+  const tellSite = () => {
+    const c = msk.context
+    if (!c) return
+    sframe.contentWindow?.postMessage({ msk: 1, event: 'context', data: { lang: c.lang, mode: c.mode } }, '*')
+  }
+  window.addEventListener('message', (e) => {
+    const d = e.data as { msk?: number; event?: string } | null
+    if (e.source === sframe.contentWindow && d?.msk === 1 && d.event === 'ready') tellSite()
+  })
+  msk.onContext(tellSite)
   // a site given by address is another origin: it may keep its own scripts, forms and storage
   const webFrame = h('iframe', {
     class: 'sframe',
