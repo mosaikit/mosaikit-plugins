@@ -21,7 +21,7 @@ import '@mosaikit/plugin-api/style.css'
 import './sites.css'
 import { connect, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
-import { followHost, t } from './i18n.ts'
+import { followHost, reloadIfLangChanged, t } from './i18n.ts'
 import { hasIndexHtml, zipEntryNames } from './zipnames.ts'
 
 const RESOURCE = 'sites' // name of the resource in the manifest
@@ -111,7 +111,7 @@ function fmtDate(iso: string | undefined): string {
 }
 
 function mount(msk: Msk) {
-  followHost(msk)
+  followHost(msk, () => state.view === 'show')
   const crud = msk.crud(RESOURCE)
   const NO_INDEX = t('the zip does not contain an index.html file')
 
@@ -551,6 +551,7 @@ function mount(msk: Msk) {
   function backToList() {
     if (state.busy) return
     showView('list')
+    reloadIfLangChanged()
   }
 
   // ---------- actions ----------
