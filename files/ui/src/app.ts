@@ -27,6 +27,53 @@ const PREF_KEY = 'msk_files_prefs'
 const DRAG_TYPE = 'application/x-mosaikit-files'
 
 type View = 'list' | 'grid'
+
+/** A file of a folder that is being uploaded, with the folders on its way from the top one (`file` absent: an empty folder). */
+interface TreeItem {
+  dir: string[]
+  file?: File
+}
+
+/** The files of a folder picked in the dialog of the browser, by their `webkitRelativePath`. */
+function treeOfFiles(files: File[]): TreeItem[] {
+  const out: TreeItem[] = []
+  for (const f of files) {
+    const rel = (f as File & { webkitRelativePath?: string }).webkitRelativePath || f.name
+    const segs = rel.split('/').filter(Boolean)
+    if (segs.length < 2) continue
+    out.push({ dir: segs.slice(0, -1), file: f })
+  }
+  return out
+}
+
+const entries = (d: FileSystemDirectoryEntry): Promise<FileSystemEntry[]> =>
+  new Promise((resolve, reject) => {
+    const reader = d.createReader()
+    const all: FileSystemEntry[] = []
+    // the reader gives a part at a time (a hundred or so) until it gives none
+    const next = () =>
+      reader.readEntries((part) => {
+        if (!part.length) resolve(all)
+        else {
+          all.push(...part)
+          next()
+        }
+      }, reject)
+    next()
+  })
+
+/** Walks a folder dropped from the desktop: every file with its path, every empty folder too. */
+async function walkEntry(e: FileSystemEntry, dir: string[], out: TreeItem[]): Promise<void> {
+  if (e.isFile) {
+    const f = await new Promise<File>((resolve, reject) => (e as FileSystemFileEntry).file(resolve, reject))
+    out.push({ dir, file: f })
+    return
+  }
+  const here = [...dir, e.name]
+  const kids = await entries(e as FileSystemDirectoryEntry)
+  if (!kids.length) out.push({ dir: here })
+  for (const k of kids) await walkEntry(k, here, out)
+}
 type ActId =
   | 'open'
   | 'tab'
@@ -39,6 +86,9 @@ type ActId =
   | 'delete'
   | 'mkdir'
   | 'upload'
+  | 'uploaddir'
+  | 'profiles'
+  | 'profilescwd'
   | 'selall'
   | 'refresh'
   | 'zipcwd'
@@ -119,6 +169,7 @@ export class FileManager {
   private readonly side: HTMLElement
   private readonly status: HTMLElement
   private readonly picker: HTMLInputElement
+  private readonly dirPicker: HTMLInputElement
   private readonly progress: HTMLElement
 
   constructor(
@@ -154,6 +205,13 @@ export class FileManager {
       this.picker.value = ''
       void this.upload(files, this.parent, this.entries)
     })
+    // a folder chosen in the picker: its files carry the path from the folder (`webkitRelativePath`)
+    this.dirPicker = h('input', { type: 'file', multiple: true, hidden: true, webkitdirectory: '' })
+    this.dirPicker.addEventListener('change', () => {
+      const files = [...(this.dirPicker.files ?? [])]
+      this.dirPicker.value = ''
+      void this.uploadTree(treeOfFiles(files), this.parent)
+    })
     this.root = h(
       'div',
       { class: 'fm', tabindex: -1 },
@@ -166,6 +224,7 @@ export class FileManager {
       }),
       h('div', { class: 'fm-content' }, this.crumbs, this.bar, h('div', { class: 'fm-body' }, this.main, this.side), this.status),
       this.picker,
+      this.dirPicker,
     )
     el.replaceChildren(this.root)
     document.body.append(this.progress)
@@ -299,6 +358,7 @@ export class FileManager {
     if (allManage) out.push({ id: 'move', label: t('Move to…'), icon: 'move' })
     out.push({ id: 'copy', label: t('Copy to…'), icon: 'copy' })
     if (this.canCreate) out.push({ id: 'duplicate', label: t('Duplicate here'), icon: 'copy' })
+    if (one?.is_dir) out.push({ id: 'profiles', label: t('Use in another app…'), icon: 'open' })
     if (one && atLeast(one.my_level, 'manage')) out.push({ id: 'share', label: t('Share'), icon: 'share' })
     if (allManage) out.push({ id: 'delete', label: t('Delete'), icon: 'trash', danger: true, kbd: t('Del') })
     return out
@@ -308,12 +368,14 @@ export class FileManager {
     const out: Action[] = []
     if (this.canCreate) {
       out.push({ id: 'upload', label: t('Upload files'), icon: 'upload', primary: true })
+      out.push({ id: 'uploaddir', label: t('Upload folder'), icon: 'upload' })
       out.push({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' })
     }
     if (this.entries.length) out.push({ id: 'selall', label: t('Select all'), icon: 'check', kbd: 'Ctrl+A' })
     out.push({ id: 'refresh', label: t('Refresh'), icon: 'refresh' })
     if (this.parent !== null) {
       out.push({ id: 'zipcwd', label: t('Download folder (.zip)'), icon: 'zip' })
+      out.push({ id: 'profilescwd', label: t('Use in another app…'), icon: 'open' })
       if (atLeast(this.listing?.my_level, 'manage')) out.push({ id: 'sharecwd', label: t('Share folder'), icon: 'share' })
     }
     return out
@@ -356,6 +418,15 @@ export class FileManager {
         break
       case 'upload':
         this.picker.click()
+        break
+      case 'uploaddir':
+        this.dirPicker.click()
+        break
+      case 'profiles':
+        if (one?.is_dir) void this.useElsewhere(one.id, one.name)
+        break
+      case 'profilescwd':
+        if (this.parent) void this.useElsewhere(this.parent, this.folderName())
         break
       case 'selall':
         this.sorted().forEach((e) => this.sel.add(e.id))
@@ -700,6 +771,99 @@ export class FileManager {
     }
   }
 
+  /**
+   * Uploads folders with what is in them into `dest`. Every top folder is a new one (a name already taken gets
+   * another, like a copy), so nothing is merged and no name clashes inside; empty folders are made too.
+   * Then the apps that recognise a folder are offered, like after unpacking a zip.
+   */
+  private async uploadTree(items: TreeItem[], dest: string | null) {
+    if (!items.length) return
+    let taken: Set<string>
+    let destName = dest === this.parent ? this.folderName() : ''
+    try {
+      const l = await this.msk.files.list(dest)
+      taken = new Set(l.entries.map((e) => e.name))
+      if (!destName) destName = l.path.length ? l.path[l.path.length - 1].name : t('My files')
+      if (!atLeast(l.my_level, 'write')) {
+        this.msk.toast(t('You do not have the permission to upload files to “{dest}”', { dest: destName }), true)
+        return
+      }
+    } catch (e) {
+      this.msk.toast(errMsg(e), true)
+      return
+    }
+    const label = h('span', { class: 'lbl' })
+    const pct = h('span', { class: 'pct' })
+    const fill = h('i')
+    const box = h('div', { class: 'fm-up' }, h('div', { class: 'r' }, label, pct), h('div', { class: 'bar' }, fill))
+    this.progress.append(box)
+    const total = items.reduce((n, i) => n + (i.file?.size ?? 0), 0) || 1
+    let done = 0
+    let count = 0
+    const ids = new Map<string, string>()
+    const tops: { name: string; id: string }[] = []
+    const errs: string[] = []
+    const folder = async (segs: string[]): Promise<string> => {
+      const key = segs.join('/')
+      const known = ids.get(key)
+      if (known) return known
+      let name = segs[segs.length - 1]
+      let parent = dest
+      if (segs.length === 1) {
+        if (taken.has(name)) name = freeName(name, taken, true)
+        taken.add(name)
+      } else {
+        parent = await folder(segs.slice(0, -1))
+      }
+      const e = await this.msk.files.mkdir(name, parent)
+      ids.set(key, e.id)
+      if (segs.length === 1) tops.push({ name, id: e.id })
+      return e.id
+    }
+    for (const it of items) {
+      try {
+        const dirId = await folder(it.dir)
+        if (!it.file) continue
+        label.textContent = it.file.name
+        await this.msk.files.upload(it.file, it.file.name, dirId, false)
+        count++
+        done += it.file.size
+        const p = Math.min(100, Math.round((done / total) * 100))
+        fill.style.width = p + '%'
+        pct.textContent = p + '%'
+      } catch (e) {
+        errs.push(`${it.dir.join('/')}/${it.file?.name ?? ''}: ${errMsg(e)}`)
+      }
+    }
+    setTimeout(() => box.remove(), 600)
+    this.report(
+      errs,
+      tops.length === 1
+        ? t('“{name}” uploaded with {n} files', { name: tops[0].name, n: count })
+        : t('{k} folders uploaded with {n} files', { k: tops.length, n: count }),
+    )
+    if (dest === this.parent) this.sel = new Set(tops.map((x) => x.id))
+    await this.refresh()
+    for (const top of tops) await this.offer(top.id, top.name, false)
+  }
+
+  /** The apps that recognise a folder (`[[folder_profiles]]`), as notices; `say`: also tell when none does. */
+  private async offer(id: string, name: string, say: boolean) {
+    let found: FolderSuggestion[] = []
+    try {
+      found = await this.msk.files.profiles(id)
+    } catch (e) {
+      if (say) this.msk.toast(errMsg(e), true)
+      return
+    }
+    for (const s of found) this.suggest(name, s)
+    if (say && !found.length) this.msk.toast(t('No app recognises “{name}”', { name }))
+  }
+
+  private async useElsewhere(id: string, name: string) {
+    await this.offer(id, name, true)
+  }
+
   /** Unpacks zip archives into `dest`, each into a new folder named after it, or straight into `dest`. */
   private async unpack(zips: File[], dest: string | null, intoFolder: boolean, taken: Set<string>, destName: string) {
     const label = h('span', { class: 'lbl' })
@@ -831,8 +995,9 @@ export class FileManager {
         ev.preventDefault()
         ev.stopPropagation()
         this.endOsDrag()
-        const files = this.droppedFiles(ev)
-        if (files.length) void this.upload(files, dest, dest === this.parent ? this.entries : undefined)
+        const dropped = this.collectDrop(ev)
+        if (dropped.files.length) void this.upload(dropped.files, dest, dest === this.parent ? this.entries : undefined)
+        if (dropped.dirs.length) void this.dropDirs(dropped.dirs, dest)
         return
       }
       if (!this.canDropOn(dest)) return
@@ -1337,26 +1502,38 @@ export class FileManager {
     this.main.classList.remove('dragover')
   }
 
-  /** Files only: folders dragged from the desktop are left out. */
-  private droppedFiles(ev: DragEvent): File[] {
+  /**
+   * What a drop holds, read while the event is still alive: the plain files, and the folders as entries to
+   * walk afterwards (the browser gives them only inside the event).
+   */
+  private collectDrop(ev: DragEvent): { files: File[]; dirs: FileSystemDirectoryEntry[] } {
     const dt = ev.dataTransfer
-    if (!dt) return []
-    const out: File[] = []
-    let skipped = 0
+    const out = { files: [] as File[], dirs: [] as FileSystemDirectoryEntry[] }
+    if (!dt) return out
     const items = [...dt.items]
     if (items.length && typeof items[0].webkitGetAsEntry === 'function') {
       for (const it of items) {
         if (it.kind !== 'file') continue
         const entry = it.webkitGetAsEntry()
         const f = it.getAsFile()
-        if (entry?.isDirectory || !f) skipped++
-        else out.push(f)
+        if (entry?.isDirectory) out.dirs.push(entry as FileSystemDirectoryEntry)
+        else if (f) out.files.push(f)
       }
     } else {
-      out.push(...dt.files)
+      out.files.push(...dt.files)
     }
-    if (skipped) this.msk.toast(skipped === 1 ? t('Folders cannot be uploaded: drag the files') : t('{n} folders ignored: only files can be uploaded', { n: skipped }), true)
     return out
+  }
+
+  private async dropDirs(dirs: FileSystemDirectoryEntry[], dest: string | null) {
+    const tree: TreeItem[] = []
+    try {
+      for (const d of dirs) await walkEntry(d, [], tree)
+    } catch (e) {
+      this.msk.toast(errMsg(e), true)
+      return
+    }
+    await this.uploadTree(tree, dest)
   }
 
   private bindMain() {
@@ -1398,8 +1575,9 @@ export class FileManager {
       ev.preventDefault()
       this.endOsDrag()
       if (!this.canCreate) return
-      const files = this.droppedFiles(ev)
-      if (files.length) void this.upload(files, this.parent, this.entries)
+      const dropped = this.collectDrop(ev)
+      if (dropped.files.length) void this.upload(dropped.files, this.parent, this.entries)
+      if (dropped.dirs.length) void this.dropDirs(dropped.dirs, this.parent)
     })
   }
 
