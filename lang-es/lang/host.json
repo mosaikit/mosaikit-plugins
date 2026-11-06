@@ -2087,5 +2087,7 @@
   "yes (sensitive: {list}, in frames of its pages)": "sí (sensible: {list}, en marcos de sus páginas)",
   "Background runs may also reach": "Las ejecuciones en segundo plano también pueden llegar a",
   "yes (sensitive: a run it starts may call the run commands of these plugins as the person who started it, if that person uses them)": "sí (sensible: una ejecución que inicia puede llamar a los comandos para ejecuciones de estos plugins como la persona que la inició, si esa persona los usa)",
-  "Background runs reach other plugins": "Las ejecuciones en segundo plano llegan a otros plugins"
+  "Background runs reach other plugins": "Las ejecuciones en segundo plano llegan a otros plugins",
+  "Offers pages with the origin of its own": "Ofrece páginas con el origen propio",
+  "yes (sensitive: {list}, shown in frames that have the origin of this plugin)": "sí (sensible: {list}, mostradas en marcos que tienen el origen de este plugin)"
 }
