@@ -2089,5 +2089,11 @@
   "yes (sensitive: a run it starts may call the run commands of these plugins as the person who started it, if that person uses them)": "sí (sensible: una ejecución que inicia puede llamar a los comandos para ejecuciones de estos plugins como la persona que la inició, si esa persona los usa)",
   "Background runs reach other plugins": "Las ejecuciones en segundo plano llegan a otros plugins",
   "Offers pages with the origin of its own": "Ofrece páginas con el origen propio",
-  "yes (sensitive: {list}, shown in frames that have the origin of this plugin)": "sí (sensible: {list}, mostradas en marcos que tienen el origen de este plugin)"
+  "yes (sensitive: {list}, shown in frames that have the origin of this plugin)": "sí (sensible: {list}, mostradas en marcos que tienen el origen de este plugin)",
+  "Writes in the Files area for you": "Escribe en el área de Archivos en tu nombre",
+  "Writes in the Files area of the person who uses it": "Escribe en el área de Archivos de quien lo usa",
+  "yes (sensitive: its pages create folders and files in the Files area with the permissions of the caller)": "sí (sensible: sus páginas crean carpetas y archivos en el área de Archivos con los permisos de quien las usa)",
+  "“{name}” looks like a {label}": "“{name}” parece un {label}",
+  "Open it in {app} to publish it.": "Ábrelo en {app} para publicarlo.",
+  "Add the path of a file to the link to reach a file of this folder, for example …/tileset.json": "Añade al enlace la ruta de un archivo para llegar a un archivo de esta carpeta, por ejemplo …/tileset.json"
 }
