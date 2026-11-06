@@ -604,7 +604,32 @@ export class FileManager {
       }
     }
     const byName = new Map(existing.map((e) => [e.name, e]))
-    const clash = files.filter((f) => byName.has(f.name))
+    // zip archives: unpack them (into a folder of their own or here) or keep them as single files
+    let list = files
+    const zips = files.filter((f) => /\.zip$/i.test(f.name))
+    if (zips.length) {
+      const mode = await choiceDialog({
+        title: zips.length === 1 ? t('“{name}” is a zip archive', { name: zips[0].name }) : t('{n} zip archives', { n: zips.length }),
+        icon: 'zip',
+        body: [
+          t('Keep it as a single file, or unpack it keeping its folders?') +
+            ' ' +
+            t('A folder of files can be shared and used by address, for example by a map.'),
+        ],
+        choices: [
+          { id: 'keep', label: t('Keep as a file') },
+          { id: 'here', label: t('Unpack here') },
+          { id: 'folder', label: t('Unpack into a new folder'), cls: '' },
+        ],
+      })
+      if (!mode) return
+      if (mode !== 'keep') {
+        list = files.filter((f) => !/\.zip$/i.test(f.name))
+        await this.unpack(zips, dest, mode === 'folder', new Set(byName.keys()), destName)
+      }
+    }
+    if (!list.length) return
+    const clash = list.filter((f) => byName.has(f.name))
     let choice: string | null = 'keep'
     if (clash.length) {
       choice = await choiceDialog({
@@ -626,7 +651,7 @@ export class FileManager {
     }
     const taken = new Set(byName.keys())
     const jobs: { name: string; file: File; replace: boolean }[] = []
-    for (const f of files) {
+    for (const f of list) {
       const old = byName.get(f.name)
       let name = f.name
       let replace = false
@@ -673,6 +698,36 @@ export class FileManager {
     } else {
       await this.refresh()
     }
+  }
+
+  /** Unpacks zip archives into `dest`, each into a new folder named after it, or straight into `dest`. */
+  private async unpack(zips: File[], dest: string | null, intoFolder: boolean, taken: Set<string>, destName: string) {
+    const label = h('span', { class: 'lbl' })
+    const pct = h('span', { class: 'pct' })
+    const fill = h('i')
+    const box = h('div', { class: 'fm-up' }, h('div', { class: 'r' }, label, pct), h('div', { class: 'bar' }, fill))
+    this.progress.append(box)
+    const made: string[] = []
+    const errs = await this.seq(zips, async (z) => {
+      label.textContent = t('Unpacking “{name}”…', { name: z.name })
+      pct.textContent = ''
+      fill.style.width = '100%'
+      const stem = z.name.replace(/\.zip$/i, '')
+      const folder = intoFolder ? (taken.has(stem) ? freeName(stem, taken, true) : stem) : undefined
+      if (folder) taken.add(folder)
+      const r = await this.msk.files.unzip(z, { parent: dest, folder, conflict: 'fail' })
+      if (r.folder) made.push(r.folder.id)
+    })
+    setTimeout(() => box.remove(), 600)
+    const here = dest === this.parent
+    this.report(
+      errs,
+      zips.length === 1
+        ? t(here ? '“{name}” unpacked' : '“{name}” unpacked into “{dest}”', { name: zips[0].name, dest: destName })
+        : t(here ? '{n} archives unpacked' : '{n} archives unpacked into “{dest}”', { n: zips.length, dest: destName }),
+    )
+    if (here && made.length) this.sel = new Set(made)
+    await this.refresh()
   }
 
   // ------------------------------------------------------------ selection
