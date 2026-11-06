@@ -230,4 +230,6 @@
 
 /* the notice that an unpacked folder looks like something another plugin knows */
 .fm-note .r { gap: 8px; align-items: center; flex-wrap: wrap; }
-.fm-note .lbl { flex: 1 1 14rem; }
+/* the stack of progress boxes lets clicks through; the notice has buttons */
+.fm-progress .fm-note { pointer-events: auto; }
+.fm-note .lbl { flex: 1 1 14rem; white-space: normal; }

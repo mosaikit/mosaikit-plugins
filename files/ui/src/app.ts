@@ -2,7 +2,7 @@
 import { emptyState, pageHead, type FileEntry, type FolderSuggestion, type Listing, type Msk } from '@mosaikit/plugin-api'
 import { choiceDialog, closeDialog, dialogOpen, nameList, pickFolder, promptDialog } from './dialogs.ts'
 import { fileIcon, h, saveBlob, spinner, svg, type IconName } from './dom.ts'
-import { locale, t } from './i18n.ts'
+import { getLang, locale, t } from './i18n.ts'
 import { closeViewer, loadPreview, openViewer, viewerOpen, type Preview } from './preview.ts'
 import {
   THUMB_MAX,
@@ -740,7 +740,7 @@ export class FileManager {
     const box = h(
       'div',
       { class: 'fm-up fm-note', role: 'status' },
-      h('div', { class: 'r' }, h('span', { class: 'lbl' }, t('“{name}” looks like a {label}', { name, label: s.label })), open, dismiss),
+      h('div', { class: 'r' }, h('span', { class: 'lbl' }, t('“{name}” looks like a {label}', { name, label: s.labels?.[getLang()] ?? s.label })), open, dismiss),
     )
     open.onclick = () => {
       this.msk.open(s.plugin, s.at).then(
