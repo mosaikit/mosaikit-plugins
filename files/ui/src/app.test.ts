@@ -14,6 +14,9 @@ function fake(entries: FileEntry[], level: Level = 'write') {
       calls.push({ op, args })
       if (op === 'files.list') return { parent: args.parent, path: [], entries, my_level: level }
       if (op === 'files.upload') return entry('new-' + args.name, args.name)
+      if (op === 'files.upload.begin') return { id: 'u1', received: 0, size: args.size }
+      if (op === 'files.upload.chunk') return { id: 'u1', received: Math.min(bigSize, args.offset + (8 << 20)), size: bigSize }
+      if (op === 'files.upload.finish') return entry('big-done', 'big.bin')
       if (op === 'files.mkdir') return entry('dir-' + args.name, args.name, { is_dir: true })
       if (op === 'files.profiles') return { suggestions }
       if (op === 'files.unzip') return { folder: args.folder ? entry('made', args.folder, { is_dir: true }) : null, files: 2, folders: 1, skipped: 0, suggestions }
@@ -27,6 +30,7 @@ function fake(entries: FileEntry[], level: Level = 'write') {
 }
 
 let suggestions: unknown[] = []
+let bigSize = 0
 const tick = () => new Promise((r) => setTimeout(r, 0))
 let fm: FileManager | null = null
 
@@ -179,5 +183,31 @@ describe('FileManager', () => {
     expect(calls.find((c) => c.op === 'files.profiles')!.args.id).toBe('1')
     expect(calls.find((c) => c.op === 'toast')!.args.text).toBe('No app recognises “city”')
     expect(document.querySelector('.fm-note')).toBeNull()
+  })
+
+  it('sends a big file in pieces, and keeps a zip too big to unpack as a file', async () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const { msk, calls } = fake([])
+    fm = new FileManager(el, msk)
+    await tick()
+    const sized = (name: string, size: number) => {
+      bigSize = size
+      return Object.defineProperty(new File(['x'], name), 'size', { value: size })
+    }
+    await fm.upload([sized('big.bin', 300 << 20)], null)
+    expect(calls.filter((c) => c.op === 'files.upload')).toHaveLength(0)
+    expect(calls.map((c) => c.op).filter((o) => o.startsWith('files.upload.')).slice(0, 2)).toEqual(['files.upload.begin', 'files.upload.chunk'])
+    expect(calls.some((c) => c.op === 'files.upload.finish')).toBe(true)
+
+    // a zip over the limit: «Unpack here» is chosen but nothing is unpacked, the zip goes up as a file
+    calls.length = 0
+    const done = fm.upload([sized('city.zip', 500 << 20)], null)
+    await tick()
+    ;[...document.querySelectorAll<HTMLButtonElement>('.fm-dlg button')].find((b) => b.textContent === 'Unpack here')!.click()
+    await done
+    expect(calls.some((c) => c.op === 'files.unzip')).toBe(false)
+    expect(calls.some((c) => c.op === 'files.upload.begin' && c.args.name === 'city.zip')).toBe(true)
+    expect(calls.find((c) => c.op === 'toast')!.args.text).toContain('too big to unpack')
   })
 })

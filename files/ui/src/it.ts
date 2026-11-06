@@ -192,4 +192,5 @@ export const IT: Record<string, string> = {
   '“{name}” uploaded with {n} files': '“{name}” caricata con {n} file',
   '{k} folders uploaded with {n} files': '{k} cartelle caricate con {n} file',
   'No app recognises “{name}”': 'Nessuna app riconosce “{name}”',
+  '“{name}” is too big to unpack here: it is kept as a file (upload the folder instead)': '“{name}” è troppo grande per essere estratto qui: resta un file (carica la cartella)',
 }

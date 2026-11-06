@@ -28,6 +28,10 @@ const DRAG_TYPE = 'application/x-mosaikit-files'
 
 type View = 'list' | 'grid'
 
+/** From this size a file goes up in pieces (one request is limited), and a zip is not unpacked (it is read in memory). */
+const BIG_FILE = 100 << 20
+const UNPACK_MAX = 400 << 20
+
 /** A file of a folder that is being uploaded, with the folders on its way from the top one (`file` absent: an empty folder). */
 interface TreeItem {
   dir: string[]
@@ -689,8 +693,11 @@ export class FileManager {
       })
       if (!mode) return
       if (mode !== 'keep') {
-        list = files.filter((f) => !/\.zip$/i.test(f.name))
-        await this.unpack(zips, dest, mode === 'folder', new Set(byName.keys()), destName)
+        // a zip too big to unpack stays a file; its folder can be uploaded as a folder instead
+        const big = zips.filter((z) => z.size > UNPACK_MAX)
+        if (big.length) this.msk.toast(t('“{name}” is too big to unpack here: it is kept as a file (upload the folder instead)', { name: big[0].name }), true)
+        list = files.filter((f) => !/\.zip$/i.test(f.name) || big.includes(f))
+        await this.unpack(zips.filter((z) => !big.includes(z)), dest, mode === 'folder', new Set(byName.keys()), destName)
       }
     }
     if (!list.length) return
@@ -744,7 +751,18 @@ export class FileManager {
       i++
       label.textContent = (jobs.length > 1 ? `${i}/${jobs.length} · ` : '') + j.name
       try {
-        const e = await this.msk.files.upload(j.file, j.name, dest, j.replace)
+        const e =
+          j.file.size > BIG_FILE
+            ? await this.msk.files.uploadLarge(j.file, j.name, {
+                parent: dest,
+                replace: j.replace,
+                onProgress: (sent) => {
+                  const p = Math.min(100, Math.round(((done + sent) / total) * 100))
+                  fill.style.width = p + '%'
+                  pct.textContent = p + '%'
+                },
+              })
+            : await this.msk.files.upload(j.file, j.name, dest, j.replace)
         uploaded.push(e.id)
       } finally {
         done += j.file.size
@@ -819,7 +837,8 @@ export class FileManager {
         const dirId = await folder(it.dir)
         if (!it.file) continue
         label.textContent = it.file.name
-        await this.msk.files.upload(it.file, it.file.name, dirId, false)
+        if (it.file.size > BIG_FILE) await this.msk.files.uploadLarge(it.file, it.file.name, { parent: dirId })
+        else await this.msk.files.upload(it.file, it.file.name, dirId, false)
         count++
         done += it.file.size
         const p = Math.min(100, Math.round((done / total) * 100))
