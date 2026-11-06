@@ -2084,5 +2084,8 @@
   "Resumed": "Reanudada",
   "Calls what other plugins contribute": "Llama a lo que otros plugins aportan",
   "Shows pages of other plugins": "Muestra páginas de otros plugins",
-  "yes (sensitive: {list}, in frames of its pages)": "sí (sensible: {list}, en marcos de sus páginas)"
+  "yes (sensitive: {list}, in frames of its pages)": "sí (sensible: {list}, en marcos de sus páginas)",
+  "Background runs may also reach": "Las ejecuciones en segundo plano también pueden llegar a",
+  "yes (sensitive: a run it starts may call the run commands of these plugins as the person who started it, if that person uses them)": "sí (sensible: una ejecución que inicia puede llamar a los comandos para ejecuciones de estos plugins como la persona que la inició, si esa persona los usa)",
+  "Background runs reach other plugins": "Las ejecuciones en segundo plano llegan a otros plugins"
 }
