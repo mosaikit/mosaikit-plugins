@@ -187,4 +187,9 @@ export const IT: Record<string, string> = {
   'Open in {app}': 'Apri in {app}',
   'Dismiss': 'Chiudi',
   '“{name}” looks like a {label}': '“{name}” sembra un {label}',
+  'Use in another app…': 'Usa in un’altra app…',
+  'Upload folder': 'Carica cartella',
+  '“{name}” uploaded with {n} files': '“{name}” caricata con {n} file',
+  '{k} folders uploaded with {n} files': '{k} cartelle caricate con {n} file',
+  'No app recognises “{name}”': 'Nessuna app riconosce “{name}”',
 }
