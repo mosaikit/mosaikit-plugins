@@ -184,4 +184,7 @@ export const IT: Record<string, string> = {
   '“{name}” unpacked into “{dest}”': '“{name}” estratto in “{dest}”',
   '{n} archives unpacked': '{n} archivi estratti',
   '{n} archives unpacked into “{dest}”': '{n} archivi estratti in “{dest}”',
+  'Open in {app}': 'Apri in {app}',
+  'Dismiss': 'Chiudi',
+  '“{name}” looks like a {label}': '“{name}” sembra un {label}',
 }

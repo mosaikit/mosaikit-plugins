@@ -1,5 +1,5 @@
 // File manager: navigation by id, multiple selection, actions according to the level of permission.
-import { emptyState, pageHead, type FileEntry, type Listing, type Msk } from '@mosaikit/plugin-api'
+import { emptyState, pageHead, type FileEntry, type FolderSuggestion, type Listing, type Msk } from '@mosaikit/plugin-api'
 import { choiceDialog, closeDialog, dialogOpen, nameList, pickFolder, promptDialog } from './dialogs.ts'
 import { fileIcon, h, saveBlob, spinner, svg, type IconName } from './dom.ts'
 import { locale, t } from './i18n.ts'
@@ -708,6 +708,7 @@ export class FileManager {
     const box = h('div', { class: 'fm-up' }, h('div', { class: 'r' }, label, pct), h('div', { class: 'bar' }, fill))
     this.progress.append(box)
     const made: string[] = []
+    const found: { name: string; s: FolderSuggestion }[] = []
     const errs = await this.seq(zips, async (z) => {
       label.textContent = t('Unpacking “{name}”…', { name: z.name })
       pct.textContent = ''
@@ -717,6 +718,7 @@ export class FileManager {
       if (folder) taken.add(folder)
       const r = await this.msk.files.unzip(z, { parent: dest, folder, conflict: 'fail' })
       if (r.folder) made.push(r.folder.id)
+      for (const s of r.suggestions) found.push({ name: r.folder?.name ?? destName, s })
     })
     setTimeout(() => box.remove(), 600)
     const here = dest === this.parent
@@ -728,6 +730,26 @@ export class FileManager {
     )
     if (here && made.length) this.sel = new Set(made)
     await this.refresh()
+    for (const f of found) this.suggest(f.name, f.s)
+  }
+
+  /** A notice that a folder just unpacked looks like something a plugin knows, with the way to take it there. */
+  private suggest(name: string, s: FolderSuggestion) {
+    const open = h('button', { type: 'button', class: 'msk-btn' }, t('Open in {app}', { app: s.plugin_label }))
+    const dismiss = h('button', { type: 'button', class: 'msk-btn ghost' }, t('Dismiss'))
+    const box = h(
+      'div',
+      { class: 'fm-up fm-note', role: 'status' },
+      h('div', { class: 'r' }, h('span', { class: 'lbl' }, t('“{name}” looks like a {label}', { name, label: s.label })), open, dismiss),
+    )
+    open.onclick = () => {
+      this.msk.open(s.plugin, s.at).then(
+        () => box.remove(),
+        (e) => this.msk.toast(errMsg(e), true),
+      )
+    }
+    dismiss.onclick = () => box.remove()
+    this.progress.append(box)
   }
 
   // ------------------------------------------------------------ selection

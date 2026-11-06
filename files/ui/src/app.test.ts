@@ -14,6 +14,7 @@ function fake(entries: FileEntry[], level: Level = 'write') {
       calls.push({ op, args })
       if (op === 'files.list') return { parent: args.parent, path: [], entries, my_level: level }
       if (op === 'files.upload') return entry('new-' + args.name, args.name)
+      if (op === 'files.unzip') return { folder: args.folder ? entry('made', args.folder, { is_dir: true }) : null, files: 2, folders: 1, skipped: 0, suggestions }
       if (op === 'confirm') return true
       return {}
     },
@@ -23,10 +24,12 @@ function fake(entries: FileEntry[], level: Level = 'write') {
   return { msk, calls }
 }
 
+let suggestions: unknown[] = []
 const tick = () => new Promise((r) => setTimeout(r, 0))
 let fm: FileManager | null = null
 
 afterEach(() => {
+  suggestions = []
   fm?.dispose()
   fm = null
   document.body.replaceChildren()
@@ -108,5 +111,29 @@ describe('FileManager', () => {
       ['photo (1).png', false],
       ['other.txt', false],
     ])
+  })
+
+  it('unpacks a zip into a new folder and offers the plugin that knows what it is', async () => {
+    suggestions = [{ plugin: 'com.test.geo', plugin_label: 'Geo data', profile: 'tiles3d', label: '3D Tiles dataset', folder: 'made', marker: 'tileset.json', at: 'profile/tiles3d/made?source=com.mosaikit.files' }]
+    const el = document.createElement('div')
+    document.body.append(el)
+    const { msk, calls } = fake([entry('1', 'city', { is_dir: true })])
+    fm = new FileManager(el, msk)
+    await tick()
+    const done = fm.upload([new File(['z'], 'city.zip'), new File(['t'], 'note.txt')], null)
+    await tick()
+    expect(document.querySelector('.fm-dlg')!.textContent).toContain('“city.zip” is a zip archive')
+    ;[...document.querySelectorAll<HTMLButtonElement>('.fm-dlg button')].find((b) => b.textContent === 'Unpack into a new folder')!.click()
+    await done
+    const unzip = calls.find((c) => c.op === 'files.unzip')!
+    // the name "city" is taken: the new folder gets another one; the zip itself is not uploaded as a file
+    expect(unzip.args).toMatchObject({ folder: 'city (1)', conflict: 'fail' })
+    expect(calls.filter((c) => c.op === 'files.upload').map((c) => c.args.name)).toEqual(['note.txt'])
+    const note = document.querySelector('.fm-note')!
+    expect(note.textContent).toContain('“city (1)” looks like a 3D Tiles dataset')
+    ;[...note.querySelectorAll('button')].find((b) => b.textContent === 'Open in Geo data')!.click()
+    await tick()
+    expect(calls.find((c) => c.op === 'nav.open')!.args).toEqual({ plugin: 'com.test.geo', at: 'profile/tiles3d/made?source=com.mosaikit.files' })
+    expect(document.querySelector('.fm-note')).toBeNull()
   })
 })
