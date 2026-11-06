@@ -2084,7 +2084,8 @@
   "Resumed": "Reanudada",
   "Calls what other plugins contribute": "Llama a lo que otros plugins aportan",
   "Shows pages of other plugins": "Muestra páginas de otros plugins",
-  "yes (sensitive: {list}, in frames of its pages)": "sí (sensible: {list}, en marcos de sus páginas)","Writes in the Files area for you": "Escribe en el área de Archivos en tu nombre",
+  "yes (sensitive: {list}, in frames of its pages)": "sí (sensible: {list}, en marcos de sus páginas)","“{name}” looks like a {label}": "“{name}” parece un {label}",
+  "Open it in {app} to publish it.": "Ábrelo en {app} para publicarlo.","Writes in the Files area for you": "Escribe en el área de Archivos en tu nombre",
   "Writes in the Files area of the person who uses it": "Escribe en el área de Archivos de quien lo usa",
   "yes (sensitive: its pages create folders and files in the Files area with the permissions of the caller)": "sí (sensible: sus páginas crean carpetas y archivos en el área de Archivos con los permisos de quien las usa)"
 }
