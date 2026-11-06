@@ -169,7 +169,8 @@ export class FileManager {
   private readonly side: HTMLElement
   private readonly status: HTMLElement
   private readonly picker: HTMLInputElement
-  private readonly dirPicker: HTMLInputElement
+  /** the input of the folder picker, made when it is asked for (a second input of type file would be in the way of the pages and tests that look for the one of the files) */
+  private dirPicker: HTMLInputElement | null = null
   private readonly progress: HTMLElement
 
   constructor(
@@ -205,13 +206,6 @@ export class FileManager {
       this.picker.value = ''
       void this.upload(files, this.parent, this.entries)
     })
-    // a folder chosen in the picker: its files carry the path from the folder (`webkitRelativePath`)
-    this.dirPicker = h('input', { type: 'file', multiple: true, hidden: true, webkitdirectory: '' })
-    this.dirPicker.addEventListener('change', () => {
-      const files = [...(this.dirPicker.files ?? [])]
-      this.dirPicker.value = ''
-      void this.uploadTree(treeOfFiles(files), this.parent)
-    })
     this.root = h(
       'div',
       { class: 'fm', tabindex: -1 },
@@ -224,7 +218,6 @@ export class FileManager {
       }),
       h('div', { class: 'fm-content' }, this.crumbs, this.bar, h('div', { class: 'fm-body' }, this.main, this.side), this.status),
       this.picker,
-      this.dirPicker,
     )
     el.replaceChildren(this.root)
     document.body.append(this.progress)
@@ -246,6 +239,7 @@ export class FileManager {
     this.setDetail(null)
     this.clearThumbs()
     this.progress.remove()
+    this.dirPicker?.remove()
     this.el.replaceChildren()
   }
 
@@ -420,7 +414,7 @@ export class FileManager {
         this.picker.click()
         break
       case 'uploaddir':
-        this.dirPicker.click()
+        this.pickDirectory()
         break
       case 'profiles':
         if (one?.is_dir) void this.useElsewhere(one.id, one.name)
@@ -845,6 +839,21 @@ export class FileManager {
     if (dest === this.parent) this.sel = new Set(tops.map((x) => x.id))
     await this.refresh()
     for (const top of tops) await this.offer(top.id, top.name, false)
+  }
+
+  /** Asks the browser for a folder: its files carry the path from the folder (`webkitRelativePath`). */
+  private pickDirectory() {
+    this.dirPicker?.remove()
+    const input = h('input', { type: 'file', multiple: true, hidden: true, webkitdirectory: '' })
+    this.dirPicker = input
+    input.addEventListener('change', () => {
+      const files = [...(input.files ?? [])]
+      input.remove()
+      if (this.dirPicker === input) this.dirPicker = null
+      void this.uploadTree(treeOfFiles(files), this.parent)
+    })
+    document.body.append(input)
+    input.click()
   }
 
   /** The apps that recognise a folder (`[[folder_profiles]]`), as notices; `say`: also tell when none does. */

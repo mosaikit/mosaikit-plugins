@@ -149,6 +149,7 @@ describe('FileManager', () => {
     fm = new FileManager(el, msk)
     await tick()
     const file = (path: string) => Object.defineProperty(new File(['x'], path.split('/').pop()!), 'webkitRelativePath', { value: path })
+    ;(fm as unknown as { pickDirectory: () => void }).pickDirectory()
     const picker = document.querySelector<HTMLInputElement>('input[webkitdirectory]')!
     Object.defineProperty(picker, 'files', { value: [file('pics/a.txt'), file('pics/sub/b.txt')], configurable: true })
     picker.dispatchEvent(new Event('change'))
