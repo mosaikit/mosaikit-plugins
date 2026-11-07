@@ -133,6 +133,12 @@ function initialFolder(): string | null {
   }
 }
 
+/** Where another plugin asked to open Files (`msk.files.open`): `f=<folder id>`, and `&share=1` to open the sharing dialog of that folder. */
+export function parsePlace(at: string | undefined): { folder: string; share: boolean } | null {
+  const m = /^f=([0-9a-fA-F-]{36})(&share=1)?$/.exec(at ?? '')
+  return m ? { folder: m[1], share: !!m[2] } : null
+}
+
 export class FileManager {
   private parent: string | null = initialFolder()
   private listing: Listing | null = null
@@ -144,6 +150,8 @@ export class FileManager {
   private loading = false
   private loadError = ''
   private loadSeq = 0
+  /** the page was opened to share this folder: the dialog opens once the folder is listed and the person manages it */
+  private shareOnOpen = false
 
   private detail: { key: string; preview?: Preview; error?: string } | null = null
   private sideKey = ''
@@ -176,6 +184,11 @@ export class FileManager {
     private readonly el: HTMLElement,
     private readonly msk: Msk,
   ) {
+    const place = parsePlace(this.msk.at)
+    if (place) {
+      this.parent = place.folder
+      this.shareOnOpen = place.share
+    }
     this.search = h('input', { type: 'search', placeholder: t('Search in this folder'), 'aria-label': t('Search in this folder') })
     this.search.addEventListener('input', () => {
       this.filter = this.search.value
@@ -299,6 +312,10 @@ export class FileManager {
       this.listing = l
       this.entries = l.entries
       this.loadError = ''
+      if (this.shareOnOpen) {
+        this.shareOnOpen = false
+        if (parent && atLeast(l.my_level, 'manage')) setTimeout(() => void this.share(parent), 0)
+      }
       const ids = new Set(l.entries.map((e) => e.id))
       this.sel = keepSel ? new Set([...this.sel].filter((id) => ids.has(id))) : new Set()
       if (this.anchor && !ids.has(this.anchor)) this.anchor = null

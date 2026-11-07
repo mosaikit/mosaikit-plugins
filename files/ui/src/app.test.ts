@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from 'vitest'
 import { Msk, type Bridge, type FileEntry, type Level } from '@mosaikit/plugin-api'
-import { FileManager } from './app.ts'
+import { FileManager, parsePlace } from './app.ts'
 
 function entry(id: string, name: string, o: Partial<FileEntry> = {}): FileEntry {
   return { id, name, is_dir: false, size: 10, mime: '', created: '2026-01-01T00:00:00Z', modified: '2026-01-01T00:00:00Z', owner_id: 'me', owner_name: 'Me', my_level: 'manage', shared: false, parent_id: null, ...o }
@@ -178,5 +178,38 @@ describe('FileManager', () => {
     expect(calls.find((c) => c.op === 'files.profiles')!.args.id).toBe('1')
     expect(calls.find((c) => c.op === 'toast')!.args.text).toBe('No app recognises “city”')
     expect(document.querySelector('.fm-note')).toBeNull()
+  })
+})
+
+const FOLDER = '11111111-2222-3333-4444-555555555555'
+
+describe('opening Files from another plugin', () => {
+  it('reads the place: a folder, and optionally its sharing dialog', () => {
+    expect(parsePlace(`f=${FOLDER}`)).toEqual({ folder: FOLDER, share: false })
+    expect(parsePlace(`f=${FOLDER}&share=1`)).toEqual({ folder: FOLDER, share: true })
+    for (const bad of [undefined, '', 'f=nope', `f=${FOLDER}&share=0`, `x=${FOLDER}`, `f=${FOLDER}&share=1&y=2`]) expect(parsePlace(bad)).toBeNull()
+  })
+
+  it('opens the folder and the sharing dialog when the person manages it', async () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const { msk, calls } = fake([entry('1', 'a.txt')], 'manage')
+    ;(msk as { at?: string }).at = `f=${FOLDER}&share=1`
+    fm = new FileManager(el, msk)
+    await tick()
+    await tick()
+    expect(calls.find((c) => c.op === 'files.list')!.args.parent).toBe(FOLDER)
+    expect(calls.some((c) => c.op === 'share')).toBe(true)
+  })
+
+  it('does not open the sharing dialog for someone who cannot manage the folder', async () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const { msk, calls } = fake([entry('1', 'a.txt')], 'write')
+    ;(msk as { at?: string }).at = `f=${FOLDER}&share=1`
+    fm = new FileManager(el, msk)
+    await tick()
+    await tick()
+    expect(calls.some((c) => c.op === 'share')).toBe(false)
   })
 })
