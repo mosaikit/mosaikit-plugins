@@ -1,8 +1,8 @@
 // File manager: navigation by id, multiple selection, actions according to the level of permission.
-import { emptyState, pageHead, type FileEntry, type Listing, type Msk } from '@mosaikit/plugin-api'
+import { emptyState, pageHead, type FileEntry, type FolderSuggestion, type Listing, type Msk } from '@mosaikit/plugin-api'
 import { choiceDialog, closeDialog, dialogOpen, nameList, pickFolder, promptDialog } from './dialogs.ts'
 import { fileIcon, h, saveBlob, spinner, svg, type IconName } from './dom.ts'
-import { locale, t } from './i18n.ts'
+import { getLang, locale, t } from './i18n.ts'
 import { closeViewer, loadPreview, openViewer, viewerOpen, type Preview } from './preview.ts'
 import {
   THUMB_MAX,
@@ -27,6 +27,57 @@ const PREF_KEY = 'msk_files_prefs'
 const DRAG_TYPE = 'application/x-mosaikit-files'
 
 type View = 'list' | 'grid'
+
+/** From this size a file goes up in pieces (one request is limited), and a zip is not unpacked (it is read in memory). */
+const BIG_FILE = 100 << 20
+const UNPACK_MAX = 400 << 20
+
+/** A file of a folder that is being uploaded, with the folders on its way from the top one (`file` absent: an empty folder). */
+interface TreeItem {
+  dir: string[]
+  file?: File
+}
+
+/** The files of a folder picked in the dialog of the browser, by their `webkitRelativePath`. */
+function treeOfFiles(files: File[]): TreeItem[] {
+  const out: TreeItem[] = []
+  for (const f of files) {
+    const rel = (f as File & { webkitRelativePath?: string }).webkitRelativePath || f.name
+    const segs = rel.split('/').filter(Boolean)
+    if (segs.length < 2) continue
+    out.push({ dir: segs.slice(0, -1), file: f })
+  }
+  return out
+}
+
+const entries = (d: FileSystemDirectoryEntry): Promise<FileSystemEntry[]> =>
+  new Promise((resolve, reject) => {
+    const reader = d.createReader()
+    const all: FileSystemEntry[] = []
+    // the reader gives a part at a time (a hundred or so) until it gives none
+    const next = () =>
+      reader.readEntries((part) => {
+        if (!part.length) resolve(all)
+        else {
+          all.push(...part)
+          next()
+        }
+      }, reject)
+    next()
+  })
+
+/** Walks a folder dropped from the desktop: every file with its path, every empty folder too. */
+async function walkEntry(e: FileSystemEntry, dir: string[], out: TreeItem[]): Promise<void> {
+  if (e.isFile) {
+    const f = await new Promise<File>((resolve, reject) => (e as FileSystemFileEntry).file(resolve, reject))
+    out.push({ dir, file: f })
+    return
+  }
+  const here = [...dir, e.name]
+  const kids = await entries(e as FileSystemDirectoryEntry)
+  if (!kids.length) out.push({ dir: here })
+  for (const k of kids) await walkEntry(k, here, out)
+}
 type ActId =
   | 'open'
   | 'tab'
@@ -39,6 +90,9 @@ type ActId =
   | 'delete'
   | 'mkdir'
   | 'upload'
+  | 'uploaddir'
+  | 'profiles'
+  | 'profilescwd'
   | 'selall'
   | 'refresh'
   | 'zipcwd'
@@ -119,6 +173,8 @@ export class FileManager {
   private readonly side: HTMLElement
   private readonly status: HTMLElement
   private readonly picker: HTMLInputElement
+  /** the input of the folder picker, made when it is asked for (a second input of type file would be in the way of the pages and tests that look for the one of the files) */
+  private dirPicker: HTMLInputElement | null = null
   private readonly progress: HTMLElement
 
   constructor(
@@ -187,6 +243,7 @@ export class FileManager {
     this.setDetail(null)
     this.clearThumbs()
     this.progress.remove()
+    this.dirPicker?.remove()
     this.el.replaceChildren()
   }
 
@@ -299,6 +356,7 @@ export class FileManager {
     if (allManage) out.push({ id: 'move', label: t('Move to…'), icon: 'move' })
     out.push({ id: 'copy', label: t('Copy to…'), icon: 'copy' })
     if (this.canCreate) out.push({ id: 'duplicate', label: t('Duplicate here'), icon: 'copy' })
+    if (one?.is_dir) out.push({ id: 'profiles', label: t('Use in another app…'), icon: 'open' })
     if (one && atLeast(one.my_level, 'manage')) out.push({ id: 'share', label: t('Share'), icon: 'share' })
     if (allManage) out.push({ id: 'delete', label: t('Delete'), icon: 'trash', danger: true, kbd: t('Del') })
     return out
@@ -308,12 +366,14 @@ export class FileManager {
     const out: Action[] = []
     if (this.canCreate) {
       out.push({ id: 'upload', label: t('Upload files'), icon: 'upload', primary: true })
+      out.push({ id: 'uploaddir', label: t('Upload folder'), icon: 'upload' })
       out.push({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' })
     }
     if (this.entries.length) out.push({ id: 'selall', label: t('Select all'), icon: 'check', kbd: 'Ctrl+A' })
     out.push({ id: 'refresh', label: t('Refresh'), icon: 'refresh' })
     if (this.parent !== null) {
       out.push({ id: 'zipcwd', label: t('Download folder (.zip)'), icon: 'zip' })
+      out.push({ id: 'profilescwd', label: t('Use in another app…'), icon: 'open' })
       if (atLeast(this.listing?.my_level, 'manage')) out.push({ id: 'sharecwd', label: t('Share folder'), icon: 'share' })
     }
     return out
@@ -356,6 +416,15 @@ export class FileManager {
         break
       case 'upload':
         this.picker.click()
+        break
+      case 'uploaddir':
+        this.pickDirectory()
+        break
+      case 'profiles':
+        if (one?.is_dir) void this.useElsewhere(one.id, one.name)
+        break
+      case 'profilescwd':
+        if (this.parent) void this.useElsewhere(this.parent, this.folderName())
         break
       case 'selall':
         this.sorted().forEach((e) => this.sel.add(e.id))
@@ -604,7 +673,35 @@ export class FileManager {
       }
     }
     const byName = new Map(existing.map((e) => [e.name, e]))
-    const clash = files.filter((f) => byName.has(f.name))
+    // zip archives: unpack them (into a folder of their own or here) or keep them as single files
+    let list = files
+    const zips = files.filter((f) => /\.zip$/i.test(f.name))
+    if (zips.length) {
+      const mode = await choiceDialog({
+        title: zips.length === 1 ? t('“{name}” is a zip archive', { name: zips[0].name }) : t('{n} zip archives', { n: zips.length }),
+        icon: 'zip',
+        body: [
+          t('Keep it as a single file, or unpack it keeping its folders?') +
+            ' ' +
+            t('A folder of files can be shared and used by address, for example by a map.'),
+        ],
+        choices: [
+          { id: 'keep', label: t('Keep as a file') },
+          { id: 'here', label: t('Unpack here') },
+          { id: 'folder', label: t('Unpack into a new folder'), cls: '' },
+        ],
+      })
+      if (!mode) return
+      if (mode !== 'keep') {
+        // a zip too big to unpack stays a file; its folder can be uploaded as a folder instead
+        const big = zips.filter((z) => z.size > UNPACK_MAX)
+        if (big.length) this.msk.toast(t('“{name}” is too big to unpack here: it is kept as a file (upload the folder instead)', { name: big[0].name }), true)
+        list = files.filter((f) => !/\.zip$/i.test(f.name) || big.includes(f))
+        await this.unpack(zips.filter((z) => !big.includes(z)), dest, mode === 'folder', new Set(byName.keys()), destName)
+      }
+    }
+    if (!list.length) return
+    const clash = list.filter((f) => byName.has(f.name))
     let choice: string | null = 'keep'
     if (clash.length) {
       choice = await choiceDialog({
@@ -626,7 +723,7 @@ export class FileManager {
     }
     const taken = new Set(byName.keys())
     const jobs: { name: string; file: File; replace: boolean }[] = []
-    for (const f of files) {
+    for (const f of list) {
       const old = byName.get(f.name)
       let name = f.name
       let replace = false
@@ -654,7 +751,18 @@ export class FileManager {
       i++
       label.textContent = (jobs.length > 1 ? `${i}/${jobs.length} · ` : '') + j.name
       try {
-        const e = await this.msk.files.upload(j.file, j.name, dest, j.replace)
+        const e =
+          j.file.size > BIG_FILE
+            ? await this.msk.files.uploadLarge(j.file, j.name, {
+                parent: dest,
+                replace: j.replace,
+                onProgress: (sent) => {
+                  const p = Math.min(100, Math.round(((done + sent) / total) * 100))
+                  fill.style.width = p + '%'
+                  pct.textContent = p + '%'
+                },
+              })
+            : await this.msk.files.upload(j.file, j.name, dest, j.replace)
         uploaded.push(e.id)
       } finally {
         done += j.file.size
@@ -673,6 +781,167 @@ export class FileManager {
     } else {
       await this.refresh()
     }
+  }
+
+  /**
+   * Uploads folders with what is in them into `dest`. Every top folder is a new one (a name already taken gets
+   * another, like a copy), so nothing is merged and no name clashes inside; empty folders are made too.
+   * Then the apps that recognise a folder are offered, like after unpacking a zip.
+   */
+  private async uploadTree(items: TreeItem[], dest: string | null) {
+    if (!items.length) return
+    let taken: Set<string>
+    let destName = dest === this.parent ? this.folderName() : ''
+    try {
+      const l = await this.msk.files.list(dest)
+      taken = new Set(l.entries.map((e) => e.name))
+      if (!destName) destName = l.path.length ? l.path[l.path.length - 1].name : t('My files')
+      if (!atLeast(l.my_level, 'write')) {
+        this.msk.toast(t('You do not have the permission to upload files to “{dest}”', { dest: destName }), true)
+        return
+      }
+    } catch (e) {
+      this.msk.toast(errMsg(e), true)
+      return
+    }
+    const label = h('span', { class: 'lbl' })
+    const pct = h('span', { class: 'pct' })
+    const fill = h('i')
+    const box = h('div', { class: 'fm-up' }, h('div', { class: 'r' }, label, pct), h('div', { class: 'bar' }, fill))
+    this.progress.append(box)
+    const total = items.reduce((n, i) => n + (i.file?.size ?? 0), 0) || 1
+    let done = 0
+    let count = 0
+    const ids = new Map<string, string>()
+    const tops: { name: string; id: string }[] = []
+    const errs: string[] = []
+    const folder = async (segs: string[]): Promise<string> => {
+      const key = segs.join('/')
+      const known = ids.get(key)
+      if (known) return known
+      let name = segs[segs.length - 1]
+      let parent = dest
+      if (segs.length === 1) {
+        if (taken.has(name)) name = freeName(name, taken, true)
+        taken.add(name)
+      } else {
+        parent = await folder(segs.slice(0, -1))
+      }
+      const e = await this.msk.files.mkdir(name, parent)
+      ids.set(key, e.id)
+      if (segs.length === 1) tops.push({ name, id: e.id })
+      return e.id
+    }
+    for (const it of items) {
+      try {
+        const dirId = await folder(it.dir)
+        if (!it.file) continue
+        label.textContent = it.file.name
+        if (it.file.size > BIG_FILE) await this.msk.files.uploadLarge(it.file, it.file.name, { parent: dirId })
+        else await this.msk.files.upload(it.file, it.file.name, dirId, false)
+        count++
+        done += it.file.size
+        const p = Math.min(100, Math.round((done / total) * 100))
+        fill.style.width = p + '%'
+        pct.textContent = p + '%'
+      } catch (e) {
+        errs.push(`${it.dir.join('/')}/${it.file?.name ?? ''}: ${errMsg(e)}`)
+      }
+    }
+    setTimeout(() => box.remove(), 600)
+    this.report(
+      errs,
+      tops.length === 1
+        ? t('“{name}” uploaded with {n} files', { name: tops[0].name, n: count })
+        : t('{k} folders uploaded with {n} files', { k: tops.length, n: count }),
+    )
+    if (dest === this.parent) this.sel = new Set(tops.map((x) => x.id))
+    await this.refresh()
+    for (const top of tops) await this.offer(top.id, top.name, false)
+  }
+
+  /** Asks the browser for a folder: its files carry the path from the folder (`webkitRelativePath`). */
+  private pickDirectory() {
+    this.dirPicker?.remove()
+    const input = h('input', { type: 'file', multiple: true, hidden: true, webkitdirectory: '' })
+    this.dirPicker = input
+    input.addEventListener('change', () => {
+      const files = [...(input.files ?? [])]
+      input.remove()
+      if (this.dirPicker === input) this.dirPicker = null
+      void this.uploadTree(treeOfFiles(files), this.parent)
+    })
+    document.body.append(input)
+    input.click()
+  }
+
+  /** The apps that recognise a folder (`[[folder_profiles]]`), as notices; `say`: also tell when none does. */
+  private async offer(id: string, name: string, say: boolean) {
+    let found: FolderSuggestion[] = []
+    try {
+      found = await this.msk.files.profiles(id)
+    } catch (e) {
+      if (say) this.msk.toast(errMsg(e), true)
+      return
+    }
+    for (const s of found) this.suggest(name, s)
+    if (say && !found.length) this.msk.toast(t('No app recognises “{name}”', { name }))
+  }
+
+  private async useElsewhere(id: string, name: string) {
+    await this.offer(id, name, true)
+  }
+
+  /** Unpacks zip archives into `dest`, each into a new folder named after it, or straight into `dest`. */
+  private async unpack(zips: File[], dest: string | null, intoFolder: boolean, taken: Set<string>, destName: string) {
+    const label = h('span', { class: 'lbl' })
+    const pct = h('span', { class: 'pct' })
+    const fill = h('i')
+    const box = h('div', { class: 'fm-up' }, h('div', { class: 'r' }, label, pct), h('div', { class: 'bar' }, fill))
+    this.progress.append(box)
+    const made: string[] = []
+    const found: { name: string; s: FolderSuggestion }[] = []
+    const errs = await this.seq(zips, async (z) => {
+      label.textContent = t('Unpacking “{name}”…', { name: z.name })
+      pct.textContent = ''
+      fill.style.width = '100%'
+      const stem = z.name.replace(/\.zip$/i, '')
+      const folder = intoFolder ? (taken.has(stem) ? freeName(stem, taken, true) : stem) : undefined
+      if (folder) taken.add(folder)
+      const r = await this.msk.files.unzip(z, { parent: dest, folder, conflict: 'fail' })
+      if (r.folder) made.push(r.folder.id)
+      for (const s of r.suggestions) found.push({ name: r.folder?.name ?? destName, s })
+    })
+    setTimeout(() => box.remove(), 600)
+    const here = dest === this.parent
+    this.report(
+      errs,
+      zips.length === 1
+        ? t(here ? '“{name}” unpacked' : '“{name}” unpacked into “{dest}”', { name: zips[0].name, dest: destName })
+        : t(here ? '{n} archives unpacked' : '{n} archives unpacked into “{dest}”', { n: zips.length, dest: destName }),
+    )
+    if (here && made.length) this.sel = new Set(made)
+    await this.refresh()
+    for (const f of found) this.suggest(f.name, f.s)
+  }
+
+  /** A notice that a folder just unpacked looks like something a plugin knows, with the way to take it there. */
+  private suggest(name: string, s: FolderSuggestion) {
+    const open = h('button', { type: 'button', class: 'msk-btn' }, t('Open in {app}', { app: s.plugin_label }))
+    const dismiss = h('button', { type: 'button', class: 'msk-btn ghost' }, t('Dismiss'))
+    const box = h(
+      'div',
+      { class: 'fm-up fm-note', role: 'status' },
+      h('div', { class: 'r' }, h('span', { class: 'lbl' }, t('“{name}” looks like a {label}', { name, label: s.labels?.[getLang()] ?? s.label })), open, dismiss),
+    )
+    open.onclick = () => {
+      this.msk.open(s.plugin, s.at).then(
+        () => box.remove(),
+        (e) => this.msk.toast(errMsg(e), true),
+      )
+    }
+    dismiss.onclick = () => box.remove()
+    this.progress.append(box)
   }
 
   // ------------------------------------------------------------ selection
@@ -754,8 +1023,9 @@ export class FileManager {
         ev.preventDefault()
         ev.stopPropagation()
         this.endOsDrag()
-        const files = this.droppedFiles(ev)
-        if (files.length) void this.upload(files, dest, dest === this.parent ? this.entries : undefined)
+        const dropped = this.collectDrop(ev)
+        if (dropped.files.length) void this.upload(dropped.files, dest, dest === this.parent ? this.entries : undefined)
+        if (dropped.dirs.length) void this.dropDirs(dropped.dirs, dest)
         return
       }
       if (!this.canDropOn(dest)) return
@@ -1260,26 +1530,38 @@ export class FileManager {
     this.main.classList.remove('dragover')
   }
 
-  /** Files only: folders dragged from the desktop are left out. */
-  private droppedFiles(ev: DragEvent): File[] {
+  /**
+   * What a drop holds, read while the event is still alive: the plain files, and the folders as entries to
+   * walk afterwards (the browser gives them only inside the event).
+   */
+  private collectDrop(ev: DragEvent): { files: File[]; dirs: FileSystemDirectoryEntry[] } {
     const dt = ev.dataTransfer
-    if (!dt) return []
-    const out: File[] = []
-    let skipped = 0
+    const out = { files: [] as File[], dirs: [] as FileSystemDirectoryEntry[] }
+    if (!dt) return out
     const items = [...dt.items]
     if (items.length && typeof items[0].webkitGetAsEntry === 'function') {
       for (const it of items) {
         if (it.kind !== 'file') continue
         const entry = it.webkitGetAsEntry()
         const f = it.getAsFile()
-        if (entry?.isDirectory || !f) skipped++
-        else out.push(f)
+        if (entry?.isDirectory) out.dirs.push(entry as FileSystemDirectoryEntry)
+        else if (f) out.files.push(f)
       }
     } else {
-      out.push(...dt.files)
+      out.files.push(...dt.files)
     }
-    if (skipped) this.msk.toast(skipped === 1 ? t('Folders cannot be uploaded: drag the files') : t('{n} folders ignored: only files can be uploaded', { n: skipped }), true)
     return out
+  }
+
+  private async dropDirs(dirs: FileSystemDirectoryEntry[], dest: string | null) {
+    const tree: TreeItem[] = []
+    try {
+      for (const d of dirs) await walkEntry(d, [], tree)
+    } catch (e) {
+      this.msk.toast(errMsg(e), true)
+      return
+    }
+    await this.uploadTree(tree, dest)
   }
 
   private bindMain() {
@@ -1321,8 +1603,9 @@ export class FileManager {
       ev.preventDefault()
       this.endOsDrag()
       if (!this.canCreate) return
-      const files = this.droppedFiles(ev)
-      if (files.length) void this.upload(files, this.parent, this.entries)
+      const dropped = this.collectDrop(ev)
+      if (dropped.files.length) void this.upload(dropped.files, this.parent, this.entries)
+      if (dropped.dirs.length) void this.dropDirs(dropped.dirs, this.parent)
     })
   }
 
