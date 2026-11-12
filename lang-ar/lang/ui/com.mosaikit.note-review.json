@@ -1,0 +1,16 @@
+{
+  "Review of «{name}»": "مراجعة «{name}»",
+  "Reviewed by {name}": "راجعها {name}",
+  "Not reviewed yet": "لم تُراجع بعد",
+  "Comment (optional)": "تعليق (اختياري)",
+  "Mark as reviewed": "تحديد كمُراجعة",
+  "Mark as not reviewed": "تحديد كغير مُراجعة",
+  "History of the reviews": "سجل المراجعات",
+  "No review yet.": "لا توجد مراجعات بعد.",
+  "reviewed": "مُراجعة",
+  "marked as not reviewed": "حُددت كغير مُراجعة",
+  "You can see the reviews; only who can edit the note reviews it.": "يمكنك عرض المراجعات؛ ولا يراجع الملاحظة إلا من يستطيع تعديلها.",
+  "This page opens as the \"Review\" tab of a note.": "تُفتح هذه الصفحة كتبويب «المراجعة» في الملاحظة.",
+  "Saved": "تم الحفظ",
+  "Note review works inside Notes: the \"Reviewed\" fields, the \"Mark as reviewed\" action and the \"Review\" tab in the detail of a note.": "تعمل مراجعة الملاحظات داخل الملاحظات: حقول «مُراجعة» وإجراء «تحديد كمُراجعة» وتبويب «المراجعة» في تفاصيل الملاحظة."
+}

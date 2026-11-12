@@ -1,6 +1,6 @@
 id = "com.mosaikit.lang-zh"
 name = "Chinese (中文)"
-version = "0.1.0"
+version = "0.1.1"
 kind = "language"
 icon = "languages"
 author = "Mosaikit"

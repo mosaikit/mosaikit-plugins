@@ -1,0 +1,16 @@
+{
+  "Review of «{name}»": "Проверка «{name}»",
+  "Reviewed by {name}": "Проверил: {name}",
+  "Not reviewed yet": "Ещё не проверено",
+  "Comment (optional)": "Комментарий (необязательно)",
+  "Mark as reviewed": "Отметить как проверенную",
+  "Mark as not reviewed": "Отметить как не проверенную",
+  "History of the reviews": "История проверок",
+  "No review yet.": "Проверок пока нет.",
+  "reviewed": "проверена",
+  "marked as not reviewed": "отмечена как не проверенная",
+  "You can see the reviews; only who can edit the note reviews it.": "Вы можете видеть проверки; проверять заметку может только тот, кто может её изменять.",
+  "This page opens as the \"Review\" tab of a note.": "Эта страница открывается как вкладка «Проверка» заметки.",
+  "Saved": "Сохранено",
+  "Note review works inside Notes: the \"Reviewed\" fields, the \"Mark as reviewed\" action and the \"Review\" tab in the detail of a note.": "Проверка заметок работает внутри «Заметок»: поля «Проверена», действие «Отметить как проверенную» и вкладка «Проверка» в сведениях о заметке."
+}

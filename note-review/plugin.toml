@@ -4,7 +4,7 @@
 # (mountCrud of @mosaikit/plugin-api does it by itself) and the host draws the tab, a page of this UI.
 id = "com.mosaikit.note-review"
 name = "Note review"
-version = "0.2.1"
+version = "0.3.0"
 description = "Marks notes as reviewed, with who did it and the history of the reviews"
 author = "Mosaikit"
 license = "Apache-2.0"
