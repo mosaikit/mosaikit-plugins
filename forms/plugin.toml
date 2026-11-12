@@ -1,0 +1,78 @@
+id = "com.mosaikit.forms"
+name = "Forms"
+version = "0.1.0"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "file-input"
+description = "Build a form, share a public link to collect answers from anyone with no account, and read the answers in a table or a CSV"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Build a form with up to 30 fields (a line of text, a long text, one choice, several choices, a number, a date or an email address), mark which ones are required and share it: with your colleagues, who answer inside the platform, or with a public link that anyone can open and fill in with no account.\n\nSet when the form closes and the most answers it takes. The answers go into a table with the counts per option, and you can export them to CSV or delete an answer, for example a spam one. A visitor never sees the answers of others, nor how many there are.\n\nThe public link needs the tenant policy «Public commands», which the Tenant Manager turns on. A form is an item of the platform: share it with people or groups (read to fill it in, write to see the answers and edit it) and everything you already know about sharing, search and the trash applies."
+screenshots = ["form.svg", "answers.svg"]
+homepage = "https://example.org/mosaikit/plugins/forms"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "📝"
+label = "Forms"
+
+[[resources]]
+name = "forms"
+label = "Forms"
+title_field = "title"
+fields = [
+  { key = "title", label = "Title", kind = "text", required = true },
+  { key = "intro", label = "Introduction", kind = "text", multiline = true },
+  # a JSON array of fields {id, label, kind, options, required, help}, edited by the UI and checked by the hook
+  { key = "fields", label = "Fields", kind = "text", hidden = true },
+  { key = "open", label = "Open (takes answers)", kind = "bool" },
+  { key = "closes_on", label = "Closes on", kind = "date" },
+  # a whole number from 1 to 5000 (1000 when empty), checked by the hook
+  { key = "max_answers", label = "Most answers", kind = "text" },
+  { key = "thanks", label = "Thank-you message", kind = "text", multiline = true },
+]
+
+# the answers: a reader writes the row of their own answer (command forms.submit); a visitor of a public link only adds a
+# row (command public_submit), under a random browser id kept by the public page
+[[tables]]
+name = "answers"
+insert_for = "visitor"
+owner_column = "user_id"
+
+[[public_commands]]
+name = "public_form"
+description = "Reads the title, the introduction, the fields and the thank-you message of the form, and whether it is open (never the answers, nor how many there are)"
+
+[[public_commands]]
+name = "public_submit"
+description = "Adds the answer of a visitor, once for each browser, while the form is open and has room"
+write = true
+
+[ui]
+entry = "index.html"
+public_view = "public.html"
+
+[permissions]
+hooks = ["forms"]
+
+[[kpi]]
+view = "kpi_forms_status"
+label = "Status of the forms"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Moduli"
+description = "Costruisci un modulo, condividi un link pubblico per raccogliere risposte da chiunque senza account e leggi le risposte in una tabella o in un CSV"
+details = "Costruisci un modulo con fino a 30 campi (una riga di testo, un testo lungo, una scelta, più scelte, un numero, una data o un indirizzo email), segna quali sono obbligatori e condividilo: con i colleghi, che rispondono dentro la piattaforma, o con un link pubblico che chiunque può aprire e compilare senza account.\n\nImposta quando il modulo si chiude e il numero massimo di risposte. Le risposte finiscono in una tabella con i conteggi per opzione, e puoi esportarle in CSV o eliminarne una, per esempio uno spam. Un visitatore non vede mai le risposte degli altri, né quante sono.\n\nIl link pubblico richiede la policy del tenant «Comandi pubblici», che attiva il Tenant Manager. Un modulo è un elemento della piattaforma: condividilo con persone o gruppi (lettura per compilarlo, scrittura per vedere le risposte e modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
+label = "Moduli"
+
+[i18n.it.resources.forms]
+label = "Moduli"
+fields = { title = "Titolo", intro = "Introduzione", fields = "Campi", open = "Aperto (accetta risposte)", closes_on = "Si chiude il", max_answers = "Numero massimo di risposte", thanks = "Messaggio di ringraziamento" }
+
+[i18n.it.kpi.kpi_forms_status]
+label = "Stato dei moduli"
+columns = { forms = "moduli", open_forms = "aperti", answers = "risposte" }
