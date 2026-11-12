@@ -1,10 +1,10 @@
 id = "com.mosaikit.contacts"
 name = "Contacts"
-version = "0.4.3"
+version = "0.5.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "book-user"
-description = "Shareable address book, with normalized and validated emails"
+description = "Shareable address book with cards, tags, birthdays, vCard and CSV, and normalized, validated emails"
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "A shared address book. Email addresses are normalized and validated when you save a contact, so the book stays clean.\n\nShare the whole book or a single contact with colleagues and groups."
@@ -28,6 +28,14 @@ fields = [
   { key = "email", label = "Email", kind = "text" },
   { key = "phone", label = "Phone", kind = "text" },
   { key = "company", label = "Company", kind = "choice", options = ["Internal", "Customer", "Partner", "Supplier"] },
+  { key = "org", label = "Organization", kind = "text" },
+  { key = "job_title", label = "Job title", kind = "text" },
+  { key = "email2", label = "Second email", kind = "text" },
+  { key = "phone2", label = "Second phone", kind = "text" },
+  { key = "address", label = "Address", kind = "text", multiline = true },
+  { key = "birthday", label = "Birthday", kind = "date" },
+  { key = "tags", label = "Tags", kind = "text", hidden = true },
+  { key = "notes", label = "Notes", kind = "text", multiline = true, hidden = true },
 ]
 
 [ui]
@@ -44,12 +52,12 @@ label = "Contacts by kind of company"
 [i18n.it]
 details = "Una rubrica condivisa. Gli indirizzi email vengono normalizzati e validati quando salvi un contatto, così la rubrica resta pulita.\n\nCondividi l’intera rubrica o un singolo contatto con colleghi e gruppi."
 name = "Contatti"
-description = "Rubrica condivisibile, con email normalizzate e validate"
+description = "Rubrica condivisibile con schede, etichette, compleanni, vCard e CSV, ed email normalizzate e validate"
 label = "Contatti"
 
 [i18n.it.resources.contacts]
 label = "Contatti"
-fields = { name = "Nome", email = "Email", phone = "Telefono", company = "Azienda" }
+fields = { name = "Nome", email = "Email", phone = "Telefono", company = "Azienda", org = "Organizzazione", job_title = "Ruolo", email2 = "Seconda email", phone2 = "Secondo telefono", address = "Indirizzo", birthday = "Compleanno", tags = "Etichette", notes = "Note" }
 options.company = { Internal = "Interna", Customer = "Cliente", Partner = "Partner", Supplier = "Fornitore" }
 
 [i18n.it.kpi.kpi_contacts_by_company]

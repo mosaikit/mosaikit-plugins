@@ -1,0 +1,13 @@
+name = "Contatos"
+description = "Agenda compartilhável, com e-mails normalizados e validados"
+label = "Contatos"
+details = "Uma agenda compartilhada. Os endereços de e-mail são normalizados e validados ao salvar um contato, assim a agenda se mantém limpa.\n\nCompartilhe a agenda inteira ou um único contato com colegas e grupos."
+
+[resources.contacts]
+label = "Contatos"
+fields = { name = "Nome", email = "E-mail", phone = "Telefone", company = "Empresa", org = "Organização", job_title = "Cargo", email2 = "Segundo e-mail", phone2 = "Segundo telefone", address = "Endereço", birthday = "Aniversário", tags = "Etiquetas", notes = "Notas" }
+options.company = { Internal = "Interna", Customer = "Cliente", Partner = "Parceiro", Supplier = "Fornecedor" }
+
+[kpi.kpi_contacts_by_company]
+label = "Contatos por tipo de empresa"
+columns = { company = "empresa", contacts = "contatos" }

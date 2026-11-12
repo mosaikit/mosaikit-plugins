@@ -1,0 +1,13 @@
+name = "Contacten"
+description = "Deelbaar adresboek, met genormaliseerde en gevalideerde e-mailadressen"
+label = "Contacten"
+details = "Een gedeeld adresboek. E-mailadressen worden bij het opslaan van een contact genormaliseerd en gevalideerd, zodat het adresboek netjes blijft.\n\nDeel het hele adresboek of één enkel contact met collega's en groepen."
+
+[resources.contacts]
+label = "Contacten"
+fields = { name = "Naam", email = "E-mail", phone = "Telefoon", company = "Bedrijf", org = "Organisatie", job_title = "Functie", email2 = "Tweede e-mailadres", phone2 = "Tweede telefoonnummer", address = "Adres", birthday = "Verjaardag", tags = "Labels", notes = "Notities" }
+options.company = { Internal = "Intern", Customer = "Klant", Partner = "Partner", Supplier = "Leverancier" }
+
+[kpi.kpi_contacts_by_company]
+label = "Contacten per type bedrijf"
+columns = { company = "bedrijf", contacts = "contacten" }

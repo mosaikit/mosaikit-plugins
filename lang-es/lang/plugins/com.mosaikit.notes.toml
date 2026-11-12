@@ -6,7 +6,7 @@ service_keys = { translate = { label = "Servicio de traducción", description = 
 
 [resources.notes]
 label = "Notas"
-fields = { title = "Título", body = "Texto", tag = "Etiqueta", tags = "Etiquetas", color = "Color", w = "Ancho", h = "Alto" }
+fields = { title = "Título", body = "Texto", tag = "Etiqueta", tags = "Etiquetas", color = "Color", w = "Ancho", h = "Alto", pinned = "Fijada", archived = "Archivada" }
 options.color = { yellow = "amarillo", orange = "naranja", pink = "rosa", violet = "violeta", blue = "azul", teal = "turquesa", green = "verde", grey = "gris" }
 
 [resources.note_tags]
@@ -19,6 +19,7 @@ all = "Todas las notas"
 mine = "Mis notas"
 shared = "Compartidas conmigo"
 tags = "Por etiqueta"
+archive = "Archivo"
 tag_personal = "Personal"
 tag_work = "Trabajo"
 tag_urgent = "Urgente"

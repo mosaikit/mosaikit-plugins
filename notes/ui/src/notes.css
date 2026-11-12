@@ -57,3 +57,35 @@ button.pi-tag[aria-pressed='true'] { border-style: solid; font-weight: 700; box-
 .pi-used { font-size: 12px; color: var(--dim); min-width: 4.5rem; }
 .pi-none { color: var(--dim); font-size: 13px; }
 .pi-tagfilter { max-width: 12rem; }
+
+/* Notes 2.0: Markdown text, progress of a check list, pin, actions of the reader */
+.nbody.msk-md, .pi .pi-body.msk-md { white-space: normal; }
+.nbody.msk-md p, .pi-body.msk-md p { margin: 0 0 4px; }
+.pi-body.msk-md h1, .pi-body.msk-md h2, .pi-body.msk-md h3 { margin: 0 0 4px; font-size: 14px; }
+.pi-body.msk-md ul, .pi-body.msk-md ol { margin: 0 0 4px; }
+.pi-body.msk-md code, .pi-body.msk-md pre { color: inherit; background: rgba(0, 0, 0, 0.08); border-color: rgba(0, 0, 0, 0.15); }
+.pi-body.msk-md a { color: inherit; }
+.pi-body.msk-md blockquote { color: inherit; border-left-color: currentColor; }
+.pi-body.msk-md li.check.done span { color: inherit; opacity: 0.6; }
+.pi-body.msk-md li.check input { accent-color: currentColor; pointer-events: none; }
+.nbody.msk-md { display: block; -webkit-line-clamp: unset; max-height: 7.2em; overflow: hidden; }
+.npg { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.npg .msk-progress.bar { flex: 1; height: 5px; }
+.pi .npg .msk-progress.bar { background: rgba(0, 0, 0, 0.15); }
+.pi .npg .msk-progress-fill { background: var(--pi-ink); }
+.ncount { font-family: var(--font-mono); font-size: 11px; opacity: 0.8; }
+.npg.big { margin: 0 0 10px; }
+.nacts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.nread.msk-md { white-space: normal; }
+.pi-pin { position: absolute; top: 6px; left: 6px; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; font-size: 13px; line-height: 22px; opacity: 0; filter: grayscale(1); transition: opacity 0.12s; }
+.pi:hover .pi-pin, .pi:focus-within .pi-pin, .pi-pin:focus-visible { opacity: 0.8; }
+.pi.pinned .pi-pin { opacity: 1; filter: none; }
+.pi-pin:focus-visible { outline: 2px solid var(--acc); }
+.pi.pinned .pi-title { padding-left: 18px; }
+.nbar { margin: 0 0 6px; }
+@media (hover: none) { .pi-pin { opacity: 0.7; } }
+
+/* Notes 2.0: who is editing the note with you */
+.ncollab { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; padding: 4px 8px; border-radius: var(--r-s); background: var(--acc-soft); font-size: 12px; }
+.ncollab[hidden] { display: none; }
+.ncollab .msk-avatar { width: 22px; height: 22px; font-size: 9px; }

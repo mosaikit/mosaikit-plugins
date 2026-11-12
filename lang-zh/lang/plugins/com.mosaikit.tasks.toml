@@ -1,0 +1,14 @@
+name = "任务"
+description = "带截止日期和优先级的任务，可通过共享来分配"
+label = "任务"
+details = "维护一份待办清单，每项都有截止日期和优先级。\n\n通过共享来分配任务：接收者会在自己的清单中看到它。完成后将其标记为已完成；已完成的任务会一直显示，直到你整理它们。\n\n任务是平台中的项目：有自己的共享级别，出现在搜索和回收站中。"
+
+[resources.tasks]
+label = "任务"
+fields = { title = "标题", due = "截止日期", priority = "优先级", done = "已完成", completed_on = "完成于", project = "项目", repeat = "重复", labels = "标签", notes = "描述" }
+options.priority = { low = "低", medium = "中", high = "高" }
+options.repeat = { none = "从不", daily = "每天", weekly = "每周", monthly = "每月" }
+
+[kpi.kpi_tasks_status]
+label = "任务状态"
+columns = { completed = "已完成", open = "未完成", overdue = "已逾期" }

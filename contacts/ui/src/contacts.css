@@ -1,12 +1,55 @@
-/* Contacts: the cards and the reading panel. Colours come from the tokens of the host. */
-.contact { display: flex; flex-direction: column; gap: 8px; }
+/* Contacts: cards, A–Z list, the reading panel, tags, dialogs. Colours come from the tokens of the host. */
+.contact { display: flex; flex-direction: column; gap: 10px; }
 .chead { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.cwho { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
-.cwho strong { font-size: 14px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chead .msk-avatar { width: 52px; height: 52px; font-size: 18px; }
+.cwho { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.cwho strong { font-size: 15px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.csub { margin: 0; font-size: 12px; color: var(--dim); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ctagrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ctag { padding: 0 8px; line-height: 18px; border-radius: var(--r-pill); background: var(--acc-soft); border: 1px solid var(--acc-line); color: var(--fg); font-size: 11px; font: inherit; font-size: 11px; }
+.cbday { font-size: 11px; color: var(--acc); font-weight: 600; }
+.clines { display: flex; flex-direction: column; gap: 2px; }
 .cline { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.contact-read { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 14px; }
-.contact-read h2 { margin: 4px 0 0; font-size: 20px; line-height: 1.2; overflow-wrap: anywhere; }
-.contact-read dl { margin: 10px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13px; width: 100%; }
+.cline a, .contact-read a:not(.msk-btn) { color: inherit; text-underline-offset: 3px; }
+.cline a:hover, .contact-read a:not(.msk-btn):hover { color: var(--acc); }
+
+/* the letters */
+.cgroups { display: flex; flex-direction: column; gap: 22px; }
+.cgroup h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.7px; color: var(--acc); }
+.msk-items.cards { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+/* the compact list */
+.crow { display: grid; grid-template-columns: auto minmax(120px, 1.2fr) minmax(80px, 1fr) minmax(120px, 1.2fr) minmax(90px, 0.8fr); align-items: center; gap: 12px; min-width: 0; }
+.crow .msk-avatar { width: 32px; height: 32px; font-size: 12px; }
+.crow > span, .crow > strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.crow-org, .crow-mail, .crow-tel { color: var(--dim); }
+@media (max-width: 640px) { .crow { grid-template-columns: auto 1fr; } .crow-org, .crow-mail, .crow-tel { display: none; } }
+
+/* the bar: tags and tools */
+.ctags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ctags[hidden] { display: none; }
+.ctag.pick { cursor: pointer; padding: 2px 10px; line-height: 18px; }
+.ctag.pick[aria-pressed='true'] { background: var(--acc); border-color: var(--acc); color: var(--on-acc, #221806); font-weight: 600; }
+.cgrow { flex: 1; }
+
+/* the reading panel */
+.contact-read { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+.cread-head { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.cread-head .msk-avatar { width: 64px; height: 64px; font-size: 22px; }
+.contact-read h2 { margin: 0; font-size: 20px; line-height: 1.2; overflow-wrap: anywhere; }
+.contact-read h3 { margin: 6px 0 0; font-size: 12px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.7px; }
+.cacts { display: flex; flex-wrap: wrap; gap: 8px; }
+.cacts .msk-btn { text-decoration: none; }
+.contact-read dl { margin: 4px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13px; width: 100%; }
 .contact-read dt { color: var(--dim); }
 .contact-read dd { margin: 0; overflow-wrap: anywhere; }
-.contact-read a { color: var(--acc); }
+.caddr { white-space: pre-line; }
+
+/* duplicates */
+.cdups { display: flex; flex-direction: column; gap: 14px; max-height: 60vh; overflow: auto; }
+.cdup-hint { margin: 0; color: var(--dim); font-size: 13px; }
+.cdup { list-style: none; margin: 0; padding: 8px; display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel2); }
+.cdup li { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cdup .msk-avatar { width: 28px; height: 28px; font-size: 11px; }
+.cdup-name { font-weight: 600; }
+.cdup-meta { flex: 1; min-width: 0; color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

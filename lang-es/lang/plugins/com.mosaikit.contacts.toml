@@ -5,7 +5,7 @@ details = "Una agenda compartida. Las direcciones de correo se normalizan y vali
 
 [resources.contacts]
 label = "Contactos"
-fields = { name = "Nombre", email = "Correo electrónico", phone = "Teléfono", company = "Empresa" }
+fields = { name = "Nombre", email = "Correo electrónico", phone = "Teléfono", company = "Empresa", org = "Organización", job_title = "Cargo", email2 = "Segundo correo", phone2 = "Segundo teléfono", address = "Dirección", birthday = "Cumpleaños", tags = "Etiquetas", notes = "Notas" }
 options.company = { Internal = "Interna", Customer = "Cliente", Partner = "Socio", Supplier = "Proveedor" }
 
 [kpi.kpi_contacts_by_company]

@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build",
     "watch": "vite build --watch --mode development",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run"
   },
   "dependencies": {
     "@mosaikit/plugin-api": "file:../../../mosaikit/ui/plugin-api"
