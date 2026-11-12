@@ -3,8 +3,57 @@
 version = 4
 
 [[package]]
+name = "announcements"
+version = "0.1.1"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
+name = "approvals"
+version = "0.1.1"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
+name = "bookmarks"
+version = "0.1.0"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
+name = "calendar"
+version = "0.1.1"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
+name = "chat"
+version = "0.1.0"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
 name = "contacts"
-version = "0.4.0"
+version = "0.5.0"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
+name = "dashboard"
+version = "0.1.0"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
+name = "forms"
+version = "0.1.1"
 dependencies = [
  "mosaikit-plugin-sdk",
 ]
@@ -38,7 +87,14 @@ dependencies = [
 
 [[package]]
 name = "notes"
-version = "0.4.0"
+version = "0.9.1"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
+name = "polls"
+version = "0.2.0"
 dependencies = [
  "mosaikit-plugin-sdk",
 ]
@@ -50,6 +106,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "projects"
+version = "0.1.1"
+dependencies = [
+ "mosaikit-plugin-sdk",
 ]
 
 [[package]]
@@ -105,6 +168,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "snippets"
+version = "0.1.0"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
+name = "surveys"
+version = "0.1.1"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
+
+[[package]]
 name = "syn"
 version = "3.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -117,7 +194,7 @@ dependencies = [
 
 [[package]]
 name = "tasks"
-version = "0.4.0"
+version = "0.6.0"
 dependencies = [
  "mosaikit-plugin-sdk",
 ]
@@ -127,6 +204,13 @@ name = "unicode-ident"
 version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2c754d6c33795a1c324727428e5a7dedb5b06195f9890bdbcba760d3e246563"
+
+[[package]]
+name = "whiteboard"
+version = "0.1.1"
+dependencies = [
+ "mosaikit-plugin-sdk",
+]
 
 [[package]]
 name = "zmij"
