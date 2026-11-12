@@ -1,0 +1,58 @@
+id = "com.mosaikit.snippets"
+name = "Snippets"
+version = "0.1.0"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "code"
+description = "A shared collection of reusable texts and pieces of code with tags, copied in one click"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Keep the texts and the code your team uses again and again: a title, the text or code itself, a kind (plain text, shell, SQL, JSON, JavaScript, Python, Rust, Markdown) and tags. Find a snippet by search, by kind or by tag and copy it to the clipboard with one click.\n\nA snippet is an item of the platform: share it with people or groups (read to use it, write to edit it) and everything you already know about sharing, search and the trash applies."
+screenshots = ["list.svg", "detail.svg"]
+homepage = "https://example.org/mosaikit/plugins/snippets"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "🧩"
+label = "Snippets"
+
+[[resources]]
+name = "snippets"
+label = "Snippets"
+title_field = "title"
+fields = [
+  { key = "title", label = "Title", kind = "text", required = true },
+  { key = "body", label = "Content", kind = "text", multiline = true, required = true },
+  { key = "kind", label = "Kind", kind = "choice", options = ["text", "shell", "sql", "json", "javascript", "python", "rust", "markdown", "other"] },
+  # a JSON array of strings, edited as chips by the UI
+  { key = "tags", label = "Tags", kind = "text", hidden = true },
+]
+
+[ui]
+entry = "index.html"
+
+[permissions]
+hooks = ["snippets"]
+
+[[kpi]]
+view = "kpi_snippets_by_kind"
+label = "Snippets by kind"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+details = "Tieni a portata di mano i testi e il codice che il tuo gruppo riutilizza di continuo: un titolo, il testo o il codice, un tipo (testo semplice, shell, SQL, JSON, JavaScript, Python, Rust, Markdown) e delle etichette. Trova uno snippet con la ricerca, per tipo o per etichetta e copialo negli appunti con un clic.\n\nUno snippet è un elemento della piattaforma: condividilo con persone o gruppi (lettura per usarlo, scrittura per modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
+name = "Snippet"
+description = "Una raccolta condivisa di testi e frammenti di codice riutilizzabili, con etichette, da copiare con un clic"
+label = "Snippet"
+
+[i18n.it.resources.snippets]
+label = "Snippet"
+fields = { title = "Titolo", body = "Contenuto", kind = "Tipo", tags = "Etichette" }
+options.kind = { text = "testo", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "altro" }
+
+[i18n.it.kpi.kpi_snippets_by_kind]
+label = "Snippet per tipo"
+columns = { kind = "tipo", snippets = "snippet" }
