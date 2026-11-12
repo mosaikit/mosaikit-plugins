@@ -1,0 +1,8 @@
+name = "Meet"
+description = "Salles de visioconférence : rejoignez avec caméra, microphone et partage d’écran, voyez qui est dans la salle"
+label = "Meet"
+details = "Ouvrez une salle et retrouvez vos collègues face à face : caméra, microphone, partage d’écran et un chat dans l’appel.\n\nUne salle est un élément de la plateforme : partagez-la avec les personnes ou les groupes qui peuvent y entrer (qui voit la salle peut y entrer). La salle s’ouvre dans la page et montre qui l’a ouverte ; l’appel se déroule dans le service Jitsi Meet, donc aucune vidéo ne passe par Mosaikit.\n\nLe navigateur vous demande la caméra et le microphone la première fois."
+
+[resources.rooms]
+label = "Salles"
+fields = { name = "Nom", topic = "Sujet" }
