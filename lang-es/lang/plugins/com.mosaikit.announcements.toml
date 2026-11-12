@@ -1,0 +1,13 @@
+name = "Avisos"
+description = "Un tablón de avisos: publica avisos con un nivel y un periodo, y mira quién confirmó haberlos leído"
+label = "Avisos"
+details = "Publica un aviso para las personas con las que se comparte: un título, un texto en Markdown, un nivel (información, importante o urgente) y el periodo en que vale. Los avisos urgentes y los fijados se quedan arriba.\n\nCuando un aviso pide confirmación, cada lector confirma con un clic y el autor ve quién lo hizo y cuándo.\n\nUn aviso es un elemento de la plataforma: compártelo con personas o grupos (lectura para seguirlo, escritura para editarlo) y vale todo lo que ya sabes sobre compartir, buscar y la papelera."
+
+[resources.notices]
+label = "Avisos"
+fields = { title = "Título", body = "Texto", level = "Nivel", starts_on = "Válido desde", ends_on = "Válido hasta", pinned = "Fijado", needs_ack = "Pedir confirmación" }
+options.level = { info = "información", important = "importante", urgent = "urgente" }
+
+[kpi.kpi_notices_status]
+label = "Estado de los avisos"
+columns = { published = "publicados", in_force = "vigentes", urgent = "urgentes vigentes", pinned = "fijados" }
