@@ -1,14 +1,52 @@
-/* Tasks: the items of the list and of the board. Colours come from the tokens of the host. */
-.task { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
-.tcheck { width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: var(--acc); cursor: pointer; }
+/* Tasks: quick add, grouped list, board and week, the reader. Colours come from the tokens of the host. */
+.task { display: flex; align-items: flex-start; gap: 12px; min-width: 0; position: relative; }
+.tcheck { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 1px 0 0; flex: none; cursor: pointer; border: 2px solid var(--dim); border-radius: 50%; background: transparent; display: inline-grid; place-items: center; transition: background var(--dur-1), border-color var(--dur-1), transform var(--dur-1) var(--ease); }
+.tcheck:hover:not(:disabled) { border-color: var(--acc); }
+.tcheck:checked { background: var(--ok); border-color: var(--ok); }
+.tcheck:checked::after { content: ''; width: 5px; height: 9px; border: solid var(--bg); border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); }
+.tcheck:active:not(:disabled) { transform: scale(0.9); }
+.tcheck:disabled { cursor: default; opacity: 0.6; }
+.task.p-high .tcheck:not(:checked) { border-color: var(--err); }
+.task.p-low .tcheck:not(:checked) { border-style: dashed; }
 .tbody { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 6px; }
 .ttitle { font-weight: 600; overflow-wrap: anywhere; }
 .task.done .ttitle { color: var(--dim); text-decoration: line-through; font-weight: 500; }
-.tmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; color: var(--dim); }
+.tmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 12px; color: var(--dim); }
 .tdue.late { color: var(--err); font-weight: 600; }
-.msk-items.list .task { align-items: center; }
-.msk-items.list .tbody { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.msk-items.list .tbody .ttitle { flex: 1 1 200px; }
-.msk-items.list.col .task { align-items: flex-start; }
-.msk-items.list.col .tbody { flex-direction: column; align-items: flex-start; gap: 6px; }
-.msk-items.list.col .tbody .ttitle { flex: none; }
+.tproj, .trep { white-space: nowrap; }
+.tlabel { padding: 0 8px; line-height: 18px; border-radius: var(--r-pill); background: var(--acc-soft); border: 1px solid var(--acc-line); color: var(--fg); font-size: 11px; }
+.tmeta .msk-progress.bar { width: 48px; min-width: 48px; }
+.tcount { font-family: var(--font-mono); font-size: 11px; }
+.twho { display: inline-flex; align-items: center; gap: 4px; }
+.twho .msk-avatar { width: 18px; height: 18px; font-size: 8px; }
+
+/* quick add */
+.tq { display: flex; align-items: center; gap: 8px; flex: 1; min-width: min(100%, 280px); max-width: 720px; padding: 4px 4px 4px 12px; border: 1px solid var(--line); border-radius: var(--r-l); background: var(--panel); transition: border-color var(--dur-1), box-shadow var(--dur-1); }
+.tq:focus-within { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-soft); }
+.tq-plus { color: var(--acc); font-weight: 700; }
+.tq .tq-input { flex: 1; min-width: 0; border: 0; background: none; box-shadow: none; padding: 8px 4px; }
+.tq .tq-input:focus { box-shadow: none; }
+
+/* grouped list */
+.tgroups { display: flex; flex-direction: column; gap: 22px; }
+.tgroup h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase; color: var(--dim); }
+.tgroup.g-overdue h2 { color: var(--err); }
+.tgroup.g-today h2 { color: var(--acc); }
+.tlist { display: flex; flex-direction: column; gap: 6px; }
+.tcard { transition: border-color var(--dur-1), box-shadow var(--dur-1); }
+.tcard:hover { box-shadow: var(--sh-1); }
+.tcard .tbody { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 14px; }
+.tcard .ttitle { flex: 1 1 220px; }
+.tcard .task { align-items: center; }
+
+/* the cards of the board and the week */
+.msk-kcard .task { align-items: flex-start; }
+.msk-kcard .tbody { flex-direction: column; }
+
+/* the reader of the detail panel */
+.tread-title { margin: 0 0 8px; font-size: 20px; line-height: 1.25; overflow-wrap: anywhere; }
+.tread .tmeta { margin-bottom: 14px; }
+.tprog { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.tprog .msk-progress.bar { flex: 1; }
+.tnone { color: var(--dim); font-style: italic; }
+@media (prefers-reduced-motion: reduce) { .tcheck { transition: none; } }

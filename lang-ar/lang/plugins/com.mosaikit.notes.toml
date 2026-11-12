@@ -1,0 +1,29 @@
+name = "الملاحظات"
+description = "ملاحظات شخصية، يمكن مشاركتها مع الزملاء والمجموعات"
+label = "الملاحظات"
+details = "اكتب ملاحظات كأوراق لاصقة ملونة بعنوان ونص ووسوم خاصة بك، وغيّر حجمها، واحتفظ بها خاصة أو شاركها مع الزملاء والمجموعات.\n\nلكل ملاحظة مستوى مشاركة خاص بها، ورابط عام عند الحاجة، ومكان في بحث المنصة.\n\nعندما يضبط المسؤول خدمة ترجمة (النظام › مفاتيح الخدمات الخارجية)، تُترجم الملاحظة إلى لغة أخرى بنقرة واحدة."
+service_keys = { translate = { label = "خدمة الترجمة", description = "مفتاح الخدمة التي تترجم الملاحظات إلى لغات أخرى" }, translate-endpoint = { label = "عنوان خدمة الترجمة", description = "عنوان الويب للخدمة التي تترجم الملاحظات (مثلًا https://translate.example.org)" } }
+
+[resources.notes]
+label = "الملاحظات"
+fields = { title = "العنوان", body = "النص", tag = "الوسم", tags = "الوسوم", color = "اللون", w = "العرض", h = "الارتفاع", pinned = "مثبتة", archived = "مؤرشفة" }
+options.color = { yellow = "أصفر", orange = "برتقالي", pink = "وردي", violet = "بنفسجي", blue = "أزرق", teal = "فيروزي", green = "أخضر", grey = "رمادي" }
+
+[resources.note_tags]
+label = "وسوم الملاحظات"
+fields = { name = "الاسم", color = "اللون" }
+options.color = { yellow = "أصفر", orange = "برتقالي", pink = "وردي", violet = "بنفسجي", blue = "أزرق", teal = "فيروزي", green = "أخضر", grey = "رمادي" }
+
+[nav]
+all = "كل الملاحظات"
+mine = "ملاحظاتي"
+shared = "شُورِكت معي"
+tags = "حسب الوسم"
+archive = "الأرشيف"
+tag_personal = "شخصي"
+tag_work = "عمل"
+tag_urgent = "عاجل"
+
+[kpi.kpi_notes_by_tag]
+label = "الملاحظات حسب الوسم"
+columns = { tag = "الوسم", notes = "الملاحظات" }

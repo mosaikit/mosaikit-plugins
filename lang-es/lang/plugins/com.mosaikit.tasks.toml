@@ -5,8 +5,9 @@ details = "Mantén una lista de cosas por hacer, cada una con fecha límite y pr
 
 [resources.tasks]
 label = "Tareas"
-fields = { title = "Título", due = "Fecha límite", priority = "Prioridad", done = "Hecha", completed_on = "Completada el" }
+fields = { title = "Título", due = "Fecha límite", priority = "Prioridad", done = "Hecha", completed_on = "Completada el", project = "Proyecto", repeat = "Repetir", labels = "Etiquetas", notes = "Descripción" }
 options.priority = { low = "baja", medium = "media", high = "alta" }
+options.repeat = { none = "nunca", daily = "cada día", weekly = "cada semana", monthly = "cada mes" }
 
 [kpi.kpi_tasks_status]
 label = "Estado de las tareas"

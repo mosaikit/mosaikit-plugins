@@ -1,0 +1,29 @@
+name = "Notes"
+description = "Notes personnelles, partageables avec des collègues et des groupes"
+label = "Notes"
+details = "Écrivez des notes comme des post-it de couleur avec titre, texte et étiquettes personnelles, changez leur taille, gardez-les privées ou partagez-les avec des collègues et des groupes.\n\nChaque note a son propre niveau de partage, un lien public quand il le faut et une place dans la recherche de la plateforme.\n\nLorsque l’administrateur a configuré un service de traduction (Système › Clés de services externes), une note se traduit dans une autre langue en un clic."
+service_keys = { translate = { label = "Service de traduction", description = "Clé du service qui traduit les notes dans d’autres langues" }, translate-endpoint = { label = "Adresse du service de traduction", description = "Adresse web du service qui traduit les notes (par exemple https://translate.example.org)" } }
+
+[resources.notes]
+label = "Notes"
+fields = { title = "Titre", body = "Texte", tag = "Étiquette", tags = "Étiquettes", color = "Couleur", w = "Largeur", h = "Hauteur", pinned = "Épinglée", archived = "Archivée" }
+options.color = { yellow = "jaune", orange = "orange", pink = "rose", violet = "violet", blue = "bleu", teal = "turquoise", green = "vert", grey = "gris" }
+
+[resources.note_tags]
+label = "Étiquettes des notes"
+fields = { name = "Nom", color = "Couleur" }
+options.color = { yellow = "jaune", orange = "orange", pink = "rose", violet = "violet", blue = "bleu", teal = "turquoise", green = "vert", grey = "gris" }
+
+[nav]
+all = "Toutes les notes"
+mine = "Mes notes"
+shared = "Partagées avec moi"
+tags = "Par étiquette"
+archive = "Archives"
+tag_personal = "Personnel"
+tag_work = "Travail"
+tag_urgent = "Urgent"
+
+[kpi.kpi_notes_by_tag]
+label = "Notes par étiquette"
+columns = { tag = "étiquette", notes = "notes" }

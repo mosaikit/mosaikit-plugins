@@ -1,0 +1,14 @@
+name = "Tarefas"
+description = "Tarefas com prazo e prioridade, que podem ser atribuídas por compartilhamento"
+label = "Tarefas"
+details = "Mantenha uma lista de coisas a fazer, cada uma com prazo e prioridade.\n\nAtribua uma tarefa compartilhando-a: quem a recebe a encontra na própria lista. Marque-a como concluída quando terminar; as tarefas concluídas continuam visíveis até você arrumá-las.\n\nAs tarefas são itens da plataforma: têm seu próprio nível de compartilhamento, um lugar na busca e na lixeira."
+
+[resources.tasks]
+label = "Tarefas"
+fields = { title = "Título", due = "Prazo", priority = "Prioridade", done = "Concluída", completed_on = "Concluída em", project = "Projeto", repeat = "Repetir", labels = "Etiquetas", notes = "Descrição" }
+options.priority = { low = "baixa", medium = "média", high = "alta" }
+options.repeat = { none = "nunca", daily = "todo dia", weekly = "toda semana", monthly = "todo mês" }
+
+[kpi.kpi_tasks_status]
+label = "Estado das tarefas"
+columns = { completed = "concluídas", open = "abertas", overdue = "atrasadas" }

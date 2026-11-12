@@ -1,0 +1,13 @@
+name = "Contacts"
+description = "Carnet d’adresses partageable, avec e-mails normalisés et validés"
+label = "Contacts"
+details = "Un carnet d’adresses partagé. Les adresses e-mail sont normalisées et validées à l’enregistrement d’un contact, ce qui garde le carnet propre.\n\nPartagez tout le carnet ou un seul contact avec des collègues et des groupes."
+
+[resources.contacts]
+label = "Contacts"
+fields = { name = "Nom", email = "E-mail", phone = "Téléphone", company = "Entreprise", org = "Organisation", job_title = "Fonction", email2 = "Deuxième e-mail", phone2 = "Deuxième téléphone", address = "Adresse", birthday = "Anniversaire", tags = "Étiquettes", notes = "Notes" }
+options.company = { Internal = "Interne", Customer = "Client", Partner = "Partenaire", Supplier = "Fournisseur" }
+
+[kpi.kpi_contacts_by_company]
+label = "Contacts par type d’entreprise"
+columns = { company = "entreprise", contacts = "contacts" }

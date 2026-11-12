@@ -2,11 +2,13 @@
 // the open note and edit it, and the management of the tags (English by default; Italian and Spanish follow the language of the host).
 import '@mosaikit/plugin-api/style.css'
 import './notes.css'
-import { connect, el, errText, mountCrud, type CrudClient, type CrudView, type EditorCtx, type ItemCtx, type Msk, type Row } from '@mosaikit/plugin-api'
+import { checkProgress, connect, el, errText, mountCrud, progress, renderMarkdown, toggleCheck, type CrudClient, type CrudView, type EditorCtx, type ItemCtx, type Msk, type Row } from '@mosaikit/plugin-api'
 import { COLORS, colorOfName, isColor, paletteCss, type Color } from './palette.ts'
 import { cleanName, hasTag, MAX_TAG, parseTags, removeTag, renameTag, sameTag, tagValues, withoutRepeats } from './tags.ts'
 import { clampSize, resizedBy, tiltOf } from './size.ts'
 import { translateTool } from './translate.ts'
+import { mdToolbar, saveText } from './mdbar.ts'
+import { editTogether } from './collab.ts'
 
 const PAGE = 100
 
@@ -24,6 +26,10 @@ const TEXTS = {
     nameOf: 'Name of the tag {n}', colourOf: 'Colour of the tag {n}', deleteTag: 'Delete', deleteTagOf: 'Delete the tag {n}', close: 'Close', noTags: 'No tags yet: add the first one above.',
     notesN: '{n} notes', noteN: '1 note', tagExists: 'A tag with this name exists already', tagDeleted: 'Tag deleted', tagSaved: 'Tag saved', tagAdded: 'Tag added',
     confirmDelete: 'Delete the tag “{n}”? It is removed from all the notes that have it.',
+    pin: 'Pin', unpin: 'Unpin', pinned: 'Pinned', archive: 'Archive', restore: 'Restore', archived: 'Archive', exportMd: 'Export as Markdown', archivedMsg: 'Note archived', restoredMsg: 'Note restored', exportedMsg: 'Note exported',
+    emptyArchive: 'Nothing in the archive', emptyArchiveText: 'Archived notes wait here; restore one to bring it back.', mdHelp: 'Markdown: **bold**, *italic*, - list, - [ ] check list',
+    bold: 'Bold', italic: 'Italic', heading: 'Heading', bullets: 'List', checks: 'Check list', quote: 'Quote', code: 'Code', link: 'Link', formatting: 'Formatting', progress: '{d} of {n} done',
+    editingWith: 'Editing together with {n}', tooLongTogether: 'This note is too long to edit together: only one person at a time should edit it.',
   },
   it: {
     title: 'Note', all: 'Tutte le note', newLabel: '＋ Nuova nota', postits: 'Post-it', list: 'Elenco', emptyTitle: 'Ancora nessuna nota', emptyText: 'Scrivi la prima nota: resta tua finché non la condividi.',
@@ -33,6 +39,10 @@ const TEXTS = {
     nameOf: 'Nome del tag {n}', colourOf: 'Colore del tag {n}', deleteTag: 'Elimina', deleteTagOf: 'Elimina il tag {n}', close: 'Chiudi', noTags: 'Ancora nessun tag: aggiungi il primo qui sopra.',
     notesN: '{n} note', noteN: '1 nota', tagExists: 'Esiste già un tag con questo nome', tagDeleted: 'Tag eliminato', tagSaved: 'Tag salvato', tagAdded: 'Tag aggiunto',
     confirmDelete: 'Eliminare il tag “{n}”? Viene tolto da tutte le note che lo hanno.',
+    pin: 'Fissa', unpin: 'Stacca', pinned: 'Fissata', archive: 'Archivia', restore: 'Ripristina', archived: 'Archivio', exportMd: 'Esporta in Markdown', archivedMsg: 'Nota archiviata', restoredMsg: 'Nota ripristinata', exportedMsg: 'Nota esportata',
+    emptyArchive: 'Niente nell’archivio', emptyArchiveText: 'Le note archiviate aspettano qui; ripristinane una per riaverla.', mdHelp: 'Markdown: **grassetto**, *corsivo*, - elenco, - [ ] lista di controllo',
+    bold: 'Grassetto', italic: 'Corsivo', heading: 'Titolo', bullets: 'Elenco', checks: 'Lista di controllo', quote: 'Citazione', code: 'Codice', link: 'Link', formatting: 'Formattazione', progress: '{d} di {n} fatti',
+    editingWith: 'Stai modificando insieme a {n}', tooLongTogether: 'Questa nota è troppo lunga per essere modificata insieme: dovrebbe modificarla una persona alla volta.',
   },
   es: {
     title: 'Notas', all: 'Todas las notas', newLabel: '＋ Nueva nota', postits: 'Post-its', list: 'Lista', emptyTitle: 'Todavía no hay notas', emptyText: 'Escribe la primera nota: es tuya hasta que la compartas.',
@@ -42,6 +52,10 @@ const TEXTS = {
     nameOf: 'Nombre de la etiqueta {n}', colourOf: 'Color de la etiqueta {n}', deleteTag: 'Eliminar', deleteTagOf: 'Eliminar la etiqueta {n}', close: 'Cerrar', noTags: 'Todavía no hay etiquetas: añade la primera arriba.',
     notesN: '{n} notas', noteN: '1 nota', tagExists: 'Ya existe una etiqueta con este nombre', tagDeleted: 'Etiqueta eliminada', tagSaved: 'Etiqueta guardada', tagAdded: 'Etiqueta añadida',
     confirmDelete: '¿Eliminar la etiqueta “{n}”? Se quita de todas las notas que la tienen.',
+    pin: 'Fijar', unpin: 'Soltar', pinned: 'Fijada', archive: 'Archivar', restore: 'Restaurar', archived: 'Archivo', exportMd: 'Exportar como Markdown', archivedMsg: 'Nota archivada', restoredMsg: 'Nota restaurada', exportedMsg: 'Nota exportada',
+    emptyArchive: 'Nada en el archivo', emptyArchiveText: 'Las notas archivadas esperan aquí; restaura una para recuperarla.', mdHelp: 'Markdown: **negrita**, *cursiva*, - lista, - [ ] lista de control',
+    bold: 'Negrita', italic: 'Cursiva', heading: 'Título', bullets: 'Lista', checks: 'Lista de control', quote: 'Cita', code: 'Código', link: 'Enlace', formatting: 'Formato', progress: '{d} de {n} hechos',
+    editingWith: 'Editando junto a {n}', tooLongTogether: 'Esta nota es demasiado larga para editarla en conjunto: solo una persona a la vez debería editarla.',
   },
 }
 // the three tags of the first versions keep their names in the language of the person until the person gives them a name
@@ -101,28 +115,47 @@ async function mount(msk: Msk) {
   // the page of the navigation of the shell it was opened at: all, mine, shared or a tag
   const at = msk.at ?? 'all'
   const navTag = at.startsWith('tag-') ? at.slice(4) : null
+  const isPinned = (row: Row) => !!row.values.pinned
+  const isArchived = (row: Row) => !!row.values.archived
   const where = (row: Row) => {
     const tags = parseTags(row.values.tags)
     if (tagFilter && !hasTag(tags, tagFilter)) return false
+    // archived notes are only in the Archive page; everywhere else they are out of the way
+    if (at === 'archive') return isArchived(row)
+    if (isArchived(row)) return false
     if (at === 'mine') return row.owner_id === msk.user?.id
     if (at === 'shared') return row.owner_id !== msk.user?.id
     return navTag ? hasTag(tags, navTag) : true
   }
   // the header reads «Notes › subsection»
-  const section = () => (at === 'mine' ? T().mine : at === 'shared' ? T().shared : navTag ? `${T().tag}: ${TAGS[navTag]?.[lang] ?? navTag}` : T().all)
+  const section = () => (at === 'archive' ? T().archived : at === 'mine' ? T().mine : at === 'shared' ? T().shared : navTag ? `${T().tag}: ${TAGS[navTag]?.[lang] ?? navTag}` : T().all)
   const who = (c: ItemCtx) => (c.row.owner_id !== msk.user?.id ? subst(T().sharedBy, c.row.owner_name) : '')
   const tagsRow = (tags: string[], c: ItemCtx) => el('div', { class: 'nfoot' }, ...tags.map(tagChip), ...(who(c) ? [el('span', { class: 'nwho' }, who(c))] : []))
   const colorOf = (c: ItemCtx): Color => (isColor(c.value('color')) ? (c.value('color') as Color) : 'yellow')
 
+  /** The text of a note drawn as Markdown (a plain line when there is none), with the progress of its check list under it. */
+  const bodyBox = (cls: string, body: string) => {
+    const box = el('div', { class: cls + (body ? ' msk-md' : ' none') })
+    if (!body) {
+      box.textContent = T().empty
+      return box
+    }
+    box.append(renderMarkdown(body))
+    const p = checkProgress(body)
+    if (p.total) box.append(el('div', { class: 'npg' }, progress({ value: p.done, max: p.total, label: subst2(T().progress, p.done, p.total) }), el('span', { class: 'ncount' }, `${p.done}/${p.total}`)))
+    return box
+  }
+  const subst2 = (s: string, d: number, n: number) => s.replace('{d}', String(d)).replace('{n}', String(n))
+
   // --- the list view: the note as a card in a column
   const card = (c: ItemCtx) => {
     const body = c.text('body').trim()
-    return el('div', { class: 'note' }, el('strong', { class: 'ntitle' }, c.text('title') || T().untitled), el('p', { class: 'nbody' + (body ? '' : ' none') }, body || T().empty), tagsRow(parseTags(c.value('tags')), c))
+    return el('div', { class: 'note' }, el('strong', { class: 'ntitle' }, (isPinned(c.row) ? '📌 ' : '') + (c.text('title') || T().untitled)), bodyBox('nbody', body), tagsRow(parseTags(c.value('tags')), c))
   }
   // --- the post-it: its content, then its box (colour, size, tilt, the grip and the colour menu)
   const postit = (c: ItemCtx) => {
     const body = c.text('body').trim()
-    return el('div', { class: 'pi-in' }, el('strong', { class: 'pi-title' }, c.text('title') || T().untitled), el('p', { class: 'pi-body' + (body ? '' : ' none') }, body || T().empty), tagsRow(parseTags(c.value('tags')), c))
+    return el('div', { class: 'pi-in' }, el('strong', { class: 'pi-title' }, c.text('title') || T().untitled), bodyBox('pi-body', body), tagsRow(parseTags(c.value('tags')), c))
   }
   const closeMenus = (except?: HTMLElement) => {
     for (const p of document.querySelectorAll<HTMLElement>('.pi-pop:not([hidden])')) {
@@ -135,6 +168,7 @@ async function mount(msk: Msk) {
   const postitBox = (c: ItemCtx, box: HTMLElement) => {
     const size = clampSize(c.value('w'), c.value('h'))
     box.classList.add('pi', `pc-${colorOf(c)}`)
+    if (isPinned(c.row)) box.classList.add('pinned')
     box.style.width = `${size.w}px`
     box.style.height = `${size.h}px`
     box.style.setProperty('--pi-tilt', `${tiltOf(c.row.id)}deg`)
@@ -208,17 +242,55 @@ async function mount(msk: Msk) {
       pal.setAttribute('aria-expanded', 'false')
       pal.focus()
     })
-    box.append(pal, pop, grip)
+    const pin = el('button', { type: 'button', class: 'pi-pin', 'aria-pressed': String(isPinned(c.row)), 'aria-label': isPinned(c.row) ? T().unpin : T().pin, title: isPinned(c.row) ? T().unpin : T().pin }, '📌')
+    pin.addEventListener('click', (e) => {
+      e.stopPropagation()
+      void c.update({ pinned: !isPinned(c.row) })
+    })
+    box.append(pal, pop, grip, pin)
   }
 
   const reader = (c: ItemCtx) => {
     const body = c.text('body').trim()
-    return el('article', { class: 'note-read' }, el('h2', {}, c.text('title') || T().untitled), tagsRow(parseTags(c.value('tags')), c), el('div', { class: 'nread' + (body ? '' : ' none') }, body || T().empty))
+    const text = el('div', { class: 'nread' + (body ? ' msk-md' : ' none') })
+    if (body) {
+      text.append(renderMarkdown(body, c.canWrite ? { onToggle: (line, checked) => void c.update({ body: toggleCheck(String(c.value('body') ?? ''), line, checked) }) } : {}))
+      const p = checkProgress(body)
+      if (p.total) text.prepend(el('div', { class: 'npg big' }, progress({ value: p.done, max: p.total, label: subst2(T().progress, p.done, p.total) }), el('span', { class: 'ncount' }, subst2(T().progress, p.done, p.total))))
+    } else text.textContent = T().empty
+    const acts = el('div', { class: 'nacts' })
+    const act = (label: string, fn: () => void) => {
+      const b = el('button', { type: 'button', class: 'msk-btn ghost mini' }, label)
+      b.addEventListener('click', fn)
+      acts.append(b)
+    }
+    if (c.canWrite) {
+      act((isPinned(c.row) ? '📌 ' + T().unpin : '📌 ' + T().pin), () => void c.update({ pinned: !isPinned(c.row) }))
+      act(isArchived(c.row) ? T().restore : T().archive, () => void c.update({ archived: !isArchived(c.row) }).then(() => msk.toast(isArchived(c.row) ? T().restoredMsg : T().archivedMsg)))
+    }
+    act(T().exportMd, () => {
+      saveText(`# ${c.text('title') || T().untitled}\n\n${String(c.value('body') ?? '')}\n`, `${(c.text('title') || 'note').replace(/[\\/:*?"<>|]+/g, '-').slice(0, 60)}.md`)
+      msk.toast(T().exportedMsg)
+    })
+    return el('article', { class: 'note-read' }, el('h2', {}, c.text('title') || T().untitled), tagsRow(parseTags(c.value('tags')), c), text, acts)
   }
 
   // --- the editor: the colour and the tags of the note, next to its fields
   const editor = (e: EditorCtx, box: HTMLElement) => {
     if (!e.canWrite) return
+    // a Markdown toolbar above the text field of the form (the form is in the page once the editor has drawn its box)
+    const t = T()
+    setTimeout(() => {
+      const ta = box.closest('.msk-form')?.querySelector<HTMLTextAreaElement>('[data-key="body"]')
+      if (!ta || ta.parentElement?.querySelector('.msk-rt-bar')) return
+      ta.before(mdToolbar(ta, { bold: t.bold, italic: t.italic, heading: t.heading, list: t.bullets, checks: t.checks, quote: t.quote, code: t.code, link: t.link, group: t.formatting }))
+      ta.setAttribute('placeholder', t.mdHelp)
+      // an open note is edited together with the people who have it open for editing too (the text is saved with the form, as before)
+      if (e.row?.id && !ta.dataset.together) {
+        ta.dataset.together = '1'
+        editTogether(msk, ta, e.row.id, { editingWith: t.editingWith, tooLong: t.tooLongTogether }, ta.parentElement?.querySelector<HTMLElement>('.msk-rt-bar') ?? ta)
+      }
+    }, 0)
     const color: Color = isColor(e.value('color')) ? (e.value('color') as Color) : 'yellow'
     let sel = parseTags(e.value('tags'))
     const swatches = COLORS.map((col) => {
@@ -382,9 +454,10 @@ async function mount(msk: Msk) {
   }
 
   // --- the page
+  const byPinned = (a: Row, b: Row) => Number(isPinned(b)) - Number(isPinned(a))
   const views = (): CrudView[] => [
-    { key: 'postits', label: T().postits, kind: 'flow', item: postit, box: postitBox },
-    { key: 'list', label: T().list, kind: 'list', item: card },
+    { key: 'postits', label: T().postits, kind: 'flow', item: postit, box: postitBox, sort: byPinned },
+    { key: 'list', label: T().list, kind: 'list', item: card, sort: byPinned },
   ]
   const open = () => {
     const filter = el('select', { class: 'pi-tagfilter', 'aria-label': T().filterTag })
@@ -405,7 +478,7 @@ async function mount(msk: Msk) {
       title: T().title,
       section: section(),
       newLabel: T().newLabel,
-      empty: { art: 'notes', title: T().emptyTitle, text: T().emptyText },
+      empty: at === 'archive' ? { art: 'notes', title: T().emptyArchive, text: T().emptyArchiveText, actions: [] } : { art: 'notes', title: T().emptyTitle, text: T().emptyText },
       columns: ['title'],
       where,
       views: views(),

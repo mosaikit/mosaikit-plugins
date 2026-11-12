@@ -1,10 +1,10 @@
 id = "com.mosaikit.tasks"
 name = "Tasks"
-version = "0.4.4"
+version = "0.6.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "square-check-big"
-description = "Tasks with due date and priority, assigned by sharing them"
+description = "Tasks with due date, priority, labels, projects, checklists and repetition, assigned by sharing them"
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Keep a list of things to do, each with a due date and a priority.\n\nAssign a task by sharing it: the person who receives it finds it in their own list. Mark it done when it is finished; done tasks stay visible until you tidy them up.\n\nTasks are items of the platform: they have their own sharing level, a place in the search and in the trash."
@@ -31,6 +31,10 @@ fields = [
   { key = "due", label = "Due", kind = "date" },
   { key = "priority", label = "Priority", kind = "choice", options = ["low", "medium", "high"] },
   { key = "done", label = "Done", kind = "bool" },
+  { key = "project", label = "Project", kind = "text" },
+  { key = "repeat", label = "Repeat", kind = "choice", options = ["none", "daily", "weekly", "monthly"] },
+  { key = "labels", label = "Labels", kind = "text", hidden = true },
+  { key = "notes", label = "Description", kind = "text", multiline = true, hidden = true },
   { key = "completed_on", label = "Completed on", kind = "date", hidden = true },
 ]
 
@@ -44,17 +48,30 @@ hooks = ["tasks"]
 view = "kpi_tasks_status"
 label = "Status of the tasks"
 
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "open-tasks"
+label = "Open tasks"
+data = { command = "tasks.widget_open", kind = "number", size = "s", texts = { en = { secondary = "overdue", empty = "Nothing to do" }, it = { label = "Attività aperte", secondary = "in ritardo", empty = "Niente da fare" }, es = { label = "Tareas abiertas", secondary = "vencidas", empty = "Nada que hacer" } } }
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "due-soon"
+label = "Due this week"
+data = { command = "tasks.widget_soon", kind = "list", size = "m", texts = { en = { empty = "Nothing due in the next 7 days" }, it = { label = "In scadenza questa settimana", empty = "Nessuna scadenza nei prossimi 7 giorni" }, es = { label = "Vencen esta semana", empty = "Nada vence en los próximos 7 días" } } }
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Tieni un elenco di cose da fare, ciascuna con una scadenza e una priorità.\n\nAssegna un’attività condividendola: chi la riceve la trova nel proprio elenco. Segnala come fatta quando è finita; le attività fatte restano visibili finché non le ordini.\n\nLe attività sono elementi della piattaforma: hanno un livello di condivisione, un posto nella ricerca e nel cestino."
 name = "Attività"
-description = "Attività con scadenza e priorità, assegnabili condividendole"
+description = "Attività con scadenza, priorità, etichette, progetti, liste di controllo e ripetizione, assegnabili condividendole"
 label = "Attività"
 
 [i18n.it.resources.tasks]
 label = "Attività"
-fields = { title = "Titolo", due = "Scadenza", priority = "Priorità", done = "Fatto", completed_on = "Completata il" }
+fields = { title = "Titolo", due = "Scadenza", priority = "Priorità", done = "Fatto", project = "Progetto", repeat = "Ripeti", labels = "Etichette", notes = "Descrizione", completed_on = "Completata il" }
 options.priority = { low = "bassa", medium = "media", high = "alta" }
+options.repeat = { none = "mai", daily = "ogni giorno", weekly = "ogni settimana", monthly = "ogni mese" }
 
 [i18n.it.kpi.kpi_tasks_status]
 label = "Stato delle attività"

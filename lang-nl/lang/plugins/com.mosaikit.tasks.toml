@@ -1,0 +1,14 @@
+name = "Taken"
+description = "Taken met deadline en prioriteit, die je kunt toewijzen door ze te delen"
+label = "Taken"
+details = "Houd een lijst bij van dingen die moeten gebeuren, elk met deadline en prioriteit.\n\nWijs een taak toe door hem te delen: wie hem ontvangt, vindt hem in de eigen lijst. Markeer hem als gedaan als hij klaar is; gedane taken blijven zichtbaar tot je ze opruimt.\n\nTaken zijn items van het platform: ze hebben hun eigen deelniveau, een plek in de zoekfunctie en in de prullenbak."
+
+[resources.tasks]
+label = "Taken"
+fields = { title = "Titel", due = "Deadline", priority = "Prioriteit", done = "Gedaan", completed_on = "Voltooid op", project = "Project", repeat = "Herhalen", labels = "Labels", notes = "Beschrijving" }
+options.priority = { low = "laag", medium = "gemiddeld", high = "hoog" }
+options.repeat = { none = "nooit", daily = "elke dag", weekly = "elke week", monthly = "elke maand" }
+
+[kpi.kpi_tasks_status]
+label = "Status van de taken"
+columns = { completed = "voltooid", open = "open", overdue = "achterstallig" }

@@ -1,0 +1,14 @@
+name = "Tâches"
+description = "Tâches avec échéance et priorité, assignables par partage"
+label = "Tâches"
+details = "Tenez une liste de choses à faire, chacune avec une échéance et une priorité.\n\nAssignez une tâche en la partageant : la personne qui la reçoit la retrouve dans sa propre liste. Marquez-la comme terminée quand elle est faite ; les tâches terminées restent visibles jusqu’à ce que vous les rangiez.\n\nLes tâches sont des éléments de la plateforme : elles ont leur propre niveau de partage, une place dans la recherche et dans la corbeille."
+
+[resources.tasks]
+label = "Tâches"
+fields = { title = "Titre", due = "Échéance", priority = "Priorité", done = "Terminée", completed_on = "Terminée le", project = "Projet", repeat = "Répéter", labels = "Étiquettes", notes = "Description" }
+options.priority = { low = "basse", medium = "moyenne", high = "haute" }
+options.repeat = { none = "jamais", daily = "chaque jour", weekly = "chaque semaine", monthly = "chaque mois" }
+
+[kpi.kpi_tasks_status]
+label = "État des tâches"
+columns = { completed = "terminées", open = "ouvertes", overdue = "en retard" }

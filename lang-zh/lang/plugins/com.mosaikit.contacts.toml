@@ -1,0 +1,13 @@
+name = "联系人"
+description = "可共享的通讯录，电子邮件地址会自动规范化并校验"
+label = "联系人"
+details = "共享的通讯录。保存联系人时，电子邮件地址会被规范化并校验，让通讯录保持整洁。\n\n可以把整个通讯录或单个联系人共享给同事和群组。"
+
+[resources.contacts]
+label = "联系人"
+fields = { name = "姓名", email = "电子邮件", phone = "电话", company = "公司", org = "组织", job_title = "职位", email2 = "第二电子邮件", phone2 = "第二电话", address = "地址", birthday = "生日", tags = "标签", notes = "备注" }
+options.company = { Internal = "内部", Customer = "客户", Partner = "合作伙伴", Supplier = "供应商" }
+
+[kpi.kpi_contacts_by_company]
+label = "按公司类型统计的联系人"
+columns = { company = "公司", contacts = "联系人" }

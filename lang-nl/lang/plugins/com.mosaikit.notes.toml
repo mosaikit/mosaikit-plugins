@@ -1,0 +1,29 @@
+name = "Notities"
+description = "Persoonlijke notities, die je kunt delen met collega's en groepen"
+label = "Notities"
+details = "Schrijf notities als gekleurde plakbriefjes met titel, tekst en eigen labels, wijzig hun formaat, houd ze privé of deel ze met collega's en groepen.\n\nElke notitie heeft zijn eigen deelniveau, een openbare link wanneer dat nodig is en een plek in de zoekfunctie van het platform.\n\nAls de beheerder een vertaaldienst heeft ingesteld (Systeem › Sleutels van externe diensten), vertaal je een notitie met één klik naar een andere taal."
+service_keys = { translate = { label = "Vertaaldienst", description = "Sleutel van de dienst die notities naar andere talen vertaalt" }, translate-endpoint = { label = "Adres van de vertaaldienst", description = "Webadres van de dienst die de notities vertaalt (bijvoorbeeld https://translate.example.org)" } }
+
+[resources.notes]
+label = "Notities"
+fields = { title = "Titel", body = "Tekst", tag = "Label", tags = "Labels", color = "Kleur", w = "Breedte", h = "Hoogte", pinned = "Vastgezet", archived = "Gearchiveerd" }
+options.color = { yellow = "geel", orange = "oranje", pink = "roze", violet = "paars", blue = "blauw", teal = "turkoois", green = "groen", grey = "grijs" }
+
+[resources.note_tags]
+label = "Labels van de notities"
+fields = { name = "Naam", color = "Kleur" }
+options.color = { yellow = "geel", orange = "oranje", pink = "roze", violet = "paars", blue = "blauw", teal = "turkoois", green = "groen", grey = "grijs" }
+
+[nav]
+all = "Alle notities"
+mine = "Mijn notities"
+shared = "Met mij gedeeld"
+tags = "Per label"
+archive = "Archief"
+tag_personal = "Persoonlijk"
+tag_work = "Werk"
+tag_urgent = "Dringend"
+
+[kpi.kpi_notes_by_tag]
+label = "Notities per label"
+columns = { tag = "label", notes = "notities" }

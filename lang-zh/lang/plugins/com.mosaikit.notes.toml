@@ -1,0 +1,29 @@
+name = "笔记"
+description = "个人笔记，可共享给同事和群组"
+label = "笔记"
+details = "像彩色便利贴一样书写笔记，带有标题、正文和自己的标签，可调整大小，保持私有或共享给同事和群组。\n\n每条笔记都有自己的共享级别，需要时可生成公开链接，并出现在平台搜索中。\n\n当管理员配置了翻译服务（系统 › 外部服务密钥）后，一键即可把笔记翻译成其他语言。"
+service_keys = { translate = { label = "翻译服务", description = "将笔记翻译成其他语言的服务密钥" }, translate-endpoint = { label = "翻译服务地址", description = "翻译笔记的服务的网址（例如 https://translate.example.org）" } }
+
+[resources.notes]
+label = "笔记"
+fields = { title = "标题", body = "正文", tag = "标签", tags = "标签", color = "颜色", w = "宽度", h = "高度", pinned = "已置顶", archived = "已归档" }
+options.color = { yellow = "黄色", orange = "橙色", pink = "粉色", violet = "紫色", blue = "蓝色", teal = "青色", green = "绿色", grey = "灰色" }
+
+[resources.note_tags]
+label = "笔记标签"
+fields = { name = "名称", color = "颜色" }
+options.color = { yellow = "黄色", orange = "橙色", pink = "粉色", violet = "紫色", blue = "蓝色", teal = "青色", green = "绿色", grey = "灰色" }
+
+[nav]
+all = "全部笔记"
+mine = "我的笔记"
+shared = "与我共享"
+tags = "按标签"
+archive = "归档"
+tag_personal = "个人"
+tag_work = "工作"
+tag_urgent = "紧急"
+
+[kpi.kpi_notes_by_tag]
+label = "按标签统计的笔记"
+columns = { tag = "标签", notes = "笔记" }
