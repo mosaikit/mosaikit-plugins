@@ -1,0 +1,12 @@
+name = "聊天"
+description = "实时频道与对话，支持在线状态、回复、表情回应和 Markdown"
+label = "聊天"
+details = "在频道里与同事交流。消息会即时送达已打开该频道的人，并显示谁在线、谁正在输入。\n\n频道是平台中的一个项目：可以与个人或群组共享（只读用于关注，可写用于发言），你已经熟悉的共享规则都适用。消息会保留为历史记录；用 Markdown 书写，回复某条消息，用表情回应，编辑或删除自己的消息。"
+
+[resources.channels]
+label = "频道"
+fields = { name = "名称", topic = "主题" }
+
+[resources.messages]
+label = "消息"
+fields = { text = "文本", reply_to = "回复", edited = "已编辑", reactions = "回应" }
