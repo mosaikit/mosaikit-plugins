@@ -1,0 +1,12 @@
+name = "Formulieren"
+description = "Maak een formulier, deel een openbare link om antwoorden te verzamelen van iedereen zonder account en lees de antwoorden in een tabel of een CSV"
+label = "Formulieren"
+details = "Maak een formulier met maximaal 30 velden (een regel tekst, een lange tekst, één keuze, meerdere keuzes, een getal, een datum of een e-mailadres), markeer welke verplicht zijn en deel het: met je collega's, die binnen het platform antwoorden, of met een openbare link die iedereen zonder account kan openen en invullen.\n\nStel in wanneer het formulier sluit en hoeveel antwoorden het maximaal aanneemt. De antwoorden komen in een tabel met de aantallen per optie, en je kunt ze exporteren naar CSV of een antwoord verwijderen, bijvoorbeeld een spamantwoord. Een bezoeker ziet nooit de antwoorden van anderen, en ook niet hoeveel het er zijn.\n\nVoor de openbare link is het tenantbeleid «Openbare opdrachten» nodig, dat de Tenant Manager inschakelt. Een formulier is een onderdeel van het platform: deel het met mensen of groepen (lezen om het in te vullen, schrijven om de antwoorden te zien en het te bewerken) en alles wat je al weet over delen, zoeken en de prullenbak geldt ook hier."
+
+[resources.forms]
+label = "Formulieren"
+fields = { title = "Titel", intro = "Inleiding", fields = "Velden", open = "Open (neemt antwoorden aan)", closes_on = "Sluit op", max_answers = "Maximaal aantal antwoorden", thanks = "Bedankbericht" }
+
+[kpi.kpi_forms_status]
+label = "Status van de formulieren"
+columns = { forms = "formulieren", open_forms = "open", answers = "antwoorden" }

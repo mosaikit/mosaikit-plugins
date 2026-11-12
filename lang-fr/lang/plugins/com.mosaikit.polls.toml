@@ -1,0 +1,13 @@
+name = "Sondages"
+description = "Une question rapide posée à un groupe : choix unique ou multiple, une échéance facultative, votes nominatifs ou masqués et résultats en direct"
+label = "Sondages"
+details = "Posez une question rapide aux personnes avec qui le sondage est partagé : écrivez la question et de deux à douze options, choisissez entre choix unique ou multiple, fixez une date de clôture si vous le souhaitez et décidez si les votants sont nommés.\n\nToute personne ayant accès vote d'un clic et peut changer son vote tant que le sondage est ouvert. Les résultats apparaissent sous forme de barres qui bougent en direct pendant que d'autres votent ; vous choisissez s'ils s'affichent toujours, après le vote ou seulement à la clôture du sondage.\n\nUn sondage est un élément de la plateforme : partagez-le avec des personnes ou des groupes (l'accès en lecture suffit pour voter) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique."
+
+[resources.polls]
+label = "Sondages"
+fields = { question = "Question", details = "Détails", options = "Options", multiple = "Plusieurs choix possibles", hide_voters = "Masquer qui a voté", results = "Afficher les résultats", closes_on = "Se termine le", closed = "Clos" }
+options.results = { always = "toujours", after_vote = "après le vote", after_close = "après la clôture" }
+
+[kpi.kpi_polls_status]
+label = "État des sondages"
+columns = { total = "total", open_polls = "ouverts", closed_polls = "clos" }

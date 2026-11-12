@@ -1,0 +1,13 @@
+name = "白板"
+description = "共享白板，可放置便利贴、形状、箭头并手绘，多人实时编辑"
+label = "白板"
+details = "自由形式的白板，适合头脑风暴、工作坊以及在通话中一起绘制图表：便利贴、矩形、椭圆、文字、箭头和手绘，配有调色板、撤销和重做、缩放和平移，并可导出为 PNG 或 SVG。\n\n打开白板的每个人都能实时看到其他人的更改和指针。更改由有编辑权限的人保存到白板中；只有只读权限的人可以实时观看，但不能更改任何内容。\n\n白板是平台中的一个条目：可以共享给个人或群组（只读用于查看，可写用于在上面绘制），你已熟悉的共享、搜索和回收站功能同样适用。"
+
+[resources.whiteboards]
+label = "白板"
+fields = { title = "标题", snapshot = "绘图", bg = "背景" }
+options.bg = { plain = "纯色", dots = "点阵", grid = "方格" }
+
+[kpi.kpi_whiteboards_status]
+label = "白板状态"
+columns = { whiteboards = "白板" }

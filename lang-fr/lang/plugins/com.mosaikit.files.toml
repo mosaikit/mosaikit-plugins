@@ -1,0 +1,4 @@
+name = "Documents"
+description = "Fichiers et dossiers partageables, avec aperçu, zip et liens publics"
+label = "Documents"
+details = "Conservez des fichiers et des dossiers, prévisualisez-les dans le navigateur, téléchargez un dossier sous forme d’archive zip et partagez-les.\n\nChaque fichier a son propre niveau de partage et peut être ouvert à n’importe qui avec un lien public. Les fichiers comptent dans le quota de l’organisation."

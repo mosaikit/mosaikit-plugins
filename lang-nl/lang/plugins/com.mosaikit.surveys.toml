@@ -1,0 +1,12 @@
+name = "Surveys"
+description = "Reeksen vragen die worden beantwoord door de mensen met wie een survey wordt gedeeld, met de resultaten per vraag en quizzen met score"
+label = "Surveys"
+details = "Maak een survey met maximaal 40 vragen (één antwoord, meerdere antwoorden, vrije tekst of een schaal van 1 tot 5), deel hem en bekijk de resultaten per vraag: een balk voor elke optie, het gemiddelde van een schaal en de tekstantwoorden. Iedereen antwoordt één keer en de resultaten kunnen worden geëxporteerd naar CSV.\n\nIn quizmodus worden de antwoorden gescoord: markeer de juiste opties en de punten per vraag, stel een slaagcijfer in en iedereen ziet de eigen score en of hij of zij is geslaagd; de goede en foute antwoorden worden pas na het verzenden getoond.\n\nEen survey is een item van het platform: deel hem met personen of groepen (lezen om te antwoorden, schrijven om alle resultaten te zien en hem te bewerken) en alles wat je al weet over delen, zoeken en de prullenbak is van toepassing."
+
+[resources.surveys]
+label = "Surveys"
+fields = { title = "Titel", intro = "Inleiding", questions = "Vragen", quiz = "Quiz (met score)", pass_percent = "Slaagcijfer (%)", closes_on = "Sluit op", closed = "Gesloten" }
+
+[kpi.kpi_surveys_status]
+label = "Status van de surveys"
+columns = { surveys = "surveys", open_surveys = "open", responses = "antwoorden" }

@@ -1,0 +1,12 @@
+name = "Mapas"
+description = "Catálogo de mapas GeoLibre: configuração salva no projeto .geolibre.json"
+label = "Mapas"
+details = "Um catálogo de mapas criados com o GeoLibre. Cada mapa guarda sua configuração (camadas, estilos, visualização) em um projeto .geolibre.json que você pode abrir, modificar e compartilhar.\n\nCompartilhe um mapa com colegas e grupos, ou mantenha-o privado enquanto trabalha nele."
+
+[resources.maps]
+label = "Mapas"
+fields = { name = "Nome", description = "Descrição", config = "Configuração (.geolibre.json)", layers = "Camadas" }
+
+[kpi.kpi_maps]
+label = "Mapas e camadas"
+columns = { maps = "mapas", layers = "camadas" }

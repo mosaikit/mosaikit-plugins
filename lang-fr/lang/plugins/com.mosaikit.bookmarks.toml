@@ -1,0 +1,12 @@
+name = "Favoris"
+description = "Une collection partagée de liens web avec une note et des étiquettes, pour les retrouver et les partager avec des personnes et des groupes"
+label = "Favoris"
+details = "Gardez les liens auxquels votre équipe revient souvent : chaque favori a un titre, l'adresse, une note et des étiquettes. Cherchez par n'importe lequel d'entre eux, filtrez par étiquette, marquez comme préférés ceux que vous utilisez le plus et ouvrez ou copiez un lien d'un clic.\n\nUn favori est un élément de la plateforme : partagez-le avec des personnes ou des groupes (lecture pour le voir, écriture pour le modifier) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique. Seules les adresses http et https sont acceptées, et rien n'est téléchargé depuis les sites que vous enregistrez."
+
+[resources.bookmarks]
+label = "Favoris"
+fields = { title = "Titre", url = "Adresse", note = "Note", tags = "Étiquettes", favorite = "Préféré" }
+
+[kpi.kpi_bookmarks_status]
+label = "État des favoris"
+columns = { total = "total", favorites = "préférés" }

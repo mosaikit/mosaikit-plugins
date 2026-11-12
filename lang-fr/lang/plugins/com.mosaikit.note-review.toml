@@ -1,0 +1,5 @@
+name = "Révision des notes"
+description = "Marque les notes comme révisées, avec qui l’a fait et l’historique des révisions"
+label = "Révision des notes"
+extension = { fields = { reviewed = "Révisée", reviewed_by = "Révisée par", history = "Historique des révisions" }, actions = { mark_reviewed = "Marquer comme révisée" }, tabs = { review = "Révision" } }
+details = "Ajoute un onglet Révision aux notes de l’application Notes. La personne qui révise marque une note comme révisée, avec un commentaire facultatif ; l’onglet montre qui l’a fait, quand, et l’historique des révisions.\n\nUne extension : elle ne fonctionne que là où Notes est installé, et sa permission décide qui peut réviser."

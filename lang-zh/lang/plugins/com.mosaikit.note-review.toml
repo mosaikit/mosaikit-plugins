@@ -1,0 +1,5 @@
+name = "笔记审阅"
+description = "将笔记标记为已审阅，记录审阅人和审阅历史"
+label = "笔记审阅"
+extension = { fields = { reviewed = "已审阅", reviewed_by = "审阅人", history = "审阅历史" }, actions = { mark_reviewed = "标记为已审阅" }, tabs = { review = "审阅" } }
+details = "为笔记应用中的笔记添加“审阅”选项卡。审阅人把笔记标记为已审阅，可附上评论；选项卡会显示审阅人、审阅时间以及审阅历史。\n\n这是一个扩展：只有在已安装笔记的地方才能使用，其权限决定谁可以审阅。"

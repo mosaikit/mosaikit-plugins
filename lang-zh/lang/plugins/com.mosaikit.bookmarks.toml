@@ -1,0 +1,12 @@
+name = "书签"
+description = "共享的网页链接集合,附带备注和标签,方便再次查找并与个人和群组共享"
+label = "书签"
+details = "保存团队经常回访的链接:每个书签都有标题、网址、备注和标签。可按其中任意一项搜索,按标签筛选,将最常用的标为收藏,并一键打开或复制链接。\n\n书签是平台中的一个元素:可以与个人或群组共享(读取权限用于查看,写入权限用于编辑),您已熟悉的共享、搜索和回收站功能同样适用。仅接受 http 和 https 网址,且不会从您保存的网站下载任何内容。"
+
+[resources.bookmarks]
+label = "书签"
+fields = { title = "标题", url = "网址", note = "备注", tags = "标签", favorite = "收藏" }
+
+[kpi.kpi_bookmarks_status]
+label = "书签状态"
+columns = { total = "总数", favorites = "收藏" }

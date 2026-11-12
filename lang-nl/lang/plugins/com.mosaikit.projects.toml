@@ -1,0 +1,13 @@
+name = "Projecten"
+description = "Geef een set taken een plan: bordkolommen, mijlpalen met data en sprints, met een voortgangsbalk"
+label = "Projecten"
+details = "Plan het werk van een release, een bouwplaats of een campagne. Een project heeft de kolommen van een bord, mijlpalen met een datum en sprints (tijdvakken), en laat zien hoeveel van de taken klaar zijn.\n\nDe taken blijven taken: ze horen bij de plugin Taken, die geïnstalleerd moet zijn, en het project is de naam die in hun veld Project staat. Je ziet en wijzigt alleen de taken die je in Taken mag zien en wijzigen.\n\nEen project is een item van het platform: deel het met personen of groepen (lezen om het te volgen, schrijven om het bord in te richten) en alles wat je al weet over delen, zoeken en de prullenbak geldt ook hier."
+
+[resources.projects]
+label = "Projecten"
+fields = { name = "Naam", description = "Beschrijving", status = "Status", starts_on = "Begint op", ends_on = "Eindigt op", columns = "Kolommen", milestones = "Mijlpalen", sprints = "Sprints" }
+options.status = { planned = "gepland", active = "actief", on_hold = "on hold", done = "afgerond" }
+
+[kpi.kpi_projects_status]
+label = "Status van de projecten"
+columns = { projects = "projecten", active_projects = "actieve projecten" }

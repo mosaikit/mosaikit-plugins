@@ -1,0 +1,4 @@
+name = "Documenten"
+description = "Deelbare bestanden en mappen, met voorbeeld, zip en openbare links"
+label = "Documenten"
+details = "Bewaar bestanden en mappen, bekijk ze in de browser, download een map als zip-bestand en deel ze.\n\nElk bestand heeft zijn eigen deelniveau en kan voor iedereen met een openbare link worden geopend. Bestanden tellen mee in het quotum van de organisatie."

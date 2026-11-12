@@ -1,0 +1,13 @@
+name = "Goedkeuringen"
+description = "Vraag een of meer mensen een verzoek goed te keuren of af te wijzen en bewaar de geschiedenis van wie wat en wanneer heeft besloten"
+label = "Goedkeuringen"
+details = "Schrijf een verzoek, kies de mensen die moeten beslissen en hoe: één goedkeuring is genoeg, iedereen moet goedkeuren, of de een na de ander in de volgorde waarin je ze opsomt. Elke beoordelaar keurt goed of wijst af met een opmerking, één keer, en de beslissing is definitief.\n\nDe status van het verzoek (in behandeling, goedgekeurd, afgewezen of geannuleerd) wordt altijd afgeleid uit de beslissingen, en iedereen ziet wie wat en wanneer heeft besloten. Wie moet beslissen ziet een teller met de verzoeken die op diegene wachten.\n\nEen verzoek is een item van het platform: deel het met de beoordelaars (zij hebben leestoegang nodig om te beslissen) en alles wat je al weet over delen, zoeken en de prullenbak is van toepassing."
+
+[resources.requests]
+label = "Verzoeken"
+fields = { title = "Titel", details = "Details", amount = "Bedrag", mode = "Modus", approvers = "Beoordelaars", cancelled = "Geannuleerd" }
+options.mode = { any = "een is genoeg", all = "allemaal", sequence = "in volgorde" }
+
+[kpi.kpi_requests_status]
+label = "Status van de verzoeken"
+columns = { requests = "verzoeken", cancelled_requests = "geannuleerd", decided_requests = "met minstens één beslissing" }

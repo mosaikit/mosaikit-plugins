@@ -1,0 +1,29 @@
+id = "com.mosaikit.lang-pt"
+name = "Portuguese (Português)"
+version = "0.1.0"
+kind = "language"
+icon = "languages"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Portuguese interface for the shell and for the names of the official plugins (their fields, options and indicators). Texts inside the pages of a plugin are drawn by the plugin itself: where it has no Portuguese text they stay in English.\n\nTo add another language, copy this plugin."
+homepage = "https://example.org/mosaikit/plugins/lang-pt"
+description = "Portuguese interface: the shell and the manifest texts of the official plugins"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "🌐"
+label = "Português"
+
+# the language this plugin adds: the code and its name in that language
+[language]
+code = "pt"
+name = "Português"
+
+[i18n.it]
+details = "Interfaccia in portoghese per la shell e per i nomi dei plugin ufficiali (campi, opzioni e indicatori). I testi dentro le pagine di un plugin li disegna il plugin stesso: dove non ha un testo in portoghese restano in inglese.\n\nPer aggiungere un’altra lingua, copia questo plugin."
+name = "Portoghese (Português)"
+description = "Interfaccia in portoghese: la shell e i testi di manifest dei plugin ufficiali"
+label = "Português"

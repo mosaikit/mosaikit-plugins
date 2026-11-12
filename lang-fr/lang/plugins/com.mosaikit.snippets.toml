@@ -1,0 +1,13 @@
+name = "Extraits"
+description = "Une collection partagée de textes et de morceaux de code réutilisables, avec des étiquettes, à copier d'un clic"
+label = "Extraits"
+details = "Gardez sous la main les textes et le code que votre équipe réutilise sans cesse : un titre, le texte ou le code lui-même, un type (texte brut, shell, SQL, JSON, JavaScript, Python, Rust, Markdown) et des étiquettes. Retrouvez un extrait par la recherche, par type ou par étiquette et copiez-le dans le presse-papiers d'un clic.\n\nUn extrait est un élément de la plateforme : partagez-le avec des personnes ou des groupes (lecture pour l'utiliser, écriture pour le modifier) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique."
+
+[resources.snippets]
+label = "Extraits"
+fields = { title = "Titre", body = "Contenu", kind = "Type", tags = "Étiquettes" }
+options.kind = { text = "texte", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "autre" }
+
+[kpi.kpi_snippets_by_kind]
+label = "Extraits par type"
+columns = { kind = "type", snippets = "extraits" }

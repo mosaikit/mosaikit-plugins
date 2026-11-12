@@ -1,0 +1,12 @@
+name = "Cartes"
+description = "Catalogue de cartes GeoLibre : configuration enregistrée dans le projet .geolibre.json"
+label = "Cartes"
+details = "Un catalogue de cartes créées avec GeoLibre. Chaque carte enregistre sa configuration (couches, styles, vue) dans un projet .geolibre.json que vous pouvez ouvrir, modifier et partager.\n\nPartagez une carte avec des collègues et des groupes, ou gardez-la privée pendant que vous travaillez dessus."
+
+[resources.maps]
+label = "Cartes"
+fields = { name = "Nom", description = "Description", config = "Configuration (.geolibre.json)", layers = "Couches" }
+
+[kpi.kpi_maps]
+label = "Cartes et couches"
+columns = { maps = "cartes", layers = "couches" }

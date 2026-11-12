@@ -1,0 +1,12 @@
+name = "站点"
+description = "从 zip 压缩包发布静态站点，或通过网址展示站点，可共享并支持公开链接"
+label = "站点"
+details = "从 zip 压缩包发布静态站点，或根据网址在平台内展示已有站点。\n\n每个站点都可以共享给同事和群组，也可以通过公开链接向任何人开放，该链接随时可以撤销。站点由独立的来源提供服务，因此其脚本绝不会触及平台。"
+
+[resources.sites]
+label = "站点"
+fields = { name = "名称", description = "描述", zip_name = "已上传的 zip", entry = "起始页", files = "文件", size = "大小（字节）", url = "网址", framable = "可嵌入", thumbnail = "缩略图" }
+
+[kpi.kpi_sites]
+label = "已发布的站点"
+columns = { sites = "站点", files = "文件", bytes = "字节" }

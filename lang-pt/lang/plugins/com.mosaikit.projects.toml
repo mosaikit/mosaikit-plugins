@@ -1,0 +1,13 @@
+name = "Projetos"
+description = "Dê um plano a um conjunto de tarefas: colunas do quadro, marcos com datas e sprints, com uma barra de progresso"
+label = "Projetos"
+details = "Planeje o trabalho de uma versão, de uma obra ou de uma campanha. Um projeto tem as colunas de um quadro, marcos com uma data e sprints (janelas de tempo), e mostra quantas de suas tarefas estão concluídas.\n\nAs tarefas continuam sendo tarefas: pertencem ao plugin Tarefas, que deve estar instalado, e o projeto é o nome escrito no campo Projeto delas. Você vê e altera apenas as tarefas que pode ver e alterar em Tarefas.\n\nUm projeto é um elemento da plataforma: compartilhe-o com pessoas ou grupos (leitura para acompanhá-lo, escrita para organizar o quadro) e vale tudo o que você já sabe sobre compartilhamento, busca e lixeira."
+
+[resources.projects]
+label = "Projetos"
+fields = { name = "Nome", description = "Descrição", status = "Status", starts_on = "Começa em", ends_on = "Termina em", columns = "Colunas", milestones = "Marcos", sprints = "Sprints" }
+options.status = { planned = "planejado", active = "ativo", on_hold = "em pausa", done = "concluído" }
+
+[kpi.kpi_projects_status]
+label = "Status dos projetos"
+columns = { projects = "projetos", active_projects = "projetos ativos" }

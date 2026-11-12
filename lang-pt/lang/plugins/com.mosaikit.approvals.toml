@@ -1,0 +1,13 @@
+name = "Aprovações"
+description = "Peça a uma ou mais pessoas que aprovem ou rejeitem uma solicitação e mantenha o histórico de quem decidiu o quê e quando"
+label = "Aprovações"
+details = "Escreva uma solicitação, escolha as pessoas que devem decidir e como: basta uma aprovação, todas devem aprovar, ou uma após a outra na ordem em que você as lista. Cada aprovador aprova ou rejeita com um comentário, uma única vez, e a decisão é definitiva.\n\nO estado da solicitação (pendente, aprovada, rejeitada ou cancelada) é sempre calculado a partir das decisões, e todos veem quem decidiu o quê e quando. Quem deve decidir vê um contador com as solicitações que o aguardam.\n\nUma solicitação é um elemento da plataforma: compartilhe com os aprovadores (eles precisam de acesso de leitura para decidir) e vale tudo o que você já sabe sobre compartilhar, pesquisar e a lixeira."
+
+[resources.requests]
+label = "Solicitações"
+fields = { title = "Título", details = "Detalhes", amount = "Valor", mode = "Modo", approvers = "Aprovadores", cancelled = "Cancelada" }
+options.mode = { any = "basta um", all = "todos", sequence = "em sequência" }
+
+[kpi.kpi_requests_status]
+label = "Situação das solicitações"
+columns = { requests = "solicitações", cancelled_requests = "canceladas", decided_requests = "com ao menos uma decisão" }

@@ -1,0 +1,13 @@
+name = "Annonces"
+description = "Un tableau d'affichage : publiez des annonces avec un niveau et une période, et voyez qui a confirmé les avoir lues"
+label = "Annonces"
+details = "Publiez une annonce pour les personnes avec lesquelles elle est partagée : un titre, un texte en Markdown, un niveau (information, important ou urgent) et la période pendant laquelle elle est valable. Les annonces urgentes et épinglées restent en haut.\n\nLorsqu'une annonce demande une confirmation, chaque lecteur confirme d'un clic et l'auteur voit qui l'a fait et quand.\n\nUne annonce est un élément de la plateforme : partagez-la avec des personnes ou des groupes (lecture pour la suivre, écriture pour la modifier) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique."
+
+[resources.notices]
+label = "Annonces"
+fields = { title = "Titre", body = "Texte", level = "Niveau", starts_on = "Valable à partir du", ends_on = "Valable jusqu'au", pinned = "Épinglée", needs_ack = "Demander une confirmation" }
+options.level = { info = "information", important = "important", urgent = "urgent" }
+
+[kpi.kpi_notices_status]
+label = "État des annonces"
+columns = { published = "publiées", in_force = "en vigueur", urgent = "urgentes en vigueur", pinned = "épinglées" }

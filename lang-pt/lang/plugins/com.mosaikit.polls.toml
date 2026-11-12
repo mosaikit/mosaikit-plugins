@@ -1,0 +1,13 @@
+name = "Enquetes"
+description = "Uma pergunta rápida para um grupo: escolha única ou múltipla, prazo opcional, votos nominais ou ocultos e resultados ao vivo"
+label = "Enquetes"
+details = "Faça uma pergunta rápida às pessoas com quem a enquete é compartilhada: escreva a pergunta e de duas a doze opções, escolha entre resposta única ou múltipla, defina uma data de encerramento se quiser e decida se quem vota aparece com o nome.\n\nQuem tem acesso vota com um clique e pode mudar o voto enquanto a enquete estiver aberta. Os resultados aparecem como barras que se movem ao vivo enquanto outras pessoas votam; você escolhe se são exibidos sempre, depois de votar ou só quando a enquete for encerrada.\n\nUma enquete é um elemento da plataforma: compartilhe com pessoas ou grupos (o acesso de leitura basta para votar) e vale tudo o que você já sabe sobre compartilhar, pesquisar e a lixeira."
+
+[resources.polls]
+label = "Enquetes"
+fields = { question = "Pergunta", details = "Detalhes", options = "Opções", multiple = "Mais de uma opção", hide_voters = "Ocultar quem votou", results = "Mostrar resultados", closes_on = "Encerra em", closed = "Encerrada" }
+options.results = { always = "sempre", after_vote = "depois de votar", after_close = "após o encerramento" }
+
+[kpi.kpi_polls_status]
+label = "Situação das enquetes"
+columns = { total = "total", open_polls = "abertas", closed_polls = "encerradas" }

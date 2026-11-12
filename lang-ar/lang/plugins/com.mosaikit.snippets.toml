@@ -1,0 +1,13 @@
+name = "المقتطفات"
+description = "مجموعة مشتركة من المقتطفات: نصوص وأجزاء من الشيفرة قابلة لإعادة الاستخدام مع وسوم، تُنسخ بنقرة واحدة"
+label = "المقتطفات"
+details = "احتفظ بالنصوص والشيفرة التي يعيد فريقك استخدامها مرارًا: عنوان، والنص أو الشيفرة نفسها، ونوع (نص عادي، shell، SQL، JSON، JavaScript، Python، Rust، Markdown)، ووسوم. اعثر على مقتطف بالبحث أو بحسب النوع أو الوسم، وانسخه إلى الحافظة بنقرة واحدة.\n\nالمقتطف عنصر في المنصة: شاركه مع أشخاص أو مجموعات (القراءة للاستخدام، والكتابة للتعديل)، وينطبق عليه كل ما تعرفه عن المشاركة والبحث وسلة المحذوفات."
+
+[resources.snippets]
+label = "المقتطفات"
+fields = { title = "العنوان", body = "المحتوى", kind = "النوع", tags = "الوسوم" }
+options.kind = { text = "نص", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "آخر" }
+
+[kpi.kpi_snippets_by_kind]
+label = "المقتطفات بحسب النوع"
+columns = { kind = "النوع", snippets = "المقتطفات" }

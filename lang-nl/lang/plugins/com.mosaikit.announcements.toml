@@ -1,0 +1,13 @@
+name = "Mededelingen"
+description = "Een mededelingenbord: publiceer mededelingen met een niveau en een periode, en zie wie heeft bevestigd ze te hebben gelezen"
+label = "Mededelingen"
+details = "Publiceer een mededeling voor de mensen met wie je deelt: een titel, een tekst in Markdown, een niveau (informatie, belangrijk of urgent) en de periode waarin de mededeling geldt. Urgente en vastgezette mededelingen blijven bovenaan staan.\n\nAls een mededeling om bevestiging vraagt, bevestigt elke lezer met één klik en ziet de auteur wie dat deed en wanneer.\n\nEen mededeling is een item van het platform: deel hem met personen of groepen (lezen om hem te volgen, schrijven om hem te bewerken) en alles wat je al weet over delen, zoeken en de prullenbak geldt ook hier."
+
+[resources.notices]
+label = "Mededelingen"
+fields = { title = "Titel", body = "Tekst", level = "Niveau", starts_on = "Geldig vanaf", ends_on = "Geldig tot", pinned = "Vastgezet", needs_ack = "Bevestiging vragen" }
+options.level = { info = "informatie", important = "belangrijk", urgent = "urgent" }
+
+[kpi.kpi_notices_status]
+label = "Status van de mededelingen"
+columns = { published = "gepubliceerd", in_force = "geldend", urgent = "urgente geldende", pinned = "vastgezet" }

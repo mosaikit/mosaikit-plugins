@@ -1,0 +1,12 @@
+name = "Sites"
+description = "Publiceer statische sites vanuit zip-bestanden of toon een site via zijn webadres, deelbaar en met openbare links"
+label = "Sites"
+details = "Publiceer een statische site vanuit een zip-bestand, of toon binnen het platform een bestaande site via zijn webadres.\n\nElke site kan worden gedeeld met collega's en groepen en voor iedereen worden geopend met een openbare link die je op elk moment kunt intrekken. Sites worden geserveerd vanaf een aparte origin, zodat hun scripts het platform nooit bereiken."
+
+[resources.sites]
+label = "Sites"
+fields = { name = "Naam", description = "Beschrijving", zip_name = "Geüploade zip", entry = "Startpagina", files = "Bestanden", size = "Grootte (bytes)", url = "Webadres", framable = "Insluitbaar", thumbnail = "Miniatuur" }
+
+[kpi.kpi_sites]
+label = "Gepubliceerde sites"
+columns = { sites = "sites", files = "bestanden", bytes = "bytes" }

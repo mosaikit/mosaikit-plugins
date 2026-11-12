@@ -1,0 +1,4 @@
+name = "Projeto"
+description = "Navegação global à esquerda, a barra lateral da área ao lado"
+label = "Projeto"
+details = "Navegação global em uma coluna estreita à esquerda, com as páginas da área atual em uma barra lateral ao lado dela. Indicado para quem trabalha principalmente em uma área por vez."

@@ -1,0 +1,5 @@
+name = "Notitiebeoordeling"
+description = "Markeer notities als beoordeeld, met wie het deed en de geschiedenis van de beoordelingen"
+label = "Notitiebeoordeling"
+extension = { fields = { reviewed = "Beoordeeld", reviewed_by = "Beoordeeld door", history = "Beoordelingsgeschiedenis" }, actions = { mark_reviewed = "Markeren als beoordeeld" }, tabs = { review = "Beoordeling" } }
+details = "Voegt een tabblad Beoordeling toe aan de notities van de app Notities. Wie beoordeelt, markeert een notitie als beoordeeld, met een optionele opmerking; het tabblad toont wie het deed, wanneer en de geschiedenis van de beoordelingen.\n\nEen extensie: werkt alleen waar Notities is geïnstalleerd, en haar recht bepaalt wie mag beoordelen."

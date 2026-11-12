@@ -1,0 +1,12 @@
+name = "Kaarten"
+description = "Catalogus van GeoLibre-kaarten: configuratie opgeslagen in het project .geolibre.json"
+label = "Kaarten"
+details = "Een catalogus van kaarten gemaakt met GeoLibre. Elke kaart bewaart zijn configuratie (lagen, stijlen, weergave) in een project .geolibre.json dat je kunt openen, wijzigen en delen.\n\nDeel een kaart met collega's en groepen, of houd hem privé terwijl je eraan werkt."
+
+[resources.maps]
+label = "Kaarten"
+fields = { name = "Naam", description = "Beschrijving", config = "Configuratie (.geolibre.json)", layers = "Lagen" }
+
+[kpi.kpi_maps]
+label = "Kaarten en lagen"
+columns = { maps = "kaarten", layers = "lagen" }
