@@ -2095,5 +2095,16 @@
   "yes (sensitive: its pages create folders and files in the Files area with the permissions of the caller)": "sí (sensible: sus páginas crean carpetas y archivos en el área de Archivos con los permisos de quien las usa)",
   "“{name}” looks like a {label}": "“{name}” parece un {label}",
   "Open it in {app} to publish it.": "Ábrelo en {app} para publicarlo.",
-  "Add the path of a file to the link to reach a file of this folder, for example …/tileset.json": "Añade al enlace la ruta de un archivo para llegar a un archivo de esta carpeta, por ejemplo …/tileset.json"
+  "Add the path of a file to the link to reach a file of this folder, for example …/tileset.json": "Añade al enlace la ruta de un archivo para llegar a un archivo de esta carpeta, por ejemplo …/tileset.json",
+  "{pct}% of the disk free": "{pct}% del disco libre",
+  "{pct}% of the requests failed in 15 minutes": "el {pct}% de las peticiones falló en 15 minutos",
+  "{n} emails failed in the last hour": "{n} correos fallidos en la última hora",
+  "the last backup failed: {error}": "la última copia de seguridad falló: {error}",
+  "yes (sensitive: anyone who holds a public link may run them, and some of them add data: only rows of the tables the plugin made for visitors, never a change or a delete)": "sí (sensible: cualquiera que tenga un enlace público puede ejecutarlos y algunos añaden datos: solo filas de las tablas que el plugin ha pensado para los visitantes, nunca un cambio ni un borrado)",
+  "adds data": "añade datos",
+  "Live messages and presence": "Mensajes en tiempo real y presencia",
+  "Camera and microphone": "Cámara y micrófono",
+  "yes (sensitive: the pages it embeds may ask the person for the camera, the microphone and the screen)": "sí (sensible: las páginas que incrusta pueden pedir a la persona la cámara, el micrófono y la pantalla)",
+  "Real-time channels": "Canales en tiempo real",
+  "yes (sensitive: live messages and who is connected, between the people who may see a resource of the plugin)": "sí (sensible: mensajes en tiempo real y quién está conectado, entre las personas que pueden ver un recurso del plugin)"
 }
