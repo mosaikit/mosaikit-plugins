@@ -1,0 +1,16 @@
+{
+  "Review of «{name}»": "Relecture de « {name} »",
+  "Reviewed by {name}": "Relue par {name}",
+  "Not reviewed yet": "Pas encore relue",
+  "Comment (optional)": "Commentaire (facultatif)",
+  "Mark as reviewed": "Marquer comme relue",
+  "Mark as not reviewed": "Marquer comme non relue",
+  "History of the reviews": "Historique des relectures",
+  "No review yet.": "Aucune relecture.",
+  "reviewed": "relue",
+  "marked as not reviewed": "marquée comme non relue",
+  "You can see the reviews; only who can edit the note reviews it.": "Vous pouvez voir les relectures ; seules les personnes pouvant modifier la note la relisent.",
+  "This page opens as the \"Review\" tab of a note.": "Cette page s’ouvre comme onglet « Relecture » d’une note.",
+  "Saved": "Enregistré",
+  "Note review works inside Notes: the \"Reviewed\" fields, the \"Mark as reviewed\" action and the \"Review\" tab in the detail of a note.": "La relecture de notes fonctionne dans Notes : les champs « Relue », l’action « Marquer comme relue » et l’onglet « Relecture » dans le détail d’une note."
+}

@@ -2,16 +2,16 @@
 import '@mosaikit/plugin-api/style.css'
 import { connect, errText } from '@mosaikit/plugin-api'
 
-const TEXTS = {
-  en: 'Note review works inside Notes: the "Reviewed" fields, the "Mark as reviewed" action and the "Review" tab in the detail of a note.',
-  it: 'Revisione delle note funziona dentro Note: i campi «Revisionata», l’azione «Segna come revisionata» e la scheda «Revisione» nel dettaglio di una nota.',
-}
+// the key is the English phrase; the other languages come from the language plugins (`msk.t`), Italian from here
+const TEXT = 'Note review works inside Notes: the "Reviewed" fields, the "Mark as reviewed" action and the "Review" tab in the detail of a note.'
+const IT = 'Revisione delle note funziona dentro Note: i campi «Revisionata», l’azione «Segna come revisionata» e la scheda «Revisione» nel dettaglio di una nota.'
 
 const app = document.getElementById('app')!
 connect()
   .then((msk) => {
+    msk.ownTexts({ it: { [TEXT]: IT } })
     const show = () => {
-      app.textContent = TEXTS[msk.context?.lang === 'it' ? 'it' : 'en']
+      app.textContent = msk.t(TEXT)
     }
     show()
     msk.onContext(show)

@@ -1,0 +1,16 @@
+{
+  "Review of «{name}»": "Revisión de «{name}»",
+  "Reviewed by {name}": "Revisada por {name}",
+  "Not reviewed yet": "Aún sin revisar",
+  "Comment (optional)": "Comentario (opcional)",
+  "Mark as reviewed": "Marcar como revisada",
+  "Mark as not reviewed": "Marcar como no revisada",
+  "History of the reviews": "Historial de revisiones",
+  "No review yet.": "Aún no hay revisiones.",
+  "reviewed": "revisada",
+  "marked as not reviewed": "marcada como no revisada",
+  "You can see the reviews; only who can edit the note reviews it.": "Puedes ver las revisiones; solo quien puede editar la nota la revisa.",
+  "This page opens as the \"Review\" tab of a note.": "Esta página se abre como la pestaña «Revisión» de una nota.",
+  "Saved": "Guardado",
+  "Note review works inside Notes: the \"Reviewed\" fields, the \"Mark as reviewed\" action and the \"Review\" tab in the detail of a note.": "La revisión de notas funciona dentro de Notas: los campos «Revisada», la acción «Marcar como revisada» y la pestaña «Revisión» en el detalle de una nota."
+}

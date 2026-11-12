@@ -6,39 +6,23 @@ import './tab.css'
 import { connect, errText, type Msk, type Row, type TabClient, type Values } from '@mosaikit/plugin-api'
 import { addReview, parseHistory } from './history.ts'
 
-const TEXTS = {
-  en: {
-    title: 'Review of «{name}»',
-    reviewedBy: 'Reviewed by {name}',
-    notReviewed: 'Not reviewed yet',
-    comment: 'Comment (optional)',
-    review: 'Mark as reviewed',
-    unreview: 'Mark as not reviewed',
-    history: 'History of the reviews',
-    noHistory: 'No review yet.',
-    reviewed: 'reviewed',
-    reopened: 'marked as not reviewed',
-    readOnly: 'You can see the reviews; only who can edit the note reviews it.',
-    notTab: 'This page opens as the "Review" tab of a note.',
-    saved: 'Saved',
-  },
-  it: {
-    title: 'Revisione di «{name}»',
-    reviewedBy: 'Revisionata da {name}',
-    notReviewed: 'Non ancora revisionata',
-    comment: 'Commento (facoltativo)',
-    review: 'Segna come revisionata',
-    unreview: 'Segna come non revisionata',
-    history: 'Storia delle revisioni',
-    noHistory: 'Nessuna revisione.',
-    reviewed: 'revisionata',
-    reopened: 'segnata come non revisionata',
-    readOnly: 'Puoi vedere le revisioni; solo chi può modificare la nota la revisiona.',
-    notTab: 'Questa pagina si apre come scheda «Revisione» di una nota.',
-    saved: 'Salvato',
-  },
+// The key of a text is the English phrase; the other languages come from the language plugins
+// (`lang/ui/com.mosaikit.note-review.json`, read through `msk.t`), Italian from this table.
+const IT: Record<string, string> = {
+  'Review of «{name}»': 'Revisione di «{name}»',
+  'Reviewed by {name}': 'Revisionata da {name}',
+  'Not reviewed yet': 'Non ancora revisionata',
+  'Comment (optional)': 'Commento (facoltativo)',
+  'Mark as reviewed': 'Segna come revisionata',
+  'Mark as not reviewed': 'Segna come non revisionata',
+  'History of the reviews': 'Storia delle revisioni',
+  'No review yet.': 'Nessuna revisione.',
+  reviewed: 'revisionata',
+  'marked as not reviewed': 'segnata come non revisionata',
+  'You can see the reviews; only who can edit the note reviews it.': 'Puoi vedere le revisioni; solo chi può modificare la nota la revisiona.',
+  'This page opens as the "Review" tab of a note.': 'Questa pagina si apre come scheda «Revisione» di una nota.',
+  Saved: 'Salvato',
 }
-type Key = keyof (typeof TEXTS)['en']
 
 const app = document.getElementById('app')!
 
@@ -54,16 +38,17 @@ function h<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, 
 
 function start(msk: Msk) {
   if (!msk.tab) {
-    app.textContent = TEXTS.en.notTab
+    app.textContent = 'This page opens as the "Review" tab of a note.'
     return
   }
+  msk.ownTexts({ it: IT })
   const tab: TabClient = msk.tabClient()
   const canWrite = msk.tab.level === 'write' || msk.tab.level === 'manage'
-  const lang = () => (msk.context?.lang === 'it' ? 'it' : 'en')
-  const tr = (k: Key, vars: Record<string, string> = {}) => TEXTS[lang()][k].replace(/\{(\w+)\}/g, (_, v: string) => vars[v] ?? '')
+  const lang = () => msk.context?.lang ?? 'en'
+  const tr = (phrase: string, vars: Record<string, string> = {}) => msk.t(phrase, vars)
   const date = (iso: string) => {
     const d = new Date(iso)
-    return Number.isNaN(d.getTime()) ? iso : d.toLocaleString(lang() === 'it' ? 'it-IT' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+    return Number.isNaN(d.getTime()) ? iso : d.toLocaleString(lang() === 'it' ? 'it-IT' : lang() === 'en' ? 'en-GB' : lang(), { dateStyle: 'medium', timeStyle: 'short' })
   }
   let item: Row | null = null
   let values: Values = {}
@@ -74,11 +59,11 @@ function start(msk: Msk) {
     document.documentElement.lang = lang()
     const name = String(item?.values.title ?? '')
     const reviewed = values.reviewed === true
-    const status = h('p', { class: 'status' + (reviewed ? ' ok' : '') }, reviewed ? tr('reviewedBy', { name: String(values.reviewed_by ?? '') }) : tr('notReviewed'))
-    const parts: Node[] = [h('h1', {}, tr('title', { name })), status]
+    const status = h('p', { class: 'status' + (reviewed ? ' ok' : '') }, reviewed ? tr('Reviewed by {name}', { name: String(values.reviewed_by ?? '') }) : tr('Not reviewed yet'))
+    const parts: Node[] = [h('h1', {}, tr('Review of «{name}»', { name })), status]
     if (canWrite) {
       const comment = h('textarea', { id: 'comment', rows: '2', maxlength: '500' })
-      const label = h('label', { for: 'comment' }, tr('comment'))
+      const label = h('label', { for: 'comment' }, tr('Comment (optional)'))
       const save = (ok: boolean) => async () => {
         try {
           const by = msk.user?.name ?? ''
@@ -87,7 +72,7 @@ function start(msk: Msk) {
             reviewed_by: ok ? by : null,
             history: addReview(values.history, { at: new Date().toISOString(), by, reviewed: ok, note: comment.value }),
           })
-          msg = tr('saved')
+          msg = tr('Saved')
           error = false
         } catch (e) {
           msg = errText(e, msk.context?.lang)
@@ -95,25 +80,25 @@ function start(msk: Msk) {
         }
         render()
       }
-      const primary = h('button', { type: 'button', class: 'msk-btn' }, tr('review'))
+      const primary = h('button', { type: 'button', class: 'msk-btn' }, tr('Mark as reviewed'))
       primary.addEventListener('click', save(true))
-      const secondary = h('button', { type: 'button', class: 'msk-btn ghost' }, tr('unreview'))
+      const secondary = h('button', { type: 'button', class: 'msk-btn ghost' }, tr('Mark as not reviewed'))
       secondary.addEventListener('click', save(false))
       parts.push(h('div', { class: 'msk-field' }, label, comment), h('div', { class: 'msk-actions' }, primary, ...(reviewed ? [secondary] : [])))
-    } else parts.push(h('p', { class: 'hint' }, tr('readOnly')))
+    } else parts.push(h('p', { class: 'hint' }, tr('You can see the reviews; only who can edit the note reviews it.')))
     parts.push(h('p', { class: 'msk-msg' + (error ? ' err' : ''), role: 'status' }, msg))
     const reviews = parseHistory(values.history).reverse()
     parts.push(
-      h('h2', {}, tr('history')),
+      h('h2', {}, tr('History of the reviews')),
       reviews.length
         ? h(
             'ol',
             { class: 'history' },
             ...reviews.map((r) =>
-              h('li', {}, h('span', { class: 'when' }, date(r.at)), ' · ', h('b', {}, r.by), ' — ', r.reviewed ? tr('reviewed') : tr('reopened'), ...(r.note ? [h('q', {}, r.note)] : [])),
+              h('li', {}, h('span', { class: 'when' }, date(r.at)), ' · ', h('b', {}, r.by), ' — ', r.reviewed ? tr('reviewed') : tr('marked as not reviewed'), ...(r.note ? [h('q', {}, r.note)] : [])),
             ),
           )
-        : h('p', { class: 'hint' }, tr('noHistory')),
+        : h('p', { class: 'hint' }, tr('No review yet.')),
     )
     app.replaceChildren(...parts)
   }

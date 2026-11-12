@@ -1,0 +1,16 @@
+{
+  "Review of «{name}»": "Review van «{name}»",
+  "Reviewed by {name}": "Gereviewd door {name}",
+  "Not reviewed yet": "Nog niet gereviewd",
+  "Comment (optional)": "Opmerking (optioneel)",
+  "Mark as reviewed": "Markeren als gereviewd",
+  "Mark as not reviewed": "Markeren als niet gereviewd",
+  "History of the reviews": "Geschiedenis van de reviews",
+  "No review yet.": "Nog geen review.",
+  "reviewed": "gereviewd",
+  "marked as not reviewed": "gemarkeerd als niet gereviewd",
+  "You can see the reviews; only who can edit the note reviews it.": "Je kunt de reviews zien; alleen wie de notitie kan bewerken, reviewt hem.",
+  "This page opens as the \"Review\" tab of a note.": "Deze pagina opent als tabblad «Review» van een notitie.",
+  "Saved": "Opgeslagen",
+  "Note review works inside Notes: the \"Reviewed\" fields, the \"Mark as reviewed\" action and the \"Review\" tab in the detail of a note.": "Notitiereview werkt binnen Notities: de velden «Gereviewd», de actie «Markeren als gereviewd» en het tabblad «Review» in het detail van een notitie."
+}
