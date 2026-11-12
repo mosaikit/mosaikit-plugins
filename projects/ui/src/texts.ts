@@ -1,0 +1,86 @@
+// The texts of the Projects UI (English by default; Italian and Spanish follow the language of the host).
+const en = {
+  title: 'Projects', newProject: '＋ New project', filter: 'Status',
+  all: 'All', planned: 'Planned', active: 'Active', on_hold: 'On hold', done: 'Done',
+  emptyTitle: 'No projects yet', emptyText: 'Create a project to give a set of tasks a board, milestones with dates and sprints.', emptyFilter: 'No project with this status.',
+  tasksMissingTitle: 'Install the Tasks plugin', tasksMissingText: 'Projects arranges the tasks of the Tasks plugin. Install it (version 0.6 or later), turn it on, and come back.',
+  progressNeedsTasks: 'Progress needs the Tasks plugin.',
+  back: '← Projects', tBoard: 'Board', tMilestones: 'Milestones', tSprints: 'Sprints', tDetails: 'Details', view: 'View',
+  tasksDone: '{done} of {total} tasks done', noTasks: 'No tasks yet', percent: '{p}% complete', noProgress: 'Progress not shown',
+  next: 'Next: {n}, {d}', noMilestone: 'No milestone ahead', dates: '{a} to {b}', since: 'from {a}', until: 'until {b}',
+  readOnly: 'You can read this project but not change it.',
+  addTaskIn: 'Add a task to {c}', addPlaceholder: '＋ Add a task', add: 'Add', moveTo: 'Move to…', moveAria: 'Move “{t}”', moved: '“{t}” moved to {c}',
+  due: 'due {d}', low: 'Low', medium: 'Medium', high: 'High', doneMark: '✓ Done', inSprint: 'Sprint: {s}', colEmpty: 'Nothing here',
+  attachExisting: 'Add existing tasks…', attachTitle: 'Add existing tasks', attachHint: 'Open tasks that belong to no project.', searchTasks: 'Search tasks',
+  attachNone: 'No task without a project matches.', attachGo: 'Add to project', attached: '{n} task(s) added', pickOne: 'Pick at least one task',
+  mAdd: '＋ Add milestone', mName: 'Name', mDate: 'Date', overdue: 'Overdue', mDoneAria: 'Mark “{n}” as done', mEmptyTitle: 'No milestones yet', mEmptyText: 'A milestone is a date to reach: a release, an approval, a deadline.',
+  mNew: 'New milestone', mEdit: 'Edit milestone', mNeed: 'Write a name and choose a date',
+  sAdd: '＋ Add sprint', sName: 'Name', sStart: 'Starts on', sEnd: 'Ends on', current: 'Current', unassigned: 'Unassigned', sprintOf: 'Sprint of “{t}”', noSprint: 'No sprint',
+  sprintCount: '{d} of {t} done', sEmptyTitle: 'No sprints yet', sEmptyText: 'A sprint is a time box: add one, then give it tasks from the board.', sNew: 'New sprint', sEdit: 'Edit sprint', sNeed: 'Write a name and choose both dates',
+  sNoTasks: 'No tasks in this sprint', sEnd2: 'The end cannot be before the start',
+  dName: 'Name', dDesc: 'Description', dStatus: 'Status', dStart: 'Starts on', dEnd: 'Ends on', dColumns: 'Board columns (one per line, 2 to 8)',
+  dColumnsHint: 'Cards of a column you remove or rename go back to the first column.', dNameHint: 'A new name is written again on the tasks you can change; the others stay with the old name.', needName: 'Write a name', saved: 'Saved',
+  create: 'Create', save: 'Save', cancel: 'Cancel', close: 'Close', edit: 'Edit', remove: 'Remove', share: 'Share…', del: 'Delete project',
+  newTitle: 'New project', removeConfirm: 'Remove “{n}”?', delConfirm: 'Delete the project “{n}”? Its tasks stay in Tasks.',
+  failed: 'Could not start the UI of the plugin: ', loadFailed: 'Could not load the projects: ',
+}
+export type Texts = typeof en
+export type L = 'en' | 'it' | 'es'
+
+const it: Texts = {
+  title: 'Progetti', newProject: '＋ Nuovo progetto', filter: 'Stato',
+  all: 'Tutti', planned: 'Pianificati', active: 'Attivi', on_hold: 'In pausa', done: 'Conclusi',
+  emptyTitle: 'Ancora nessun progetto', emptyText: 'Crea un progetto per dare a un insieme di attività una lavagna, tappe con date e sprint.', emptyFilter: 'Nessun progetto con questo stato.',
+  tasksMissingTitle: 'Installa il plugin Attività', tasksMissingText: 'Progetti organizza le attività del plugin Attività. Installalo (versione 0.6 o successiva), accendilo e torna qui.',
+  progressNeedsTasks: 'L’avanzamento richiede il plugin Attività.',
+  back: '← Progetti', tBoard: 'Lavagna', tMilestones: 'Tappe', tSprints: 'Sprint', tDetails: 'Dettagli', view: 'Vista',
+  tasksDone: '{done} attività su {total} fatte', noTasks: 'Ancora nessuna attività', percent: '{p}% completato', noProgress: 'Avanzamento non mostrato',
+  next: 'Prossima: {n}, {d}', noMilestone: 'Nessuna tappa in vista', dates: '{a} – {b}', since: 'dal {a}', until: 'fino al {b}',
+  readOnly: 'Puoi leggere questo progetto ma non modificarlo.',
+  addTaskIn: 'Aggiungi un’attività a {c}', addPlaceholder: '＋ Aggiungi un’attività', add: 'Aggiungi', moveTo: 'Sposta in…', moveAria: 'Sposta “{t}”', moved: '“{t}” spostata in {c}',
+  due: 'scade {d}', low: 'Bassa', medium: 'Media', high: 'Alta', doneMark: '✓ Fatta', inSprint: 'Sprint: {s}', colEmpty: 'Niente qui',
+  attachExisting: 'Aggiungi attività esistenti…', attachTitle: 'Aggiungi attività esistenti', attachHint: 'Attività aperte che non appartengono a nessun progetto.', searchTasks: 'Cerca attività',
+  attachNone: 'Nessuna attività senza progetto corrisponde.', attachGo: 'Aggiungi al progetto', attached: '{n} attività aggiunte', pickOne: 'Scegli almeno un’attività',
+  mAdd: '＋ Aggiungi tappa', mName: 'Nome', mDate: 'Data', overdue: 'In ritardo', mDoneAria: 'Segna “{n}” come fatta', mEmptyTitle: 'Ancora nessuna tappa', mEmptyText: 'Una tappa è una data da raggiungere: un rilascio, un’approvazione, una scadenza.',
+  mNew: 'Nuova tappa', mEdit: 'Modifica tappa', mNeed: 'Scrivi un nome e scegli una data',
+  sAdd: '＋ Aggiungi sprint', sName: 'Nome', sStart: 'Inizia il', sEnd: 'Finisce il', current: 'In corso', unassigned: 'Non assegnate', sprintOf: 'Sprint di “{t}”', noSprint: 'Nessuno sprint',
+  sprintCount: '{d} su {t} fatte', sEmptyTitle: 'Ancora nessuno sprint', sEmptyText: 'Uno sprint è una finestra di tempo: aggiungine uno, poi dagli attività dalla lavagna.', sNew: 'Nuovo sprint', sEdit: 'Modifica sprint', sNeed: 'Scrivi un nome e scegli entrambe le date',
+  sNoTasks: 'Nessuna attività in questo sprint', sEnd2: 'La fine non può precedere l’inizio',
+  dName: 'Nome', dDesc: 'Descrizione', dStatus: 'Stato', dStart: 'Inizia il', dEnd: 'Finisce il', dColumns: 'Colonne della lavagna (una per riga, da 2 a 8)',
+  dColumnsHint: 'Le schede di una colonna rimossa o rinominata tornano nella prima colonna.', dNameHint: 'Un nuovo nome viene riscritto sulle attività che puoi modificare; le altre restano con il vecchio nome.', needName: 'Scrivi un nome', saved: 'Salvato',
+  create: 'Crea', save: 'Salva', cancel: 'Annulla', close: 'Chiudi', edit: 'Modifica', remove: 'Rimuovi', share: 'Condividi…', del: 'Elimina progetto',
+  newTitle: 'Nuovo progetto', removeConfirm: 'Rimuovere “{n}”?', delConfirm: 'Eliminare il progetto “{n}”? Le sue attività restano in Attività.',
+  failed: 'Impossibile avviare la UI del plugin: ', loadFailed: 'Impossibile caricare i progetti: ',
+}
+const es: Texts = {
+  title: 'Proyectos', newProject: '＋ Nuevo proyecto', filter: 'Estado',
+  all: 'Todos', planned: 'Planificados', active: 'Activos', on_hold: 'En pausa', done: 'Concluidos',
+  emptyTitle: 'Todavía no hay proyectos', emptyText: 'Crea un proyecto para dar a un conjunto de tareas un tablero, hitos con fechas y sprints.', emptyFilter: 'Ningún proyecto con este estado.',
+  tasksMissingTitle: 'Instala el plugin Tareas', tasksMissingText: 'Proyectos organiza las tareas del plugin Tareas. Instálalo (versión 0.6 o posterior), actívalo y vuelve aquí.',
+  progressNeedsTasks: 'El avance necesita el plugin Tareas.',
+  back: '← Proyectos', tBoard: 'Tablero', tMilestones: 'Hitos', tSprints: 'Sprints', tDetails: 'Detalles', view: 'Vista',
+  tasksDone: '{done} de {total} tareas hechas', noTasks: 'Todavía no hay tareas', percent: '{p}% completado', noProgress: 'Avance no mostrado',
+  next: 'Próximo: {n}, {d}', noMilestone: 'Ningún hito a la vista', dates: '{a} – {b}', since: 'desde el {a}', until: 'hasta el {b}',
+  readOnly: 'Puedes leer este proyecto pero no cambiarlo.',
+  addTaskIn: 'Añadir una tarea a {c}', addPlaceholder: '＋ Añadir una tarea', add: 'Añadir', moveTo: 'Mover a…', moveAria: 'Mover “{t}”', moved: '“{t}” movida a {c}',
+  due: 'vence {d}', low: 'Baja', medium: 'Media', high: 'Alta', doneMark: '✓ Hecha', inSprint: 'Sprint: {s}', colEmpty: 'Nada aquí',
+  attachExisting: 'Añadir tareas existentes…', attachTitle: 'Añadir tareas existentes', attachHint: 'Tareas abiertas que no pertenecen a ningún proyecto.', searchTasks: 'Buscar tareas',
+  attachNone: 'Ninguna tarea sin proyecto coincide.', attachGo: 'Añadir al proyecto', attached: '{n} tarea(s) añadidas', pickOne: 'Elige al menos una tarea',
+  mAdd: '＋ Añadir hito', mName: 'Nombre', mDate: 'Fecha', overdue: 'Vencido', mDoneAria: 'Marcar “{n}” como hecho', mEmptyTitle: 'Todavía no hay hitos', mEmptyText: 'Un hito es una fecha que alcanzar: una versión, una aprobación, un plazo.',
+  mNew: 'Nuevo hito', mEdit: 'Editar hito', mNeed: 'Escribe un nombre y elige una fecha',
+  sAdd: '＋ Añadir sprint', sName: 'Nombre', sStart: 'Empieza el', sEnd: 'Termina el', current: 'En curso', unassigned: 'Sin asignar', sprintOf: 'Sprint de “{t}”', noSprint: 'Sin sprint',
+  sprintCount: '{d} de {t} hechas', sEmptyTitle: 'Todavía no hay sprints', sEmptyText: 'Un sprint es una ventana de tiempo: añade uno y dale tareas desde el tablero.', sNew: 'Nuevo sprint', sEdit: 'Editar sprint', sNeed: 'Escribe un nombre y elige las dos fechas',
+  sNoTasks: 'No hay tareas en este sprint', sEnd2: 'El final no puede ser anterior al inicio',
+  dName: 'Nombre', dDesc: 'Descripción', dStatus: 'Estado', dStart: 'Empieza el', dEnd: 'Termina el', dColumns: 'Columnas del tablero (una por línea, de 2 a 8)',
+  dColumnsHint: 'Las tarjetas de una columna eliminada o renombrada vuelven a la primera columna.', dNameHint: 'Un nombre nuevo se vuelve a escribir en las tareas que puedes cambiar; las demás se quedan con el nombre anterior.', needName: 'Escribe un nombre', saved: 'Guardado',
+  create: 'Crear', save: 'Guardar', cancel: 'Cancelar', close: 'Cerrar', edit: 'Editar', remove: 'Quitar', share: 'Compartir…', del: 'Eliminar proyecto',
+  newTitle: 'Nuevo proyecto', removeConfirm: '¿Quitar “{n}”?', delConfirm: '¿Eliminar el proyecto “{n}”? Sus tareas siguen en Tareas.',
+  failed: 'No se pudo iniciar la interfaz del plugin: ', loadFailed: 'No se pudieron cargar los proyectos: ',
+}
+export const TEXTS: Record<L, Texts> = { en, it, es }
+
+export const langOf = (l: string | undefined): L => {
+  const x = (l ?? navigator.language).toLowerCase()
+  return x.startsWith('it') ? 'it' : x.startsWith('es') ? 'es' : 'en'
+}
+export const sub = (t: string, vars: Record<string, string | number>) => t.replace(/\{(\w+)\}/g, (_, k: string) => String(vars[k] ?? ''))

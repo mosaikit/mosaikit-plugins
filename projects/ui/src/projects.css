@@ -1,0 +1,46 @@
+/* Projects: the list of projects and the page of one project. Colours come from the tokens of the host; the state of
+   everything is also written in words. */
+.pj { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.pj-head { display: flex; align-items: center; gap: var(--sp-3); min-height: 57px; padding: 8px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.pj-head h1 { margin: 0; font-size: 16px; font-weight: 600; flex: 1; min-width: 0; }
+.pj-headrow { display: flex; align-items: center; gap: var(--sp-3); flex: 1 1 280px; min-width: 0; }
+.pj-head .pj-prog { flex: 1 1 220px; max-width: 360px; }
+.pj-body { flex: 1; min-height: 0; overflow: auto; padding: var(--sp-4) 24px; display: flex; flex-direction: column; gap: var(--sp-3); }
+.pj-body > .msk-emptystate { margin: auto; }
+.pj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--sp-4); }
+.pj-card { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel); transition: border-color var(--dur-1), box-shadow var(--dur-1); }
+.pj-card:hover { border-color: var(--acc-line); box-shadow: var(--sh-2); }
+.pj-cardhead { display: flex; align-items: center; gap: var(--sp-2); }
+.pj-cardhead h2 { margin: 0; font-size: 16px; flex: 1; min-width: 0; }
+.pj-name { all: unset; cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+.pj-name:hover { text-decoration: underline; }
+.pj-name:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 3px; }
+.pj-prog { display: flex; flex-direction: column; gap: 4px; }
+.pj-meta, .pj-dim { margin: 0; font-size: 12px; color: var(--dim); }
+.pj-note { margin: 0; padding: var(--sp-2) var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-s, 6px); font-size: 13px; }
+.pj-bar { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.pj-boardwrap { flex: 1; min-height: 0; overflow: auto; }
+.pj-task { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.pj-ttitle { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.pj-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); font-size: 12px; }
+.pj-due { color: var(--dim); }
+.pj-donemark { color: var(--ok); font-weight: 600; }
+.pj-add { display: flex; gap: var(--sp-2); padding: var(--sp-2); }
+.pj-add input { flex: 1; min-width: 0; }
+.pj-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
+.pj-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel); flex-wrap: wrap; }
+.pj-item.done .pj-iname { text-decoration: line-through; color: var(--dim); }
+.pj-iname { flex: 1; min-width: 120px; overflow-wrap: anywhere; }
+.pj-sprints { display: flex; flex-direction: column; gap: var(--sp-4); max-width: 880px; width: 100%; }
+.pj-sprint { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel); }
+.pj-sprint.current { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc) inset; }
+.pj-acts { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.pj-form { display: flex; flex-direction: column; gap: var(--sp-3); min-width: min(520px, 76vw); }
+.pj-details { max-width: 720px; min-width: 0; }
+.pj-form textarea { resize: vertical; }
+.pj-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--sp-3); align-items: end; }
+.pj-pick { display: flex; flex-direction: column; gap: var(--sp-1); max-height: 40vh; overflow: auto; }
+.pj-pickrow { display: flex; align-items: center; gap: var(--sp-3); padding: 4px 0; font-size: 14px; }
+.pj-pickrow span:first-of-type { flex: 1; overflow-wrap: anywhere; }
+.msk-btn.danger-text:hover:not(:disabled) { color: var(--err); border-color: var(--err); }
+@media (max-width: 640px) { .pj-head, .pj-body { padding-left: 16px; padding-right: 16px; } .pj-form { min-width: 0; } }

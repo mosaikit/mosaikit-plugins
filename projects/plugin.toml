@@ -1,0 +1,63 @@
+id = "com.mosaikit.projects"
+name = "Projects"
+version = "0.1.1"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "kanban"
+description = "Give a set of tasks a plan: board columns, milestones with dates and sprints, with a progress bar"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Plan the work of a release, a construction site or a campaign. A project has the columns of a board, milestones with a date and sprints (time boxes), and shows how many of its tasks are done.\n\nThe tasks stay tasks: they belong to the Tasks plugin, which must be installed, and the project is the name written in their Project field. You see and change only the tasks you may see and change in Tasks.\n\nA project is an item of the platform: share it with people or groups (read to follow it, write to arrange the board) and everything you already know about sharing, search and the trash applies."
+screenshots = ["board.svg", "plan.svg"]
+homepage = "https://example.org/mosaikit/plugins/projects"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "📋"
+label = "Projects"
+
+[[resources]]
+name = "projects"
+label = "Projects"
+title_field = "name"
+fields = [
+  { key = "name", label = "Name", kind = "text", required = true },
+  { key = "description", label = "Description", kind = "text", multiline = true },
+  { key = "status", label = "Status", kind = "choice", options = ["planned", "active", "on_hold", "done"] },
+  { key = "starts_on", label = "Starts on", kind = "date" },
+  { key = "ends_on", label = "Ends on", kind = "date" },
+  { key = "columns", label = "Columns", kind = "text", hidden = true },
+  { key = "milestones", label = "Milestones", kind = "text", hidden = true },
+  { key = "sprints", label = "Sprints", kind = "text", hidden = true },
+]
+
+[ui]
+entry = "index.html"
+
+[permissions]
+hooks = ["projects"]
+# the tasks of a project are read and arranged through commands of Tasks, as the same person
+calls = ["com.mosaikit.tasks"]
+
+[[kpi]]
+view = "kpi_projects_status"
+label = "Status of the projects"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+details = "Pianifica il lavoro di un rilascio, di un cantiere o di una campagna. Un progetto ha le colonne di una lavagna, le tappe con una data e gli sprint (finestre di tempo), e mostra quante delle sue attività sono fatte.\n\nLe attività restano attività: appartengono al plugin Attività, che deve essere installato, e il progetto è il nome scritto nel loro campo Progetto. Vedi e modifichi solo le attività che puoi vedere e modificare in Attività.\n\nUn progetto è un elemento della piattaforma: condividilo con persone o gruppi (lettura per seguirlo, scrittura per organizzare la lavagna) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
+name = "Progetti"
+description = "Dai un piano a un insieme di attività: colonne della lavagna, tappe con date e sprint, con una barra di avanzamento"
+label = "Progetti"
+
+[i18n.it.resources.projects]
+label = "Progetti"
+fields = { name = "Nome", description = "Descrizione", status = "Stato", starts_on = "Inizia il", ends_on = "Finisce il", columns = "Colonne", milestones = "Tappe", sprints = "Sprint" }
+options.status = { planned = "pianificato", active = "attivo", on_hold = "in pausa", done = "concluso" }
+
+[i18n.it.kpi.kpi_projects_status]
+label = "Stato dei progetti"
+columns = { projects = "progetti", active_projects = "progetti attivi" }
