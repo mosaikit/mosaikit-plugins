@@ -1,0 +1,12 @@
+name = "Marcadores"
+description = "Una colección compartida de enlaces web con una nota y etiquetas, para volver a encontrarlos y compartirlos con personas y grupos"
+label = "Marcadores"
+details = "Guarda los enlaces a los que tu equipo vuelve a menudo: cada marcador tiene un título, la dirección, una nota y etiquetas. Busca por cualquiera de ellos, filtra por etiqueta, marca como favoritos los que más usas y abre o copia un enlace con un clic.\n\nUn marcador es un elemento de la plataforma: compártelo con personas o grupos (lectura para verlo, escritura para editarlo) y vale todo lo que ya sabes sobre compartir, buscar y la papelera. Solo se aceptan direcciones http y https y de los sitios que guardas no se descarga nada."
+
+[resources.bookmarks]
+label = "Marcadores"
+fields = { title = "Título", url = "Dirección", note = "Nota", tags = "Etiquetas", favorite = "Favorito" }
+
+[kpi.kpi_bookmarks_status]
+label = "Estado de los marcadores"
+columns = { total = "total", favorites = "favoritos" }

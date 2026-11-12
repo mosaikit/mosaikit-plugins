@@ -1,0 +1,57 @@
+id = "com.mosaikit.bookmarks"
+name = "Bookmarks"
+version = "0.1.0"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "bookmark"
+description = "A shared collection of web links with a note and tags, to find again and to share with people and groups"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Keep the links your team comes back to: each bookmark has a title, the address, a note and tags. Search by any of them, filter by tag, mark the ones you use most as favourites and open or copy a link with one click.\n\nA bookmark is an item of the platform: share it with people or groups (read to see it, write to edit it) and everything you already know about sharing, search and the trash applies. Only http and https addresses are accepted, and nothing is fetched from the sites you save."
+screenshots = ["list.svg", "edit.svg"]
+homepage = "https://example.org/mosaikit/plugins/bookmarks"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "🔖"
+label = "Bookmarks"
+
+[[resources]]
+name = "bookmarks"
+label = "Bookmarks"
+title_field = "title"
+fields = [
+  { key = "title", label = "Title", kind = "text", required = true },
+  { key = "url", label = "Address", kind = "text", required = true },
+  { key = "note", label = "Note", kind = "text", multiline = true },
+  { key = "tags", label = "Tags", kind = "text", hidden = true },
+  { key = "favorite", label = "Favourite", kind = "bool" },
+]
+
+[ui]
+entry = "index.html"
+
+[permissions]
+hooks = ["bookmarks"]
+
+[[kpi]]
+view = "kpi_bookmarks_status"
+label = "Status of the bookmarks"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+details = "Tieni i link a cui il tuo gruppo torna spesso: ogni segnalibro ha un titolo, l’indirizzo, una nota e delle etichette. Cerca per ciascuno di questi, filtra per etichetta, segna come preferiti quelli che usi di più e apri o copia un link con un clic.\n\nUn segnalibro è un elemento della piattaforma: condividilo con persone o gruppi (lettura per vederlo, scrittura per modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino. Sono accettati solo indirizzi http e https e dai siti che salvi non viene scaricato nulla."
+name = "Segnalibri"
+description = "Una raccolta condivisa di link web con una nota e delle etichette, da ritrovare e da condividere con persone e gruppi"
+label = "Segnalibri"
+
+[i18n.it.resources.bookmarks]
+label = "Segnalibri"
+fields = { title = "Titolo", url = "Indirizzo", note = "Nota", tags = "Etichette", favorite = "Preferito" }
+
+[i18n.it.kpi.kpi_bookmarks_status]
+label = "Stato dei segnalibri"
+columns = { total = "totale", favorites = "preferiti" }

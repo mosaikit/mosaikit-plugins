@@ -1,0 +1,35 @@
+/* Bookmarks: a grid of cards. Colours come from the tokens of the host; a pressed filter is also marked by a line under it. */
+.bk { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.bk-head { display: flex; align-items: center; gap: var(--sp-3); min-height: 57px; padding: 8px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.bk-head h1 { margin: 0; font-size: 16px; font-weight: 600; flex: 1; }
+.bk-bar { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-3) 24px 0; }
+.bk-bar:empty { display: none; }
+.bk-search { width: 100%; max-width: 460px; }
+.bk-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.bk-chip { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12px; font-weight: 600; padding: 3px 11px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--panel2); color: var(--fg); cursor: pointer; }
+.bk-chip:hover { border-color: var(--acc-line); }
+.bk-chip[aria-pressed='true'] { background: var(--acc-soft); border-color: var(--acc); box-shadow: inset 0 -2px 0 var(--acc); }
+.bk-count { font-weight: 400; color: var(--dim); }
+.bk-body { flex: 1; min-height: 0; overflow: auto; padding: var(--sp-4) 24px; display: flex; flex-direction: column; }
+.bk-body > .msk-emptystate { margin: auto; }
+.bk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--sp-4); align-items: start; }
+.bk-card { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel); transition: border-color var(--dur-1), box-shadow var(--dur-1); }
+.bk-card:hover { border-color: var(--acc-line); box-shadow: var(--sh-2); }
+.bk-top { display: flex; align-items: center; gap: var(--sp-3); }
+.bk-id { flex: 1; min-width: 0; }
+.bk-id h2 { margin: 0; font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
+.bk-host { margin: 0; font-size: 12px; color: var(--dim); overflow-wrap: anywhere; }
+.bk-star { font: inherit; font-size: 20px; line-height: 1; padding: 4px 6px; border: 0; background: none; color: var(--fg); cursor: pointer; border-radius: var(--r-s); }
+.bk-star:hover:not(:disabled) { background: var(--acc-soft); }
+.bk-star:disabled { cursor: default; opacity: 0.6; }
+.bk-note { margin: 0; font-size: 13px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bk-tags { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+.bk-tag { font-size: 11px; padding: 1px 8px; border-radius: var(--r-pill); border: 1px solid var(--line); color: var(--dim); }
+.bk-acts { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-2); }
+a.msk-btn { text-decoration: none; display: inline-flex; align-items: center; }
+.bk-form { display: flex; flex-direction: column; gap: var(--sp-3); min-width: min(520px, 76vw); }
+.bk-form textarea { min-height: 80px; resize: vertical; }
+.bk-check { display: flex; align-items: center; gap: var(--sp-2); font-size: 14px; }
+.bk-copybox { position: fixed; left: -9999px; top: 0; opacity: 0; }
+.msk-btn.danger-text:hover:not(:disabled) { color: var(--err); border-color: var(--err); }
+@media (max-width: 640px) { .bk-head, .bk-body { padding-left: 16px; padding-right: 16px; } .bk-bar { padding-left: 16px; padding-right: 16px; } }
