@@ -1,0 +1,12 @@
+name = "Chat"
+description = "Kanalen en gesprekken in realtime met aanwezigheid, antwoorden, reacties en Markdown"
+label = "Chat"
+details = "Praat met je collega's in kanalen. Een bericht komt direct aan bij wie het kanaal open heeft, met wie online is en wie er typt.\n\nEen kanaal is een item van het platform: deel het met personen of groepen (lezen om mee te volgen, schrijven om mee te praten) en alles wat je al weet over delen geldt. Berichten blijven als geschiedenis bewaard; schrijf ze in Markdown, antwoord op een bericht, reageer met een emoji, bewerk of verwijder je eigen berichten."
+
+[resources.channels]
+label = "Kanalen"
+fields = { name = "Naam", topic = "Onderwerp" }
+
+[resources.messages]
+label = "Berichten"
+fields = { text = "Tekst", reply_to = "Antwoord op", edited = "Bewerkt", reactions = "Reacties" }

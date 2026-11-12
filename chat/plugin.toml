@@ -1,0 +1,65 @@
+id = "com.mosaikit.chat"
+name = "Chat"
+version = "0.1.0"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "message-circle"
+description = "Channels and live conversations with presence, replies, reactions and Markdown"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Talk with your colleagues in channels. A message arrives at once for everyone who has the channel open, with who is online and who is typing.\n\nA channel is an item of the platform: share it with people or groups (read to follow, write to talk) and everything you already know about sharing applies. Messages are kept as history; write them in Markdown, reply to one, react with an emoji, edit or delete your own."
+screenshots = ["channel.svg", "channels.svg"]
+homepage = "https://example.org/mosaikit/plugins/chat"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "💬"
+label = "Chat"
+
+# a channel: its messages are its children, so whoever sees the channel sees them (and the sharing of the channel is theirs)
+[[resources]]
+name = "channels"
+label = "Channels"
+title_field = "name"
+fields = [
+  { key = "name", label = "Name", kind = "text", required = true },
+  { key = "topic", label = "Topic", kind = "text" },
+]
+
+[[resources]]
+name = "messages"
+label = "Messages"
+title_field = "text"
+fields = [
+  { key = "text", label = "Text", kind = "text", required = true, multiline = true },
+  # the id of the message this one answers
+  { key = "reply_to", label = "Reply to", kind = "text", hidden = true, search = false },
+  { key = "edited", label = "Edited", kind = "bool", hidden = true },
+  # a JSON object: emoji -> list of user ids
+  { key = "reactions", label = "Reactions", kind = "text", hidden = true, search = false },
+]
+
+[ui]
+entry = "index.html"
+
+[permissions]
+hooks = ["channels", "messages"]
+realtime = true
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+description = "Canali e conversazioni in tempo reale con presenza, risposte, reazioni e Markdown"
+details = "Parla con i colleghi nei canali. Un messaggio arriva subito a chi ha il canale aperto, con chi è online e chi sta scrivendo.\n\nUn canale è un elemento della piattaforma: condividilo con persone o gruppi (lettura per seguire, scrittura per parlare) e vale tutto ciò che sai già sulla condivisione. I messaggi restano come cronologia; scrivili in Markdown, rispondi a uno, reagisci con una emoji, modifica o elimina i tuoi."
+name = "Chat"
+label = "Chat"
+
+[i18n.it.resources.channels]
+label = "Canali"
+fields = { name = "Nome", topic = "Argomento" }
+
+[i18n.it.resources.messages]
+label = "Messaggi"
+fields = { text = "Testo", reply_to = "Risposta a", edited = "Modificato", reactions = "Reazioni" }

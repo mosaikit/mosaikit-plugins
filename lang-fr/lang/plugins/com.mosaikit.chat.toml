@@ -1,0 +1,12 @@
+name = "Chat"
+description = "Canaux et conversations en temps réel avec présence, réponses, réactions et Markdown"
+label = "Chat"
+details = "Discutez avec vos collègues dans des canaux. Un message arrive instantanément chez qui a le canal ouvert, avec les personnes en ligne et celles en train d’écrire.\n\nUn canal est un élément de la plateforme : partagez-le avec des personnes ou des groupes (lecture pour suivre, écriture pour parler) et tout ce que vous savez déjà sur le partage s’applique. Les messages restent en historique ; rédigez-les en Markdown, répondez à l’un d’eux, réagissez avec un emoji, modifiez ou supprimez les vôtres."
+
+[resources.channels]
+label = "Canaux"
+fields = { name = "Nom", topic = "Sujet" }
+
+[resources.messages]
+label = "Messages"
+fields = { text = "Texte", reply_to = "Réponse à", edited = "Modifié", reactions = "Réactions" }
