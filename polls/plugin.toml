@@ -1,0 +1,85 @@
+id = "com.mosaikit.polls"
+name = "Polls"
+version = "0.2.0"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "vote"
+description = "A quick question to a group: single or multiple choice, an optional deadline, named or hidden votes and live results"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Ask a quick question to the people a poll is shared with: write the question and two to twelve options, choose single or multiple choice, set a closing date if you want one and decide whether the voters are named.\n\nEveryone with access votes with one click and can change their vote while the poll is open. Results appear as bars that move live while others vote; you choose whether they show always, after the vote or only once the poll is closed.\n\nA poll is an item of the platform: share it with people or groups (read access is enough to vote) and everything you already know about sharing, search and the trash applies."
+screenshots = ["poll.svg", "results.svg"]
+homepage = "https://example.org/mosaikit/plugins/polls"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "🗳️"
+label = "Polls"
+
+[[resources]]
+name = "polls"
+label = "Polls"
+title_field = "question"
+fields = [
+  { key = "question", label = "Question", kind = "text", required = true },
+  { key = "details", label = "Details", kind = "text", multiline = true },
+  { key = "options", label = "Options", kind = "text", hidden = true },
+  { key = "multiple", label = "More than one choice", kind = "bool" },
+  { key = "hide_voters", label = "Hide who voted", kind = "bool" },
+  { key = "results", label = "Show results", kind = "choice", options = ["always", "after_vote", "after_close"] },
+  { key = "closes_on", label = "Closes on", kind = "date" },
+  { key = "closed", label = "Closed", kind = "bool" },
+]
+
+# who voted for what: a reader writes and deletes only their own rows (command polls.vote); a visitor of a public link
+# only adds rows (command public_vote), under a random browser id kept by the public page
+[[tables]]
+name = "votes"
+insert_for = "visitor"
+owner_column = "user_id"
+
+[[public_commands]]
+name = "public_poll"
+description = "Reads the question, the options and, when the poll shows them to a visitor, the counts (never names)"
+
+[[public_commands]]
+name = "public_vote"
+description = "Adds the vote of a visitor, once for each browser, while the poll is open"
+write = true
+
+[ui]
+entry = "index.html"
+public_view = "public.html"
+
+[permissions]
+hooks = ["polls"]
+realtime = true
+
+[[kpi]]
+view = "kpi_polls_status"
+label = "Status of the polls"
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "open-polls"
+label = "Open polls"
+data = { command = "polls.widget_open", kind = "number", size = "s", texts = { en = { secondary = "open in all", empty = "No open polls" }, it = { label = "Sondaggi aperti", secondary = "aperti in tutto", empty = "Nessun sondaggio aperto" }, es = { label = "Encuestas abiertas", secondary = "abiertas en total", empty = "No hay encuestas abiertas" } } }
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Sondaggi"
+description = "Una domanda veloce a un gruppo: scelta singola o multipla, una scadenza facoltativa, voti con nome o nascosti e risultati in tempo reale"
+details = "Fai una domanda veloce alle persone con cui il sondaggio è condiviso: scrivi la domanda e da due a dodici opzioni, scegli tra risposta singola o multipla, fissa una data di chiusura se vuoi e decidi se i votanti sono nominati.\n\nChiunque abbia accesso vota con un clic e può cambiare il voto finché il sondaggio è aperto. I risultati compaiono come barre che si muovono in tempo reale mentre gli altri votano; scegli tu se mostrarli sempre, dopo il voto o solo a sondaggio chiuso.\n\nUn sondaggio è un elemento della piattaforma: condividilo con persone o gruppi (basta l’accesso in lettura per votare) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
+label = "Sondaggi"
+
+[i18n.it.resources.polls]
+label = "Sondaggi"
+fields = { question = "Domanda", details = "Dettagli", options = "Opzioni", multiple = "Più di una scelta", hide_voters = "Nascondi chi ha votato", results = "Mostra i risultati", closes_on = "Chiude il", closed = "Chiuso" }
+options.results = { always = "sempre", after_vote = "dopo il voto", after_close = "dopo la chiusura" }
+
+[i18n.it.kpi.kpi_polls_status]
+label = "Stato dei sondaggi"
+columns = { total = "totale", open_polls = "aperti", closed_polls = "chiusi" }

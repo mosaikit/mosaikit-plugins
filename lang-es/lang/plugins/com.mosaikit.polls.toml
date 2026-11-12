@@ -1,0 +1,13 @@
+name = "Encuestas"
+description = "Una pregunta rápida a un grupo: elección única o múltiple, un plazo opcional, votos con nombre u ocultos y resultados en directo"
+label = "Encuestas"
+details = "Haz una pregunta rápida a las personas con las que se comparte la encuesta: escribe la pregunta y de dos a doce opciones, elige entre respuesta única o múltiple, fija una fecha de cierre si quieres y decide si se nombra a quienes votan.\n\nQuien tenga acceso vota con un clic y puede cambiar su voto mientras la encuesta esté abierta. Los resultados aparecen como barras que se mueven en directo mientras otros votan; tú eliges si se muestran siempre, tras votar o solo cuando la encuesta se cierra.\n\nUna encuesta es un elemento de la plataforma: compártela con personas o grupos (basta el acceso de lectura para votar) y vale todo lo que ya sabes sobre compartir, buscar y la papelera."
+
+[resources.polls]
+label = "Encuestas"
+fields = { question = "Pregunta", details = "Detalles", options = "Opciones", multiple = "Más de una opción", hide_voters = "Ocultar quién ha votado", results = "Mostrar resultados", closes_on = "Se cierra el", closed = "Cerrada" }
+options.results = { always = "siempre", after_vote = "tras votar", after_close = "tras el cierre" }
+
+[kpi.kpi_polls_status]
+label = "Estado de las encuestas"
+columns = { total = "total", open_polls = "abiertas", closed_polls = "cerradas" }
