@@ -1,0 +1,14 @@
+[package]
+name = "surveys"
+version = "0.1.1"
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+mosaikit-plugin-sdk.workspace = true
+
+[lints]
+workspace = true
