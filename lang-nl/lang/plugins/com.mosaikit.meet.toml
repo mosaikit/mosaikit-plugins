@@ -1,0 +1,8 @@
+name = "Meet"
+description = "Videovergaderzalen: doe mee met camera, microfoon en gedeeld scherm, zie wie er in de zaal is"
+label = "Meet"
+details = "Open een zaal en kom samen met je collega's van aangezicht tot aangezicht: camera, microfoon, gedeeld scherm en een chat binnen het gesprek.\n\nEen zaal is een item van het platform: deel hem met de personen of groepen die mogen meedoen (wie de zaal ziet, kan meedoen). De zaal opent binnen de pagina en toont wie hem open heeft; het gesprek verloopt via de dienst Jitsi Meet, dus er gaat geen video via Mosaikit.\n\nDe browser vraagt de eerste keer om camera en microfoon."
+
+[resources.rooms]
+label = "Zalen"
+fields = { name = "Naam", topic = "Onderwerp" }

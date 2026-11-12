@@ -1,0 +1,31 @@
+/* Meet: the rooms as cards, a room with the meeting service inside the page. Colours come from the tokens of the host. */
+.mt { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.mt-head { display: flex; align-items: center; gap: var(--sp-3); min-height: 57px; padding: 8px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.mt-head h1 { margin: 0; font-size: 16px; font-weight: 600; flex: 1; }
+.mt-titles { flex: 1; min-width: 0; }
+.mt-titles h1 { flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-titles p { margin: 0; font-size: 12px; color: var(--dim); }
+.mt-titles p:empty { display: none; }
+.mt-who { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.mt-count { font-size: 12px; color: var(--dim); white-space: nowrap; }
+.mt-count::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--ok); }
+.mt-head a.msk-btn { text-decoration: none; }
+.mt-body { flex: 1; min-height: 0; overflow: auto; padding: var(--sp-4) 24px; display: flex; flex-direction: column; }
+.mt-body.in-room { padding: 0; overflow: hidden; }
+.mt-body > .msk-emptystate { margin: auto; }
+.mt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--sp-4); }
+.mt-card { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel); transition: border-color var(--dur-1), box-shadow var(--dur-1); }
+.mt-card:hover { border-color: var(--acc-line); box-shadow: var(--sh-2); }
+.mt-card-head { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.mt-card-head .msk-avatar { width: 44px; height: 44px; font-size: 16px; }
+.mt-card-titles { display: flex; flex-direction: column; min-width: 0; }
+.mt-card-titles strong { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-card-titles span { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-by { font-size: 12px; color: var(--dim); }
+.mt-card-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin-top: auto; }
+.msk-btn.danger-text:hover:not(:disabled) { color: var(--err); border-color: var(--err); }
+.mt-frame { flex: 1; width: 100%; min-height: 0; border: 0; background: #000; }
+.mt-privacy { margin: 0; padding: 6px 24px; font-size: 12px; color: var(--dim); border-top: 1px solid var(--line); }
+.mt-form { display: flex; flex-direction: column; gap: var(--sp-2); min-width: min(380px, 70vw); }
+@media (max-width: 640px) { .mt-head, .mt-body { padding-left: 16px; padding-right: 16px; } .mt-privacy { padding: 6px 16px; } }
+@media (prefers-reduced-motion: reduce) { .mt-card { transition: none; } }

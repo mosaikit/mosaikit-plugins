@@ -1,0 +1,50 @@
+id = "com.mosaikit.meet"
+name = "Meet"
+version = "0.1.0"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "video"
+description = "Video meeting rooms: join with camera, microphone and screen share, see who is in the room"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Open a room and meet your colleagues face to face: camera, microphone, screen sharing and a chat inside the call.\n\nA room is an item of the platform: share it with the people or groups who may join (anyone who can see the room can enter it). The room opens inside the page and shows who has it open; the call itself runs on the Jitsi Meet service, so no video goes through Mosaikit.\n\nThe browser asks you for the camera and the microphone the first time."
+screenshots = ["room.svg", "rooms.svg"]
+homepage = "https://example.org/mosaikit/plugins/meet"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "📹"
+label = "Meet"
+
+[[resources]]
+name = "rooms"
+label = "Rooms"
+title_field = "name"
+fields = [
+  { key = "name", label = "Name", kind = "text", required = true },
+  { key = "topic", label = "Topic", kind = "text" },
+]
+
+[ui]
+entry = "index.html"
+
+[permissions]
+# the meeting service shown in the page of a room (it gets the camera and the microphone of the person, after they agree)
+frame_src = ["https://meet.jit.si"]
+media = true
+# who has a room open: a live channel on the room
+realtime = true
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+description = "Stanze per videoriunioni: entra con fotocamera, microfono e condivisione dello schermo, vedi chi c’è nella stanza"
+details = "Apri una stanza e incontra i colleghi faccia a faccia: fotocamera, microfono, condivisione dello schermo e una chat dentro la chiamata.\n\nUna stanza è un elemento della piattaforma: condividila con le persone o i gruppi che possono entrare (chiunque veda la stanza può entrarci). La stanza si apre dentro la pagina e mostra chi la tiene aperta; la chiamata vera e propria passa dal servizio Jitsi Meet, quindi nessun video passa da Mosaikit.\n\nIl browser ti chiede fotocamera e microfono la prima volta."
+name = "Riunioni"
+label = "Riunioni"
+
+[i18n.it.resources.rooms]
+label = "Stanze"
+fields = { name = "Nome", topic = "Argomento" }
