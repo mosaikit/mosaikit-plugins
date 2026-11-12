@@ -1,0 +1,4 @@
+name = "Chino (中文)"
+description = "Interfaz en chino: la plataforma y los textos de manifiesto de los plugins oficiales"
+label = "中文"
+details = "Interfaz en chino para la plataforma y para los nombres de los plugins oficiales (campos, opciones e indicadores). Los textos dentro de las páginas de un plugin los dibuja el propio plugin: donde no tiene un texto en chino quedan en inglés.\n\nPara añadir otro idioma, copia este plugin."

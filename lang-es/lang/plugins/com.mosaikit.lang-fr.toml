@@ -1,0 +1,4 @@
+name = "Francés (Français)"
+description = "Interfaz en francés: la plataforma y los textos de manifiesto de los plugins oficiales"
+label = "Français"
+details = "Interfaz en francés para la plataforma y para los nombres de los plugins oficiales (campos, opciones e indicadores). Los textos dentro de las páginas de un plugin los dibuja el propio plugin: donde no tiene un texto en francés quedan en inglés.\n\nPara añadir otro idioma, copia este plugin."

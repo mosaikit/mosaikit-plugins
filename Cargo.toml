@@ -8,6 +8,18 @@ members = [
     "tasks",
     "contacts",
     "maps",
+    "chat",
+    "announcements",
+    "bookmarks",
+    "snippets",
+    "polls",
+    "surveys",
+    "approvals",
+    "dashboard",
+    "forms",
+    "projects",
+    "calendar",
+    "whiteboard",
 ]
 
 [workspace.package]

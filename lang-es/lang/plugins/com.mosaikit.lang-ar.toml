@@ -1,0 +1,4 @@
+name = "Árabe (العربية)"
+description = "Interfaz en árabe: la plataforma y los textos de manifiesto de los plugins oficiales"
+label = "العربية"
+details = "Interfaz en árabe para la plataforma y para los nombres de los plugins oficiales (campos, opciones e indicadores). Los textos dentro de las páginas de un plugin los dibuja el propio plugin: donde no tiene un texto en árabe quedan en inglés.\n\nPara añadir otro idioma, copia este plugin."
