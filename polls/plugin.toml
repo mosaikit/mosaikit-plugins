@@ -8,7 +8,7 @@ description = "A quick question to a group: single or multiple choice, an option
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Ask a quick question to the people a poll is shared with: write the question and two to twelve options, choose single or multiple choice, set a closing date if you want one and decide whether the voters are named.\n\nEveryone with access votes with one click and can change their vote while the poll is open. Results appear as bars that move live while others vote; you choose whether they show always, after the vote or only once the poll is closed.\n\nA poll is an item of the platform: share it with people or groups (read access is enough to vote) and everything you already know about sharing, search and the trash applies."
-screenshots = ["poll.svg", "results.svg"]
+screenshots = ["poll.webp", "results.webp"]
 homepage = "https://example.org/mosaikit/plugins/polls"
 
 [requires]

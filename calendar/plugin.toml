@@ -8,7 +8,7 @@ description = "The agenda of the team: month, week and day views, events with in
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Write an event with its day, its time and a repeat (every day, week, month or year), invite people of your organisation and see everything in a month, week or day view. The invitees answer yes, maybe or no, and everybody sees who is coming. Times are written as local times, exactly as you type them: there is no time zone conversion, so a meeting at 09:30 is at 09:30 for everyone.\n\nThe open tasks with a due date appear next to the events (you can switch them off), so deadlines and meetings are in one place. An event is an item of the platform: share it with the invitees so that they can see it and answer, and download it as an .ics file to add it to another calendar."
-screenshots = ["month.svg", "invitation.svg"]
+screenshots = ["month.webp", "invitation.webp"]
 homepage = "https://example.org/mosaikit/plugins/calendar"
 
 [requires]

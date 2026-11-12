@@ -8,7 +8,7 @@ description = "Build a form, share a public link to collect answers from anyone 
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Build a form with up to 30 fields (a line of text, a long text, one choice, several choices, a number, a date or an email address), mark which ones are required and share it: with your colleagues, who answer inside the platform, or with a public link that anyone can open and fill in with no account.\n\nSet when the form closes and the most answers it takes. The answers go into a table with the counts per option, and you can export them to CSV or delete an answer, for example a spam one. A visitor never sees the answers of others, nor how many there are.\n\nThe public link needs the tenant policy «Public commands», which the Tenant Manager turns on. A form is an item of the platform: share it with people or groups (read to fill it in, write to see the answers and edit it) and everything you already know about sharing, search and the trash applies."
-screenshots = ["form.svg", "answers.svg"]
+screenshots = ["form.webp", "answers.webp"]
 homepage = "https://example.org/mosaikit/plugins/forms"
 
 [requires]

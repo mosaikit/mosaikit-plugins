@@ -6,7 +6,7 @@ description = "Top bar with a wide search, a drawer that opens and closes"
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "A top bar with a wide search field and a drawer that opens and closes. Suited to people who search more than they browse."
-screenshots = ["layout.svg", "layout-page.svg"]
+screenshots = ["layout.webp", "layout-page.webp"]
 homepage = "https://example.org/mosaikit/plugins/layout-workspace"
 
 [requires]

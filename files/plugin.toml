@@ -8,7 +8,7 @@ description = "Shareable files and folders, with preview, zip and public links"
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Store files and folders, preview them in the browser, download a folder as a zip archive and share them.\n\nEvery file has its own sharing level and can be opened to anyone with a public link. Files count against the quota of the tenant."
-screenshots = ["files.svg", "preview.svg"]
+screenshots = ["files.webp", "preview.webp"]
 homepage = "https://example.org/mosaikit/plugins/files"
 
 [requires]

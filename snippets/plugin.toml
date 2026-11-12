@@ -8,7 +8,7 @@ description = "A shared collection of reusable texts and pieces of code with tag
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Keep the texts and the code your team uses again and again: a title, the text or code itself, a kind (plain text, shell, SQL, JSON, JavaScript, Python, Rust, Markdown) and tags. Find a snippet by search, by kind or by tag and copy it to the clipboard with one click.\n\nA snippet is an item of the platform: share it with people or groups (read to use it, write to edit it) and everything you already know about sharing, search and the trash applies."
-screenshots = ["list.svg", "detail.svg"]
+screenshots = ["list.webp", "detail.webp"]
 homepage = "https://example.org/mosaikit/plugins/snippets"
 
 [requires]

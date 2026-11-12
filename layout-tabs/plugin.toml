@@ -6,7 +6,7 @@ description = "Apps and pages as tabs under the band, a menu for the pages of an
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Apps and pages as tabs under the band; a menu lists the pages of an app. Suited to few apps used side by side."
-screenshots = ["layout.svg", "layout-page.svg"]
+screenshots = ["layout.webp", "layout-page.webp"]
 homepage = "https://example.org/mosaikit/plugins/layout-tabs"
 
 [requires]

@@ -8,7 +8,7 @@ description = "Video meeting rooms: join with camera, microphone and screen shar
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Open a room and meet your colleagues face to face: camera, microphone, screen sharing and a chat inside the call.\n\nA room is an item of the platform: share it with the people or groups who may join (anyone who can see the room can enter it). The room opens inside the page and shows who has it open; the call itself runs on the Jitsi Meet service, so no video goes through Mosaikit.\n\nThe browser asks you for the camera and the microphone the first time."
-screenshots = ["room.svg", "rooms.svg"]
+screenshots = ["rooms.webp", "room.webp"]
 homepage = "https://example.org/mosaikit/plugins/meet"
 
 [requires]

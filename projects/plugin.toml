@@ -8,7 +8,7 @@ description = "Give a set of tasks a plan: board columns, milestones with dates 
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Plan the work of a release, a construction site or a campaign. A project has the columns of a board, milestones with a date and sprints (time boxes), and shows how many of its tasks are done.\n\nThe tasks stay tasks: they belong to the Tasks plugin, which must be installed, and the project is the name written in their Project field. You see and change only the tasks you may see and change in Tasks.\n\nA project is an item of the platform: share it with people or groups (read to follow it, write to arrange the board) and everything you already know about sharing, search and the trash applies."
-screenshots = ["board.svg", "plan.svg"]
+screenshots = ["board.webp", "plan.webp"]
 homepage = "https://example.org/mosaikit/plugins/projects"
 
 [requires]
