@@ -1,0 +1,14 @@
+name = "Calendario"
+description = "La agenda del equipo: vistas por mes, semana y día, eventos con personas invitadas, repeticiones y las fechas de vencimiento de tus tareas"
+label = "Calendario"
+details = "Escribe un evento con su día, su hora y una repetición (cada día, semana, mes o año), invita a personas de tu organización y míralo todo en una vista por mes, semana o día. Los invitados responden sí, quizá o no, y todos ven quién asiste. Las horas son horas locales, escritas tal como las tecleas: no hay conversión de zona horaria, así que una reunión a las 09:30 es a las 09:30 para todos.\n\nLas tareas abiertas con fecha de vencimiento aparecen junto a los eventos (puedes ocultarlas), de modo que plazos y reuniones están en un mismo lugar. Un evento es un elemento de la plataforma: compártelo con los invitados para que lo vean y respondan, y descárgalo como archivo .ics para añadirlo a otro calendario."
+
+[resources.events]
+label = "Eventos"
+fields = { title = "Título", details = "Detalles", location = "Lugar", starts_on = "Empieza el", starts_time = "Hora de inicio", ends_on = "Termina el", ends_time = "Hora de fin", all_day = "Todo el día", repeat = "Repetir", repeat_until = "Repetir hasta el", attendees = "Invitados", color = "Color" }
+options.repeat = { none = "nunca", daily = "cada día", weekly = "cada semana", monthly = "cada mes", yearly = "cada año" }
+options.color = { blue = "azul", green = "verde", red = "rojo", orange = "naranja", purple = "morado", grey = "gris" }
+
+[kpi.kpi_events_status]
+label = "Estado de los eventos"
+columns = { events = "eventos", recurring_events = "eventos que se repiten" }
