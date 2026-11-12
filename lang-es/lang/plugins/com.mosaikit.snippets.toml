@@ -1,0 +1,13 @@
+name = "Fragmentos"
+description = "Una colección compartida de textos y fragmentos de código reutilizables, con etiquetas, para copiar con un clic"
+label = "Fragmentos"
+details = "Ten a mano los textos y el código que tu equipo reutiliza una y otra vez: un título, el texto o el código, un tipo (texto simple, shell, SQL, JSON, JavaScript, Python, Rust, Markdown) y etiquetas. Encuentra un fragmento con la búsqueda, por tipo o por etiqueta y cópialo al portapapeles con un clic.\n\nUn fragmento es un elemento de la plataforma: compártelo con personas o grupos (lectura para usarlo, escritura para editarlo) y vale todo lo que ya sabes sobre compartir, buscar y la papelera."
+
+[resources.snippets]
+label = "Fragmentos"
+fields = { title = "Título", body = "Contenido", kind = "Tipo", tags = "Etiquetas" }
+options.kind = { text = "texto", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "otro" }
+
+[kpi.kpi_snippets_by_kind]
+label = "Fragmentos por tipo"
+columns = { kind = "tipo", snippets = "fragmentos" }
