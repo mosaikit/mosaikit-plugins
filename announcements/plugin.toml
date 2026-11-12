@@ -1,0 +1,78 @@
+id = "com.mosaikit.announcements"
+name = "Announcements"
+version = "0.1.1"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "megaphone"
+description = "A notice board: publish notices with a level and a period, and see who confirmed they read them"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Publish a notice for the people it is shared with: a title, a text in Markdown, a level (information, important or urgent) and the period it is valid. Urgent and pinned notices stay at the top.\n\nWhen a notice asks for confirmation, each reader confirms with one click and the author sees who did and when.\n\nA notice is an item of the platform: share it with people or groups (read to follow it, write to edit it) and everything you already know about sharing, search and the trash applies."
+screenshots = ["board.svg", "notice.svg"]
+homepage = "https://example.org/mosaikit/plugins/announcements"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "📣"
+label = "Announcements"
+
+[[resources]]
+name = "notices"
+label = "Notices"
+title_field = "title"
+fields = [
+  { key = "title", label = "Title", kind = "text", required = true },
+  { key = "body", label = "Text", kind = "text", multiline = true },
+  { key = "level", label = "Level", kind = "choice", options = ["info", "important", "urgent"] },
+  { key = "starts_on", label = "Valid from", kind = "date" },
+  { key = "ends_on", label = "Valid until", kind = "date" },
+  { key = "pinned", label = "Pinned", kind = "bool" },
+  { key = "needs_ack", label = "Ask for confirmation", kind = "bool" },
+]
+
+# who confirmed a notice: a reader writes the row of their own confirmation (command notices.confirm)
+[[tables]]
+name = "acks"
+insert_for = "reader"
+owner_column = "user_id"
+
+[ui]
+entry = "index.html"
+
+[permissions]
+hooks = ["notices"]
+
+[[kpi]]
+view = "kpi_notices_status"
+label = "Status of the notices"
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "current-notices"
+label = "Current notices"
+data = { command = "notices.widget_current", kind = "list", size = "m", texts = { en = { empty = "No notices in force" }, it = { label = "Avvisi in corso", empty = "Nessun avviso in corso" }, es = { label = "Avisos vigentes", empty = "No hay avisos vigentes" } } }
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "to-confirm"
+label = "Notices to confirm"
+data = { command = "notices.widget_to_confirm", kind = "number", size = "s", texts = { en = { empty = "Nothing to confirm" }, it = { label = "Avvisi da confermare", empty = "Niente da confermare" }, es = { label = "Avisos por confirmar", empty = "Nada por confirmar" } } }
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+details = "Pubblica un avviso per le persone con cui è condiviso: un titolo, un testo in Markdown, un livello (informazione, importante o urgente) e il periodo in cui vale. Gli avvisi urgenti e quelli fissati restano in alto.\n\nQuando un avviso chiede conferma, ogni lettore conferma con un clic e l’autore vede chi lo ha fatto e quando.\n\nUn avviso è un elemento della piattaforma: condividilo con persone o gruppi (lettura per seguirlo, scrittura per modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
+name = "Avvisi"
+description = "Una bacheca di avvisi: pubblica avvisi con un livello e un periodo, e vedi chi ha confermato di averli letti"
+label = "Avvisi"
+
+[i18n.it.resources.notices]
+label = "Avvisi"
+fields = { title = "Titolo", body = "Testo", level = "Livello", starts_on = "Valido dal", ends_on = "Valido fino al", pinned = "Fissato", needs_ack = "Chiedi conferma" }
+options.level = { info = "informazione", important = "importante", urgent = "urgente" }
+
+[i18n.it.kpi.kpi_notices_status]
+label = "Stato degli avvisi"
+columns = { published = "pubblicati", in_force = "in corso", urgent = "urgenti in corso", pinned = "fissati" }
