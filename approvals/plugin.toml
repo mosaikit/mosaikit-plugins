@@ -1,0 +1,75 @@
+id = "com.mosaikit.approvals"
+name = "Approvals"
+version = "0.1.1"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "shield-check"
+description = "Ask one or more people to approve or reject a request, and keep the history of who decided what and when"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Write a request, choose the people who must decide and how: one approval is enough, everybody must approve, or one after the other in the order you list them. Each approver approves or rejects with a comment, once, and the decision is final.\n\nThe state of the request (pending, approved, rejected or cancelled) is always worked out from the decisions, and everybody sees who decided what and when. The people who decide get a badge with the requests waiting for them.\n\nA request is an item of the platform: share it with the approvers (they need read access to decide) and everything you already know about sharing, search and the trash applies."
+screenshots = ["requests.svg", "decision.svg"]
+homepage = "https://example.org/mosaikit/plugins/approvals"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "✅"
+label = "Approvals"
+
+[[resources]]
+name = "requests"
+label = "Requests"
+title_field = "title"
+fields = [
+  { key = "title", label = "Title", kind = "text", required = true },
+  { key = "details", label = "Details", kind = "text", multiline = true },
+  { key = "amount", label = "Amount", kind = "text" },
+  { key = "mode", label = "Mode", kind = "choice", options = ["any", "all", "sequence"] },
+  { key = "approvers", label = "Approvers", kind = "text", hidden = true },
+  { key = "cancelled", label = "Cancelled", kind = "bool" },
+]
+
+# the decisions of the approvers: a reader writes the row of their own decision (command requests.decide)
+[[tables]]
+name = "decisions"
+insert_for = "reader"
+owner_column = "user_id"
+
+[ui]
+entry = "index.html"
+
+[permissions]
+hooks = ["requests"]
+# the approvers are chosen among the people of the tenant
+directory = true
+# an open request is refreshed when somebody decides (live channel `status` on the request)
+realtime = true
+
+[[kpi]]
+view = "kpi_requests_status"
+label = "Status of the requests"
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "to-decide"
+label = "To decide"
+data = { command = "requests.widget_to_decide", kind = "number", size = "s", texts = { en = { secondary = "of yours pending", empty = "Nothing to decide" }, it = { label = "Da decidere", secondary = "tue in attesa", empty = "Niente da decidere" }, es = { label = "Por decidir", secondary = "tuyas pendientes", empty = "Nada por decidir" } } }
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+details = "Scrivi una richiesta, scegli le persone che devono decidere e come: basta una approvazione, devono approvare tutti, oppure uno dopo l’altro nell’ordine in cui li elenchi. Ogni approvatore approva o rifiuta con un commento, una sola volta, e la decisione è definitiva.\n\nLo stato della richiesta (in attesa, approvata, rifiutata o annullata) è sempre calcolato dalle decisioni, e tutti vedono chi ha deciso che cosa e quando. Chi deve decidere vede un contatore con le richieste che lo aspettano.\n\nUna richiesta è un elemento della piattaforma: condividila con gli approvatori (servono i diritti di lettura per decidere) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
+name = "Approvazioni"
+description = "Chiedi a una o più persone di approvare o rifiutare una richiesta e conserva la storia di chi ha deciso che cosa e quando"
+label = "Approvazioni"
+
+[i18n.it.resources.requests]
+label = "Richieste"
+fields = { title = "Titolo", details = "Dettagli", amount = "Importo", mode = "Modalità", approvers = "Approvatori", cancelled = "Annullata" }
+options.mode = { any = "ne basta uno", all = "tutti", sequence = "in sequenza" }
+
+[i18n.it.kpi.kpi_requests_status]
+label = "Stato delle richieste"
+columns = { requests = "richieste", cancelled_requests = "annullate", decided_requests = "con almeno una decisione" }

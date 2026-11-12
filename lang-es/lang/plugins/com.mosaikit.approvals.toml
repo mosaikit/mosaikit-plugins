@@ -1,0 +1,13 @@
+name = "Aprobaciones"
+description = "Pide a una o más personas que aprueben o rechacen una solicitud y conserva el historial de quién decidió qué y cuándo"
+label = "Aprobaciones"
+details = "Escribe una solicitud, elige a las personas que deben decidir y cómo: basta una aprobación, deben aprobar todas, o una tras otra en el orden en que las enumeras. Cada aprobador aprueba o rechaza con un comentario, una sola vez, y la decisión es definitiva.\n\nEl estado de la solicitud (pendiente, aprobada, rechazada o cancelada) se calcula siempre a partir de las decisiones, y todos ven quién decidió qué y cuándo. Quien debe decidir ve un contador con las solicitudes que le esperan.\n\nUna solicitud es un elemento de la plataforma: compártela con los aprobadores (necesitan acceso de lectura para decidir) y vale todo lo que ya sabes sobre compartir, buscar y la papelera."
+
+[resources.requests]
+label = "Solicitudes"
+fields = { title = "Título", details = "Detalles", amount = "Importe", mode = "Modo", approvers = "Aprobadores", cancelled = "Cancelada" }
+options.mode = { any = "basta uno", all = "todos", sequence = "en secuencia" }
+
+[kpi.kpi_requests_status]
+label = "Estado de las solicitudes"
+columns = { requests = "solicitudes", cancelled_requests = "canceladas", decided_requests = "con al menos una decisión" }
