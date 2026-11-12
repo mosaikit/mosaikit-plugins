@@ -1,0 +1,13 @@
+name = "Panel"
+description = "Una página de widgets que muestra lo que te importa en las apps: tareas abiertas, avisos por confirmar, encuestas por votar, solicitudes por decidir"
+label = "Panel"
+details = "Compón una página con los widgets que ofrecen las apps de tu espacio de trabajo: tus tareas abiertas y atrasadas, los avisos que esperan tu confirmación, las encuestas por votar, las solicitudes por decidir, tus notas recientes. Cada widget muestra solo tus datos, con las reglas de acceso de la app de la que viene.\n\nUn tablero es una lista de widgets en el orden que elegiste, en una, dos o tres columnas. Guarda tantos tableros como quieras, uno para la mañana, otro para un proyecto, y comparte un tablero con un compañero.\n\nUna app añade sola un widget al Panel: aquí no hay nada que configurar, y un widget que falla nunca oculta a los demás."
+
+[resources.boards]
+label = "Tableros"
+fields = { name = "Nombre", widgets = "Widgets", columns = "Columnas" }
+options.columns = { auto = "automático", "2" = "2", "3" = "3" }
+
+[kpi.kpi_boards_status]
+label = "Tableros del panel"
+columns = { boards = "tableros", with_widgets = "con widgets", empty = "vacíos" }

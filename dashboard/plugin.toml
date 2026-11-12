@@ -1,0 +1,58 @@
+id = "com.mosaikit.dashboard"
+name = "Dashboard"
+version = "0.1.0"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "layout-dashboard"
+description = "One page of widgets that shows what matters to you across the apps: open tasks, notices to confirm, polls to vote, requests to decide"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Arrange one page from the widgets the apps of your workspace offer: your open and overdue tasks, notices waiting for your confirmation, polls to vote, requests to decide, your recent notes. Each widget shows your own data only, with the access rules of the app it comes from.\n\nA board is a list of widgets in the order you chose, in one, two or three columns. Keep as many boards as you like, one for the morning, one for a project, and share a board with a colleague.\n\nAn app adds a widget to the Dashboard by itself: nothing to configure here, and a widget that fails never hides the others."
+screenshots = ["board.svg", "edit.svg"]
+homepage = "https://example.org/mosaikit/plugins/dashboard"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "📊"
+label = "Dashboard"
+
+[[resources]]
+name = "boards"
+label = "Boards"
+title_field = "name"
+fields = [
+  { key = "name", label = "Name", kind = "text", required = true },
+  { key = "widgets", label = "Widgets", kind = "text", hidden = true },
+  { key = "columns", label = "Columns", kind = "choice", options = ["auto", "2", "3"] },
+]
+
+[ui]
+entry = "index.html"
+
+[permissions]
+hooks = ["boards"]
+# the widgets of the other apps: [[contributes]] point = "com.mosaikit.dashboard.widget"
+contributions = ["com.mosaikit.dashboard.widget"]
+
+[[kpi]]
+view = "kpi_boards_status"
+label = "Boards of the dashboard"
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Dashboard"
+description = "Una pagina di widget che mostra ciò che conta per te nelle app: attività aperte, avvisi da confermare, sondaggi da votare, richieste da decidere"
+details = "Componi una pagina con i widget che le app del tuo spazio di lavoro offrono: le tue attività aperte e in ritardo, gli avvisi in attesa di conferma, i sondaggi da votare, le richieste da decidere, le tue note recenti. Ogni widget mostra solo i tuoi dati, con le regole di accesso dell’app da cui arriva.\n\nUna bacheca è un elenco di widget nell’ordine che hai scelto, su una, due o tre colonne. Tieni quante bacheche vuoi, una per la mattina, una per un progetto, e condividi una bacheca con un collega.\n\nUn’app aggiunge da sola un widget alla Dashboard: qui non c’è nulla da configurare, e un widget che si guasta non nasconde mai gli altri."
+label = "Dashboard"
+
+[i18n.it.resources.boards]
+label = "Bacheche"
+fields = { name = "Nome", widgets = "Widget", columns = "Colonne" }
+options.columns = { auto = "automatico", "2" = "2", "3" = "3" }
+
+[i18n.it.kpi.kpi_boards_status]
+label = "Bacheche della dashboard"
+columns = { boards = "bacheche", with_widgets = "con widget", empty = "vuote" }

@@ -1,0 +1,40 @@
+/* Dashboard: boards of widget cards. Colours come from the tokens of the host; a tone is always written in words and with a symbol. */
+.dsh { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.dsh-head { display: flex; align-items: center; gap: var(--sp-3); min-height: 57px; padding: 8px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.dsh-head h1 { margin: 0; font-size: 16px; font-weight: 600; }
+.dsh-grow { flex: 1; }
+.dsh-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.dsh-pick { max-width: 240px; }
+.dsh-body { flex: 1; min-height: 0; overflow: auto; padding: var(--sp-4) 24px; display: flex; flex-direction: column; }
+.dsh-body > .msk-emptystate { margin: auto; }
+.dsh-grid { display: grid; gap: var(--sp-4); align-items: start; }
+.dsh-card { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; padding: var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel); transition: border-color var(--dur-1), box-shadow var(--dur-1); }
+.dsh-card:hover { border-color: var(--acc-line); box-shadow: var(--sh-2); }
+.dsh-card h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--dim); letter-spacing: 0.02em; }
+.dsh-card.size-l { grid-column: span 2; }
+.dsh-value { margin: 0; font-size: 44px; line-height: 1.05; font-weight: 700; font-variant-numeric: tabular-nums; }
+.dsh-card.size-s .dsh-value { font-size: 34px; }
+.dsh-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.dsh-second { font-size: 13px; color: var(--fg); }
+.dsh-tone { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--fg); white-space: nowrap; }
+.dsh-tone.ok { border-color: var(--ok); }
+.dsh-tone.warn { border-color: #e0a93a; }
+.dsh-tone.err { border-color: var(--err); }
+.dsh-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.dsh-item { display: flex; align-items: flex-start; gap: var(--sp-2); padding: 7px 0; border-top: 1px solid var(--line); }
+.dsh-item:first-child { border-top: 0; }
+.dsh-item .dsh-tone { flex: none; margin-top: 1px; }
+.dsh-itext { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+.dsh-ititle { font-size: 14px; overflow-wrap: anywhere; }
+.dsh-more { margin: var(--sp-2) 0 0; font-size: 12px; color: var(--dim); }
+.dsh-dim { color: var(--dim); font-size: 12px; margin: 0; }
+.dsh-form { display: flex; flex-direction: column; gap: var(--sp-3); min-width: min(520px, 76vw); }
+.dsh-elist { list-style: none; margin: var(--sp-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-1); max-height: 40vh; overflow: auto; }
+.dsh-erow { display: flex; align-items: center; gap: var(--sp-2); padding: 4px 0; }
+.dsh-echeck { flex: 1; display: flex; align-items: center; gap: var(--sp-2); font-size: 14px; min-width: 0; }
+.msk-btn.danger-text:hover:not(:disabled) { color: var(--err); border-color: var(--err); }
+@media (max-width: 640px) {
+  .dsh-head, .dsh-body { padding-left: 16px; padding-right: 16px; }
+  .dsh-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .dsh-card.size-l { grid-column: auto; }
+}
