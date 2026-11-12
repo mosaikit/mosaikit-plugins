@@ -1,0 +1,13 @@
+name = "投票"
+description = "向一组人提出一个快速问题：单选或多选，可设截止日期，实名或匿名投票，结果实时显示"
+label = "投票"
+details = "向共享投票的人提出一个快速问题：写下问题和两到十二个选项，选择单选或多选，需要时设置截止日期，并决定是否显示投票人姓名。\n\n有访问权限的人只需一次点击即可投票，投票开放期间还可以更改自己的选择。结果以条形图显示，其他人投票时会实时变化；你可以选择始终显示、投票后显示，或仅在投票关闭后显示。\n\n投票是平台中的一个项目：可以共享给个人或群组（只需读取权限即可投票），你已熟悉的共享、搜索和回收站功能同样适用。"
+
+[resources.polls]
+label = "投票"
+fields = { question = "问题", details = "详情", options = "选项", multiple = "可多选", hide_voters = "隐藏投票人", results = "显示结果", closes_on = "截止日期", closed = "已关闭" }
+options.results = { always = "始终", after_vote = "投票后", after_close = "关闭后" }
+
+[kpi.kpi_polls_status]
+label = "投票状态"
+columns = { total = "总数", open_polls = "进行中", closed_polls = "已关闭" }

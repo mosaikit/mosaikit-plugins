@@ -1,0 +1,13 @@
+name = "公告"
+description = "一块公告板:发布带有级别和有效期的公告,并查看谁已确认阅读"
+label = "公告"
+details = "为共享对象发布公告:标题、Markdown 正文、级别(信息、重要或紧急)以及有效期。紧急公告和置顶公告会显示在最上方。\n\n当公告要求确认时,每位读者只需点击一次即可确认,作者可以看到是谁在何时确认的。\n\n公告是平台中的一个元素:可以与个人或群组共享(读取权限用于关注,写入权限用于编辑),您已熟悉的共享、搜索和回收站功能同样适用。"
+
+[resources.notices]
+label = "公告"
+fields = { title = "标题", body = "正文", level = "级别", starts_on = "生效日期", ends_on = "截止日期", pinned = "置顶", needs_ack = "要求确认" }
+options.level = { info = "信息", important = "重要", urgent = "紧急" }
+
+[kpi.kpi_notices_status]
+label = "公告状态"
+columns = { published = "已发布", in_force = "有效", urgent = "有效的紧急公告", pinned = "已置顶" }

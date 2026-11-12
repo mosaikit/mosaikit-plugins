@@ -1,0 +1,13 @@
+name = "Polls"
+description = "Een snelle vraag aan een groep: enkele of meervoudige keuze, een optionele deadline, genoemde of verborgen stemmen en live resultaten"
+label = "Polls"
+details = "Stel een snelle vraag aan de mensen met wie je de poll deelt: schrijf de vraag en twee tot twaalf opties, kies tussen enkele of meervoudige keuze, stel eventueel een sluitingsdatum in en bepaal of de stemmers bij naam worden genoemd.\n\nIedereen met toegang stemt met één klik en kan de stem wijzigen zolang de poll open is. De resultaten verschijnen als balken die live meebewegen terwijl anderen stemmen; jij kiest of ze altijd, na het stemmen of pas na het sluiten van de poll zichtbaar zijn.\n\nEen poll is een item van het platform: deel hem met personen of groepen (leestoegang is genoeg om te stemmen) en alles wat je al weet over delen, zoeken en de prullenbak is van toepassing."
+
+[resources.polls]
+label = "Polls"
+fields = { question = "Vraag", details = "Details", options = "Opties", multiple = "Meer dan één keuze", hide_voters = "Verberg wie heeft gestemd", results = "Resultaten tonen", closes_on = "Sluit op", closed = "Gesloten" }
+options.results = { always = "altijd", after_vote = "na het stemmen", after_close = "na het sluiten" }
+
+[kpi.kpi_polls_status]
+label = "Status van de polls"
+columns = { total = "totaal", open_polls = "open", closed_polls = "gesloten" }

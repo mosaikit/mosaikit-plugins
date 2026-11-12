@@ -1,0 +1,13 @@
+name = "Trechos"
+description = "Uma coleção compartilhada de textos e trechos de código reutilizáveis, com etiquetas, para copiar com um clique"
+label = "Trechos"
+details = "Tenha à mão os textos e o código que sua equipe reutiliza o tempo todo: um título, o texto ou o código, um tipo (texto simples, shell, SQL, JSON, JavaScript, Python, Rust, Markdown) e etiquetas. Encontre um trecho pela busca, por tipo ou por etiqueta e copie-o para a área de transferência com um clique.\n\nUm trecho é um elemento da plataforma: compartilhe-o com pessoas ou grupos (leitura para usá-lo, escrita para editá-lo) e vale tudo o que você já sabe sobre compartilhar, buscar e a lixeira."
+
+[resources.snippets]
+label = "Trechos"
+fields = { title = "Título", body = "Conteúdo", kind = "Tipo", tags = "Etiquetas" }
+options.kind = { text = "texto", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "outro" }
+
+[kpi.kpi_snippets_by_kind]
+label = "Trechos por tipo"
+columns = { kind = "tipo", snippets = "trechos" }

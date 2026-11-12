@@ -1,0 +1,12 @@
+name = "الخرائط"
+description = "كتالوج خرائط GeoLibre: الإعداد محفوظ في مشروع .geolibre.json"
+label = "الخرائط"
+details = "كتالوج خرائط أُنشئت بـ GeoLibre. تحفظ كل خريطة إعدادها (الطبقات والأنماط والعرض) في مشروع .geolibre.json يمكنك فتحه وتعديله ومشاركته.\n\nشارك خريطة مع الزملاء والمجموعات، أو أبقها خاصة أثناء عملك عليها."
+
+[resources.maps]
+label = "الخرائط"
+fields = { name = "الاسم", description = "الوصف", config = "الإعداد (.geolibre.json)", layers = "الطبقات" }
+
+[kpi.kpi_maps]
+label = "الخرائط والطبقات"
+columns = { maps = "الخرائط", layers = "الطبقات" }

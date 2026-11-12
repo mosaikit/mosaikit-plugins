@@ -1,0 +1,13 @@
+name = "片段"
+description = "共享的可复用文本和代码片段集合,带标签,一键复制"
+label = "片段"
+details = "随手备好团队反复使用的文本和代码:标题、文本或代码本身、类型(纯文本、shell、SQL、JSON、JavaScript、Python、Rust、Markdown)和标签。可通过搜索、类型或标签找到片段,并一键复制到剪贴板。\n\n片段是平台中的一个元素:可以与个人或群组共享(读取权限用于使用,写入权限用于编辑),您已熟悉的共享、搜索和回收站功能同样适用。"
+
+[resources.snippets]
+label = "片段"
+fields = { title = "标题", body = "内容", kind = "类型", tags = "标签" }
+options.kind = { text = "文本", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "其他" }
+
+[kpi.kpi_snippets_by_kind]
+label = "按类型统计的片段"
+columns = { kind = "类型", snippets = "片段" }

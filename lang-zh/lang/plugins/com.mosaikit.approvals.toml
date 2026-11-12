@@ -1,0 +1,13 @@
+name = "审批"
+description = "请一个或多个人批准或拒绝某项申请，并保留谁在何时做出了什么决定的历史记录"
+label = "审批"
+details = "写下一项申请，选择必须做出决定的人以及方式：一人批准即可、所有人都必须批准，或按你列出的顺序依次审批。每位审批人只能附上评论批准或拒绝一次，决定为最终结果。\n\n申请的状态（待处理、已批准、已拒绝或已取消）始终根据各项决定计算得出，所有人都能看到谁在何时做出了什么决定。需要做决定的人会看到一个徽标，显示等待自己处理的申请数量。\n\n申请是平台中的一个项目：可以共享给审批人（他们需要读取权限才能做决定），你已熟悉的共享、搜索和回收站功能同样适用。"
+
+[resources.requests]
+label = "申请"
+fields = { title = "标题", details = "详情", amount = "金额", mode = "方式", approvers = "审批人", cancelled = "已取消" }
+options.mode = { any = "一人即可", all = "全部", sequence = "依次" }
+
+[kpi.kpi_requests_status]
+label = "申请状态"
+columns = { requests = "申请", cancelled_requests = "已取消", decided_requests = "至少有一项决定" }

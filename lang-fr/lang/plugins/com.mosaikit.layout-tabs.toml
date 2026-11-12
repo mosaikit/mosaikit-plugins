@@ -1,0 +1,4 @@
+name = "Onglets"
+description = "Applications et pages sous forme d’onglets sous le bandeau, un menu pour les pages d’une application"
+label = "Onglets"
+details = "Applications et pages sous forme d’onglets sous le bandeau ; un menu liste les pages d’une application. Convient à peu d’applications utilisées en parallèle."

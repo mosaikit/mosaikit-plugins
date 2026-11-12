@@ -1,0 +1,4 @@
+name = "Documentos"
+description = "Arquivos e pastas compartilháveis, com pré-visualização, zip e links públicos"
+label = "Documentos"
+details = "Guarde arquivos e pastas, visualize-os no navegador, baixe uma pasta como arquivo zip e compartilhe-os.\n\nCada arquivo tem seu próprio nível de compartilhamento e pode ser aberto a qualquer pessoa com um link público. Os arquivos contam na cota da organização."

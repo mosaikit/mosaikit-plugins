@@ -1,0 +1,13 @@
+name = "Whiteboard"
+description = "Een gedeeld bord voor plaknotities, vormen, pijlen en tekeningen, live bewerkt door meerdere personen"
+label = "Whiteboard"
+details = "Een vrij bord voor brainstormen, workshops en diagrammen die je samen tekent tijdens een gesprek: plaknotities, rechthoeken, ellipsen, tekst, pijlen en tekenen uit de losse hand, met een kleurenpalet, ongedaan maken en opnieuw, zoomen en verschuiven, en export naar PNG of SVG.\n\nIedereen die het bord open heeft, ziet de wijzigingen en de aanwijzers van de anderen terwijl ze gebeuren. De wijzigingen worden in het bord opgeslagen door de personen die het mogen bewerken; wie alleen leesrechten heeft, volgt live mee maar kan niets wijzigen.\n\nEen bord is een item van het platform: deel het met personen of groepen (lezen om het te bekijken, schrijven om erop te tekenen) en alles wat je al weet over delen, zoeken en de prullenbak geldt ook hier."
+
+[resources.whiteboards]
+label = "Whiteboards"
+fields = { title = "Titel", snapshot = "Tekening", bg = "Achtergrond" }
+options.bg = { plain = "effen", dots = "stippen", grid = "ruitjes" }
+
+[kpi.kpi_whiteboards_status]
+label = "Status van de whiteboards"
+columns = { whiteboards = "whiteboards" }

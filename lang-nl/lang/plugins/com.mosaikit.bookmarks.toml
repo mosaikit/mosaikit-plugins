@@ -1,0 +1,12 @@
+name = "Bladwijzers"
+description = "Een gedeelde verzameling weblinks met een notitie en labels, om ze terug te vinden en te delen met personen en groepen"
+label = "Bladwijzers"
+details = "Bewaar de links waar je team vaak naar terugkeert: elke bladwijzer heeft een titel, het adres, een notitie en labels. Zoek op een van die velden, filter op label, markeer de bladwijzers die je het vaakst gebruikt als favoriet en open of kopieer een link met één klik.\n\nEen bladwijzer is een item van het platform: deel hem met personen of groepen (lezen om hem te bekijken, schrijven om hem te bewerken) en alles wat je al weet over delen, zoeken en de prullenbak geldt ook hier. Alleen http- en https-adressen worden geaccepteerd en van de sites die je bewaart wordt niets gedownload."
+
+[resources.bookmarks]
+label = "Bladwijzers"
+fields = { title = "Titel", url = "Adres", note = "Notitie", tags = "Labels", favorite = "Favoriet" }
+
+[kpi.kpi_bookmarks_status]
+label = "Status van de bladwijzers"
+columns = { total = "totaal", favorites = "favorieten" }

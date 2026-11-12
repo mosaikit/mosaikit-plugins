@@ -1,0 +1,13 @@
+name = "项目"
+description = "为一组任务制定计划：看板列、带日期的里程碑和冲刺，并显示进度条"
+label = "项目"
+details = "规划一次版本发布、一处工地或一场活动的工作。项目包含看板的列、带日期的里程碑和冲刺（时间段），并显示其中有多少任务已完成。\n\n任务仍然是任务：它们属于“任务”插件（必须已安装），项目就是填写在任务“项目”字段中的名称。你只能查看和修改在“任务”中有权查看和修改的任务。\n\n项目是平台中的一个条目：可以共享给个人或群组（只读用于关注项目，可写用于整理看板），你已熟悉的共享、搜索和回收站功能同样适用。"
+
+[resources.projects]
+label = "项目"
+fields = { name = "名称", description = "描述", status = "状态", starts_on = "开始日期", ends_on = "结束日期", columns = "列", milestones = "里程碑", sprints = "冲刺" }
+options.status = { planned = "已计划", active = "进行中", on_hold = "已暂停", done = "已完成" }
+
+[kpi.kpi_projects_status]
+label = "项目状态"
+columns = { projects = "项目", active_projects = "进行中的项目" }

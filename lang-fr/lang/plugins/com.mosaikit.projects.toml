@@ -1,0 +1,13 @@
+name = "Projets"
+description = "Donnez un plan à un ensemble de tâches : colonnes de tableau, jalons avec dates et sprints, avec une barre de progression"
+label = "Projets"
+details = "Planifiez le travail d'une version, d'un chantier ou d'une campagne. Un projet a les colonnes d'un tableau, des jalons avec une date et des sprints (fenêtres de temps), et indique combien de ses tâches sont terminées.\n\nLes tâches restent des tâches : elles appartiennent au plugin Tâches, qui doit être installé, et le projet est le nom écrit dans leur champ Projet. Vous ne voyez et ne modifiez que les tâches que vous pouvez voir et modifier dans Tâches.\n\nUn projet est un élément de la plateforme : partagez-le avec des personnes ou des groupes (lecture pour le suivre, écriture pour organiser le tableau) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique."
+
+[resources.projects]
+label = "Projets"
+fields = { name = "Nom", description = "Description", status = "Statut", starts_on = "Début le", ends_on = "Fin le", columns = "Colonnes", milestones = "Jalons", sprints = "Sprints" }
+options.status = { planned = "planifié", active = "actif", on_hold = "en pause", done = "terminé" }
+
+[kpi.kpi_projects_status]
+label = "Statut des projets"
+columns = { projects = "projets", active_projects = "projets actifs" }

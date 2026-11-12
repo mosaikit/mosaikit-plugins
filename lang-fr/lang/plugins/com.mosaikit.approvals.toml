@@ -1,0 +1,13 @@
+name = "Approbations"
+description = "Demandez à une ou plusieurs personnes d'approuver ou de refuser une demande, et conservez l'historique de qui a décidé quoi et quand"
+label = "Approbations"
+details = "Rédigez une demande, choisissez les personnes qui doivent décider et comment : une seule approbation suffit, tous doivent approuver, ou l'un après l'autre dans l'ordre où vous les listez. Chaque approbateur approuve ou refuse avec un commentaire, une seule fois, et la décision est définitive.\n\nL'état de la demande (en attente, approuvée, refusée ou annulée) est toujours calculé à partir des décisions, et chacun voit qui a décidé quoi et quand. Les personnes qui doivent décider voient un compteur des demandes qui les attendent.\n\nUne demande est un élément de la plateforme : partagez-la avec les approbateurs (ils ont besoin de l'accès en lecture pour décider) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique."
+
+[resources.requests]
+label = "Demandes"
+fields = { title = "Titre", details = "Détails", amount = "Montant", mode = "Mode", approvers = "Approbateurs", cancelled = "Annulée" }
+options.mode = { any = "un seul suffit", all = "tous", sequence = "en séquence" }
+
+[kpi.kpi_requests_status]
+label = "État des demandes"
+columns = { requests = "demandes", cancelled_requests = "annulées", decided_requests = "avec au moins une décision" }

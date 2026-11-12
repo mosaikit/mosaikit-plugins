@@ -1,0 +1,12 @@
+name = "地图"
+description = "GeoLibre 地图目录：配置保存在 .geolibre.json 项目中"
+label = "地图"
+details = "由 GeoLibre 创建的地图目录。每张地图把配置（图层、样式、视图）保存在 .geolibre.json 项目中，你可以打开、修改和共享。\n\n可以把地图共享给同事和群组，也可以在编辑期间保持私有。"
+
+[resources.maps]
+label = "地图"
+fields = { name = "名称", description = "描述", config = "配置（.geolibre.json）", layers = "图层" }
+
+[kpi.kpi_maps]
+label = "地图和图层"
+columns = { maps = "地图", layers = "图层" }

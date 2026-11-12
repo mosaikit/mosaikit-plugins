@@ -1,0 +1,13 @@
+name = "Avisos"
+description = "Um mural de avisos: publique avisos com um nível e um período e veja quem confirmou a leitura"
+label = "Avisos"
+details = "Publique um aviso para as pessoas com quem você compartilha: um título, um texto em Markdown, um nível (informação, importante ou urgente) e o período em que ele vale. Os avisos urgentes e os fixados ficam no topo.\n\nQuando um aviso pede confirmação, cada leitor confirma com um clique e o autor vê quem confirmou e quando.\n\nUm aviso é um elemento da plataforma: compartilhe-o com pessoas ou grupos (leitura para acompanhar, escrita para editar) e vale tudo o que você já sabe sobre compartilhar, buscar e a lixeira."
+
+[resources.notices]
+label = "Avisos"
+fields = { title = "Título", body = "Texto", level = "Nível", starts_on = "Válido a partir de", ends_on = "Válido até", pinned = "Fixado", needs_ack = "Pedir confirmação" }
+options.level = { info = "informação", important = "importante", urgent = "urgente" }
+
+[kpi.kpi_notices_status]
+label = "Estado dos avisos"
+columns = { published = "publicados", in_force = "vigentes", urgent = "urgentes vigentes", pinned = "fixados" }

@@ -1,0 +1,13 @@
+name = "Painel"
+description = "Uma página de widgets que mostra o que importa para você nos apps: tarefas em aberto, avisos a confirmar, enquetes para votar, solicitações a decidir"
+label = "Painel"
+details = "Monte uma página com os widgets que os apps do seu espaço de trabalho oferecem: suas tarefas em aberto e atrasadas, os avisos que aguardam sua confirmação, as enquetes para votar, as solicitações a decidir, suas notas recentes. Cada widget mostra apenas os seus dados, com as regras de acesso do app de onde ele vem.\n\nUm quadro é uma lista de widgets na ordem que você escolheu, em uma, duas ou três colunas. Guarde quantos quadros quiser, um para a manhã, outro para um projeto, e compartilhe um quadro com um colega.\n\nUm app adiciona sozinho um widget ao Painel: não há nada para configurar aqui, e um widget que falha nunca esconde os outros."
+
+[resources.boards]
+label = "Quadros"
+fields = { name = "Nome", widgets = "Widgets", columns = "Colunas" }
+options.columns = { auto = "automático", "2" = "2", "3" = "3" }
+
+[kpi.kpi_boards_status]
+label = "Quadros do painel"
+columns = { boards = "quadros", with_widgets = "com widgets", empty = "vazios" }

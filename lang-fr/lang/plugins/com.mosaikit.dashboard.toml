@@ -1,0 +1,13 @@
+name = "Tableau de bord"
+description = "Une page de widgets qui montre ce qui compte pour vous dans les apps : tâches ouvertes, avis à confirmer, sondages à voter, demandes à trancher"
+label = "Tableau de bord"
+details = "Composez une page avec les widgets que proposent les apps de votre espace de travail : vos tâches ouvertes et en retard, les avis qui attendent votre confirmation, les sondages à voter, les demandes à trancher, vos notes récentes. Chaque widget n'affiche que vos propres données, avec les règles d'accès de l'app dont il provient.\n\nUn tableau est une liste de widgets dans l'ordre que vous avez choisi, sur une, deux ou trois colonnes. Gardez autant de tableaux que vous voulez, un pour le matin, un pour un projet, et partagez un tableau avec un collègue.\n\nUne app ajoute d'elle-même un widget au Tableau de bord : il n'y a rien à configurer ici, et un widget qui échoue ne masque jamais les autres."
+
+[resources.boards]
+label = "Tableaux"
+fields = { name = "Nom", widgets = "Widgets", columns = "Colonnes" }
+options.columns = { auto = "automatique", "2" = "2", "3" = "3" }
+
+[kpi.kpi_boards_status]
+label = "Tableaux du tableau de bord"
+columns = { boards = "tableaux", with_widgets = "avec widgets", empty = "vides" }

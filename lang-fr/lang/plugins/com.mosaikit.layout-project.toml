@@ -1,0 +1,4 @@
+name = "Projet"
+description = "Navigation globale à gauche, la barre latérale de l’espace à côté"
+label = "Projet"
+details = "Navigation globale dans une colonne étroite à gauche, avec les pages de l’espace courant dans une barre latérale à côté. Convient à qui travaille surtout dans un espace à la fois."

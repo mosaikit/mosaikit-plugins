@@ -1,0 +1,12 @@
+name = "Sites"
+description = "Publie des sites statiques à partir d’archives zip ou affiche un site depuis son adresse web, partageables et avec liens publics"
+label = "Sites"
+details = "Publiez un site statique à partir d’une archive zip, ou affichez dans la plateforme un site existant à partir de son adresse web.\n\nChaque site peut être partagé avec des collègues et des groupes et ouvert à n’importe qui avec un lien public que vous pouvez révoquer à tout moment. Les sites sont servis depuis une origine séparée, de sorte que leurs scripts n’atteignent jamais la plateforme."
+
+[resources.sites]
+label = "Sites"
+fields = { name = "Nom", description = "Description", zip_name = "Zip téléversé", entry = "Page d’accueil", files = "Fichiers", size = "Taille (octets)", url = "Adresse web", framable = "Intégrable", thumbnail = "Miniature" }
+
+[kpi.kpi_sites]
+label = "Sites publiés"
+columns = { sites = "sites", files = "fichiers", bytes = "octets" }

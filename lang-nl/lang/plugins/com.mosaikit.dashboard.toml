@@ -1,0 +1,13 @@
+name = "Dashboard"
+description = "Eén pagina met widgets die laat zien wat voor jou belangrijk is in de apps: open taken, meldingen om te bevestigen, polls om op te stemmen, verzoeken om te beslissen"
+label = "Dashboard"
+details = "Stel een pagina samen met de widgets die de apps in je werkruimte aanbieden: je openstaande en achterstallige taken, de meldingen die op jouw bevestiging wachten, de polls om op te stemmen, de verzoeken om te beslissen, je recente notities. Elke widget toont alleen jouw eigen gegevens, met de toegangsregels van de app waar hij vandaan komt.\n\nEen bord is een lijst met widgets in de volgorde die je hebt gekozen, in één, twee of drie kolommen. Bewaar zoveel borden als je wilt, één voor de ochtend, één voor een project, en deel een bord met een collega.\n\nEen app voegt zelf een widget toe aan het Dashboard: hier hoef je niets in te stellen, en een widget die faalt verbergt de andere nooit."
+
+[resources.boards]
+label = "Borden"
+fields = { name = "Naam", widgets = "Widgets", columns = "Kolommen" }
+options.columns = { auto = "automatisch", "2" = "2", "3" = "3" }
+
+[kpi.kpi_boards_status]
+label = "Borden van het dashboard"
+columns = { boards = "borden", with_widgets = "met widgets", empty = "leeg" }

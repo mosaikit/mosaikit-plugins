@@ -1,0 +1,13 @@
+name = "Tableau blanc"
+description = "Un tableau partagé pour notes adhésives, formes, flèches et dessin, modifié en direct par plusieurs personnes"
+label = "Tableau blanc"
+details = "Un tableau libre pour les brainstormings, les ateliers et les schémas dessinés ensemble pendant un appel : notes adhésives, rectangles, ellipses, texte, flèches et dessin à main levée, avec une palette de couleurs, annuler et rétablir, zoom et déplacement, et export en PNG ou SVG.\n\nToute personne qui a le tableau ouvert voit en temps réel les modifications et les pointeurs des autres. Les modifications sont enregistrées dans le tableau par les personnes qui peuvent le modifier ; celles qui n'ont que la lecture suivent en direct mais ne peuvent rien changer.\n\nUn tableau est un élément de la plateforme : partagez-le avec des personnes ou des groupes (lecture pour le regarder, écriture pour y dessiner) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique."
+
+[resources.whiteboards]
+label = "Tableaux blancs"
+fields = { title = "Titre", snapshot = "Dessin", bg = "Arrière-plan" }
+options.bg = { plain = "uni", dots = "pointillé", grid = "quadrillé" }
+
+[kpi.kpi_whiteboards_status]
+label = "Statut des tableaux blancs"
+columns = { whiteboards = "tableaux blancs" }

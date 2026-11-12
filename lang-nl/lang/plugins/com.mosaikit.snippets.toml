@@ -1,0 +1,13 @@
+name = "Snippets"
+description = "Een gedeelde verzameling herbruikbare teksten en codefragmenten, met labels, om met één klik te kopiëren"
+label = "Snippets"
+details = "Houd de teksten en de code die je team steeds opnieuw gebruikt bij de hand: een titel, de tekst of de code, een type (gewone tekst, shell, SQL, JSON, JavaScript, Python, Rust, Markdown) en labels. Vind een snippet via zoeken, op type of op label en kopieer hem met één klik naar het klembord.\n\nEen snippet is een item van het platform: deel hem met personen of groepen (lezen om hem te gebruiken, schrijven om hem te bewerken) en alles wat je al weet over delen, zoeken en de prullenbak geldt ook hier."
+
+[resources.snippets]
+label = "Snippets"
+fields = { title = "Titel", body = "Inhoud", kind = "Type", tags = "Labels" }
+options.kind = { text = "tekst", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "overig" }
+
+[kpi.kpi_snippets_by_kind]
+label = "Snippets per type"
+columns = { kind = "type", snippets = "snippets" }
