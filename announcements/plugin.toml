@@ -8,7 +8,7 @@ description = "A notice board: publish notices with a level and a period, and se
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Publish a notice for the people it is shared with: a title, a text in Markdown, a level (information, important or urgent) and the period it is valid. Urgent and pinned notices stay at the top.\n\nWhen a notice asks for confirmation, each reader confirms with one click and the author sees who did and when.\n\nA notice is an item of the platform: share it with people or groups (read to follow it, write to edit it) and everything you already know about sharing, search and the trash applies."
-screenshots = ["board.svg", "notice.svg"]
+screenshots = ["board.webp", "notice.webp"]
 homepage = "https://example.org/mosaikit/plugins/announcements"
 
 [requires]

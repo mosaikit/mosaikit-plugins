@@ -8,7 +8,7 @@ description = "A shared collection of web links with a note and tags, to find ag
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Keep the links your team comes back to: each bookmark has a title, the address, a note and tags. Search by any of them, filter by tag, mark the ones you use most as favourites and open or copy a link with one click.\n\nA bookmark is an item of the platform: share it with people or groups (read to see it, write to edit it) and everything you already know about sharing, search and the trash applies. Only http and https addresses are accepted, and nothing is fetched from the sites you save."
-screenshots = ["list.svg", "edit.svg"]
+screenshots = ["list.webp", "edit.webp"]
 homepage = "https://example.org/mosaikit/plugins/bookmarks"
 
 [requires]

@@ -8,7 +8,7 @@ description = "Ask one or more people to approve or reject a request, and keep t
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Write a request, choose the people who must decide and how: one approval is enough, everybody must approve, or one after the other in the order you list them. Each approver approves or rejects with a comment, once, and the decision is final.\n\nThe state of the request (pending, approved, rejected or cancelled) is always worked out from the decisions, and everybody sees who decided what and when. The people who decide get a badge with the requests waiting for them.\n\nA request is an item of the platform: share it with the approvers (they need read access to decide) and everything you already know about sharing, search and the trash applies."
-screenshots = ["requests.svg", "decision.svg"]
+screenshots = ["requests.webp", "decision.webp"]
 homepage = "https://example.org/mosaikit/plugins/approvals"
 
 [requires]

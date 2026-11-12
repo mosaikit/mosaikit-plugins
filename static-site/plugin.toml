@@ -8,7 +8,7 @@ description = "Publishes static sites from zip archives or shows a site by its w
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Publish a static site from a zip archive, or show an existing site by its web address inside the platform.\n\nEvery site can be shared with colleagues and groups, and opened to anyone with a public link that you can revoke at any time. Sites are served from a separate origin, so their scripts never reach the platform."
-screenshots = ["sites.svg", "site.svg"]
+screenshots = ["sites.webp", "site.webp"]
 homepage = "https://example.org/mosaikit/plugins/static-site"
 
 [requires]

@@ -1,0 +1,98 @@
+{
+  "announcements": {
+    "board.webp": "Announcements: the board with urgent, important and information notices",
+    "notice.webp": "Announcements: the people who confirmed they read a notice"
+  },
+  "approvals": {
+    "requests.webp": "Approvals: the list of requests with their state and approvers",
+    "decision.webp": "Approvals: one request, the approvers and what each decided"
+  },
+  "bookmarks": {
+    "list.webp": "Bookmarks: cards with search, tags and favourites",
+    "edit.webp": "Bookmarks: the form of a bookmark with its address, note and tags"
+  },
+  "calendar": {
+    "month.webp": "Calendar: the month with events, task due dates and today highlighted",
+    "invitation.webp": "Calendar: an event with its invitees and their answers"
+  },
+  "chat": {
+    "channel.webp": "Chat: a channel with messages, replies and the list of channels",
+    "channels.webp": "Chat: another channel of the same team"
+  },
+  "contacts": {
+    "book.webp": "Contacts: the address book as cards with tags",
+    "contact.webp": "Contacts: a contact with its details and notes"
+  },
+  "dashboard": {
+    "board.webp": "Dashboard: a board with numbers and lists from the apps",
+    "edit.webp": "Dashboard: choosing and ordering the widgets of a board"
+  },
+  "files": {
+    "files.webp": "Documents: folders and files",
+    "preview.webp": "Documents: preview of a picture, with sharing"
+  },
+  "forms": {
+    "form.webp": "Forms: a registration form with text, email, choice and number fields",
+    "answers.webp": "Forms: the answers with the counts per option"
+  },
+  "layout-project": {
+    "layout.webp": "Project layout: the dashboard of a tenant",
+    "layout-page.webp": "Project layout: a page of an app"
+  },
+  "layout-suite": {
+    "layout.webp": "Suite layout: the dashboard of a tenant",
+    "layout-page.webp": "Suite layout: a page of an app"
+  },
+  "layout-tabs": {
+    "layout.webp": "Tabs layout: the dashboard of a tenant",
+    "layout-page.webp": "Tabs layout: a page of an app"
+  },
+  "layout-workspace": {
+    "layout.webp": "Workspace layout: the dashboard of a tenant",
+    "layout-page.webp": "Workspace layout: a page of an app"
+  },
+  "maps": {
+    "catalog.webp": "Maps: the catalogue of maps",
+    "map.webp": "Maps: a map with a layer of points and an area"
+  },
+  "meet": {
+    "rooms.webp": "Meet: the rooms as cards",
+    "room.webp": "Meet: a room open inside the page"
+  },
+  "note-review": {
+    "review.webp": "Note review: the Review tab of a note with its history",
+    "fields.webp": "Note review: the Reviewed fields in the detail of a note"
+  },
+  "notes": {
+    "list.webp": "Notes: notes as post-its",
+    "note.webp": "Notes: the panel of a note"
+  },
+  "polls": {
+    "poll.webp": "Polls: the list of polls with their state and the number of voters",
+    "results.webp": "Polls: one poll with its results as bars"
+  },
+  "projects": {
+    "board.webp": "Projects: the board of a project with its progress",
+    "plan.webp": "Projects: the milestones of a project with their dates"
+  },
+  "snippets": {
+    "list.webp": "Snippets: the list with search, kind and tags",
+    "detail.webp": "Snippets: one snippet with its code and the Copy button"
+  },
+  "static-site": {
+    "sites.webp": "Sites: the list of sites as cards",
+    "site.webp": "Sites: a published site shown inside the page"
+  },
+  "surveys": {
+    "survey.webp": "Surveys: answering a quiz, one question per card with a progress bar",
+    "results.webp": "Surveys: results per question with a bar for each option"
+  },
+  "tasks": {
+    "list.webp": "Tasks: the list grouped by due date",
+    "task.webp": "Tasks: the detail of a task"
+  },
+  "whiteboard": {
+    "board.webp": "Whiteboard: a retrospective with sticky notes and headings",
+    "list.webp": "Whiteboard: the list of whiteboards as cards with a small picture of each"
+  }
+}

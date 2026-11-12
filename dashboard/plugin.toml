@@ -8,7 +8,7 @@ description = "One page of widgets that shows what matters to you across the app
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Arrange one page from the widgets the apps of your workspace offer: your open and overdue tasks, notices waiting for your confirmation, polls to vote, requests to decide, your recent notes. Each widget shows your own data only, with the access rules of the app it comes from.\n\nA board is a list of widgets in the order you chose, in one, two or three columns. Keep as many boards as you like, one for the morning, one for a project, and share a board with a colleague.\n\nAn app adds a widget to the Dashboard by itself: nothing to configure here, and a widget that fails never hides the others."
-screenshots = ["board.svg", "edit.svg"]
+screenshots = ["board.webp", "edit.webp"]
 homepage = "https://example.org/mosaikit/plugins/dashboard"
 
 [requires]

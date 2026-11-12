@@ -8,7 +8,7 @@ description = "Shareable address book with cards, tags, birthdays, vCard and CSV
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "A shared address book. Email addresses are normalized and validated when you save a contact, so the book stays clean.\n\nShare the whole book or a single contact with colleagues and groups."
-screenshots = ["book.svg", "contact.svg"]
+screenshots = ["book.webp", "contact.webp"]
 homepage = "https://example.org/mosaikit/plugins/contacts"
 
 [requires]

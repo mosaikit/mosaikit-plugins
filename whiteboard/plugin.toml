@@ -8,7 +8,7 @@ description = "A shared board for sticky notes, shapes, arrows and drawing, edit
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "A free-form board for brainstorming, workshops and diagrams drawn together in a call: sticky notes, rectangles, ellipses, text, arrows and freehand drawing, with a colour palette, undo and redo, zoom and pan, and export as PNG or SVG.\n\nEveryone who has the board open sees the changes and the pointers of the others as they happen. Changes are saved in the board by the people who can edit it; people with read access follow along live but cannot change anything.\n\nA board is an item of the platform: share it with people or groups (read to watch it, write to draw on it) and everything you already know about sharing, search and the trash applies."
-screenshots = ["board.svg", "list.svg"]
+screenshots = ["board.webp", "list.webp"]
 homepage = "https://example.org/mosaikit/plugins/whiteboard"
 
 [requires]

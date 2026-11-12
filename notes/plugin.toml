@@ -7,7 +7,7 @@ icon = "notebook-pen"
 description = "Personal notes in Markdown with check lists, pins and an archive, shareable with colleagues and groups"
 author = "Mosaikit"
 details = "Write notes in Markdown (bold, lists, check lists with progress) as coloured post-its with a title, a text and tags of your own, resize them, keep them private or share them with colleagues and groups.\n\nEvery note has its own sharing level, a public link when you need one, and a place in the search of the platform.\n\nWhen the Administrator has set a translation service (System > Keys of outside services), a note can be translated into another language with one click."
-screenshots = ["list.svg", "note.svg"]
+screenshots = ["list.webp", "note.webp"]
 homepage = "https://example.org/mosaikit/plugins/notes"
 license = "Apache-2.0"
 

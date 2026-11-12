@@ -8,7 +8,7 @@ description = "Channels and live conversations with presence, replies, reactions
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Talk with your colleagues in channels. A message arrives at once for everyone who has the channel open, with who is online and who is typing.\n\nA channel is an item of the platform: share it with people or groups (read to follow, write to talk) and everything you already know about sharing applies. Messages are kept as history; write them in Markdown, reply to one, react with an emoji, edit or delete your own."
-screenshots = ["channel.svg", "channels.svg"]
+screenshots = ["channel.webp", "channels.webp"]
 homepage = "https://example.org/mosaikit/plugins/chat"
 
 [requires]

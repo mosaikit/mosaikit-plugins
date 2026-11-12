@@ -8,7 +8,7 @@ description = "Tasks with due date, priority, labels, projects, checklists and r
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Keep a list of things to do, each with a due date and a priority.\n\nAssign a task by sharing it: the person who receives it finds it in their own list. Mark it done when it is finished; done tasks stay visible until you tidy them up.\n\nTasks are items of the platform: they have their own sharing level, a place in the search and in the trash."
-screenshots = ["list.svg", "task.svg"]
+screenshots = ["list.webp", "task.webp"]
 homepage = "https://example.org/mosaikit/plugins/tasks"
 
 [requires]

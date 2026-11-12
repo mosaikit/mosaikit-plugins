@@ -8,7 +8,7 @@ description = "Series of questions answered by the people a survey is shared wit
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Build a survey with up to 40 questions (one answer, several answers, free text or a scale from 1 to 5), share it and see the results per question: a bar for each option, the average of a scale and the text answers. Each person answers once, and the results can be exported to CSV.\n\nIn quiz mode the answers are scored: mark the correct options and the points of each question, set a pass mark and every person sees their score and whether they passed, with the right and wrong answers shown only after they submit.\n\nA survey is an item of the platform: share it with people or groups (read to answer it, write to see all the results and edit it) and everything you already know about sharing, search and the trash applies."
-screenshots = ["survey.svg", "results.svg"]
+screenshots = ["survey.webp", "results.webp"]
 homepage = "https://example.org/mosaikit/plugins/surveys"
 
 [requires]

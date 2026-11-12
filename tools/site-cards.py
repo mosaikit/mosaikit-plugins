@@ -4,7 +4,7 @@
     python tools/site-cards.py <path of the clone of mosaikit.github.io>
 
 For every plugin folder: `plugin.toml` (name, version, description, permissions, screenshots), `media/` (the pictures of the
-carousel) and `CARD.md` (the text of the card: one paragraph that says what the plugin is for and what it does, then `Uses:` and
+carousel; the alt texts come from `tools/screenshot-captions.json`, written by `tools/screenshots.py`) and `CARD.md` (the text of the card: one paragraph that says what the plugin is for and what it does, then `Uses:` and
 a bullet list of the typical cases). A plugin without `CARD.md` falls back to its manifest description. Language plugins show the
 flag of the language (`assets/flags/<code>.svg` of the site) instead of a thumbnail.
 
@@ -15,6 +15,8 @@ import html, json, os, re, shutil, sys, tomllib
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.dirname(HERE)
 SITE = sys.argv[1] if len(sys.argv) > 1 else sys.exit(__doc__)
+_CAPS = os.path.join(HERE, 'screenshot-captions.json')
+CAPTIONS = json.load(open(_CAPS, encoding='utf-8')) if os.path.exists(_CAPS) else {}
 
 GROUPS = [
     ('Applications', None, ['files', 'notes', 'tasks', 'contacts', 'chat', 'meet', 'announcements', 'bookmarks', 'snippets', 'polls', 'surveys', 'approvals', 'dashboard', 'forms', 'projects', 'calendar', 'whiteboard', 'maps', 'static-site']),
@@ -63,8 +65,12 @@ def card(d):
     for i, s in enumerate(m.get('screenshots', [])):
         os.makedirs(dest, exist_ok=True)
         shutil.copyfile(os.path.join(SRC, d, 'media', s), os.path.join(dest, s))
-        alt = re.search(r'aria-label="([^"]*)"', open(os.path.join(dest, s), encoding='utf-8').read())
-        items.append({'src': f'/assets/plugins/{d}/{s}', 'alt': html.unescape(alt.group(1)) if alt else f'{name}, image {i + 1}'})
+        # alt text: tools/screenshot-captions.json (real screenshots), else the aria-label of an SVG illustration
+        alt = CAPTIONS.get(d, {}).get(s)
+        if not alt and s.endswith('.svg'):
+            m = re.search(r'aria-label="([^"]*)"', open(os.path.join(dest, s), encoding='utf-8').read())
+            alt = html.unescape(m.group(1)) if m else None
+        items.append({'src': f'/assets/plugins/{d}/{s}', 'alt': alt or f'{name}, image {i + 1}'})
     perms = m.get('permissions', {})
     bits = [b for b, on in (('real-time', perms.get('realtime')), ('camera and microphone', perms.get('media'))) if on]
     chips = '<p class="chips">' + ''.join(f'<span class="chip">{b}</span>' for b in bits) + '</p>' if bits else ''
