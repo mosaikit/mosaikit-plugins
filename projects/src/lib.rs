@@ -769,6 +769,54 @@ fn overview(ctx: &Ctx, _args: Value) -> Result<Value> {
     Ok(json!({ "progress": progress, "tasks_available": available }))
 }
 
+/// Most items a list widget shows; the rest is reported as `more`.
+const WIDGET_ITEMS: usize = 6;
+
+/// The next milestone not done, the earliest: `(date, name)`.
+fn next_open_milestone(milestones: &[Value]) -> Option<(String, String)> {
+    milestones
+        .iter()
+        .filter(|m| !m.get("done").and_then(Value::as_bool).unwrap_or(false))
+        .map(|m| (text_of(m, "date"), text_of(m, "name")))
+        .filter(|(d, _)| is_date(d))
+        .min()
+}
+
+/// The items of the widget: each active project with its next milestone (red when it is past), those with a milestone
+/// first by date, then the rest by name.
+fn active_items(rows: &[Value], today: &str) -> Vec<Value> {
+    let mut list: Vec<(bool, String, String, Value)> = rows
+        .iter()
+        .map(|r| {
+            let (name, id) = (row_str(r, "name"), row_str(r, "id"));
+            let next = next_open_milestone(&list_of(&row_str(r, "milestones")));
+            let (meta, tone, date) = match &next {
+                Some((d, n)) => (format!("{n} · {d}"), if d.as_str() < today { "err" } else { "" }, d.clone()),
+                None => (String::new(), "", String::new()),
+            };
+            (next.is_none(), date, name.clone(), json!({ "id": id, "title": name, "meta": meta, "tone": tone }))
+        })
+        .collect();
+    list.sort_by(|a, b| (a.0, &a.1, &a.2).cmp(&(b.0, &b.1, &b.2)));
+    list.into_iter().map(|x| x.3).collect()
+}
+
+/// Widget `active-projects`: the active projects the caller sees with their next milestone.
+fn widget_active(ctx: &Ctx, _args: Value) -> Result<Value> {
+    let rows = ctx.db().query(
+        "select p.resource_id::text as id, p.name, p.milestones from projects p join core.visible_resources v on v.id = p.resource_id where v.kind = 'projects' and p.status = 'active' limit 500",
+        &[],
+    )?;
+    let today = ctx
+        .db()
+        .query_one("select current_date::text as d", &[])?
+        .map(|r| row_str(&r, "d"))
+        .unwrap_or_default();
+    let items = active_items(&rows, today.get(..10).unwrap_or(""));
+    let more = items.len().saturating_sub(WIDGET_ITEMS);
+    Ok(json!({ "items": items.into_iter().take(WIDGET_ITEMS).collect::<Vec<_>>(), "more": more }))
+}
+
 mosaikit_plugin_sdk::plugin! {
     hooks: {
         "projects.before_create" => project,
@@ -777,6 +825,7 @@ mosaikit_plugin_sdk::plugin! {
     commands: {
         "projects.board" => board,
         "projects.burndown" => burndown,
+        "projects.widget_active" => widget_active,
         "projects.move" => move_task,
         "projects.add_task" => add_task,
         "projects.attach" => attach,
@@ -1317,5 +1366,50 @@ mod burndown_tests {
             .command(&__msk_registry(), "projects.burndown", json!({ "id": PID }))
             .unwrap_err()
             .contains("at most"));
+    }
+}
+
+#[cfg(test)]
+mod widget_tests {
+    use super::*;
+    use mosaikit_plugin_sdk::testing::MockHost;
+
+    fn row(id: &str, name: &str, milestones: &str) -> Value {
+        json!({ "id": id, "name": name, "milestones": milestones })
+    }
+
+    #[test]
+    fn the_widget_shows_the_next_open_milestone_and_marks_a_past_one() {
+        let rows = vec![
+            row("a", "Zeta", r#"[{"id":"m","name":"Beta","date":"2026-12-01","done":false}]"#),
+            row("b", "Alpha", r#"[{"id":"m","name":"Old","date":"2026-01-01","done":false},{"id":"n","name":"Done","date":"2025-01-01","done":true}]"#),
+            row("c", "Nomilestone", "[]"),
+            row("d", "Bravo", r#"[{"id":"m","name":"Only done","date":"2026-02-02","done":true}]"#),
+        ];
+        let items = active_items(&rows, "2026-11-13");
+        let titles: Vec<&str> = items.iter().map(|i| i["title"].as_str().unwrap()).collect();
+        // by next date, then the ones with no open milestone by name
+        assert_eq!(titles, ["Alpha", "Zeta", "Bravo", "Nomilestone"]);
+        assert_eq!(items[0]["meta"], "Old · 2026-01-01");
+        assert_eq!(items[0]["tone"], "err");
+        assert_eq!(items[1]["tone"], "");
+        assert_eq!(items[2]["meta"], "");
+    }
+
+    #[test]
+    fn the_widget_command_lists_six_and_counts_the_rest() {
+        let host = MockHost::new().on("db.query", |req| {
+            let sql = req["sql"].as_str().unwrap_or_default();
+            if sql.contains("current_date") {
+                Ok(json!([{ "d": "2026-11-13" }]))
+            } else {
+                Ok(Value::Array((0..8).map(|i| row(&format!("id{i}"), &format!("P{i}"), "[]")).collect()))
+            }
+        });
+        let out = host
+            .command(&__msk_registry(), "projects.widget_active", json!({}))
+            .unwrap();
+        assert_eq!(out["items"].as_array().unwrap().len(), 6);
+        assert_eq!(out["more"], 2);
     }
 }

@@ -1,6 +1,6 @@
 id = "com.mosaikit.snippets"
 name = "Snippets"
-version = "0.2.0"
+version = "0.3.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "code"
@@ -40,6 +40,12 @@ hooks = ["snippets"]
 [[kpi]]
 view = "kpi_snippets_by_kind"
 label = "Snippets by kind"
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "recent-snippets"
+label = "Recent snippets"
+data = { command = "snippets.widget_recent", kind = "list", size = "m", texts = { en = { empty = "No snippets yet" }, it = { label = "Snippet recenti", empty = "Ancora nessuno snippet" }, es = { label = "Snippets recientes", empty = "Todavía no hay snippets" } } }
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]

@@ -1,6 +1,6 @@
 id = "com.mosaikit.bookmarks"
 name = "Bookmarks"
-version = "0.2.0"
+version = "0.3.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "bookmark"
@@ -40,6 +40,12 @@ hooks = ["bookmarks"]
 [[kpi]]
 view = "kpi_bookmarks_status"
 label = "Status of the bookmarks"
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "favorites"
+label = "Favourite links"
+data = { command = "bookmarks.widget_favorites", kind = "list", size = "m", texts = { en = { empty = "No favourite links yet" }, it = { label = "Link preferiti", empty = "Ancora nessun link preferito" }, es = { label = "Enlaces favoritos", empty = "Todavía no hay enlaces favoritos" } } }
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]

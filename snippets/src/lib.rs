@@ -109,10 +109,38 @@ fn snippet(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     Ok(Some(v))
 }
 
+/// Most items a list widget shows; the rest is reported as `more`.
+const WIDGET_ITEMS: usize = 6;
+
+/// The body of a list widget: at most six items and how many were left out.
+fn list_body(items: Vec<Value>) -> Value {
+    let more = items.len().saturating_sub(WIDGET_ITEMS);
+    json!({ "items": items.into_iter().take(WIDGET_ITEMS).collect::<Vec<_>>(), "more": more })
+}
+
+/// Widget `recent-snippets`: the snippets the caller sees, the newest first, with their kind.
+fn widget_recent(ctx: &Ctx, _args: Value) -> Result<Value> {
+    let rows = ctx.db().query(
+        "select s.resource_id::text as id, s.title, s.kind from snippets s join core.visible_resources v on v.id = s.resource_id where v.kind = 'snippets' order by v.created_at desc limit 500",
+        &[],
+    )?;
+    let items = rows
+        .iter()
+        .map(|r| {
+            let s = |k: &str| r.get(k).and_then(Value::as_str).unwrap_or_default();
+            json!({ "id": s("id"), "title": s("title"), "meta": s("kind"), "tone": "" })
+        })
+        .collect();
+    Ok(list_body(items))
+}
+
 mosaikit_plugin_sdk::plugin! {
     hooks: {
         "snippets.before_create" => snippet,
         "snippets.before_update" => snippet,
+    },
+    commands: {
+        "snippets.widget_recent" => widget_recent,
     },
 }
 
@@ -252,5 +280,19 @@ mod tests {
             json!({ "title": "x", "body": "y", "kind": "cobol" }),
         );
         assert!(r.unwrap_err().contains("kind"));
+    }
+
+    #[test]
+    fn the_recent_widget_lists_the_newest_with_their_kind_and_counts_the_rest() {
+        let rows: Vec<Value> = (0..7)
+            .map(|i| json!({ "id": format!("id{i}"), "title": format!("S{i}"), "kind": "shell" }))
+            .collect();
+        let host = MockHost::new().on("db.query", move |_| Ok(Value::Array(rows.clone())));
+        let out = host
+            .command(&__msk_registry(), "snippets.widget_recent", json!({}))
+            .unwrap();
+        assert_eq!(out["items"].as_array().unwrap().len(), 6);
+        assert_eq!(out["more"], 1);
+        assert_eq!(out["items"][2], json!({ "id": "id2", "title": "S2", "meta": "shell", "tone": "" }));
     }
 }
