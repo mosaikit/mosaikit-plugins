@@ -23,7 +23,9 @@ import {
 } from '@mosaikit/plugin-api'
 import {
   STATUSES,
+  behindBy,
   byStatus,
+  chartGeometry,
   columnsFromText,
   columnsToText,
   currentSprint,
@@ -33,8 +35,10 @@ import {
   parseColumns,
   parseMilestones,
   parseSprints,
+  pointsAttr,
   statusOf,
   todayLocal,
+  type Burndown,
   type Milestone,
   type Sprint,
   type Status,
@@ -84,7 +88,7 @@ interface Candidate {
   title: string
   due: string | null
 }
-type Tab = 'board' | 'milestones' | 'sprints' | 'details'
+type Tab = 'board' | 'milestones' | 'sprints' | 'burndown' | 'details'
 
 const tasksMissing = (e: unknown) => (e as { code?: string } | null)?.code === 'tasks_unavailable' || (e instanceof Error && /Tasks plugin is not available/i.test(e.message))
 
@@ -291,6 +295,7 @@ function mount(msk: Msk) {
           { key: 'board', label: tr().tBoard },
           { key: 'milestones', label: tr().tMilestones },
           { key: 'sprints', label: tr().tSprints },
+          { key: 'burndown', label: tr().tBurndown },
           { key: 'details', label: tr().tDetails },
         ],
         onChange: (k) => {
@@ -315,6 +320,7 @@ function mount(msk: Msk) {
       return
     }
     if (tab === 'sprints') return drawSprints(p, board)
+    if (tab === 'burndown') return void drawBurndown(p)
     drawBoard(p, board)
   }
 
@@ -615,6 +621,66 @@ function mount(msk: Msk) {
       wrap.append(el('section', { class: 'pj-sprint', 'data-testid': 'sprint-unassigned' }, el('div', { class: 'pj-cardhead' }, el('h2', {}, tr().unassigned)), ul))
     }
     body.append(wrap)
+  }
+
+  // ------------------------------------------------------------------------------------------------- burndown
+  let burnSprint = ''
+  const svgEl = (name: string, attrs: Record<string, string>, ...kids: (SVGElement | string)[]) => {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', name)
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v)
+    e.append(...kids)
+    return e
+  }
+
+  const drawBurndown = async (p: Proj) => {
+    const box = el('div', { class: 'pj-burn' })
+    const sel = el('select', { 'aria-label': tr().burnScope, 'data-testid': 'burn-scope' })
+    sel.append(el('option', { value: '' }, tr().burnProject))
+    for (const s of p.sprints) sel.append(el('option', { value: s.id }, s.name))
+    if (!p.sprints.some((s) => s.id === burnSprint)) burnSprint = ''
+    sel.value = burnSprint
+    sel.addEventListener('change', () => {
+      burnSprint = sel.value
+      void drawBurndown(p)
+    })
+    body.append(el('div', { class: 'pj-bar' }, el('label', {}, tr().burnScope + ' '), sel), box)
+    box.append(skeleton({ kind: 'cards', count: 1 }))
+    let b: Burndown
+    try {
+      b = await msk.call<Burndown>('projects.burndown', { id: p.id, ...(burnSprint ? { sprint: burnSprint } : {}) })
+    } catch (e) {
+      if (current()?.id === p.id && tab === 'burndown') box.replaceChildren(el('p', { class: 'pj-dim' }, errText(e, msk.context?.lang)))
+      return
+    }
+    if (current()?.id !== p.id || tab !== 'burndown') return
+    if (!b.available || !b.days?.length) {
+      box.replaceChildren(emptyState({ art: 'projects', title: tr().burnNoDatesTitle, text: tr().burnNoDatesText }))
+      return
+    }
+    if (!b.total) {
+      box.replaceChildren(emptyState({ art: 'projects', title: tr().burnNoTasksTitle, text: tr().burnNoTasksText }))
+      return
+    }
+    const g = chartGeometry(b.days, b.total)
+    const last = [...b.days].reverse().find((d) => d.remaining !== null)
+    const diff = behindBy(b.days)
+    const status = diff === null ? '' : diff > 0.5 ? sub(tr().burnBehind, { n: Math.round(diff) }) : diff < -0.5 ? sub(tr().burnAhead, { n: Math.round(-diff) }) : tr().burnOnTrack
+    const summary = sub(tr().burnSummary, { r: last?.remaining ?? b.total, t: b.total, d: b.done ?? 0 })
+    const svg = svgEl('svg', { viewBox: `0 0 ${g.width} ${g.height}`, class: 'pj-chart', role: 'img', 'aria-label': `${summary}. ${status}`, 'data-testid': 'burndown-chart' })
+    for (const t of g.ticks) {
+      svg.append(svgEl('line', { x1: String(g.left), x2: String(g.right), y1: String(t.y), y2: String(t.y), class: 'pj-grid' }), svgEl('text', { x: String(g.left - 6), y: String(t.y + 4), class: 'pj-axis', 'text-anchor': 'end' }, String(t.value)))
+    }
+    svg.append(
+      svgEl('text', { x: String(g.left), y: String(g.height - 12), class: 'pj-axis' }, day(b.from ?? '')),
+      svgEl('text', { x: String(g.right), y: String(g.height - 12), class: 'pj-axis', 'text-anchor': 'end' }, day(b.to ?? '')),
+      svgEl('polyline', { points: pointsAttr(g.ideal), class: 'pj-line ideal', fill: 'none' }),
+      svgEl('polyline', { points: pointsAttr(g.actual), class: 'pj-line actual', fill: 'none' }),
+    )
+    const legend = el('ul', { class: 'pj-legend' }, el('li', { class: 'ideal' }, tr().burnIdeal), el('li', { class: 'actual' }, tr().burnActual))
+    const notes = el('div', { class: 'pj-dim' })
+    if (b.undated) notes.append(el('p', {}, sub(tr().burnUndated, { n: b.undated })))
+    notes.append(el('p', {}, tr().burnScopeNote))
+    box.replaceChildren(el('p', { class: 'pj-summary', 'data-testid': 'burn-summary' }, summary + (status ? ' · ' + status : '')), svg, legend, notes)
   }
 
   // ---------------------------------------------------------------------------------------------------- details

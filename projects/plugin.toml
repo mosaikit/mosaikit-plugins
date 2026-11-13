@@ -1,6 +1,6 @@
 id = "com.mosaikit.projects"
 name = "Projects"
-version = "0.2.0"
+version = "0.3.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "kanban"

@@ -44,3 +44,16 @@
 .pj-pickrow span:first-of-type { flex: 1; overflow-wrap: anywhere; }
 .msk-btn.danger-text:hover:not(:disabled) { color: var(--err); border-color: var(--err); }
 @media (max-width: 640px) { .pj-head, .pj-body { padding-left: 16px; padding-right: 16px; } .pj-form { min-width: 0; } }
+
+/* burndown */
+.pj-burn { display: flex; flex-direction: column; gap: var(--sp-3); margin-top: var(--sp-3); }
+.pj-summary { margin: 0; font-weight: 600; }
+.pj-chart { width: 100%; max-width: 640px; height: auto; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-m); }
+.pj-chart .pj-grid { stroke: var(--line); stroke-width: 1; }
+.pj-chart .pj-axis { fill: var(--muted); font-size: 11px; }
+.pj-chart .pj-line { stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.pj-chart .pj-line.ideal { stroke: var(--muted); stroke-dasharray: 6 5; }
+.pj-chart .pj-line.actual { stroke: var(--acc); }
+.pj-legend { display: flex; gap: var(--sp-4); list-style: none; margin: 0; padding: 0; font-size: 0.9em; }
+.pj-legend li::before { content: ''; display: inline-block; width: 22px; height: 0; border-top: 3px solid var(--acc); margin-right: 6px; vertical-align: middle; }
+.pj-legend li.ideal::before { border-top: 3px dashed var(--muted); }

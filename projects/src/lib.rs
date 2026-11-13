@@ -314,6 +314,134 @@ fn per_sprint(sprint_ids: &[String], cards: &[Value]) -> Vec<Value> {
         .collect()
 }
 
+// ------------------------------------------------------------------------------------------------------ burndown
+
+/// Days since 1970-01-01 of a valid `YYYY-MM-DD`.
+fn day_number(s: &str) -> Option<i64> {
+    if !is_date(s) {
+        return None;
+    }
+    let (y, m, d) = (
+        s[0..4].parse::<i64>().ok()?,
+        s[5..7].parse::<i64>().ok()?,
+        s[8..10].parse::<i64>().ok()?,
+    );
+    let y = if m <= 2 { y - 1 } else { y };
+    let era = y.div_euclid(400);
+    let yoe = y - era * 400;
+    let mp = (m + 9) % 12;
+    let doy = (153 * mp + 2) / 5 + d - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    Some(era * 146_097 + doe - 719_468)
+}
+
+/// The date `YYYY-MM-DD` of a number of days since 1970-01-01.
+fn date_of(n: i64) -> String {
+    let z = n + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z - era * 146_097;
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let y = yoe + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = doy - (153 * mp + 2) / 5 + 1;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 };
+    format!("{:04}-{:02}-{:02}", if m <= 2 { y + 1 } else { y }, m, d)
+}
+
+/// The most days a burndown draws.
+const MAX_BURNDOWN_DAYS: i64 = 400;
+
+/// The burndown of `total` tasks between `from` and `to`: for each day the tasks still open at its end (`remaining`, only
+/// up to `today`) and the ideal line, a straight way from all of them to none. `done_on` are the days the finished tasks
+/// were completed; `undated` finished tasks have no day and count as finished before the first day. A task completed
+/// before `from` is finished at the start; one completed after `to` is still open at the end of the period.
+fn burndown_days(from: i64, to: i64, today: i64, total: usize, done_on: &[i64], undated: usize) -> Vec<Value> {
+    let span = (to - from).max(1) as f64;
+    (from..=to)
+        .map(|d| {
+            let finished = undated + done_on.iter().filter(|c| **c <= d).count();
+            let remaining = if d <= today {
+                json!(total.saturating_sub(finished))
+            } else {
+                Value::Null
+            };
+            let ideal = (total as f64 * (to - d) as f64 / span * 10.0).round() / 10.0;
+            json!({ "date": date_of(d), "remaining": remaining, "ideal": ideal })
+        })
+        .collect()
+}
+
+/// The burndown of the project, or of one of its sprints (`sprint`): the tasks in scope are the cards of the board.
+fn burndown(ctx: &Ctx, args: Value) -> Result<Value> {
+    let p = load(ctx, &arg_id(&args, "id")?)?;
+    let sprint = args
+        .get("sprint")
+        .and_then(Value::as_str)
+        .filter(|s| !s.is_empty())
+        .map(str::to_string);
+    let (start, end) = match &sprint {
+        Some(sid) => {
+            let s = p
+                .sprints
+                .iter()
+                .find(|s| s.get("id").and_then(Value::as_str) == Some(sid.as_str()))
+                .ok_or_else(|| Error::coded("not_found", "sprint not found"))?;
+            (text_of(s, "start"), text_of(s, "end"))
+        }
+        None => (p.starts_on.clone(), p.ends_on.clone()),
+    };
+    let (Some(from), Some(to)) = (day_number(&start), day_number(&end)) else {
+        // a project with no dates has nothing to burn down against
+        return Ok(json!({ "available": false, "reason": "no_dates" }));
+    };
+    if to < from {
+        return Ok(json!({ "available": false, "reason": "no_dates" }));
+    }
+    if to - from > MAX_BURNDOWN_DAYS {
+        return Err(Error::coded(
+            "range_too_wide",
+            format!("a burndown covers at most {MAX_BURNDOWN_DAYS} days"),
+        ));
+    }
+    let tasks = tasks_of(ctx, &p.name)?;
+    let placements = placements_of(ctx, &p.id)?;
+    let sprint_ids = ids_of(&p.sprints);
+    let cards: Vec<Value> = arrange(&p.columns, &sprint_ids, &tasks, &placements)
+        .into_iter()
+        .flatten()
+        .filter(|c| match &sprint {
+            Some(sid) => c.get("sprint").and_then(Value::as_str) == Some(sid.as_str()),
+            None => true,
+        })
+        .collect();
+    let done: Vec<&Value> = cards.iter().filter(|c| is_done(c)).collect();
+    let done_on: Vec<i64> = done
+        .iter()
+        .filter_map(|c| {
+            c.get("completed_on")
+                .and_then(Value::as_str)
+                .and_then(|d| day_number(d.get(..10).unwrap_or("")))
+        })
+        .collect();
+    let undated = done.len() - done_on.len();
+    let today_text = ctx
+        .db()
+        .query_one("select current_date::text as d", &[])?
+        .map(|r| row_str(&r, "d"))
+        .unwrap_or_default();
+    let today = day_number(today_text.get(..10).unwrap_or("")).unwrap_or(to);
+    Ok(json!({
+        "available": true,
+        "from": date_of(from),
+        "to": date_of(to),
+        "total": cards.len(),
+        "done": done.len(),
+        "undated": undated,
+        "days": burndown_days(from, to, today, cards.len(), &done_on, undated),
+    }))
+}
+
 // ------------------------------------------------------------------------------------------------------ data
 
 struct Loaded {
@@ -648,6 +776,7 @@ mosaikit_plugin_sdk::plugin! {
     },
     commands: {
         "projects.board" => board,
+        "projects.burndown" => burndown,
         "projects.move" => move_task,
         "projects.add_task" => add_task,
         "projects.attach" => attach,
@@ -1070,5 +1199,123 @@ mod tests {
         ] {
             assert!(names.contains(&c), "{c}");
         }
+    }
+}
+
+#[cfg(test)]
+mod burndown_tests {
+    use super::*;
+    use mosaikit_plugin_sdk::testing::MockHost;
+
+    const PID: &str = "99999999-9999-9999-9999-999999999999";
+    const TASKS: &str = "com.mosaikit.tasks";
+
+    #[test]
+    fn days_and_dates_go_back_and_forth() {
+        for d in ["1970-01-01", "2000-02-29", "2026-11-13", "2027-03-01", "1999-12-31"] {
+            assert_eq!(date_of(day_number(d).unwrap()), d);
+        }
+        assert_eq!(day_number("1970-01-02"), Some(1));
+        assert_eq!(day_number("2026-02-30"), None);
+        assert_eq!(day_number("soon"), None);
+        assert_eq!(
+            day_number("2026-03-01").unwrap() - day_number("2026-02-28").unwrap(),
+            1
+        );
+    }
+
+    fn n(d: &str) -> i64 {
+        day_number(d).unwrap()
+    }
+
+    #[test]
+    fn the_burndown_counts_the_open_tasks_at_the_end_of_each_day() {
+        // four tasks over five days; one done on the 2nd, two on the 4th; today is the 4th
+        let days = burndown_days(n("2026-06-01"), n("2026-06-05"), n("2026-06-04"), 4, &[n("2026-06-02"), n("2026-06-04"), n("2026-06-04")], 0);
+        let rem: Vec<Value> = days.iter().map(|d| d["remaining"].clone()).collect();
+        assert_eq!(rem, [json!(4), json!(3), json!(3), json!(1), Value::Null]);
+        let ideal: Vec<f64> = days.iter().map(|d| d["ideal"].as_f64().unwrap()).collect();
+        assert_eq!(ideal, [4.0, 3.0, 2.0, 1.0, 0.0]);
+        assert_eq!(days[0]["date"], "2026-06-01");
+        assert_eq!(days[4]["date"], "2026-06-05");
+    }
+
+    #[test]
+    fn finished_tasks_with_no_day_count_from_the_start_and_late_ones_stay_open() {
+        let days = burndown_days(n("2026-06-01"), n("2026-06-03"), n("2026-06-03"), 3, &[n("2026-06-09"), n("2026-05-20")], 1);
+        let rem: Vec<Value> = days.iter().map(|d| d["remaining"].clone()).collect();
+        // one undated and one done before the start are finished at the start; the one done on the 9th is still open
+        assert_eq!(rem, [json!(1), json!(1), json!(1)]);
+        // a single day does not divide by zero
+        let one = burndown_days(n("2026-06-01"), n("2026-06-01"), n("2026-06-01"), 2, &[], 0);
+        assert_eq!(one.len(), 1);
+        assert_eq!(one[0]["ideal"].as_f64(), Some(0.0));
+    }
+
+    fn row(starts: &str, ends: &str) -> Value {
+        json!({ "name": "Release 2", "status": "active", "description": "", "starts_on": starts, "ends_on": ends,
+                "columns": "[\"To do\",\"Doing\",\"Done\"]", "milestones": "[]",
+                "sprints": "[{\"id\":\"s1\",\"name\":\"Sprint 1\",\"start\":\"2026-06-01\",\"end\":\"2026-06-04\"}]" })
+    }
+
+    fn host(starts: &'static str, ends: &'static str) -> MockHost {
+        MockHost::new()
+            .on("db.query", move |req| {
+                let sql = req["sql"].as_str().unwrap_or_default();
+                if sql.contains("from placements") {
+                    Ok(json!([{ "task": "t1", "column_name": "Done", "sprint_id": "s1", "position": 0 },
+                              { "task": "t2", "column_name": "Doing", "sprint_id": "s1", "position": 0 }]))
+                } else if sql.contains("current_date") {
+                    Ok(json!([{ "d": "2026-06-03" }]))
+                } else {
+                    Ok(json!([row(starts, ends)]))
+                }
+            })
+            .with_plugin_command(TASKS, "tasks.for_project", |_| {
+                Ok(json!([
+                    { "id": "t1", "title": "a", "done": true, "completed_on": "2026-06-02" },
+                    { "id": "t2", "title": "b", "done": false },
+                    { "id": "t3", "title": "c", "done": true },
+                ]))
+            })
+    }
+
+    #[test]
+    fn the_burndown_of_a_sprint_uses_its_dates_and_its_tasks() {
+        let out = host("", "")
+            .command(&__msk_registry(), "projects.burndown", json!({ "id": PID, "sprint": "s1" }))
+            .unwrap();
+        assert_eq!(out["available"], true);
+        assert_eq!((out["from"].as_str(), out["to"].as_str()), (Some("2026-06-01"), Some("2026-06-04")));
+        // t3 is in no sprint: two tasks, one done
+        assert_eq!((out["total"].as_i64(), out["done"].as_i64(), out["undated"].as_i64()), (Some(2), Some(1), Some(0)));
+        let rem: Vec<Value> = out["days"].as_array().unwrap().iter().map(|d| d["remaining"].clone()).collect();
+        assert_eq!(rem, [json!(2), json!(1), json!(1), Value::Null]);
+    }
+
+    #[test]
+    fn the_burndown_of_the_project_counts_every_task_and_says_what_is_undated() {
+        let out = host("2026-06-01", "2026-06-04")
+            .command(&__msk_registry(), "projects.burndown", json!({ "id": PID }))
+            .unwrap();
+        assert_eq!((out["total"].as_i64(), out["done"].as_i64(), out["undated"].as_i64()), (Some(3), Some(2), Some(1)));
+        // t3 has no day: finished from the start; t1 on the 2nd
+        let rem: Vec<Value> = out["days"].as_array().unwrap().iter().map(|d| d["remaining"].clone()).collect();
+        assert_eq!(rem, [json!(2), json!(1), json!(1), Value::Null]);
+    }
+
+    #[test]
+    fn a_project_with_no_dates_has_no_burndown_and_an_unknown_sprint_is_an_error() {
+        let out = host("", "")
+            .command(&__msk_registry(), "projects.burndown", json!({ "id": PID }))
+            .unwrap();
+        assert_eq!(out, json!({ "available": false, "reason": "no_dates" }));
+        assert!(host("", "")
+            .command(&__msk_registry(), "projects.burndown", json!({ "id": PID, "sprint": "nope" }))
+            .is_err());
+        assert!(host("2024-01-01", "2026-06-04")
+            .command(&__msk_registry(), "projects.burndown", json!({ "id": PID }))
+            .unwrap_err()
+            .contains("at most"));
     }
 }

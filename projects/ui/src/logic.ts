@@ -97,3 +97,78 @@ export function todayLocal(now: Date = new Date()): string {
 
 /** The percent of a sprint or project, rounded, 0 for nothing to do. */
 export const percentOf = (done: number, total: number): number => (total > 0 ? Math.round((done * 100) / total) : 0)
+
+// -------------------------------------------------------------------------------------------------------- burndown
+
+export interface BurndownDay {
+  date: string
+  /** open tasks at the end of the day; null for a day that has not come yet */
+  remaining: number | null
+  ideal: number
+}
+
+export interface Burndown {
+  available: boolean
+  reason?: string
+  from?: string
+  to?: string
+  total?: number
+  done?: number
+  undated?: number
+  days?: BurndownDay[]
+}
+
+export interface ChartPoint {
+  x: number
+  y: number
+}
+
+export interface ChartGeometry {
+  width: number
+  height: number
+  /** where the plot starts and ends inside the picture */
+  left: number
+  right: number
+  top: number
+  bottom: number
+  max: number
+  ideal: ChartPoint[]
+  actual: ChartPoint[]
+  /** the scale on the side: values and their height */
+  ticks: { value: number; y: number }[]
+}
+
+/** The points of the two lines of a burndown in a picture of `width` x `height`: x follows the days, y the number of tasks. */
+export function chartGeometry(days: BurndownDay[], total: number, width = 560, height = 260): ChartGeometry {
+  const left = 40
+  const right = width - 12
+  const top = 12
+  const bottom = height - 34
+  const max = Math.max(1, total, ...days.map((d) => d.remaining ?? 0))
+  const x = (i: number) => (days.length <= 1 ? left : left + ((right - left) * i) / (days.length - 1))
+  const y = (v: number) => bottom - ((bottom - top) * v) / max
+  const step = max <= 5 ? 1 : max <= 10 ? 2 : Math.ceil(max / 5)
+  const ticks: { value: number; y: number }[] = []
+  for (let v = 0; v <= max; v += step) ticks.push({ value: v, y: y(v) })
+  return {
+    width,
+    height,
+    left,
+    right,
+    top,
+    bottom,
+    max,
+    ideal: days.map((d, i) => ({ x: x(i), y: y(d.ideal) })),
+    actual: days.flatMap((d, i) => (d.remaining === null ? [] : [{ x: x(i), y: y(d.remaining) }])),
+    ticks,
+  }
+}
+
+/** A polyline attribute from points (`x,y x,y`), numbers rounded to one decimal. */
+export const pointsAttr = (pts: ChartPoint[]): string => pts.map((p) => `${Math.round(p.x * 10) / 10},${Math.round(p.y * 10) / 10}`).join(' ')
+
+/** Whether the work is ahead of, on or behind the ideal line on the last day that has come: the difference in tasks (negative is ahead). */
+export function behindBy(days: BurndownDay[]): number | null {
+  const last = [...days].reverse().find((d) => d.remaining !== null)
+  return last ? Math.round((last.remaining! - last.ideal) * 10) / 10 : null
+}

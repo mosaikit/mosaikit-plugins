@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  behindBy,
+  chartGeometry,
+  pointsAttr,
   byStatus,
   columnsFromText,
   columnsToText,
@@ -97,5 +100,52 @@ describe('the list of projects', () => {
   it('an id has a prefix and letters or digits', () => {
     expect(newId('m', () => 0.5)).toMatch(/^m[0-9a-z]{6}$/)
     expect(newId('s', () => 0)).toBe('s000000')
+  })
+})
+
+describe('burndown chart', () => {
+  const days = [
+    { date: '2026-06-01', remaining: 4, ideal: 4 },
+    { date: '2026-06-02', remaining: 3, ideal: 3 },
+    { date: '2026-06-03', remaining: 3, ideal: 2 },
+    { date: '2026-06-04', remaining: null, ideal: 1 },
+    { date: '2026-06-05', remaining: null, ideal: 0 },
+  ]
+
+  it('draws the ideal line over every day and the real one only up to today', () => {
+    const g = chartGeometry(days, 4, 560, 260)
+    expect(g.ideal).toHaveLength(5)
+    expect(g.actual).toHaveLength(3)
+    // from the first day at the left edge to the last at the right edge
+    expect(g.ideal[0].x).toBe(g.left)
+    expect(g.ideal[4].x).toBe(g.right)
+    // all the tasks are at the top of the plot and none on the bottom line
+    expect(g.ideal[0].y).toBe(g.top)
+    expect(g.ideal[4].y).toBe(g.bottom)
+    // a fall is a rise of y
+    expect(g.actual[1].y).toBeGreaterThan(g.actual[0].y)
+  })
+
+  it('has a scale that reaches the most tasks, in whole steps', () => {
+    const g = chartGeometry(days, 4)
+    expect(g.ticks.map((t) => t.value)).toEqual([0, 1, 2, 3, 4])
+    const big = chartGeometry([{ date: 'a', remaining: 30, ideal: 30 }, { date: 'b', remaining: 0, ideal: 0 }], 30)
+    expect(big.ticks.map((t) => t.value)).toEqual([0, 6, 12, 18, 24, 30])
+  })
+
+  it('does not break with a single day or no tasks drawn', () => {
+    const one = chartGeometry([{ date: 'a', remaining: 2, ideal: 0 }], 2)
+    expect(one.ideal).toHaveLength(1)
+    expect(chartGeometry([], 0).ticks.map((t) => t.value)).toEqual([0, 1])
+  })
+
+  it('writes the points of a line', () => {
+    expect(pointsAttr([{ x: 1.234, y: 2 }, { x: 3, y: 4.56 }])).toBe('1.2,2 3,4.6')
+  })
+
+  it('says how far behind or ahead the work is on the last day that has come', () => {
+    expect(behindBy(days)).toBe(1)
+    expect(behindBy([{ date: 'a', remaining: 1, ideal: 3 }])).toBe(-2)
+    expect(behindBy([{ date: 'a', remaining: null, ideal: 3 }])).toBeNull()
   })
 })
