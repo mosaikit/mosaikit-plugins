@@ -386,7 +386,14 @@ fn event(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
         ));
     }
     // an all-day event has no time of the day to convert
-    v.set("timezone", if v.bool("all_day") { String::new() } else { zone });
+    v.set(
+        "timezone",
+        if v.bool("all_day") {
+            String::new()
+        } else {
+            zone
+        },
+    );
     Ok(Some(v))
 }
 
@@ -577,15 +584,12 @@ fn occurrence_target(ctx: &Ctx, args: &Value) -> Result<(String, String, Value)>
 }
 
 /// Writes the exception of one occurrence: changes the row of that day or adds it.
-fn put_exception(
-    ctx: &Ctx,
-    id: &str,
-    on: &str,
-    skipped: bool,
-    f: [Option<&str>; 4],
-) -> Result<()> {
+fn put_exception(ctx: &Ctx, id: &str, on: &str, skipped: bool, f: [Option<&str>; 4]) -> Result<()> {
     let tenant = ctx.tenant.clone().unwrap_or_default();
-    let cols: Vec<Value> = f.iter().map(|x| x.map_or(Value::Null, |t| json!(t))).collect();
+    let cols: Vec<Value> = f
+        .iter()
+        .map(|x| x.map_or(Value::Null, |t| json!(t)))
+        .collect();
     let mut p = vec![json!(skipped)];
     p.extend(cols.iter().cloned());
     p.extend([json!(id), json!(on)]);
@@ -722,9 +726,10 @@ fn ics_data(ctx: &Ctx, args: Value) -> Result<Value> {
         &format!("select {EVENT_COLUMNS} from events limit 2000"),
         &[],
     )?;
-    let excs = ctx
-        .db()
-        .query(&format!("{EXCEPTIONS_SQL} order by on_date limit 5000"), &[])?;
+    let excs = ctx.db().query(
+        &format!("{EXCEPTIONS_SQL} order by on_date limit 5000"),
+        &[],
+    )?;
     let rs = ctx.db().query(
         "select resource_id::text as id, user_id::text as user_id, answer from rsvps",
         &[],
@@ -1723,10 +1728,12 @@ mod exception_tests {
         let a = json!({ "id": EV, "on": "2026-11-09" });
         assert!(run(1, "events.skip", a).0.unwrap_err().contains("can edit"));
         // 2026-11-10 is a Tuesday: the series is on Mondays
-        assert!(run(2, "events.skip", json!({ "id": EV, "on": "2026-11-10" }))
-            .0
-            .unwrap_err()
-            .contains("no occurrence"));
+        assert!(
+            run(2, "events.skip", json!({ "id": EV, "on": "2026-11-10" }))
+                .0
+                .unwrap_err()
+                .contains("no occurrence")
+        );
         assert!(run(2, "events.skip", json!({ "id": EV, "on": "nonsense" }))
             .0
             .is_err());
@@ -1775,9 +1782,11 @@ mod exception_tests {
         let (out, sql) = run(2, "events.restore", json!({ "id": EV, "on": "2026-11-09" }));
         assert!(out.is_ok());
         assert!(sql[0].starts_with("delete from exceptions"));
-        assert!(run(1, "events.restore", json!({ "id": EV, "on": "2026-11-09" }))
-            .0
-            .is_err());
+        assert!(
+            run(1, "events.restore", json!({ "id": EV, "on": "2026-11-09" }))
+                .0
+                .is_err()
+        );
     }
 
     #[test]

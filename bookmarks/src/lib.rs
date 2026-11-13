@@ -354,7 +354,10 @@ mod tests {
             .unwrap();
         assert_eq!(out["items"].as_array().unwrap().len(), 6);
         assert_eq!(out["more"], 2);
-        assert_eq!(out["items"][0], json!({ "id": "id0", "title": "T0", "meta": "www.site0.org", "tone": "" }));
+        assert_eq!(
+            out["items"][0],
+            json!({ "id": "id0", "title": "T0", "meta": "www.site0.org", "tone": "" })
+        );
         let none = MockHost::new()
             .on("db.query", |_| Ok(json!([])))
             .command(&__msk_registry(), "bookmarks.widget_favorites", json!({}))

@@ -293,6 +293,9 @@ mod tests {
             .unwrap();
         assert_eq!(out["items"].as_array().unwrap().len(), 6);
         assert_eq!(out["more"], 1);
-        assert_eq!(out["items"][2], json!({ "id": "id2", "title": "S2", "meta": "shell", "tone": "" }));
+        assert_eq!(
+            out["items"][2],
+            json!({ "id": "id2", "title": "S2", "meta": "shell", "tone": "" })
+        );
     }
 }
