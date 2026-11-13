@@ -2106,5 +2106,8 @@
   "Camera and microphone": "Cámara y micrófono",
   "yes (sensitive: the pages it embeds may ask the person for the camera, the microphone and the screen)": "sí (sensible: las páginas que incrusta pueden pedir a la persona la cámara, el micrófono y la pantalla)",
   "Real-time channels": "Canales en tiempo real",
-  "yes (sensitive: live messages and who is connected, between the people who may see a resource of the plugin)": "sí (sensible: mensajes en tiempo real y quién está conectado, entre las personas que pueden ver un recurso del plugin)"
+  "yes (sensitive: live messages and who is connected, between the people who may see a resource of the plugin)": "sí (sensible: mensajes en tiempo real y quién está conectado, entre las personas que pueden ver un recurso del plugin)",
+  "The link does not expire": "El enlace no caduca",
+  "The link works until {date}, on every visit.": "El enlace funciona hasta el {date}, en cada visita.",
+  "The link does not expire and works on every visit.": "El enlace no caduca y funciona en cada visita."
 }
