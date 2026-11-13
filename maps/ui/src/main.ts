@@ -525,5 +525,5 @@ function mount(msk: Msk) {
   // ---------- start ----------
 
   showView('list')
-  void load()
+  void msk.loading(load())
 }

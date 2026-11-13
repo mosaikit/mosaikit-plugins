@@ -1,6 +1,6 @@
 id = "com.mosaikit.notes"
 name = "Notes"
-version = "0.10.0"
+version = "0.10.1"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "notebook-pen"

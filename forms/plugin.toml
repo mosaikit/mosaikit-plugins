@@ -1,6 +1,6 @@
 id = "com.mosaikit.forms"
 name = "Forms"
-version = "0.3.0"
+version = "0.3.1"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "file-input"

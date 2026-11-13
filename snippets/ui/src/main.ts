@@ -335,7 +335,7 @@ function mount(msk: Msk) {
     main = null
     draw()
   })
-  void load()
+  void msk.loading(load())
 }
 
 connect()

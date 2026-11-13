@@ -617,7 +617,7 @@ function mount(msk: Msk) {
     lang = langOf(ctx.lang)
     draw()
   })
-  void load()
+  void msk.loading(load())
 }
 
 connect()

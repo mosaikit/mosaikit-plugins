@@ -503,7 +503,7 @@ function mount(msk: Msk) {
     drawMessages(false)
   })
   drawRoomEmpty()
-  void loadChannels().then(() => {
+  void msk.loading(loadChannels()).then(() => {
     drawRoomEmpty()
     // the page can be opened at a channel (a notification, a link): `at` is its id
     if (msk.at && channels.some((c) => c.id === msk.at)) void open(msk.at)

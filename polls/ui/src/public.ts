@@ -148,7 +148,7 @@ function mount(msk: Msk) {
     }
   }
 
-  void refresh().then(draw)
+  void msk.loading(refresh()).then(draw)
 }
 
 connect()
