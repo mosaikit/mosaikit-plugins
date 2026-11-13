@@ -8,6 +8,12 @@ export const MIN_OPTIONS = 2
 export const MAX_OPTIONS = 10
 export const MAX_TEXT_ANSWER = 1000
 
+/** A condition: the question is shown only when `question` (an earlier one) was answered with one of `any_of` (option indexes, or 1 to 5 for a scale). */
+export interface ShowIf {
+  question: string
+  any_of: number[]
+}
+
 export interface Question {
   id: string
   text: string
@@ -16,6 +22,7 @@ export interface Question {
   correct: number[]
   points: number
   required: boolean
+  show_if?: ShowIf
 }
 
 export type Answer = number | number[] | string
@@ -59,18 +66,72 @@ export function parseQuestions(raw: unknown): Question[] {
       correct: Array.isArray(o.correct) ? o.correct.filter((x): x is number => Number.isInteger(x)) : [],
       points: Number.isInteger(o.points) ? (o.points as number) : 0,
       required: o.required === true,
+      ...(parseShowIf(o.show_if) ? { show_if: parseShowIf(o.show_if) } : {}),
     })
   }
   return out
 }
 
+function parseShowIf(raw: unknown): ShowIf | undefined {
+  if (!raw || typeof raw !== 'object') return undefined
+  const o = raw as Record<string, unknown>
+  if (typeof o.question !== 'string' || !Array.isArray(o.any_of)) return undefined
+  const any_of = o.any_of.filter((x): x is number => Number.isInteger(x))
+  return any_of.length ? { question: o.question, any_of } : undefined
+}
+
 /** What the builder sends: texts trimmed, no correct answers or points outside a quiz, options only where they belong. */
 export function cleanQuestions(list: Question[], quiz: boolean): Question[] {
-  return list.map((q) => {
+  return list.map((q, i) => {
     const options = hasOptions(q.kind) ? q.options.map((o) => o.trim()) : []
     const correct = quiz && hasOptions(q.kind) ? [...new Set(q.correct)].filter((i) => i < options.length).sort((a, b) => a - b) : []
-    return { ...q, text: q.text.trim(), options, correct, points: quiz && hasOptions(q.kind) ? q.points : 0 }
+    const { show_if, ...rest } = q
+    const cond = show_if && conditionProblem(list, i) === null ? { show_if: { question: show_if.question, any_of: [...new Set(show_if.any_of)].sort((a, b) => a - b) } } : {}
+    return { ...rest, ...cond, text: q.text.trim(), options, correct, points: quiz && hasOptions(q.kind) ? q.points : 0 }
   })
+}
+
+/** The kinds a condition can look at: a question with options or a scale. */
+export function canBranchOn(q: Pick<Question, 'kind'>): boolean {
+  return q.kind === 'choice' || q.kind === 'multi' || q.kind === 'scale'
+}
+
+/** The values a condition on this question can list: the options (by index), or 1 to 5 for a scale. */
+export function branchValues(q: Question): { value: number; label: string }[] {
+  if (q.kind === 'scale') return [1, 2, 3, 4, 5].map((v) => ({ value: v, label: String(v) }))
+  return q.options.map((o, i) => ({ value: i, label: o }))
+}
+
+/** The earlier questions the question `index` can depend on. */
+export function branchSources(list: Question[], index: number): Question[] {
+  return list.slice(0, index).filter(canBranchOn)
+}
+
+/** What is wrong with the condition of question `index`, or null (the same rules as the hook of the plugin). */
+export function conditionProblem(list: Question[], index: number): 'earlier' | 'kind' | 'values' | null {
+  const c = list[index]?.show_if
+  if (!c) return null
+  const src = list.slice(0, index).find((q) => q.id === c.question)
+  if (!src) return 'earlier'
+  if (!canBranchOn(src)) return 'kind'
+  const count = src.kind === 'scale' ? 5 : src.options.length
+  const valid = c.any_of.filter((v) => (src.kind === 'scale' ? v >= 1 && v <= count : v >= 0 && v < count))
+  return valid.length && valid.length === c.any_of.length ? null : 'values'
+}
+
+/** The ids of the questions a person sees with these answers: no condition, or the source is shown and was answered with a listed value. */
+export function visibleIds(list: Question[], answers: Record<string, Answer>): Set<string> {
+  const shown = new Set<string>()
+  for (const q of list) {
+    const c = q.show_if
+    let on = !c
+    if (c && shown.has(c.question)) {
+      const a = answers[c.question]
+      on = Array.isArray(a) ? a.some((v) => c.any_of.includes(v)) : typeof a === 'number' && c.any_of.includes(a)
+    }
+    if (on) shown.add(q.id)
+  }
+  return shown
 }
 
 /** The answer key of the builder state: question id to correct option indexes, only for the questions that have some (none outside a quiz). */
@@ -90,7 +151,7 @@ export function mergeKey(list: Question[], key: Record<string, number[]> | null 
   return list.map((q) => ({ ...q, correct: hasOptions(q.kind) && key?.[q.id] ? [...key[q.id]] : [] }))
 }
 
-export type Problem = { index: number; key: 'needText' | 'needOptions' | 'needOptionText' | 'needCorrect' | 'oneCorrect' | 'tooMany' | 'badPoints' }
+export type Problem = { index: number; key: 'needText' | 'needOptions' | 'needOptionText' | 'needCorrect' | 'oneCorrect' | 'tooMany' | 'badPoints' | 'badBranch' }
 
 /** The first thing wrong with the questions (the hook of the plugin says the same), or null. `index` is 0-based. */
 export function firstProblem(list: Question[], quiz: boolean): Problem | null {
@@ -99,6 +160,7 @@ export function firstProblem(list: Question[], quiz: boolean): Problem | null {
   for (let i = 0; i < clean.length; i++) {
     const q = clean[i]
     if (!q.text) return { index: i, key: 'needText' }
+    if (conditionProblem(list, i)) return { index: i, key: 'badBranch' }
     if (hasOptions(q.kind)) {
       if (q.options.length < MIN_OPTIONS || q.options.length > MAX_OPTIONS) return { index: i, key: 'needOptions' }
       if (q.options.some((o) => !o)) return { index: i, key: 'needOptionText' }
@@ -110,6 +172,17 @@ export function firstProblem(list: Question[], quiz: boolean): Problem | null {
     }
   }
   return null
+}
+
+/** Removes the question `id` and the conditions that depended on it. */
+export function removeQuestion(list: Question[], id: string): Question[] {
+  return list
+    .filter((q) => q.id !== id)
+    .map((q) => {
+      if (q.show_if?.question !== id) return q
+      const { show_if: _gone, ...rest } = q
+      return rest
+    })
 }
 
 /** Moves the question `i` by `dir` (-1 up, +1 down); a new list, the same one when it cannot move. */
@@ -142,17 +215,23 @@ export function isAnswered(a: Answer | undefined): boolean {
 export function progressOf(list: Question[], answers: Record<string, Answer>): { done: number; total: number; firstMissing: number } {
   let done = 0
   let firstMissing = -1
+  let total = 0
+  const shown = visibleIds(list, answers)
   list.forEach((q, i) => {
+    if (!shown.has(q.id)) return
+    total += 1
     if (isAnswered(answers[q.id])) done += 1
     else if (q.required && firstMissing < 0) firstMissing = i
   })
-  return { done, total: list.length, firstMissing }
+  return { done, total, firstMissing }
 }
 
 /** The answers as the command wants them: only the given ones. */
 export function answersToSend(list: Question[], answers: Record<string, Answer>): Record<string, Answer> {
   const out: Record<string, Answer> = {}
+  const shown = visibleIds(list, answers)
   for (const q of list) {
+    if (!shown.has(q.id)) continue
     const a = answers[q.id]
     if (isAnswered(a)) out[q.id] = typeof a === 'string' ? a.trim() : a
   }
@@ -187,8 +266,8 @@ export function csvCell(v: string | number | null | undefined): string {
 }
 
 export interface Respondent {
-  name: string
-  at: string
+  name: string | null
+  at: string | null
   score: number | null
   max_score: number | null
   percent: number | null
@@ -209,11 +288,12 @@ export function buildCsv(
   people: Respondent[],
   quiz: boolean,
   head: { respondent: string; submitted: string; score: string; max: string; percent: string },
+  anonymous = false,
 ): string {
-  const header = [head.respondent, head.submitted, ...(quiz ? [head.score, head.max, head.percent] : []), ...questions.map((q) => q.text)]
+  const who = anonymous ? [] : [head.respondent, head.submitted]
+  const header = [...who, ...(quiz ? [head.score, head.max, head.percent] : []), ...questions.map((q) => q.text)]
   const rows = people.map((p) => [
-    p.name,
-    p.at,
+    ...(anonymous ? [] : [p.name, p.at]),
     ...(quiz ? [p.score, p.max_score, p.percent] : []),
     ...questions.map((q) => answerText(q, p.answers[q.id])),
   ])
