@@ -22,12 +22,14 @@ import {
   MAX_FIELDS,
   MAX_OPTIONS,
   MIN_OPTIONS,
+  branchSources,
   buildCsv,
   cleanFields,
   firstProblem,
   hasOptions,
   isOpen,
   moveItem,
+  removeField,
   newField,
   parseFields,
   pct,
@@ -54,16 +56,18 @@ interface Form {
   closesOn: string
   max: string
   thanks: string
+  anonymous: boolean
 }
 interface Overview {
   mine: string[]
   counts: Record<string, number>
 }
 interface Results {
+  anonymous?: boolean
   total: number
   truncated: boolean
   fields: { id: string; kind: Kind; answered: number; counts?: number[] }[]
-  answers: { id: string; name: string; at: string; values: Record<string, Value | undefined> }[]
+  answers: { id: string | null; name: string | null; at: string | null; values: Record<string, Value | undefined> }[]
 }
 
 type View = { kind: 'list' } | { kind: 'detail'; f: Form; tab: 'fill' | 'answers'; done?: string }
@@ -105,6 +109,7 @@ function mount(msk: Msk) {
     closesOn: String(r.values.closes_on ?? ''),
     max: String(r.values.max_answers ?? ''),
     thanks: String(r.values.thanks ?? ''),
+    anonymous: r.values.anonymous === true,
   })
 
   // ------------------------------------------------------------------------------------------------------ the builder
@@ -114,6 +119,10 @@ function mount(msk: Msk) {
     const title = el('input', { type: 'text', maxlength: '160', 'aria-label': tr().fTitle, placeholder: tr().fTitle })
     const intro = el('textarea', { rows: '3', 'aria-label': tr().fIntro, placeholder: tr().fIntro })
     const open = el('input', { type: 'checkbox', id: 'fm-open' })
+    const anon = el('input', { type: 'checkbox', id: 'fm-anon', 'data-testid': 'anonymous' })
+    anon.checked = existing?.anonymous ?? false
+    // an anonymous form stays anonymous (the people who answered were promised it)
+    anon.disabled = existing?.anonymous === true
     const max = el('input', { type: 'number', min: '1', max: '5000', step: '1', 'aria-label': tr().fMax, placeholder: '1000' })
     const thanks = el('textarea', { rows: '2', maxlength: '500', 'aria-label': tr().fThanks, placeholder: tr().fThanks })
     title.value = existing?.title ?? ''
@@ -142,7 +151,7 @@ function mount(msk: Msk) {
           drawFields(`down-${f.id}`)
         })
         const del = btn('✕', 'msk-btn ghost mini danger-text', () => {
-          fs = fs.filter((x) => x.id !== f.id)
+          fs = removeField(fs, f.id)
           drawFields('add')
         })
         up.setAttribute('aria-label', sub(tr().moveUp, { n }))
@@ -175,6 +184,39 @@ function mount(msk: Msk) {
         help.value = f.help
         help.addEventListener('input', () => (f.help = help.value))
         block.append(label, el('div', { class: 'fm-frow' }, kind, el('label', { class: 'fm-check' }, required, el('span', {}, tr().fRequired))), help)
+
+        // show this field only when an earlier answer matches
+        const sources = branchSources(fs, fi)
+        if (sources.length) {
+          const src = el('select', { 'aria-label': sub(tr().fShowIf, { n }), 'data-testid': 'show-if' })
+          src.append(el('option', { value: '' }, tr().showAlways))
+          sources.forEach((s2) => src.append(el('option', { value: s2.id }, sub(tr().showIfQ, { n: fs.indexOf(s2) + 1 }))))
+          src.value = f.show_if && sources.some((s2) => s2.id === f.show_if!.field) ? f.show_if.field : ''
+          src.addEventListener('change', () => {
+            if (src.value) f.show_if = { field: src.value, any_of: [] }
+            else delete f.show_if
+            drawFields(`showif-${f.id}`)
+          })
+          src.dataset.act = `showif-${f.id}`
+          const cond = el('div', { class: 'fm-cond' }, el('span', { class: 'fm-dim' }, tr().showIfLabel), src)
+          const source = sources.find((s2) => s2.id === f.show_if?.field)
+          if (f.show_if && source) {
+            const vals = el('div', { class: 'fm-condvals', role: 'group', 'aria-label': sub(tr().showIfValues, { n }) })
+            for (const o of source.options) {
+              const c = el('input', { type: 'checkbox', 'aria-label': `${sub(tr().showIfValues, { n })}: ${o}` })
+              c.checked = f.show_if.any_of.includes(o)
+              c.addEventListener('change', () => {
+                const cur = new Set(f.show_if!.any_of)
+                if (c.checked) cur.add(o)
+                else cur.delete(o)
+                f.show_if!.any_of = [...cur]
+              })
+              vals.append(el('label', { class: 'fm-check' }, c, el('span', {}, o || '…')))
+            }
+            cond.append(vals)
+          }
+          block.append(cond)
+        }
 
         if (hasOptions(f.kind)) {
           const opts = el('div', { class: 'fm-opts' })
@@ -233,6 +275,8 @@ function mount(msk: Msk) {
       field(tr().fTitle, title),
       field(tr().fIntro, intro),
       check(open, tr().fOpen),
+      check(anon, tr().fAnonymous),
+      el('p', { class: 'fm-dim' }, tr().anonNote),
       el('div', { class: 'fm-row' }, field(tr().fCloses, closesField.el), field(tr().fMax, max)),
       field(tr().fThanks, thanks),
       el('h3', { class: 'fm-sub' }, tr().fFields),
@@ -265,6 +309,7 @@ function mount(msk: Msk) {
         closes_on: closes,
         max_answers: max.value.trim(),
         thanks: thanks.value.trim(),
+        anonymous: anon.checked,
         fields: JSON.stringify(cleanFields(fs)),
       }
       try {
@@ -442,14 +487,16 @@ function mount(msk: Msk) {
       return go({ kind: 'list' })
     }
     const wrap = el('div', { class: 'fm-page' })
+    const anonymous = r.anonymous === true
     const rows: AnswerRow[] = r.answers.map((a) => ({ id: a.id, name: a.name, at: a.at, values: a.values }))
     const exp = btn(tr().exportCsv, 'msk-btn ghost mini', () => {
-      download(slug(f.title) + '.csv', buildCsv(f.fields, rows, { name: tr().csvName, submitted: tr().csvWhen }))
+      download(slug(f.title) + '.csv', buildCsv(f.fields, rows, { name: tr().csvName, submitted: tr().csvWhen }, anonymous))
       toast(tr().exported, { tone: 'ok' })
     })
     exp.disabled = r.total === 0
     head.append(exp)
     wrap.append(el('p', { class: 'fm-summary', 'data-testid': 'summary' }, `${tr().total}: ${r.total}`))
+    if (anonymous) wrap.append(el('p', { class: 'fm-dim', 'data-testid': 'anonymous-note' }, tr().anonResults))
     if (r.truncated) wrap.append(el('p', { class: 'fm-dim' }, tr().truncated))
     if (!r.total) {
       wrap.append(el('p', { class: 'fm-dim' }, tr().noAnswers))
@@ -466,20 +513,23 @@ function mount(msk: Msk) {
       wrap.append(c)
     }
     const table = el('table', { class: 'fm-table', 'data-testid': 'answers' })
-    const hr = el('tr', {}, el('th', { scope: 'col' }, tr().colName), el('th', { scope: 'col' }, tr().colWhen), ...f.fields.map((x) => el('th', { scope: 'col' }, x.label)))
-    if (isManager(f)) hr.append(el('th', { scope: 'col' }, tr().colActions))
+    const hr = el('tr', {}, ...(anonymous ? [el('th', { scope: 'col' }, tr().colResponse)] : [el('th', { scope: 'col' }, tr().colName), el('th', { scope: 'col' }, tr().colWhen)]), ...f.fields.map((x) => el('th', { scope: 'col' }, x.label)))
+    if (isManager(f) && !anonymous) hr.append(el('th', { scope: 'col' }, tr().colActions))
     table.append(el('thead', {}, hr))
     const tb = el('tbody')
+    let nth = 0
     for (const a of r.answers) {
-      const row = el('tr', { 'data-testid': 'answer' }, el('td', {}, a.name), el('td', {}, when(a.at)), ...f.fields.map((x) => el('td', {}, valueText(a.values[x.id]))))
-      if (isManager(f)) {
+      nth += 1
+      const row = el('tr', { 'data-testid': 'answer' }, ...(anonymous || !a.at ? [el('td', {}, sub(tr().responseN, { n: nth }))] : [el('td', {}, a.name ?? ''), el('td', {}, when(a.at))]), ...f.fields.map((x) => el('td', {}, valueText(a.values[x.id]))))
+      if (isManager(f) && !anonymous && a.id) {
+        const who = a.id
         row.append(
           el(
             'td',
             {},
             (() => {
-              const b = btn(tr().deleteAnswer, 'msk-btn ghost mini danger-text', () => void removeAnswer(f, a))
-              b.setAttribute('aria-label', sub(tr().deleteLabel, { n: a.name }))
+              const b = btn(tr().deleteAnswer, 'msk-btn ghost mini danger-text', () => void removeAnswer(f, { id: who, name: a.name ?? '' }))
+              b.setAttribute('aria-label', sub(tr().deleteLabel, { n: a.name ?? '' }))
               return b
             })(),
           ),

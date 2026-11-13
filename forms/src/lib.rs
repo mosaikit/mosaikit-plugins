@@ -38,6 +38,15 @@ struct Field {
     options: Vec<String>,
     required: bool,
     help: String,
+    /// Shown only when an earlier field was answered with one of these options.
+    show_if: Option<ShowIf>,
+}
+
+/// A condition of a field: the earlier choice or multi field `field` has one of the options in `any_of` among its answers.
+#[derive(Debug, Clone, PartialEq)]
+struct ShowIf {
+    field: String,
+    any_of: Vec<String>,
 }
 
 impl Field {
@@ -46,10 +55,14 @@ impl Field {
     }
 
     fn to_json(&self) -> Value {
-        json!({
+        let mut o = json!({
             "id": self.id, "label": self.label, "kind": self.kind, "options": self.options,
             "required": self.required, "help": self.help,
-        })
+        });
+        if let Some(c) = &self.show_if {
+            o["show_if"] = json!({ "field": c.field, "any_of": c.any_of });
+        }
+        o
     }
 }
 
@@ -155,6 +168,7 @@ fn parse_fields(raw: &str) -> Result<Vec<Field>> {
                 ));
             }
         }
+        let show_if = parse_show_if(f.get("show_if"), &out, n)?;
         out.push(Field {
             id: id.to_string(),
             label,
@@ -162,9 +176,61 @@ fn parse_fields(raw: &str) -> Result<Vec<Field>> {
             options,
             required: f.get("required").and_then(Value::as_bool).unwrap_or(false),
             help,
+            show_if,
         });
     }
     Ok(out)
+}
+
+/// Reads the condition of field `n` against the fields before it: it must name one of them, a choice or multi field,
+/// and list at least one of its options.
+fn parse_show_if(raw: Option<&Value>, before: &[Field], n: usize) -> Result<Option<ShowIf>> {
+    let Some(c) = raw.filter(|c| !c.is_null()) else {
+        return Ok(None);
+    };
+    let wrong = |m: &str| bad("form_field_branch", format!("field {n}: {m}"));
+    let source = c.get("field").and_then(Value::as_str).unwrap_or("");
+    let Some(src) = before.iter().find(|f| f.id == source) else {
+        return Err(wrong("the condition must use an earlier field"));
+    };
+    if !src.has_options() {
+        return Err(wrong("the condition needs a field with options"));
+    }
+    let list = c
+        .get("any_of")
+        .and_then(Value::as_array)
+        .ok_or_else(|| wrong("the condition needs at least one option"))?;
+    let mut any_of: Vec<String> = Vec::new();
+    for v in list {
+        let o = v.as_str().unwrap_or("");
+        if !src.options.iter().any(|x| x == o) {
+            return Err(wrong("the condition has an option the field does not have"));
+        }
+        if !any_of.iter().any(|x| x == o) {
+            any_of.push(o.to_string());
+        }
+    }
+    if any_of.is_empty() {
+        return Err(wrong("the condition needs at least one option"));
+    }
+    // in the order of the options of the source
+    any_of.sort_by_key(|o| src.options.iter().position(|x| x == o));
+    Ok(Some(ShowIf {
+        field: source.to_string(),
+        any_of,
+    }))
+}
+
+/// Whether the (checked) values meet the condition `c`.
+fn condition_met(c: &ShowIf, values: &Map<String, Value>) -> bool {
+    match values.get(&c.field) {
+        Some(Value::String(s)) => c.any_of.contains(s),
+        Some(Value::Array(l)) => l
+            .iter()
+            .filter_map(Value::as_str)
+            .any(|s| c.any_of.iter().any(|x| x == s)),
+        _ => false,
+    }
 }
 
 /// The cap of answers is empty (the default, 1000) or a whole number from 1 to 5000.
@@ -223,6 +289,14 @@ fn form(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
         ));
     }
     v.set("thanks", thanks);
+    // an anonymous form stays anonymous: the people who answered it were promised not to be known
+    if hook.previous.as_ref().is_some_and(|p| p.bool("anonymous")) && !v.bool("anonymous") {
+        return Err(bad(
+            "form_anonymous_fixed",
+            "an anonymous form cannot be made named again",
+        ));
+    }
+    v.set("anonymous", v.bool("anonymous"));
     Ok(Some(v))
 }
 
@@ -401,7 +475,17 @@ fn validate_answer(fields: &[Field], values: &Value) -> Result<String> {
         ));
     }
     let mut out = Map::new();
+    let mut shown: BTreeSet<String> = BTreeSet::new();
     for (i, f) in fields.iter().enumerate() {
+        // a field whose condition is not met is not asked: nothing is required and a stray value is dropped
+        let on = f
+            .show_if
+            .as_ref()
+            .is_none_or(|c| shown.contains(&c.field) && condition_met(c, &out));
+        if !on {
+            continue;
+        }
+        shown.insert(f.id.clone());
         if let Some(v) = check_value(f, map.get(&f.id), i + 1)? {
             out.insert(f.id.clone(), v);
         }
@@ -483,6 +567,7 @@ struct Loaded {
     open: bool,
     thanks: String,
     max: i64,
+    anonymous: bool,
 }
 
 fn loaded_from(row: &Value) -> Result<Loaded> {
@@ -500,6 +585,7 @@ fn loaded_from(row: &Value) -> Result<Loaded> {
         open: is_open(flag(row.get("is_open")), &closes_on, &today),
         thanks: s("thanks"),
         max: max_answers_of(&max_raw),
+        anonymous: flag(row.get("anonymous")),
     })
 }
 
@@ -509,7 +595,7 @@ fn load(ctx: &Ctx, id: &str) -> Result<Loaded> {
         .db()
         .query_one(
             "select title, intro, fields, coalesce(\"open\", false) as is_open, closes_on::text as closes_on, \
-             max_answers, thanks, current_date::text as today \
+             max_answers, thanks, coalesce(anonymous, false) as anonymous, current_date::text as today \
              from forms where resource_id::text = $1",
             &[json!(id)],
         )?
@@ -584,8 +670,13 @@ fn submit(ctx: &Ctx, args: Value) -> Result<Value> {
         .user
         .clone()
         .ok_or_else(|| bad("not_signed_in", "sign in to answer a form"))?;
-    let name = ctx.username.clone().unwrap_or_else(|| user.clone());
     let f = load(ctx, &id)?;
+    // an anonymous form keeps no name with the answers (the person is still known once, to answer only once)
+    let name = if f.anonymous {
+        String::new()
+    } else {
+        ctx.username.clone().unwrap_or_else(|| user.clone())
+    };
     ready_for_answers(ctx, &id, &f)?;
     let body = validate_answer(&f.fields, args.get("values").unwrap_or(&Value::Null))?;
     if has_answered(ctx, &id, &user)? {
@@ -680,17 +771,27 @@ fn results(ctx: &Ctx, args: Value) -> Result<Value> {
             .unwrap_or_default()
     };
     let all: Vec<Map<String, Value>> = rows.iter().map(parse).collect();
-    let answers: Vec<Value> = rows
-        .iter()
-        .zip(&all)
-        .map(|(r, values)| {
-            json!({
-                "id": r.get("user_id"), "name": r.get("user_name"), "at": r.get("at"),
-                "values": values,
-            })
+    let mut order: Vec<usize> = (0..rows.len()).collect();
+    if f.anonymous {
+        // nothing of the order of arrival is left: the answers are listed by their content
+        order.sort_by_key(|i| rows[*i].get("body").and_then(Value::as_str).unwrap_or("").to_string());
+    }
+    let answers: Vec<Value> = order
+        .into_iter()
+        .map(|i| {
+            let (r, values) = (&rows[i], &all[i]);
+            if f.anonymous {
+                json!({ "id": Value::Null, "name": Value::Null, "at": Value::Null, "values": values })
+            } else {
+                json!({
+                    "id": r.get("user_id"), "name": r.get("user_name"), "at": r.get("at"),
+                    "values": values,
+                })
+            }
         })
         .collect();
     Ok(json!({
+        "anonymous": f.anonymous,
         "total": total,
         "truncated": total > RESULT_ROWS,
         "fields": tally(&f.fields, &all),
@@ -734,6 +835,12 @@ fn delete_answer(ctx: &Ctx, args: Value) -> Result<Value> {
         return Err(bad(
             "delete_forbidden",
             "only people who manage the form can delete an answer",
+        ));
+    }
+    if load(ctx, &id)?.anonymous {
+        return Err(bad(
+            "answer_anonymous",
+            "the answers of an anonymous form cannot be told apart, so none can be deleted",
         ));
     }
     let n = ctx.db().exec(
@@ -961,6 +1068,7 @@ mod tests {
                 kind: "longtext".into(),
                 options: vec![],
                 required: false,
+                show_if: None,
                 help: String::new(),
             })
             .collect();
@@ -1327,5 +1435,148 @@ mod tests {
             .command(&__msk_registry(), "forms.overview", json!({}))
             .unwrap();
         assert_eq!(out, json!({ "mine": ["b"], "counts": { "a": 3 } }));
+    }
+}
+
+#[cfg(test)]
+mod branching_tests {
+    use super::*;
+    use mosaikit_plugin_sdk::testing::MockHost;
+
+    fn fields(show_b: Value) -> Result<Vec<Field>> {
+        parse_fields(
+            &json!([
+                { "id": "a", "label": "Do you drive?", "kind": "choice", "options": ["Yes", "No", "Sometimes"] },
+                { "id": "b", "label": "Which car?", "kind": "text", "required": true, "show_if": show_b },
+                { "id": "c", "label": "Why not?", "kind": "text", "show_if": { "field": "a", "any_of": ["No"] } },
+                { "id": "d", "label": "Anything else?", "kind": "text" },
+            ])
+            .to_string(),
+        )
+    }
+
+    #[test]
+    fn a_condition_names_an_earlier_field_with_options() {
+        let ok = fields(json!({ "field": "a", "any_of": ["Sometimes", "Yes", "Yes"] })).unwrap();
+        // in the order of the options, each once
+        assert_eq!(ok[1].show_if.as_ref().unwrap().any_of, ["Yes", "Sometimes"]);
+        let bad = |c: Value, kind: &str| {
+            parse_fields(
+                &json!([
+                    { "id": "a", "label": "A", "kind": kind, "options": ["x", "y"] },
+                    { "id": "b", "label": "B", "kind": "text", "show_if": c },
+                ])
+                .to_string(),
+            )
+            .unwrap_err()
+            .to_string()
+        };
+        assert!(bad(json!({ "field": "z", "any_of": ["x"] }), "choice").contains("earlier"));
+        assert!(bad(json!({ "field": "b", "any_of": ["x"] }), "choice").contains("earlier"));
+        assert!(bad(json!({ "field": "a", "any_of": ["x"] }), "text").contains("with options"));
+        assert!(bad(json!({ "field": "a", "any_of": ["q"] }), "choice").contains("does not have"));
+        assert!(bad(json!({ "field": "a", "any_of": [] }), "choice").contains("at least one"));
+    }
+
+    #[test]
+    fn the_condition_is_kept_when_the_form_is_saved() {
+        let v = MockHost::new()
+            .hook(
+                &__msk_registry(),
+                "before_create",
+                "forms",
+                json!({ "title": "T", "fields": json!([
+                    { "id": "a", "label": "A", "kind": "multi", "options": ["x", "y"] },
+                    { "id": "b", "label": "B", "kind": "text", "show_if": { "field": "a", "any_of": ["y"] } },
+                ]).to_string() }),
+            )
+            .unwrap()
+            .unwrap();
+        assert!(v.str("fields").contains(r#""show_if":{"any_of":["y"],"field":"a"}"#));
+    }
+
+    #[test]
+    fn a_field_is_asked_only_when_the_condition_is_met() {
+        let f = fields(json!({ "field": "a", "any_of": ["Yes"] })).unwrap();
+        // «Yes»: the car is asked and required
+        assert_eq!(
+            validate_answer(&f, &json!({ "a": "Yes" })).unwrap_err().to_string(),
+            "field 2 (Which car?) needs an answer"
+        );
+        let body = validate_answer(&f, &json!({ "a": "Yes", "b": "Fiat" })).unwrap();
+        assert_eq!(body, r#"{"a":"Yes","b":"Fiat"}"#);
+        // «No»: the car is not asked, a stray value is dropped and the other condition applies
+        let no = validate_answer(&f, &json!({ "a": "No", "b": "Fiat", "c": "Bike" })).unwrap();
+        assert_eq!(no, r#"{"a":"No","c":"Bike"}"#);
+    }
+
+    #[test]
+    fn a_multiple_choice_matches_any_of_its_picks() {
+        let f = parse_fields(
+            &json!([
+                { "id": "a", "label": "A", "kind": "multi", "options": ["x", "y", "z"] },
+                { "id": "b", "label": "B", "kind": "text", "required": true, "show_if": { "field": "a", "any_of": ["z"] } },
+            ])
+            .to_string(),
+        )
+        .unwrap();
+        assert!(validate_answer(&f, &json!({ "a": ["x", "z"] })).is_err());
+        assert!(validate_answer(&f, &json!({ "a": ["x", "z"], "b": "why" })).is_ok());
+        assert!(validate_answer(&f, &json!({ "a": ["x", "y"] })).is_ok());
+    }
+
+    #[test]
+    fn an_anonymous_form_cannot_be_made_named_again() {
+        let h = MockHost::new();
+        let v = |anon: bool| json!({ "title": "T", "anonymous": anon });
+        let made = h
+            .hook(&__msk_registry(), "before_create", "forms", v(true))
+            .unwrap()
+            .unwrap();
+        assert!(made.bool("anonymous"));
+        let named = h
+            .hook_with_previous(&__msk_registry(), "before_update", "forms", v(false), v(true))
+            .unwrap_err();
+        assert!(named.contains("anonymous"));
+        assert!(h
+            .hook_with_previous(&__msk_registry(), "before_update", "forms", v(true), v(false))
+            .is_ok());
+    }
+
+    #[test]
+    fn results_of_an_anonymous_form_name_nobody_and_deleting_is_refused() {
+        let row = |sql: &str| {
+            if sql.contains("from answers") {
+                json!([
+                    { "user_id": "11111111-1111-1111-1111-111111111111", "user_name": "", "body": r#"{"d":"b"}"#, "at": "2026-11-13" },
+                    { "user_id": "22222222-2222-2222-2222-222222222222", "user_name": "", "body": r#"{"d":"a"}"#, "at": "2026-11-12" },
+                ])
+            } else if sql.contains("count(*)") {
+                json!([{ "n": 2 }])
+            } else if sql.contains("level_of") {
+                json!([{ "lvl": 3 }])
+            } else {
+                json!([{ "title": "T", "intro": "", "fields": json!([{ "id": "d", "label": "D", "kind": "text" }]).to_string(),
+                    "is_open": true, "closes_on": "", "max_answers": "1000", "thanks": "", "anonymous": true, "today": "2026-11-13" }])
+            }
+        };
+        let h = MockHost::new().on("db.query", move |req| Ok(row(req["sql"].as_str().unwrap_or_default())));
+        let id = "99999999-9999-9999-9999-999999999999";
+        let out = h
+            .command(&__msk_registry(), "forms.results", json!({ "id": id }))
+            .unwrap();
+        assert_eq!(out["anonymous"], true);
+        let a = out["answers"].as_array().unwrap();
+        // by content, not by arrival; no identity
+        assert_eq!(a[0]["values"]["d"], "a");
+        assert!(a.iter().all(|x| x["id"].is_null() && x["name"].is_null() && x["at"].is_null()));
+        let del = h
+            .command(
+                &__msk_registry(),
+                "forms.delete_answer",
+                json!({ "id": id, "answer_user": "11111111-1111-1111-1111-111111111111" }),
+            )
+            .unwrap_err();
+        assert!(del.contains("anonymous"));
     }
 }
