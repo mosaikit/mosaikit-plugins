@@ -199,7 +199,11 @@ fn parse_show_if(raw: Option<&Value>, before: &[Question], n: usize) -> Result<O
     let max = match src.kind.as_str() {
         "choice" | "multi" => src.options.len() as i64,
         "scale" => 6,
-        _ => return Err(wrong("the condition needs a question with options or a scale")),
+        _ => {
+            return Err(wrong(
+                "the condition needs a question with options or a scale",
+            ))
+        }
     };
     let min = if src.kind == "scale" { 1 } else { 0 };
     let list = c
@@ -783,13 +787,20 @@ fn results(ctx: &Ctx, args: Value) -> Result<Value> {
         o
     });
     if level_of(ctx, &id)? < 2 {
-        return Ok(json!({ "full": false, "responded": mine.is_some(), "mine": mine_json, "anonymous": s.anonymous }));
+        return Ok(
+            json!({ "full": false, "responded": mine.is_some(), "mine": mine_json, "anonymous": s.anonymous }),
+        );
     }
     let all: Vec<Map<String, Value>> = rows.iter().map(parse).collect();
     let mut order: Vec<&Value> = rows.iter().collect();
     if s.anonymous {
         // nothing of the order of arrival is left: the answers are listed by their content
-        order.sort_by_key(|r| r.get("answers").and_then(Value::as_str).unwrap_or("").to_string());
+        order.sort_by_key(|r| {
+            r.get("answers")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string()
+        });
     }
     let respondents: Vec<Value> = order
         .into_iter()
@@ -1334,7 +1345,9 @@ mod branching_tests {
         // a later or unknown question, a text source, a value the source cannot have, no value
         assert!(bad(json!({ "question": "z", "any_of": [0] }), "choice").contains("earlier"));
         assert!(bad(json!({ "question": "b", "any_of": [0] }), "choice").contains("earlier"));
-        assert!(bad(json!({ "question": "a", "any_of": [0] }), "text").contains("options or a scale"));
+        assert!(
+            bad(json!({ "question": "a", "any_of": [0] }), "text").contains("options or a scale")
+        );
         assert!(bad(json!({ "question": "a", "any_of": [2] }), "choice").contains("cannot have"));
         assert!(bad(json!({ "question": "a", "any_of": [0] }), "scale").contains("cannot have"));
         assert!(bad(json!({ "question": "a", "any_of": [] }), "choice").contains("at least one"));
@@ -1354,14 +1367,19 @@ mod branching_tests {
             )
             .unwrap()
             .unwrap();
-        assert!(v.str("questions").contains(r#""show_if":{"any_of":[1],"question":"a"}"#));
+        assert!(v
+            .str("questions")
+            .contains(r#""show_if":{"any_of":[1],"question":"a"}"#));
     }
 
     #[test]
     fn a_question_is_asked_only_when_the_condition_is_met() {
         let q = qs(json!({ "question": "a", "any_of": [0] }));
         // answered "yes": the car is asked (and required) and so is the rating (not required)
-        assert!(check_answers(&q, &json!({ "a": 0 })).unwrap_err().to_string().contains("question 2"));
+        assert!(check_answers(&q, &json!({ "a": 0 }))
+            .unwrap_err()
+            .to_string()
+            .contains("question 2"));
         let ok = check_answers(&q, &json!({ "a": 0, "b": "Fiat" })).unwrap();
         assert_eq!(ok.len(), 2);
         // answered "no": the car is not asked, a stray answer is dropped
@@ -1400,11 +1418,23 @@ mod branching_tests {
             .unwrap();
         assert!(make.bool("anonymous"));
         let named = h
-            .hook_with_previous(&__msk_registry(), "before_update", "surveys", v(false), v(true))
+            .hook_with_previous(
+                &__msk_registry(),
+                "before_update",
+                "surveys",
+                v(false),
+                v(true),
+            )
             .unwrap_err();
         assert!(named.contains("anonymous"));
         assert!(h
-            .hook_with_previous(&__msk_registry(), "before_update", "surveys", v(true), v(false))
+            .hook_with_previous(
+                &__msk_registry(),
+                "before_update",
+                "surveys",
+                v(true),
+                v(false)
+            )
             .is_ok());
     }
 }

@@ -356,7 +356,14 @@ const MAX_BURNDOWN_DAYS: i64 = 400;
 /// up to `today`) and the ideal line, a straight way from all of them to none. `done_on` are the days the finished tasks
 /// were completed; `undated` finished tasks have no day and count as finished before the first day. A task completed
 /// before `from` is finished at the start; one completed after `to` is still open at the end of the period.
-fn burndown_days(from: i64, to: i64, today: i64, total: usize, done_on: &[i64], undated: usize) -> Vec<Value> {
+fn burndown_days(
+    from: i64,
+    to: i64,
+    today: i64,
+    total: usize,
+    done_on: &[i64],
+    undated: usize,
+) -> Vec<Value> {
     let span = (to - from).max(1) as f64;
     (from..=to)
         .map(|d| {
@@ -791,10 +798,19 @@ fn active_items(rows: &[Value], today: &str) -> Vec<Value> {
             let (name, id) = (row_str(r, "name"), row_str(r, "id"));
             let next = next_open_milestone(&list_of(&row_str(r, "milestones")));
             let (meta, tone, date) = match &next {
-                Some((d, n)) => (format!("{n} · {d}"), if d.as_str() < today { "err" } else { "" }, d.clone()),
+                Some((d, n)) => (
+                    format!("{n} · {d}"),
+                    if d.as_str() < today { "err" } else { "" },
+                    d.clone(),
+                ),
                 None => (String::new(), "", String::new()),
             };
-            (next.is_none(), date, name.clone(), json!({ "id": id, "title": name, "meta": meta, "tone": tone }))
+            (
+                next.is_none(),
+                date,
+                name.clone(),
+                json!({ "id": id, "title": name, "meta": meta, "tone": tone }),
+            )
         })
         .collect();
     list.sort_by(|a, b| (a.0, &a.1, &a.2).cmp(&(b.0, &b.1, &b.2)));
@@ -1261,7 +1277,13 @@ mod burndown_tests {
 
     #[test]
     fn days_and_dates_go_back_and_forth() {
-        for d in ["1970-01-01", "2000-02-29", "2026-11-13", "2027-03-01", "1999-12-31"] {
+        for d in [
+            "1970-01-01",
+            "2000-02-29",
+            "2026-11-13",
+            "2027-03-01",
+            "1999-12-31",
+        ] {
             assert_eq!(date_of(day_number(d).unwrap()), d);
         }
         assert_eq!(day_number("1970-01-02"), Some(1));
@@ -1280,7 +1302,14 @@ mod burndown_tests {
     #[test]
     fn the_burndown_counts_the_open_tasks_at_the_end_of_each_day() {
         // four tasks over five days; one done on the 2nd, two on the 4th; today is the 4th
-        let days = burndown_days(n("2026-06-01"), n("2026-06-05"), n("2026-06-04"), 4, &[n("2026-06-02"), n("2026-06-04"), n("2026-06-04")], 0);
+        let days = burndown_days(
+            n("2026-06-01"),
+            n("2026-06-05"),
+            n("2026-06-04"),
+            4,
+            &[n("2026-06-02"), n("2026-06-04"), n("2026-06-04")],
+            0,
+        );
         let rem: Vec<Value> = days.iter().map(|d| d["remaining"].clone()).collect();
         assert_eq!(rem, [json!(4), json!(3), json!(3), json!(1), Value::Null]);
         let ideal: Vec<f64> = days.iter().map(|d| d["ideal"].as_f64().unwrap()).collect();
@@ -1291,7 +1320,14 @@ mod burndown_tests {
 
     #[test]
     fn finished_tasks_with_no_day_count_from_the_start_and_late_ones_stay_open() {
-        let days = burndown_days(n("2026-06-01"), n("2026-06-03"), n("2026-06-03"), 3, &[n("2026-06-09"), n("2026-05-20")], 1);
+        let days = burndown_days(
+            n("2026-06-01"),
+            n("2026-06-03"),
+            n("2026-06-03"),
+            3,
+            &[n("2026-06-09"), n("2026-05-20")],
+            1,
+        );
         let rem: Vec<Value> = days.iter().map(|d| d["remaining"].clone()).collect();
         // one undated and one done before the start are finished at the start; the one done on the 9th is still open
         assert_eq!(rem, [json!(1), json!(1), json!(1)]);
@@ -1332,13 +1368,32 @@ mod burndown_tests {
     #[test]
     fn the_burndown_of_a_sprint_uses_its_dates_and_its_tasks() {
         let out = host("", "")
-            .command(&__msk_registry(), "projects.burndown", json!({ "id": PID, "sprint": "s1" }))
+            .command(
+                &__msk_registry(),
+                "projects.burndown",
+                json!({ "id": PID, "sprint": "s1" }),
+            )
             .unwrap();
         assert_eq!(out["available"], true);
-        assert_eq!((out["from"].as_str(), out["to"].as_str()), (Some("2026-06-01"), Some("2026-06-04")));
+        assert_eq!(
+            (out["from"].as_str(), out["to"].as_str()),
+            (Some("2026-06-01"), Some("2026-06-04"))
+        );
         // t3 is in no sprint: two tasks, one done
-        assert_eq!((out["total"].as_i64(), out["done"].as_i64(), out["undated"].as_i64()), (Some(2), Some(1), Some(0)));
-        let rem: Vec<Value> = out["days"].as_array().unwrap().iter().map(|d| d["remaining"].clone()).collect();
+        assert_eq!(
+            (
+                out["total"].as_i64(),
+                out["done"].as_i64(),
+                out["undated"].as_i64()
+            ),
+            (Some(2), Some(1), Some(0))
+        );
+        let rem: Vec<Value> = out["days"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|d| d["remaining"].clone())
+            .collect();
         assert_eq!(rem, [json!(2), json!(1), json!(1), Value::Null]);
     }
 
@@ -1347,9 +1402,21 @@ mod burndown_tests {
         let out = host("2026-06-01", "2026-06-04")
             .command(&__msk_registry(), "projects.burndown", json!({ "id": PID }))
             .unwrap();
-        assert_eq!((out["total"].as_i64(), out["done"].as_i64(), out["undated"].as_i64()), (Some(3), Some(2), Some(1)));
+        assert_eq!(
+            (
+                out["total"].as_i64(),
+                out["done"].as_i64(),
+                out["undated"].as_i64()
+            ),
+            (Some(3), Some(2), Some(1))
+        );
         // t3 has no day: finished from the start; t1 on the 2nd
-        let rem: Vec<Value> = out["days"].as_array().unwrap().iter().map(|d| d["remaining"].clone()).collect();
+        let rem: Vec<Value> = out["days"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|d| d["remaining"].clone())
+            .collect();
         assert_eq!(rem, [json!(2), json!(1), json!(1), Value::Null]);
     }
 
@@ -1360,7 +1427,11 @@ mod burndown_tests {
             .unwrap();
         assert_eq!(out, json!({ "available": false, "reason": "no_dates" }));
         assert!(host("", "")
-            .command(&__msk_registry(), "projects.burndown", json!({ "id": PID, "sprint": "nope" }))
+            .command(
+                &__msk_registry(),
+                "projects.burndown",
+                json!({ "id": PID, "sprint": "nope" })
+            )
             .is_err());
         assert!(host("2024-01-01", "2026-06-04")
             .command(&__msk_registry(), "projects.burndown", json!({ "id": PID }))
@@ -1381,10 +1452,22 @@ mod widget_tests {
     #[test]
     fn the_widget_shows_the_next_open_milestone_and_marks_a_past_one() {
         let rows = vec![
-            row("a", "Zeta", r#"[{"id":"m","name":"Beta","date":"2026-12-01","done":false}]"#),
-            row("b", "Alpha", r#"[{"id":"m","name":"Old","date":"2026-01-01","done":false},{"id":"n","name":"Done","date":"2025-01-01","done":true}]"#),
+            row(
+                "a",
+                "Zeta",
+                r#"[{"id":"m","name":"Beta","date":"2026-12-01","done":false}]"#,
+            ),
+            row(
+                "b",
+                "Alpha",
+                r#"[{"id":"m","name":"Old","date":"2026-01-01","done":false},{"id":"n","name":"Done","date":"2025-01-01","done":true}]"#,
+            ),
             row("c", "Nomilestone", "[]"),
-            row("d", "Bravo", r#"[{"id":"m","name":"Only done","date":"2026-02-02","done":true}]"#),
+            row(
+                "d",
+                "Bravo",
+                r#"[{"id":"m","name":"Only done","date":"2026-02-02","done":true}]"#,
+            ),
         ];
         let items = active_items(&rows, "2026-11-13");
         let titles: Vec<&str> = items.iter().map(|i| i["title"].as_str().unwrap()).collect();
@@ -1403,7 +1486,11 @@ mod widget_tests {
             if sql.contains("current_date") {
                 Ok(json!([{ "d": "2026-11-13" }]))
             } else {
-                Ok(Value::Array((0..8).map(|i| row(&format!("id{i}"), &format!("P{i}"), "[]")).collect()))
+                Ok(Value::Array(
+                    (0..8)
+                        .map(|i| row(&format!("id{i}"), &format!("P{i}"), "[]"))
+                        .collect(),
+                ))
             }
         });
         let out = host

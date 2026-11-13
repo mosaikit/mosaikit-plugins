@@ -774,7 +774,13 @@ fn results(ctx: &Ctx, args: Value) -> Result<Value> {
     let mut order: Vec<usize> = (0..rows.len()).collect();
     if f.anonymous {
         // nothing of the order of arrival is left: the answers are listed by their content
-        order.sort_by_key(|i| rows[*i].get("body").and_then(Value::as_str).unwrap_or("").to_string());
+        order.sort_by_key(|i| {
+            rows[*i]
+                .get("body")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string()
+        });
     }
     let answers: Vec<Value> = order
         .into_iter()
@@ -1492,7 +1498,9 @@ mod branching_tests {
             )
             .unwrap()
             .unwrap();
-        assert!(v.str("fields").contains(r#""show_if":{"any_of":["y"],"field":"a"}"#));
+        assert!(v
+            .str("fields")
+            .contains(r#""show_if":{"any_of":["y"],"field":"a"}"#));
     }
 
     #[test]
@@ -1500,7 +1508,9 @@ mod branching_tests {
         let f = fields(json!({ "field": "a", "any_of": ["Yes"] })).unwrap();
         // «Yes»: the car is asked and required
         assert_eq!(
-            validate_answer(&f, &json!({ "a": "Yes" })).unwrap_err().to_string(),
+            validate_answer(&f, &json!({ "a": "Yes" }))
+                .unwrap_err()
+                .to_string(),
             "field 2 (Which car?) needs an answer"
         );
         let body = validate_answer(&f, &json!({ "a": "Yes", "b": "Fiat" })).unwrap();
@@ -1535,11 +1545,23 @@ mod branching_tests {
             .unwrap();
         assert!(made.bool("anonymous"));
         let named = h
-            .hook_with_previous(&__msk_registry(), "before_update", "forms", v(false), v(true))
+            .hook_with_previous(
+                &__msk_registry(),
+                "before_update",
+                "forms",
+                v(false),
+                v(true),
+            )
             .unwrap_err();
         assert!(named.contains("anonymous"));
         assert!(h
-            .hook_with_previous(&__msk_registry(), "before_update", "forms", v(true), v(false))
+            .hook_with_previous(
+                &__msk_registry(),
+                "before_update",
+                "forms",
+                v(true),
+                v(false)
+            )
             .is_ok());
     }
 
@@ -1560,7 +1582,9 @@ mod branching_tests {
                     "is_open": true, "closes_on": "", "max_answers": "1000", "thanks": "", "anonymous": true, "today": "2026-11-13" }])
             }
         };
-        let h = MockHost::new().on("db.query", move |req| Ok(row(req["sql"].as_str().unwrap_or_default())));
+        let h = MockHost::new().on("db.query", move |req| {
+            Ok(row(req["sql"].as_str().unwrap_or_default()))
+        });
         let id = "99999999-9999-9999-9999-999999999999";
         let out = h
             .command(&__msk_registry(), "forms.results", json!({ "id": id }))
@@ -1569,7 +1593,9 @@ mod branching_tests {
         let a = out["answers"].as_array().unwrap();
         // by content, not by arrival; no identity
         assert_eq!(a[0]["values"]["d"], "a");
-        assert!(a.iter().all(|x| x["id"].is_null() && x["name"].is_null() && x["at"].is_null()));
+        assert!(a
+            .iter()
+            .all(|x| x["id"].is_null() && x["name"].is_null() && x["at"].is_null()));
         let del = h
             .command(
                 &__msk_registry(),

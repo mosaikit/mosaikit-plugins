@@ -553,7 +553,11 @@ fn set_approvers(ctx: &Ctx, args: Value) -> Result<Value> {
     let c = compute_row(r, &decisions);
     let old = parse_approvers(&text(r, "approvers")).unwrap_or_default();
     let mode = text(r, "mode");
-    let mode = if mode.is_empty() { "all" } else { mode.as_str() };
+    let mode = if mode.is_empty() {
+        "all"
+    } else {
+        mode.as_str()
+    };
     check_change(&old, &new, mode, c.state, &decisions)?;
     let tenant = ctx.tenant.clone().unwrap_or_default();
     let name = ctx.username.clone().unwrap_or_else(|| user.clone());
@@ -971,12 +975,20 @@ mod change_tests {
 
     fn ap(ids: &[&str]) -> Vec<Approver> {
         ids.iter()
-            .map(|i| Approver { id: i.to_string(), name: format!("P{}", &i[..1]) })
+            .map(|i| Approver {
+                id: i.to_string(),
+                name: format!("P{}", &i[..1]),
+            })
             .collect()
     }
 
     fn d(user: &str) -> Decision {
-        Decision { user_id: user.into(), verdict: "approved".into(), comment: String::new(), at: String::new() }
+        Decision {
+            user_id: user.into(),
+            verdict: "approved".into(),
+            comment: String::new(),
+            at: String::new(),
+        }
     }
 
     #[test]
@@ -999,10 +1011,12 @@ mod change_tests {
         let old = ap(&[A, B, C]);
         let ds = vec![d(A)];
         assert!(check_change(&old, &ap(&[A, C, B]), "sequence", "pending", &ds).is_ok());
-        assert!(check_change(&old, &ap(&[B, A, C]), "sequence", "pending", &ds)
-            .unwrap_err()
-            .to_string()
-            .contains("stay first"));
+        assert!(
+            check_change(&old, &ap(&[B, A, C]), "sequence", "pending", &ds)
+                .unwrap_err()
+                .to_string()
+                .contains("stay first")
+        );
         assert!(check_change(&old, &ap(&[B, A, C]), "all", "pending", &ds).is_ok());
     }
 
@@ -1015,7 +1029,11 @@ mod change_tests {
             Ok(json!([{ "who": "ann", "at": "2026-11-13", "old_list": b, "new_list": a }]))
         });
         let out = host
-            .command(&__msk_registry(), "requests.approver_log", json!({ "id": A }))
+            .command(
+                &__msk_registry(),
+                "requests.approver_log",
+                json!({ "id": A }),
+            )
             .unwrap();
         assert_eq!(out[0]["added"], json!(["P3"]));
         assert_eq!(out[0]["removed"], json!(["P2"]));

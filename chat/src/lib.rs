@@ -87,7 +87,16 @@ fn busy(channels: &[Value], counts: &[Value]) -> Vec<Value> {
         .filter_map(|c| {
             let id = c.get("id").and_then(Value::as_str)?;
             let n = n_of(id);
-            (n > 0).then(|| (n, c.get("name").and_then(Value::as_str).unwrap_or_default().to_string(), id.to_string()))
+            (n > 0).then(|| {
+                (
+                    n,
+                    c.get("name")
+                        .and_then(Value::as_str)
+                        .unwrap_or_default()
+                        .to_string(),
+                    id.to_string(),
+                )
+            })
         })
         .collect();
     list.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(&b.1)));
@@ -237,7 +246,11 @@ mod tests {
             json!({ "id": "c", "name": "quiet" }),
             json!({ "id": "d", "name": "alpha" }),
         ];
-        let counts = vec![json!({ "pid": "a", "n": 3 }), json!({ "pid": "b", "n": 9 }), json!({ "pid": "d", "n": 3 })];
+        let counts = vec![
+            json!({ "pid": "a", "n": 3 }),
+            json!({ "pid": "b", "n": 9 }),
+            json!({ "pid": "d", "n": 3 }),
+        ];
         let items = busy(&channels, &counts);
         let names: Vec<&str> = items.iter().map(|i| i["title"].as_str().unwrap()).collect();
         // ties by name
@@ -259,7 +272,10 @@ mod tests {
         let out = host
             .command(&__msk_registry(), "channels.widget_busy", json!({}))
             .unwrap();
-        assert_eq!(out["items"], json!([{ "id": "a", "title": "general", "meta": "2", "tone": "" }]));
+        assert_eq!(
+            out["items"],
+            json!([{ "id": "a", "title": "general", "meta": "2", "tone": "" }])
+        );
         assert_eq!(out["more"], 0);
     }
 }
