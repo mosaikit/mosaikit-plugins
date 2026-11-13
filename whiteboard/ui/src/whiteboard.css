@@ -59,3 +59,9 @@
   .wb-head, .wb-body { padding-left: 16px; padding-right: 16px; }
   .wb-title { width: 130px; }
 }
+
+/* templates */
+.wb-templates { display: grid; gap: var(--sp-2, 8px); min-width: min(420px, 80vw); }
+.wb-template { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: var(--sp-3, 12px); text-align: left; border: 1px solid var(--line); border-radius: var(--r-m, 10px); background: var(--panel); color: inherit; cursor: pointer; font: inherit; }
+.wb-template:hover, .wb-template:focus-visible { border-color: var(--acc); }
+.wb-template span { color: var(--muted); font-size: 0.9em; }

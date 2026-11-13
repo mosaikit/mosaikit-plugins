@@ -2,9 +2,9 @@
 import { avatarStack, dialog, el, errText, toast, type Msk, type Row } from '@mosaikit/plugin-api'
 import { bgPattern, drawObject, exportPng, exportSvg, s, svgText } from './canvas.ts'
 import {
-  DEFAULT_COLOR, HANDLES, INK, NOTE_SIZE, PALETTE, PAPER, SHAPE_SIZE, TEXT_FONT, TEXT_WIDTH, backZ, byZ, canEdit, cycle, describeBoard, fitView, fontOf, frontZ, handlePoint,
+  DEFAULT_COLOR, FRAME_SIZE, FRAME_TITLE_H, HANDLES, TEMPLATE_IDS, contains, templateBox, templateObjects, withFrameChildren, INK, NOTE_SIZE, PALETTE, PAPER, SHAPE_SIZE, TEXT_FONT, TEXT_WIDTH, backZ, byZ, canEdit, cycle, describeBoard, fitView, fontOf, frontZ, handlePoint,
   intersects, lineHeightOf, newId, normRect, objBox, penFrom, penPath, resizeRect, scalePoints, stepZoom, swatchOf, textHeight, toBoard, toScreen, topAt, unionBounds, zoomAt,
-  type Handle, type Obj, type ObjType, type Pt, type Rect, type View,
+  type Handle, type Obj, type ObjType, type Pt, type Rect, type TemplateId, type TemplateLabel, type View,
 } from './logic.ts'
 import { Board, Live, applySnapshot, encodeSnapshot, fitsSnapshot, presenceState, type ChannelPerson, type Cursor } from './sync.ts'
 import { sub, type Texts } from './texts.ts'
@@ -28,6 +28,8 @@ const ICONS: Record<string, string[]> = {
   text: ['M5 7V5h14v2', 'M12 5v14', 'M9 19h6'],
   arrow: ['M5 19L19 5', 'M10 5h9v9'],
   pen: ['M4 20l1-4L16 5l3 3L8 19z', 'M14 7l3 3'],
+  frame: ['M4 4h16v16H4z', 'M4 9h16'],
+  template: ['M4 4h7v7H4z', 'M13 4h7v7h-7z', 'M4 13h7v7H4z', 'M13 13h7v7h-7z'],
   undo: ['M9 14L4 9l5-5', 'M4 9h10a6 6 0 0 1 0 12h-3'],
   redo: ['M15 14l5-5-5-5', 'M20 9H10a6 6 0 0 0 0 12h3'],
   del: ['M4 7h16', 'M10 11v6', 'M14 11v6', 'M6 7l1 13h10l1-13', 'M9 7V4h6v3'],
@@ -70,7 +72,7 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
   let people: ChannelPerson[] = []
   let destroyed = false
 
-  const names: Record<ObjType, string> = { note: tr.kNote, rect: tr.kRect, ellipse: tr.kEllipse, text: tr.kText, arrow: tr.kArrow, pen: tr.kPen }
+  const names: Record<ObjType, string> = { note: tr.kNote, rect: tr.kRect, ellipse: tr.kEllipse, text: tr.kText, arrow: tr.kArrow, pen: tr.kPen, frame: tr.kFrame }
   const colorNames = tr.colorNames
 
   // ------------------------------------------------------------------------------------------------------------ the canvas
@@ -377,7 +379,7 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
   // ------------------------------------------------------------------------------------------------------------ changing the board
   const nowFront = () => frontZ(board.all())
   const addObj = (type: ObjType, r: Rect, extra: Partial<Obj> = {}): Obj => {
-    const ob: Obj = { id: newId(), type, x: r.x, y: r.y, w: r.w, h: r.h, text: '', color, points: [], z: nowFront(), author: myName || me, ...extra }
+    const ob: Obj = { id: newId(), type, x: r.x, y: r.y, w: r.w, h: r.h, text: '', color, points: [], z: type === 'frame' ? backZ(board.all()) : nowFront(), author: myName || me, ...extra }
     board.undo.stopCapturing()
     board.add(ob)
     return ob
@@ -394,7 +396,7 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
     board.undo.stopCapturing()
     let z = nowFront()
     const ids: string[] = []
-    for (const ob of byZ(selected())) {
+    for (const ob of byZ(withFrameChildren(selected(), board.all()))) {
       const copy: Obj = { ...ob, id: newId(), x: ob.x + 24, y: ob.y + 24, z: z++, points: [...ob.points], author: myName || me }
       board.add(copy)
       ids.push(copy.id)
@@ -435,11 +437,12 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
     const font = fontOf(ob.type) * view.k
     const center = ob.type === 'rect' || ob.type === 'ellipse'
     const inset = ob.type === 'ellipse' ? 0.15 : 0
+    const bandH = ob.type === 'frame' ? Math.min(ob.h, FRAME_TITLE_H) : ob.h
     Object.assign(edit.style, {
       left: p.x + ob.w * view.k * inset + 'px',
       top: p.y + ob.h * view.k * inset + 'px',
       width: ob.w * view.k * (1 - inset * 2) + 'px',
-      height: ob.h * view.k * (1 - inset * 2) + 'px',
+      height: bandH * view.k * (1 - inset * 2) + 'px',
       fontSize: font + 'px',
       lineHeight: lineHeightOf(fontOf(ob.type)) * view.k + 'px',
       textAlign: center ? 'center' : 'left',
@@ -594,7 +597,8 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
         } else if (!sel.has(top.id)) select([top.id])
         board.undo.stopCapturing()
         const orig = new Map<string, Pt>()
-        for (const ob of selected()) orig.set(ob.id, { x: ob.x, y: ob.y })
+        // a frame moves with what is inside it
+        for (const ob of withFrameChildren(selected(), board.all())) orig.set(ob.id, { x: ob.x, y: ob.y })
         drag = { k: 'move', start: p, orig, moved: false, shift: toggle, hitId: top.id }
         return
       }
@@ -662,7 +666,7 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
       }
       case 'marquee': {
         const r = normRect(drag.start, p)
-        const ids = board.all().filter((ob) => intersects(r, objBox(ob))).map((ob) => ob.id)
+        const ids = board.all().filter((ob) => intersects(r, objBox(ob)) && (ob.type !== 'frame' || contains(r, objBox(ob)))).map((ob) => ob.id)
         sel.clear()
         for (const i of [...drag.base, ...ids]) sel.add(i)
         drawDraft()
@@ -719,7 +723,7 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
         if (moved) ob = addObj('arrow', { x: d.start.x, y: d.start.y, w: Math.abs(p.x - d.start.x), h: Math.abs(p.y - d.start.y) }, { points: [0, 0, round(p.x - d.start.x), round(p.y - d.start.y)] })
       } else {
         const r = normRect(d.start, p)
-        const dflt = d.tool === 'note' ? NOTE_SIZE : d.tool === 'text' ? { w: TEXT_WIDTH, h: textHeight('', TEXT_WIDTH, TEXT_FONT) } : SHAPE_SIZE
+        const dflt = d.tool === 'frame' ? FRAME_SIZE : d.tool === 'note' ? NOTE_SIZE : d.tool === 'text' ? { w: TEXT_WIDTH, h: textHeight('', TEXT_WIDTH, TEXT_FONT) } : SHAPE_SIZE
         const box: Rect = moved && r.w >= 24 && r.h >= 16 ? r : { x: d.start.x - dflt.w / 2, y: d.start.y - dflt.h / 2, w: dflt.w, h: dflt.h }
         if (d.tool === 'text' && moved) box.h = textHeight('', box.w, TEXT_FONT)
         ob = addObj(d.tool, { x: Math.round(box.x), y: Math.round(box.y), w: Math.round(box.w), h: Math.round(box.h) })
@@ -729,7 +733,7 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
         const made = ob
         // the object is drawn on the next frame: select it now and open its text box once it exists
         select([made.id])
-        if (made.type === 'note' || made.type === 'text') queueMicrotask(() => startEdit(made.id))
+        if (made.type === 'note' || made.type === 'text' || made.type === 'frame') queueMicrotask(() => startEdit(made.id))
       }
     }
   }
@@ -816,7 +820,7 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
       else setView({ ...view, x: view.x - dx * 4, y: view.y - dy * 4 })
     } else if (outside) {
       const key = k.toLowerCase()
-      const tools: Record<string, Tool> = { v: 'select', h: 'hand', n: 'note', r: 'rect', o: 'ellipse', t: 'text', a: 'arrow', p: 'pen' }
+      const tools: Record<string, Tool> = { v: 'select', h: 'hand', n: 'note', r: 'rect', o: 'ellipse', t: 'text', a: 'arrow', p: 'pen', f: 'frame' }
       if (tools[key] && (canWrite || tools[key] === 'hand' || tools[key] === 'select')) setTool(tools[key]!)
       else if (k === '+' || k === '=') zoomBy(1)
       else if (k === '-') zoomBy(-1)
@@ -870,6 +874,7 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
     ['text', 'text', 'T'],
     ['arrow', 'arrow', 'A'],
     ['pen', 'pen', 'P'],
+    ['frame', 'frame', 'F'],
   ]
   const toolBtns = new Map<Tool, HTMLButtonElement>()
   for (const [t, ic, key] of toolKeys) {
@@ -923,8 +928,45 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
   const legend = () => {
     const ok = el('button', { type: 'button', class: 'msk-btn' }, tr.close)
     const list = el('ul', { class: 'wb-legend' })
-    for (const t of [tr.legendTools, tr.legendMove, tr.legendEdit, tr.legendUndo, tr.legendOrder, tr.legendView]) list.append(el('li', {}, t))
+    for (const t of [tr.legendTools, tr.legendFrames, tr.legendMove, tr.legendEdit, tr.legendUndo, tr.legendOrder, tr.legendView]) list.append(el('li', {}, t))
     const d = dialog({ title: tr.legendTitle, body: list, actions: [ok] })
+    ok.addEventListener('click', d.close)
+  }
+
+  // a template is a set of frames and notes put in the middle of what the person sees, as one step of the history
+  const insertTemplate = (tid: TemplateId) => {
+    if (!canWrite) return
+    const label = (k: TemplateLabel) => (tr as unknown as Record<string, string>)[k] ?? ''
+    const { w, h } = size()
+    const centre = toBoard(view, { x: w / 2, y: h / 2 })
+    const probe = templateBox(templateObjects(tid, label, { x: 0, y: 0 }))
+    const objs = templateObjects(tid, label, { x: centre.x - probe.x - probe.w / 2, y: centre.y - probe.y - probe.h / 2 })
+    stopEdit(true)
+    board.undo.stopCapturing()
+    let front = nowFront()
+    let back = backZ(board.all()) - objs.length
+    const ids: string[] = []
+    for (const t of objs) {
+      const ob: Obj = { id: newId(), type: t.type, x: t.x, y: t.y, w: t.w, h: t.h, text: t.text, color: t.color, points: t.points ?? [], z: t.type === 'frame' ? back++ : front++, author: myName || me }
+      board.add(ob)
+      ids.push(ob.id)
+    }
+    board.undo.stopCapturing()
+    select(ids)
+  }
+  const templates = () => {
+    const ok = el('button', { type: 'button', class: 'msk-btn ghost' }, tr.close)
+    const list = el('div', { class: 'wb-templates', role: 'list' })
+    const names: Record<TemplateId, [string, string]> = { kanban: [tr.tplKanban, tr.tplKanbanText], swot: [tr.tplSwot, tr.tplSwotText], retro: [tr.tplRetro, tr.tplRetroText], brainstorm: [tr.tplBrainstorm, tr.tplBrainstormText] }
+    for (const tid of TEMPLATE_IDS) {
+      const b = el('button', { type: 'button', class: 'wb-template', role: 'listitem', 'data-template': tid }, el('strong', {}, names[tid][0]), el('span', {}, names[tid][1]))
+      b.addEventListener('click', () => {
+        insertTemplate(tid)
+        d.close()
+      })
+      list.append(b)
+    }
+    const d = dialog({ title: tr.templatesTitle, body: list, actions: [ok] })
     ok.addEventListener('click', d.close)
   }
 
@@ -988,7 +1030,7 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
     title,
     ...(canWrite
       ? [
-          group(tr.tools, ...toolKeys.map(([t]) => toolBtns.get(t)!)),
+          group(tr.tools, ...toolKeys.map(([t]) => toolBtns.get(t)!), btn('template', tr.templates, templates, { 'data-testid': 'templates' })),
           el('div', { class: 'wb-group wb-colors', role: 'radiogroup', 'aria-label': tr.colors }, ...PALETTE.map((p) => swatches.get(p.key)!)),
           group(tr.history, undoBtn, redoBtn),
           group(tr.arrange, delBtn, dupBtn, frontBtn, backBtn),

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
+  FRAME_TITLE_H,
+  TEMPLATE_IDS,
+  contains,
+  frameChildren,
+  templateBox,
+  templateObjects,
+  withFrameChildren,
   PALETTE, acceptsFrom, arrowHead, backZ, byZ, canEdit, clampLines, clampZoom, cycle, describeBoard, fitView, frontZ, hit, initialOf, newId,
   objBox, penFrom, penPath, personColor, resizeRect, scalePoints, simplifyPolyline, stepZoom, swatchOf, textHeight, textWidth, throttle, toBoard, toScreen,
   topAt, unionBounds, wrapText, zoomAt, type Obj,
@@ -211,7 +218,7 @@ describe('small helpers', () => {
   it('initial, description and cycling', () => {
     expect(initialOf('  retro')).toBe('R')
     expect(initialOf('')).toBe('?')
-    const names = { note: 'notes', rect: 'rectangles', ellipse: 'ellipses', text: 'texts', arrow: 'arrows', pen: 'drawings' }
+    const names = { note: 'notes', rect: 'rectangles', ellipse: 'ellipses', text: 'texts', arrow: 'arrows', pen: 'drawings', frame: 'frames' }
     expect(describeBoard([obj({ type: 'note' }), obj({ type: 'note', id: 'b' }), obj({ type: 'pen', id: 'c' })], names)).toBe('2 notes, 1 drawings')
     expect(describeBoard([], names)).toBe('')
     const objs = [obj({ id: 'a', z: 1 }), obj({ id: 'b', z: 2 }), obj({ id: 'c', z: 3 })]
@@ -220,5 +227,86 @@ describe('small helpers', () => {
     expect(cycle(objs, 'c', 1)).toBe('a')
     expect(cycle(objs, 'a', -1)).toBe('c')
     expect(cycle([], 'a', 1)).toBeUndefined()
+  })
+})
+
+describe('frames', () => {
+  const frame = obj({ id: 'f', type: 'frame', x: 100, y: 100, w: 400, h: 300, z: -1 })
+  const inside = obj({ id: 'n', type: 'note', x: 150, y: 200, w: 180, h: 140, z: 1 })
+  const outside = obj({ id: 'o', type: 'note', x: 700, y: 200, w: 180, h: 140, z: 2 })
+
+  it('is hit on its title band and its border, not in the middle, so what is inside stays easy to pick', () => {
+    expect(hit(frame, { x: 300, y: 100 + FRAME_TITLE_H - 2 })).toBe(true)
+    expect(hit(frame, { x: 101, y: 300 })).toBe(true)
+    expect(hit(frame, { x: 300, y: 250 })).toBe(false)
+    expect(hit(frame, { x: 50, y: 50 })).toBe(false)
+    // a note over the middle of a frame is the one under the pointer
+    expect(topAt([frame, inside], { x: 200, y: 250 })?.id).toBe('n')
+  })
+
+  it('holds the objects whose centre is inside it, never other frames or itself', () => {
+    const other = obj({ id: 'g', type: 'frame', x: 120, y: 120, w: 100, h: 100 })
+    expect(frameChildren(frame, [frame, inside, outside, other]).map((o) => o.id)).toEqual(['n'])
+    expect(frameChildren(inside, [frame, inside])).toEqual([])
+    // an arrow counts by its own box
+    const arrow = obj({ id: 'a', type: 'arrow', x: 200, y: 200, w: 40, h: 0, points: [0, 0, 40, 0] })
+    expect(frameChildren(frame, [arrow]).map((o) => o.id)).toEqual(['a'])
+  })
+
+  it('takes what it holds when it is moved or copied, each object once', () => {
+    const all = [frame, inside, outside]
+    expect(withFrameChildren([frame], all).map((o) => o.id).sort()).toEqual(['f', 'n'])
+    expect(withFrameChildren([frame, inside], all).map((o) => o.id).sort()).toEqual(['f', 'n'])
+    expect(withFrameChildren([outside], all).map((o) => o.id)).toEqual(['o'])
+  })
+
+  it('knows when a box is wholly inside another', () => {
+    expect(contains({ x: 0, y: 0, w: 100, h: 100 }, { x: 10, y: 10, w: 50, h: 50 })).toBe(true)
+    expect(contains({ x: 0, y: 0, w: 100, h: 100 }, { x: 80, y: 10, w: 50, h: 50 })).toBe(false)
+  })
+})
+
+describe('templates', () => {
+  const label = (k: string) => `<${k}>`
+
+  it('make frames first, with a title, and put the top left corner where asked', () => {
+    for (const id of TEMPLATE_IDS) {
+      const objs = templateObjects(id, label, { x: 1000, y: 500 })
+      expect(objs.length, id).toBeGreaterThan(2)
+      const firstOther = objs.findIndex((o) => o.type !== 'frame')
+      // the frames come before everything else
+      expect((firstOther < 0 ? [] : objs.slice(firstOther)).every((o) => o.type !== 'frame'), id).toBe(true)
+      for (const f of objs.filter((o) => o.type === 'frame')) expect(f.text.startsWith('<tpl'), id).toBe(true)
+      const box = templateBox(objs)
+      expect(box.x, id).toBeGreaterThanOrEqual(1000 - 400)
+      expect(box.w, id).toBeGreaterThan(300)
+    }
+  })
+
+  it('have the shape they promise', () => {
+    const kanban = templateObjects('kanban', label, { x: 0, y: 0 })
+    expect(kanban.filter((o) => o.type === 'frame').map((o) => o.text)).toEqual(['<tplTodo>', '<tplDoing>', '<tplDone>'])
+    expect(kanban.filter((o) => o.type === 'note')).toHaveLength(1)
+    const swot = templateObjects('swot', label, { x: 0, y: 0 })
+    expect(swot).toHaveLength(4)
+    expect(new Set(swot.map((o) => `${o.x},${o.y}`)).size).toBe(4)
+    const brain = templateObjects('brainstorm', label, { x: 0, y: 0 })
+    expect(brain.filter((o) => o.type === 'note')).toHaveLength(4)
+    expect(brain.filter((o) => o.type === 'arrow')).toHaveLength(4)
+    expect(brain.filter((o) => o.type === 'ellipse')).toHaveLength(1)
+    // every arrow has the two points of its line
+    for (const a of brain.filter((o) => o.type === 'arrow')) expect(a.points).toHaveLength(4)
+  })
+
+  it('are the same every time', () => {
+    expect(templateObjects('retro', label, { x: 5, y: 7 })).toEqual(templateObjects('retro', label, { x: 5, y: 7 }))
+  })
+
+  it('keep the notes of a column inside its frame', () => {
+    const objs = templateObjects('kanban', label, { x: 0, y: 0 }).map((o, i) => ({ id: String(i), z: 0, author: '', points: o.points ?? [], ...o }))
+    const frames = objs.filter((o) => o.type === 'frame')
+    const task = objs.find((o) => o.type === 'note')!
+    expect(frameChildren(frames[0]!, objs).map((o) => o.id)).toEqual([task.id])
+    expect(frameChildren(frames[1]!, objs)).toEqual([])
   })
 })

@@ -1,6 +1,6 @@
 // Drawing of a board with SVG, built with DOM APIs only (never innerHTML): the objects, the background, the export and the thumbnail.
 import {
-  INK, PAPER, arrowHead, byZ, clampLines, fontOf, lineHeightOf, objBox, penPath, swatchOf, unionBounds, wrapText, type Obj, type Rect,
+  FRAME_TITLE_H, INK, PAPER, arrowHead, byZ, clampLines, fontOf, lineHeightOf, objBox, penPath, swatchOf, unionBounds, wrapText, type Obj, type Rect,
 } from './logic.ts'
 
 const NS = 'http://www.w3.org/2000/svg'
@@ -50,6 +50,13 @@ export function drawObject(o: Obj, g: SVGGElement, opts: { hideText?: boolean } 
         const ls = clampLines(wrapText(text, inner, font), max)
         kids.push(lines(ls, o.x + o.w / 2, o.y + o.h / 2 - (ls.length * lh) / 2 + font * 0.95, font, INK, 'middle'))
       }
+      break
+    }
+    case 'frame': {
+      // a light area behind the objects it holds, with its title on a band at the top
+      kids.push(s('rect', { x: o.x, y: o.y, width: o.w, height: o.h, rx: 8, fill: sw.fill, 'fill-opacity': 0.22, stroke: sw.stroke, 'stroke-width': 2, 'stroke-dasharray': '8 5' }))
+      kids.push(s('rect', { x: o.x, y: o.y, width: o.w, height: FRAME_TITLE_H, rx: 8, fill: sw.fill, 'fill-opacity': 0.75 }))
+      if (text) kids.push(lines(clampLines(wrapText(text, o.w - 24, font), 1), o.x + 12, o.y + 23, font, INK))
       break
     }
     case 'text': {

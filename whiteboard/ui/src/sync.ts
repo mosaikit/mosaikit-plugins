@@ -171,7 +171,7 @@ export function read(m: Y.Map<unknown>): Obj {
   const type = str('type') as ObjType
   return {
     id: str('id'),
-    type: ['note', 'rect', 'ellipse', 'text', 'arrow', 'pen'].includes(type) ? type : 'rect',
+    type: ['note', 'rect', 'ellipse', 'text', 'arrow', 'pen', 'frame'].includes(type) ? type : 'rect',
     x: num('x'),
     y: num('y'),
     w: num('w'),
