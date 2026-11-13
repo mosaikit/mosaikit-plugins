@@ -20,6 +20,8 @@ const en = {
   needTitle: 'Write a title', needApprover: 'Choose at least one approver', needReason: 'Say why you reject the request',
   doneApproved: 'You approved the request', doneRejected: 'You rejected the request',
   createdTitle: 'Request sent', createdText: 'The approvers can decide only if they can read the request: share it with them now.', shareNow: 'Share…', later: 'Later',
+  changeApprovers: 'Change approvers', changeTitle: 'Change the approvers', lockedNote: 'People who already decided stay on the request.', changedDone: 'Approvers changed',
+  logTitle: 'Changes of the approvers', logAdded: 'added {n}', logRemoved: 'removed {n}', logLine: '{who}: {what}',
   close: 'Close', failed: 'Could not start the UI of the plugin: ', loadFailed: 'Could not load the requests: ',
 }
 export type Texts = typeof en
@@ -45,6 +47,8 @@ const it: Texts = {
   needTitle: 'Scrivi un titolo', needApprover: 'Scegli almeno un approvatore', needReason: 'Spiega perché rifiuti la richiesta',
   doneApproved: 'Hai approvato la richiesta', doneRejected: 'Hai rifiutato la richiesta',
   createdTitle: 'Richiesta inviata', createdText: 'Gli approvatori possono decidere solo se possono leggere la richiesta: condividila subito con loro.', shareNow: 'Condividi…', later: 'Più tardi',
+  changeApprovers: 'Cambia approvatori', changeTitle: 'Cambia gli approvatori', lockedNote: 'Chi ha già deciso resta nella richiesta.', changedDone: 'Approvatori cambiati',
+  logTitle: 'Modifiche agli approvatori', logAdded: 'aggiunti {n}', logRemoved: 'rimossi {n}', logLine: '{who}: {what}',
   close: 'Chiudi', failed: 'Impossibile avviare la UI del plugin: ', loadFailed: 'Impossibile caricare le richieste: ',
 }
 const es: Texts = {
@@ -67,6 +71,8 @@ const es: Texts = {
   needTitle: 'Escribe un título', needApprover: 'Elige al menos un aprobador', needReason: 'Explica por qué rechazas la solicitud',
   doneApproved: 'Has aprobado la solicitud', doneRejected: 'Has rechazado la solicitud',
   createdTitle: 'Solicitud enviada', createdText: 'Los aprobadores solo pueden decidir si pueden leer la solicitud: compártela ahora con ellos.', shareNow: 'Compartir…', later: 'Más tarde',
+  changeApprovers: 'Cambiar aprobadores', changeTitle: 'Cambiar los aprobadores', lockedNote: 'Quien ya decidió se queda en la solicitud.', changedDone: 'Aprobadores cambiados',
+  logTitle: 'Cambios de los aprobadores', logAdded: 'añadidos {n}', logRemoved: 'quitados {n}', logLine: '{who}: {what}',
   close: 'Cerrar', failed: 'No se pudo iniciar la interfaz del plugin: ', loadFailed: 'No se pudieron cargar las solicitudes: ',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins

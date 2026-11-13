@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addApprover, approversJson, inTab, listOrder, markOf, modeOf, moveApprover, removeApprover, stateOf, todoCount, waitingNames, type ApproverView, type ItemLike } from './logic.ts'
+import { canChangeApprovers, canMove, removable, addApprover, approversJson, inTab, listOrder, markOf, modeOf, moveApprover, removeApprover, stateOf, todoCount, waitingNames, type ApproverView, type ItemLike } from './logic.ts'
 
 const i = (id: string, state: ItemLike['state'], o: Partial<ItemLike> = {}): ItemLike => ({ id, ownerId: 'u1', state, todo: false, createdAt: '2026-05-01T10:00:00Z', ...o })
 const p = (n: string) => ({ id: `id-${n}`, name: n })
@@ -59,5 +59,30 @@ describe('words of the data', () => {
   it('names who is up', () => {
     const a = (name: string, waiting: boolean): ApproverView => ({ id: name, name, verdict: null, comment: '', decided_at: null, waiting })
     expect(waitingNames([a('A', false), a('B', true), a('C', true)])).toEqual(['B', 'C'])
+  })
+})
+
+describe('changing the approvers', () => {
+  const list = [
+    { id: 'a', verdict: 'approved' as const },
+    { id: 'b', verdict: null },
+    { id: 'c', verdict: null },
+  ]
+  it('is for an open request and a person who can write it', () => {
+    expect(canChangeApprovers('pending', 'write')).toBe(true)
+    expect(canChangeApprovers('pending', 'manage')).toBe(true)
+    expect(canChangeApprovers('pending', 'read')).toBe(false)
+    expect(canChangeApprovers('approved', 'manage')).toBe(false)
+    expect(canChangeApprovers('cancelled', 'write')).toBe(false)
+  })
+  it('keeps the people who decided', () => {
+    expect(removable(list, 'a')).toBe(false)
+    expect(removable(list, 'b')).toBe(true)
+  })
+  it('moves only the people who did not decide, and only among them', () => {
+    expect(canMove(list, 'b', -1)).toBe(false)
+    expect(canMove(list, 'b', 1)).toBe(true)
+    expect(canMove(list, 'c', 1)).toBe(false)
+    expect(canMove(list, 'a', 1)).toBe(false)
   })
 })

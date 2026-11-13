@@ -467,12 +467,140 @@ fn check_turn(c: &Computed, user: &str) -> Result<()> {
     Ok(())
 }
 
+/// The rules for changing the approvers of an open request (pure): the request is still pending, everybody who already
+/// decided stays, and in a sequence the people who decided stay first and in the same order.
+fn check_change(
+    old: &[Approver],
+    new: &[Approver],
+    mode: &str,
+    state: &str,
+    decisions: &[Decision],
+) -> Result<()> {
+    if state != "pending" {
+        return Err(Error::coded(
+            "request_closed",
+            "only an open request can change its approvers",
+        ));
+    }
+    let decided: Vec<&Approver> = old
+        .iter()
+        .filter(|a| decisions.iter().any(|d| d.user_id == a.id))
+        .collect();
+    if decided.iter().any(|a| !new.iter().any(|n| n.id == a.id)) {
+        return Err(Error::coded(
+            "approver_decided",
+            "an approver who already decided cannot be removed",
+        ));
+    }
+    if mode == "sequence"
+        && decided
+            .iter()
+            .enumerate()
+            .any(|(i, a)| new.get(i).map(|n| &n.id) != Some(&a.id))
+    {
+        return Err(Error::coded(
+            "approver_order",
+            "in a sequence the people who decided stay first, in the same order",
+        ));
+    }
+    if old == new {
+        return Err(Error::coded(
+            "approvers_same",
+            "the approvers are the same as before",
+        ));
+    }
+    Ok(())
+}
+
+/// The caller (who writes the request) changes the approvers of an open request; the change is kept in `approver_changes`.
+fn set_approvers(ctx: &Ctx, args: Value) -> Result<Value> {
+    let id = id_arg(&args)?;
+    let user = ctx
+        .user
+        .clone()
+        .ok_or_else(|| Error::coded("not_signed_in", "sign in to change the approvers"))?;
+    let level = ctx
+        .db()
+        .query_one("select core.level_of($1::uuid) as l", &[json!(id)])?
+        .and_then(|r| r.get("l").and_then(Value::as_i64))
+        .unwrap_or(0);
+    if level < 2 {
+        return Err(Error::coded(
+            "permission_denied",
+            "only a person who can edit the request changes its approvers",
+        ));
+    }
+    let new = parse_approvers(
+        args.get("approvers")
+            .and_then(Value::as_str)
+            .unwrap_or_default(),
+    )?;
+    let rows = ctx.db().query(
+        "select approvers, mode, cancelled from requests where resource_id = $1::uuid",
+        &[json!(id)],
+    )?;
+    let Some(r) = rows.first() else {
+        return Err(Error::coded(
+            "request_missing",
+            "the request does not exist",
+        ));
+    };
+    let ds = ctx.db().query(
+        &format!("{DECISIONS_SQL} where resource_id = $1::uuid order by decided_at"),
+        &[json!(id)],
+    )?;
+    let decisions: Vec<Decision> = ds.iter().map(decision_of).collect();
+    let c = compute_row(r, &decisions);
+    let old = parse_approvers(&text(r, "approvers")).unwrap_or_default();
+    let mode = text(r, "mode");
+    let mode = if mode.is_empty() { "all" } else { mode.as_str() };
+    check_change(&old, &new, mode, c.state, &decisions)?;
+    let tenant = ctx.tenant.clone().unwrap_or_default();
+    let name = ctx.username.clone().unwrap_or_else(|| user.clone());
+    let after = approvers_json(&new);
+    ctx.db().exec(
+        "update requests set approvers = $1 where resource_id = $2::uuid",
+        &[json!(after), json!(id)],
+    )?;
+    ctx.db().exec(
+        "insert into approver_changes (resource_id, tenant_id, user_id, user_name, old_list, new_list) values ($1::uuid, $2::uuid, $3::uuid, $4, $5, $6)",
+        &[json!(id), json!(tenant), json!(user), json!(name), json!(approvers_json(&old)), json!(after)],
+    )?;
+    Ok(json!({ "changed": true }))
+}
+
+/// The changes of the approvers of one request, first to last, each `{by, at, added, removed}` (names).
+fn approver_log(ctx: &Ctx, args: Value) -> Result<Value> {
+    let id = id_arg(&args)?;
+    let rows = ctx.db().query(
+        "select user_name as who, changed_at::text as at, old_list, new_list from approver_changes where resource_id = $1::uuid order by changed_at, n",
+        &[json!(id)],
+    )?;
+    let names = |list: &[Approver], other: &[Approver]| -> Vec<String> {
+        list.iter()
+            .filter(|x| !other.iter().any(|o| o.id == x.id))
+            .map(|x| x.name.clone())
+            .collect()
+    };
+    let out: Vec<Value> = rows
+        .iter()
+        .map(|r| {
+            let b = parse_approvers(&text(r, "old_list")).unwrap_or_default();
+            let a = parse_approvers(&text(r, "new_list")).unwrap_or_default();
+            json!({ "by": text(r, "who"), "at": text(r, "at"), "added": names(&a, &b), "removed": names(&b, &a) })
+        })
+        .collect();
+    Ok(Value::Array(out))
+}
+
 mosaikit_plugin_sdk::plugin! {
     hooks: {
         "requests.before_create" => request,
         "requests.before_update" => request,
     },
     commands: {
+        "requests.set_approvers" => set_approvers,
+        "requests.approver_log" => approver_log,
         "requests.decide" => decide,
         "requests.status" => status,
         "requests.overview" => overview,
@@ -829,5 +957,68 @@ mod tests {
             .command(&__msk_registry(), "requests.widget_to_decide", json!({}))
             .unwrap();
         assert_eq!(out, json!({ "value": 1, "secondary": 0, "tone": "warn" }));
+    }
+}
+
+#[cfg(test)]
+mod change_tests {
+    use super::*;
+    use mosaikit_plugin_sdk::testing::MockHost;
+
+    const A: &str = "11111111-1111-1111-1111-111111111111";
+    const B: &str = "22222222-2222-2222-2222-222222222222";
+    const C: &str = "33333333-3333-3333-3333-333333333333";
+
+    fn ap(ids: &[&str]) -> Vec<Approver> {
+        ids.iter()
+            .map(|i| Approver { id: i.to_string(), name: format!("P{}", &i[..1]) })
+            .collect()
+    }
+
+    fn d(user: &str) -> Decision {
+        Decision { user_id: user.into(), verdict: "approved".into(), comment: String::new(), at: String::new() }
+    }
+
+    #[test]
+    fn approvers_change_only_on_an_open_request_and_decided_ones_stay() {
+        let old = ap(&[A, B]);
+        let ds = vec![d(A)];
+        assert!(check_change(&old, &ap(&[A, B, C]), "all", "pending", &ds).is_ok());
+        assert!(check_change(&old, &ap(&[A, C]), "all", "pending", &ds).is_ok());
+        assert!(check_change(&old, &ap(&[B, C]), "all", "pending", &ds)
+            .unwrap_err()
+            .to_string()
+            .contains("already decided"));
+        assert!(check_change(&old, &ap(&[A, C]), "all", "approved", &ds).is_err());
+        assert!(check_change(&old, &ap(&[A, C]), "all", "cancelled", &ds).is_err());
+        assert!(check_change(&old, &old, "all", "pending", &ds).is_err());
+    }
+
+    #[test]
+    fn in_a_sequence_the_people_who_decided_stay_first() {
+        let old = ap(&[A, B, C]);
+        let ds = vec![d(A)];
+        assert!(check_change(&old, &ap(&[A, C, B]), "sequence", "pending", &ds).is_ok());
+        assert!(check_change(&old, &ap(&[B, A, C]), "sequence", "pending", &ds)
+            .unwrap_err()
+            .to_string()
+            .contains("stay first"));
+        assert!(check_change(&old, &ap(&[B, A, C]), "all", "pending", &ds).is_ok());
+    }
+
+    #[test]
+    fn the_log_names_who_was_added_and_removed() {
+        let names = __msk_registry().command_names();
+        assert!(names.contains(&"requests.set_approvers"));
+        let (b, a) = (approvers_json(&ap(&[A, B])), approvers_json(&ap(&[A, C])));
+        let host = MockHost::new().on("db.query", move |_| {
+            Ok(json!([{ "who": "ann", "at": "2026-11-13", "old_list": b, "new_list": a }]))
+        });
+        let out = host
+            .command(&__msk_registry(), "requests.approver_log", json!({ "id": A }))
+            .unwrap();
+        assert_eq!(out[0]["added"], json!(["P3"]));
+        assert_eq!(out[0]["removed"], json!(["P2"]));
+        assert_eq!(out[0]["by"], "ann");
     }
 }

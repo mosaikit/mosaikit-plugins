@@ -89,3 +89,28 @@ export function markOf(a: Pick<ApproverView, 'verdict'>): { mark: string; kind: 
 export function waitingNames(list: ApproverView[]): string[] {
   return list.filter((a) => a.waiting).map((a) => a.name)
 }
+
+/** The approvers of an open request may change when the person can write it; a closed or cancelled one never. */
+export function canChangeApprovers(state: State, level: string | undefined): boolean {
+  return state === 'pending' && (level === 'write' || level === 'manage')
+}
+
+/** Whether the approver `id` may be removed: not once they decided. */
+export function removable(list: Pick<ApproverView, 'id' | 'verdict'>[], id: string): boolean {
+  return !list.some((a) => a.id === id && a.verdict)
+}
+
+/** In a sequence a person who is not decided yet cannot be moved above one who decided. */
+export function canMove(list: Pick<ApproverView, 'id' | 'verdict'>[], id: string, by: -1 | 1): boolean {
+  const i = list.findIndex((a) => a.id === id)
+  const j = i + by
+  if (i < 0 || j < 0 || j >= list.length) return false
+  return !list[i].verdict && !list[j].verdict
+}
+
+export interface ChangeEntry {
+  by: string
+  at: string
+  added: string[]
+  removed: string[]
+}

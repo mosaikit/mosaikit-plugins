@@ -21,6 +21,10 @@ import {
 } from '@mosaikit/plugin-api'
 import {
   addApprover,
+  canChangeApprovers,
+  canMove,
+  removable,
+  type ChangeEntry,
   approversJson,
   inTab,
   listOrder,
@@ -325,6 +329,7 @@ function mount(msk: Msk) {
       out.push(b)
     }
     if (it.ownerId === me && it.state === 'pending') btn(tr().cancelRequest, () => void cancelRequest(it))
+    if (canChangeApprovers(it.state, it.row.my_level)) btn(tr().changeApprovers, () => changeApprovers(it))
     if (it.row.my_level === 'write' || it.row.my_level === 'manage') btn(tr().edit, () => editRequest(it))
     if (it.row.my_level === 'manage') {
       btn(tr().share, () => void msk.share(it.id).catch(fail))
@@ -349,6 +354,96 @@ function mount(msk: Msk) {
       fail(e)
       await load()
       return false
+    }
+  }
+
+  // ------------------------------------------------------------------------------ change the approvers of an open request
+  const changeApprovers = (it: Item) => {
+    let list: ApproverView[] = it.approvers.map((a) => ({ ...a }))
+    const ul = el('ol', { class: 'apr-list', 'aria-label': tr().fApprovers })
+    const mini = (label: string, fn: () => void, disabled = false) => {
+      const b = el('button', { type: 'button', class: 'msk-btn ghost mini' }, label)
+      b.disabled = disabled
+      b.addEventListener('click', fn)
+      return b
+    }
+    const seq = it.mode === 'sequence'
+    const drawList = () => {
+      ul.replaceChildren()
+      for (const p of list) {
+        const li = el('li', { class: `apr-item${seq ? ' seq' : ''}` }, avatar(p.name), el('strong', {}, p.name))
+        if (seq) {
+          const up = mini('↑', () => ((list = moveItem(list, p.id, -1)), drawList()), !canMove(list, p.id, -1))
+          const down = mini('↓', () => ((list = moveItem(list, p.id, 1)), drawList()), !canMove(list, p.id, 1))
+          up.setAttribute('aria-label', `${tr().moveUp}: ${p.name}`)
+          down.setAttribute('aria-label', `${tr().moveDown}: ${p.name}`)
+          li.append(up, down)
+        }
+        const rm = mini('×', () => ((list = list.filter((x) => x.id !== p.id)), drawList()), !removable(list, p.id))
+        rm.setAttribute('aria-label', `${tr().removeApprover}: ${p.name}`)
+        li.append(rm)
+        ul.append(li)
+      }
+    }
+    const moveItem = (l: ApproverView[], id: string, by: -1 | 1) => {
+      const moved = moveApprover(l, id, by) as ApproverView[]
+      return moved
+    }
+    const picker = personPicker({
+      label: tr().addApprover,
+      placeholder: tr().addApprover,
+      noneLabel: tr().noneFound,
+      clearLabel: tr().removeApprover,
+      value: null,
+      search: (q) => msk.directory.search({ kind: 'user', q }),
+      onChange: (u) => {
+        if (!u) return
+        const next = addApprover(list, { id: u.id, name: u.name }) as ApproverView[]
+        if (next.length !== list.length) list = [...list, { id: u.id, name: u.name, verdict: null, comment: '', decided_at: null, waiting: false }]
+        drawList()
+        setTimeout(() => {
+          picker.set(null)
+          const input = picker.el.querySelector('input')
+          if (input) input.value = ''
+        }, 0)
+      },
+    })
+    drawList()
+    const ok = el('button', { type: 'button', class: 'msk-btn' }, tr().save)
+    const no = el('button', { type: 'button', class: 'msk-btn ghost' }, tr().cancel)
+    const d = dialog({
+      title: tr().changeTitle,
+      body: el('div', { class: 'apr-form' }, el('div', { class: 'apr-pick' }, el('strong', {}, tr().fApprovers), picker.el, ul, el('p', { class: 'apr-dim' }, tr().lockedNote + (seq ? ' ' + tr().orderNote : '')))),
+      actions: [no, ok],
+    })
+    no.addEventListener('click', d.close)
+    ok.addEventListener('click', async () => {
+      if (!list.length) return void toast(tr().needApprover, { tone: 'err' })
+      ok.disabled = true
+      try {
+        await msk.call('requests.set_approvers', { id: it.id, approvers: approversJson(list) })
+        toast(tr().changedDone, { tone: 'ok' })
+        d.close()
+        await load()
+      } catch (e) {
+        fail(e)
+        ok.disabled = false
+      }
+    })
+  }
+
+  const changeLog = async (id: string, into: HTMLElement) => {
+    try {
+      const rows = await msk.call<ChangeEntry[]>('requests.approver_log', { id })
+      if (!rows.length) return
+      const ul = el('ul', { class: 'apr-hist', 'data-testid': 'approver-log' })
+      for (const r of rows) {
+        const what = [r.added.length ? sub(tr().logAdded, { n: r.added.join(', ') }) : '', r.removed.length ? sub(tr().logRemoved, { n: r.removed.join(', ') }) : ''].filter(Boolean).join('; ')
+        ul.append(el('li', {}, el('div', {}, el('p', {}, sub(tr().logLine, { who: r.by, what })), el('p', { class: 'apr-dim' }, stamp(r.at)))))
+      }
+      into.append(el('h4', {}, tr().logTitle), ul)
+    } catch {
+      // the log is a nicety: the detail works without it
     }
   }
 
@@ -430,6 +525,9 @@ function mount(msk: Msk) {
         )
       })
       box.append(hist)
+      const log = el('div', {})
+      box.append(log)
+      void changeLog(it.id, log)
       const acts = ownerActions(it, d.close)
       if (acts.length) box.append(el('div', { class: 'apr-acts' }, ...acts))
     }
