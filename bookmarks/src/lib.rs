@@ -150,10 +150,38 @@ fn bookmark(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     Ok(Some(v))
 }
 
+/// Most items a list widget shows; the rest is reported as `more`.
+const WIDGET_ITEMS: usize = 6;
+
+/// The body of a list widget: at most six items and how many were left out.
+fn list_body(items: Vec<Value>) -> Value {
+    let more = items.len().saturating_sub(WIDGET_ITEMS);
+    json!({ "items": items.into_iter().take(WIDGET_ITEMS).collect::<Vec<_>>(), "more": more })
+}
+
+/// Widget `favorites`: the bookmarks marked as favourite that the caller sees, the newest first, with the site of each.
+fn widget_favorites(ctx: &Ctx, _args: Value) -> Result<Value> {
+    let rows = ctx.db().query(
+        "select b.resource_id::text as id, b.title, b.url from bookmarks b join core.visible_resources v on v.id = b.resource_id where v.kind = 'bookmarks' and coalesce(b.favorite, false) order by v.created_at desc limit 500",
+        &[],
+    )?;
+    let items = rows
+        .iter()
+        .map(|r| {
+            let s = |k: &str| r.get(k).and_then(Value::as_str).unwrap_or_default();
+            json!({ "id": s("id"), "title": s("title"), "meta": host_of(s("url")), "tone": "" })
+        })
+        .collect();
+    Ok(list_body(items))
+}
+
 mosaikit_plugin_sdk::plugin! {
     hooks: {
         "bookmarks.before_create" => bookmark,
         "bookmarks.before_update" => bookmark,
+    },
+    commands: {
+        "bookmarks.widget_favorites" => widget_favorites,
     },
 }
 
@@ -313,5 +341,24 @@ mod tests {
         )
         .unwrap_err()
         .contains("at most"));
+    }
+
+    #[test]
+    fn the_favorites_widget_lists_six_and_counts_the_rest() {
+        let rows: Vec<Value> = (0..8)
+            .map(|i| json!({ "id": format!("id{i}"), "title": format!("T{i}"), "url": format!("https://www.site{i}.org/x") }))
+            .collect();
+        let host = MockHost::new().on("db.query", move |_| Ok(Value::Array(rows.clone())));
+        let out = host
+            .command(&__msk_registry(), "bookmarks.widget_favorites", json!({}))
+            .unwrap();
+        assert_eq!(out["items"].as_array().unwrap().len(), 6);
+        assert_eq!(out["more"], 2);
+        assert_eq!(out["items"][0], json!({ "id": "id0", "title": "T0", "meta": "www.site0.org", "tone": "" }));
+        let none = MockHost::new()
+            .on("db.query", |_| Ok(json!([])))
+            .command(&__msk_registry(), "bookmarks.widget_favorites", json!({}))
+            .unwrap();
+        assert_eq!(none, json!({ "items": [], "more": 0 }));
     }
 }

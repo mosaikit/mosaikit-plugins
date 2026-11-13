@@ -64,12 +64,60 @@ fn channel(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     Ok(Some(v))
 }
 
+/// Most items a list widget shows; the rest is reported as `more`.
+const WIDGET_ITEMS: usize = 6;
+
+/// The body of a list widget: at most six items and how many were left out.
+fn list_body(items: Vec<Value>) -> Value {
+    let more = items.len().saturating_sub(WIDGET_ITEMS);
+    json!({ "items": items.into_iter().take(WIDGET_ITEMS).collect::<Vec<_>>(), "more": more })
+}
+
+/// The channels with the number of messages in the last day, busiest first; a channel with none is left out.
+fn busy(channels: &[Value], counts: &[Value]) -> Vec<Value> {
+    let n_of = |id: &str| {
+        counts
+            .iter()
+            .find(|c| c.get("pid").and_then(Value::as_str) == Some(id))
+            .and_then(|c| c.get("n").and_then(Value::as_i64))
+            .unwrap_or(0)
+    };
+    let mut list: Vec<(i64, String, String)> = channels
+        .iter()
+        .filter_map(|c| {
+            let id = c.get("id").and_then(Value::as_str)?;
+            let n = n_of(id);
+            (n > 0).then(|| (n, c.get("name").and_then(Value::as_str).unwrap_or_default().to_string(), id.to_string()))
+        })
+        .collect();
+    list.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(&b.1)));
+    list.into_iter()
+        .map(|(n, name, id)| json!({ "id": id, "title": name, "meta": n.to_string(), "tone": "" }))
+        .collect()
+}
+
+/// Widget `busy-channels`: the channels the caller sees that had messages in the last day, with how many.
+fn widget_busy(ctx: &Ctx, _args: Value) -> Result<Value> {
+    let channels = ctx.db().query(
+        "select v.id::text as id, v.title as name from core.visible_resources v where v.kind = 'channels'",
+        &[],
+    )?;
+    let counts = ctx.db().query(
+        "select v.parent_id::text as pid, count(*)::int as n from core.visible_resources v where v.kind = 'messages' and v.created_at >= now() - interval '1 day' group by v.parent_id",
+        &[],
+    )?;
+    Ok(list_body(busy(&channels, &counts)))
+}
+
 mosaikit_plugin_sdk::plugin! {
     hooks: {
         "messages.before_create" => message,
         "messages.before_update" => message,
         "channels.before_create" => channel,
         "channels.before_update" => channel,
+    },
+    commands: {
+        "channels.widget_busy" => widget_busy,
     },
 }
 
@@ -179,5 +227,39 @@ mod tests {
             ("general", "Everything")
         );
         assert!(run("before_create", "channels", json!({ "name": " " }), None).is_err());
+    }
+
+    #[test]
+    fn the_busiest_channels_come_first_and_quiet_ones_are_left_out() {
+        let channels = vec![
+            json!({ "id": "a", "name": "general" }),
+            json!({ "id": "b", "name": "random" }),
+            json!({ "id": "c", "name": "quiet" }),
+            json!({ "id": "d", "name": "alpha" }),
+        ];
+        let counts = vec![json!({ "pid": "a", "n": 3 }), json!({ "pid": "b", "n": 9 }), json!({ "pid": "d", "n": 3 })];
+        let items = busy(&channels, &counts);
+        let names: Vec<&str> = items.iter().map(|i| i["title"].as_str().unwrap()).collect();
+        // ties by name
+        assert_eq!(names, ["random", "alpha", "general"]);
+        assert_eq!(items[0]["meta"], "9");
+        assert_eq!(list_body(vec![]), json!({ "items": [], "more": 0 }));
+    }
+
+    #[test]
+    fn the_busy_widget_asks_for_channels_and_the_messages_of_the_last_day() {
+        let host = MockHost::new().on("db.query", |req| {
+            let sql = req["sql"].as_str().unwrap_or_default();
+            if sql.contains("'messages'") {
+                Ok(json!([{ "pid": "a", "n": 2 }]))
+            } else {
+                Ok(json!([{ "id": "a", "name": "general" }, { "id": "b", "name": "other" }]))
+            }
+        });
+        let out = host
+            .command(&__msk_registry(), "channels.widget_busy", json!({}))
+            .unwrap();
+        assert_eq!(out["items"], json!([{ "id": "a", "title": "general", "meta": "2", "tone": "" }]));
+        assert_eq!(out["more"], 0);
     }
 }

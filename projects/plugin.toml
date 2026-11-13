@@ -46,6 +46,12 @@ calls = ["com.mosaikit.tasks"]
 view = "kpi_projects_status"
 label = "Status of the projects"
 
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "active-projects"
+label = "Active projects"
+data = { command = "projects.widget_active", kind = "list", size = "m", texts = { en = { empty = "No active projects" }, it = { label = "Progetti attivi", empty = "Nessun progetto attivo" }, es = { label = "Proyectos activos", empty = "Ningún proyecto activo" } } }
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Pianifica il lavoro di un rilascio, di un cantiere o di una campagna. Un progetto ha le colonne di una lavagna, le tappe con una data e gli sprint (finestre di tempo), e mostra quante delle sue attività sono fatte.\n\nLe attività restano attività: appartengono al plugin Attività, che deve essere installato, e il progetto è il nome scritto nel loro campo Progetto. Vedi e modifichi solo le attività che puoi vedere e modificare in Attività.\n\nUn progetto è un elemento della piattaforma: condividilo con persone o gruppi (lettura per seguirlo, scrittura per organizzare la lavagna) e vale tutto ciò che sai già su condivisione, ricerca e cestino."

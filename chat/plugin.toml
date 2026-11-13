@@ -1,6 +1,6 @@
 id = "com.mosaikit.chat"
 name = "Chat"
-version = "0.2.0"
+version = "0.3.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "message-circle"
@@ -48,6 +48,12 @@ entry = "index.html"
 [permissions]
 hooks = ["channels", "messages"]
 realtime = true
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "busy-channels"
+label = "Busy channels"
+data = { command = "channels.widget_busy", kind = "list", size = "m", texts = { en = { empty = "No messages in the last day" }, it = { label = "Canali attivi", empty = "Nessun messaggio nell’ultimo giorno" }, es = { label = "Canales activos", empty = "Ningún mensaje en el último día" } } }
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
