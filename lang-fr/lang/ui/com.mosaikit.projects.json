@@ -93,5 +93,20 @@
   "Remove “{n}”?": "Retirer « {n} » ?",
   "Delete the project “{n}”? Its tasks stay in Tasks.": "Supprimer le projet « {n} » ? Ses tâches restent dans Tâches.",
   "Could not start the UI of the plugin: ": "Impossible de démarrer l'interface du plugin :",
-  "Could not load the projects: ": "Impossible de charger les projets :"
+  "Could not load the projects: ": "Impossible de charger les projets :",
+  "Burndown": "Burndown",
+  "Burndown of": "Burndown de",
+  "The whole project": "Tout le projet",
+  "No dates to draw against": "Aucune date pour tracer",
+  "A burndown needs a start and an end: give the project its dates in Details, or pick a sprint.": "Un burndown a besoin d'un début et d'une fin : donnez des dates au projet dans Détails ou choisissez un sprint.",
+  "No tasks to burn down": "Aucune tâche pour le burndown",
+  "Add tasks to the project (or to the sprint) and the chart draws itself.": "Ajoutez des tâches au projet (ou au sprint) et le graphique se dessine tout seul.",
+  "{r} of {t} tasks still open, {d} done": "{r} tâches sur {t} encore ouvertes, {d} terminées",
+  "behind the ideal line by {n}": "en retard de {n} sur la ligne idéale",
+  "ahead of the ideal line by {n}": "en avance de {n} sur la ligne idéale",
+  "on the ideal line": "sur la ligne idéale",
+  "Ideal": "Idéal",
+  "Open tasks": "Tâches ouvertes",
+  "{n} finished task(s) have no completion day (they were finished before Tasks 0.7.1 kept it): they count as done from the first day.": "{n} tâche(s) terminée(s) n'ont pas de jour de fin (elles ont été terminées avant que Tâches 0.7.1 ne le conserve) : elles comptent comme faites dès le premier jour.",
+  "The tasks counted are the ones the project has today; the days come from the completion day kept by Tasks.": "Les tâches comptées sont celles que le projet a aujourd'hui ; les jours viennent du jour de fin conservé par Tâches."
 }

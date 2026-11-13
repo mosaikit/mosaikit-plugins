@@ -89,5 +89,17 @@
   "Could not load the calendar: ": "Не удалось загрузить календарь: ",
   "The task due dates are not available: ": "Сроки задач недоступны: ",
   "Organised by {n}": "Организатор: {n}",
-  "No events to export in this month.": "В этом месяце нет событий для экспорта."
+  "No events to export in this month.": "В этом месяце нет событий для экспорта.",
+  "Time zone": "Часовой пояс",
+  "Local time (no conversion)": "Местное время (без пересчёта)",
+  "Times are in {z}; you see them at the hour of {m}.": "Время указано в поясе {z}; вы видите его по часам пояса {m}.",
+  "In the time zone of the event: {t} ({z})": "В часовом поясе события: {t} ({z})",
+  "Edit the series": "Изменить серию",
+  "Edit this occurrence": "Изменить этот повтор",
+  "Delete this occurrence": "Удалить этот повтор",
+  "Restore this occurrence": "Восстановить этот повтор",
+  "Delete only the occurrence of {d}? The rest of the series stays.": "Удалить только повтор от {d}? Остальная серия останется.",
+  "Occurrence of {d}. The other occurrences do not change.": "Повтор от {d}. Остальные повторы не меняются.",
+  "This occurrence was changed from the series.": "Этот повтор изменён относительно серии.",
+  "Times in the time zone {z}.": "Время в часовом поясе {z}."
 }

@@ -1,11 +1,11 @@
 name = "Calendário"
 description = "A agenda da equipe: visões por mês, semana e dia, eventos com pessoas convidadas, repetições e os prazos das suas tarefas"
 label = "Calendário"
-details = "Escreva um evento com o dia, o horário e uma repetição (todo dia, semana, mês ou ano), convide pessoas da sua organização e veja tudo em uma visão por mês, semana ou dia. Os convidados respondem sim, talvez ou não, e todos veem quem vai participar. Os horários são horários locais, escritos exatamente como você os digita: não há conversão de fuso horário, então uma reunião às 09:30 é às 09:30 para todos.\n\nAs tarefas abertas com prazo aparecem junto dos eventos (você pode ocultá-las), de modo que prazos e reuniões ficam no mesmo lugar. Um evento é um elemento da plataforma: compartilhe-o com os convidados para que o vejam e respondam, e baixe-o como arquivo .ics para adicioná-lo a outro calendário."
+details = "Escreva um evento com o dia, o horário e uma repetição (todo dia, semana, mês ou ano), convide pessoas da sua organização e veja tudo em uma visão por mês, semana ou dia. Os convidados respondem sim, talvez ou não, e todos veem quem vai participar. Os horários são horários locais, escritos exatamente como você os digita, a menos que você dê um fuso horário ao evento: então ele aparece na hora certa onde quer que cada pessoa esteja. Em uma série que se repete, você pode alterar ou excluir uma única ocorrência.\n\nAs tarefas abertas com prazo aparecem junto dos eventos (você pode ocultá-las), de modo que prazos e reuniões ficam no mesmo lugar. Um evento é um elemento da plataforma: compartilhe-o com os convidados para que o vejam e respondam, e baixe-o como arquivo .ics para adicioná-lo a outro calendário."
 
 [resources.events]
 label = "Eventos"
-fields = { title = "Título", details = "Detalhes", location = "Local", starts_on = "Começa em", starts_time = "Hora de início", ends_on = "Termina em", ends_time = "Hora de término", all_day = "Dia inteiro", repeat = "Repetir", repeat_until = "Repetir até", attendees = "Convidados", color = "Cor" }
+fields = { title = "Título", details = "Detalhes", location = "Local", starts_on = "Começa em", starts_time = "Hora de início", ends_on = "Termina em", ends_time = "Hora de término", all_day = "Dia inteiro", repeat = "Repetir", repeat_until = "Repetir até", attendees = "Convidados", timezone = "Fuso horário", color = "Cor" }
 options.repeat = { none = "nunca", daily = "todo dia", weekly = "toda semana", monthly = "todo mês", yearly = "todo ano" }
 options.color = { blue = "azul", green = "verde", red = "vermelho", orange = "laranja", purple = "roxo", grey = "cinza" }
 

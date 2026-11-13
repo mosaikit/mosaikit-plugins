@@ -89,5 +89,17 @@
   "Could not load the calendar: ": "De agenda kon niet worden geladen:",
   "The task due dates are not available: ": "De vervaldata van taken zijn niet beschikbaar:",
   "Organised by {n}": "Georganiseerd door {n}",
-  "No events to export in this month.": "Geen afspraken om te exporteren in deze maand."
+  "No events to export in this month.": "Geen afspraken om te exporteren in deze maand.",
+  "Time zone": "Tijdzone",
+  "Local time (no conversion)": "Lokale tijd (geen conversie)",
+  "Times are in {z}; you see them at the hour of {m}.": "De tijden staan in {z}; jij ziet ze op het uur van {m}.",
+  "In the time zone of the event: {t} ({z})": "In de tijdzone van de afspraak: {t} ({z})",
+  "Edit the series": "De reeks bewerken",
+  "Edit this occurrence": "Deze herhaling bewerken",
+  "Delete this occurrence": "Deze herhaling verwijderen",
+  "Restore this occurrence": "Deze herhaling herstellen",
+  "Delete only the occurrence of {d}? The rest of the series stays.": "Alleen de herhaling van {d} verwijderen? De rest van de reeks blijft.",
+  "Occurrence of {d}. The other occurrences do not change.": "Herhaling van {d}. De andere herhalingen veranderen niet.",
+  "This occurrence was changed from the series.": "Deze herhaling is aangepast ten opzichte van de reeks.",
+  "Times in the time zone {z}.": "Tijden in de tijdzone {z}."
 }

@@ -93,5 +93,20 @@
   "Remove “{n}”?": "إزالة “{n}”؟",
   "Delete the project “{n}”? Its tasks stay in Tasks.": "حذف المشروع “{n}”؟ تبقى مهامه في المهام.",
   "Could not start the UI of the plugin: ": "تعذّر تشغيل واجهة الإضافة: ",
-  "Could not load the projects: ": "تعذّر تحميل المشاريع: "
+  "Could not load the projects: ": "تعذّر تحميل المشاريع: ",
+  "Burndown": "مخطط الاحتراق",
+  "Burndown of": "مخطط الاحتراق لـ",
+  "The whole project": "المشروع كاملًا",
+  "No dates to draw against": "لا توجد تواريخ للرسم",
+  "A burndown needs a start and an end: give the project its dates in Details, or pick a sprint.": "يحتاج مخطط الاحتراق إلى بداية ونهاية: حدّد تواريخ المشروع في التفاصيل، أو اختر سباقًا.",
+  "No tasks to burn down": "لا توجد مهام للاحتراق",
+  "Add tasks to the project (or to the sprint) and the chart draws itself.": "أضف مهامًا إلى المشروع (أو إلى السباق) وسيرسم المخطط نفسه.",
+  "{r} of {t} tasks still open, {d} done": "{r} من {t} مهمة لا تزال مفتوحة، و{d} منجزة",
+  "behind the ideal line by {n}": "متأخر عن الخط المثالي بمقدار {n}",
+  "ahead of the ideal line by {n}": "متقدم على الخط المثالي بمقدار {n}",
+  "on the ideal line": "على الخط المثالي",
+  "Ideal": "المثالي",
+  "Open tasks": "المهام المفتوحة",
+  "{n} finished task(s) have no completion day (they were finished before Tasks 0.7.1 kept it): they count as done from the first day.": "{n} مهمة منتهية بلا يوم إنجاز (أُنهيت قبل أن تحتفظ المهام 0.7.1 به): تُحتسب منجزة منذ اليوم الأول.",
+  "The tasks counted are the ones the project has today; the days come from the completion day kept by Tasks.": "المهام المحسوبة هي التي يضمها المشروع اليوم؛ وتأتي الأيام من يوم الإنجاز الذي تحتفظ به المهام."
 }

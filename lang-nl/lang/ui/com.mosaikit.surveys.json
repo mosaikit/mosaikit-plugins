@@ -110,5 +110,16 @@
   "Max score": "Maximumscore",
   "Percent": "Percentage",
   "(correct)": "(juist)",
-  "CSV downloaded": "CSV gedownload"
+  "CSV downloaded": "CSV gedownload",
+  "Anonymous": "Anoniem",
+  "Nothing links an answer to a person, not even for you. It cannot be turned off later.": "Niets koppelt een antwoord aan een persoon, ook niet voor jou. Het kan later niet worden uitgezet.",
+  "This survey is anonymous: the results show answers, never people.": "Deze enquête is anoniem: de resultaten tonen antwoorden, nooit personen.",
+  "Response": "Reactie",
+  "Response {n}": "Reactie {n}",
+  "Question {n}: when to show it": "Vraag {n}: wanneer tonen",
+  "Always shown": "Altijd getoond",
+  "Only if question {n} is answered": "Alleen als vraag {n} is beantwoord",
+  "Show this question": "Deze vraag tonen",
+  "Question {n}: show it for these answers": "Vraag {n}: toon haar bij deze antwoorden",
+  "Question {n}: choose an earlier question with options or a scale, and at least one answer, for the condition": "Vraag {n}: kies voor de voorwaarde een eerdere vraag met opties of een schaal, en minstens één antwoord"
 }

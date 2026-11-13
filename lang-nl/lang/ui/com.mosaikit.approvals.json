@@ -69,5 +69,13 @@
   "Later": "Later",
   "Close": "Sluiten",
   "Could not start the UI of the plugin: ": "De interface van de plugin kon niet worden gestart:",
-  "Could not load the requests: ": "De verzoeken konden niet worden geladen:"
+  "Could not load the requests: ": "De verzoeken konden niet worden geladen:",
+  "Change approvers": "Goedkeurders wijzigen",
+  "Change the approvers": "De goedkeurders wijzigen",
+  "People who already decided stay on the request.": "Wie al heeft beslist, blijft bij het verzoek.",
+  "Approvers changed": "Goedkeurders gewijzigd",
+  "Changes of the approvers": "Wijzigingen van de goedkeurders",
+  "added {n}": "{n} toegevoegd",
+  "removed {n}": "{n} verwijderd",
+  "{who}: {what}": "{who}: {what}"
 }

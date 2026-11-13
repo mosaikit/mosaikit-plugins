@@ -1,7 +1,7 @@
 name = "Pizarra"
 description = "Una pizarra compartida para notas adhesivas, formas, flechas y dibujo, editada en vivo por varias personas"
 label = "Pizarra"
-details = "Una pizarra libre para lluvias de ideas, talleres y diagramas dibujados juntos durante una llamada: notas adhesivas, rectángulos, elipses, texto, flechas y dibujo a mano alzada, con una paleta de colores, deshacer y rehacer, zoom y desplazamiento, y exportación a PNG o SVG.\n\nQuien tenga la pizarra abierta ve en tiempo real los cambios y los punteros de los demás. Los cambios los guardan en la pizarra quienes pueden editarla; quien solo tiene lectura sigue en directo pero no puede cambiar nada.\n\nUna pizarra es un elemento de la plataforma: compártela con personas o grupos (lectura para verla, escritura para dibujar en ella) y vale todo lo que ya sabes sobre compartir, buscar y la papelera."
+details = "Una pizarra libre para lluvias de ideas, talleres y diagramas dibujados juntos durante una llamada: notas adhesivas, rectángulos, elipses, texto, flechas, marcos que agrupan lo que contienen y dibujo a mano alzada, con una paleta de colores, plantillas de las que partir (kanban, SWOT, retrospectiva, lluvia de ideas), deshacer y rehacer, zoom y desplazamiento, y exportación a PNG o SVG.\n\nQuien tenga la pizarra abierta ve en tiempo real los cambios y los punteros de los demás. Los cambios los guardan en la pizarra quienes pueden editarla; quien solo tiene lectura sigue en directo pero no puede cambiar nada.\n\nUna pizarra es un elemento de la plataforma: compártela con personas o grupos (lectura para verla, escritura para dibujar en ella) y vale todo lo que ya sabes sobre compartir, buscar y la papelera."
 
 [resources.whiteboards]
 label = "Pizarras"

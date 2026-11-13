@@ -104,5 +104,16 @@
   "The answer could not be sent: {error}": "Не удалось отправить ответ: {error}",
   "Could not open the form: {error}": "Не удалось открыть форму: {error}",
   "The answer was not accepted.": "Ответ не принят.",
-  "Check the answers: {error}": "Проверьте ответы: {error}"
+  "Check the answers: {error}": "Проверьте ответы: {error}",
+  "Anonymous": "Анонимная",
+  "Nothing links an answer to a person, not even for you; single answers cannot be deleted. It cannot be turned off later.": "Ничто не связывает ответ с человеком, даже для вас; отдельные ответы удалить нельзя. Позже это нельзя отключить.",
+  "This form is anonymous: the table shows answers, never people.": "Эта форма анонимна: в таблице видны ответы, но не люди.",
+  "Response": "Ответ",
+  "Response {n}": "Ответ {n}",
+  "Field {n}: when to show it": "Поле {n}: когда показывать",
+  "Always shown": "Показывается всегда",
+  "Only if field {n} is answered": "Только если поле {n} заполнено",
+  "Show this field": "Показывать это поле",
+  "Field {n}: show it for these answers": "Поле {n}: показывать при этих ответах",
+  "Field {n}: choose an earlier field with options, and at least one answer, for the condition": "Поле {n}: для условия выберите более раннее поле с вариантами и хотя бы один ответ"
 }

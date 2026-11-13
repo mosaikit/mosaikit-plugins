@@ -93,5 +93,20 @@
   "Remove “{n}”?": "Удалить «{n}»?",
   "Delete the project “{n}”? Its tasks stay in Tasks.": "Удалить проект «{n}»? Его задачи останутся в разделе «Задачи».",
   "Could not start the UI of the plugin: ": "Не удалось запустить интерфейс плагина: ",
-  "Could not load the projects: ": "Не удалось загрузить проекты: "
+  "Could not load the projects: ": "Не удалось загрузить проекты: ",
+  "Burndown": "Сгорание задач",
+  "Burndown of": "Сгорание задач:",
+  "The whole project": "Весь проект",
+  "No dates to draw against": "Нет дат для построения",
+  "A burndown needs a start and an end: give the project its dates in Details, or pick a sprint.": "Для диаграммы сгорания нужны начало и конец: задайте проекту даты в «Подробностях» или выберите спринт.",
+  "No tasks to burn down": "Нет задач для сгорания",
+  "Add tasks to the project (or to the sprint) and the chart draws itself.": "Добавьте задачи в проект (или в спринт), и диаграмма построится сама.",
+  "{r} of {t} tasks still open, {d} done": "Открыто задач: {r} из {t}, выполнено: {d}",
+  "behind the ideal line by {n}": "отставание от идеальной линии: {n}",
+  "ahead of the ideal line by {n}": "опережение идеальной линии: {n}",
+  "on the ideal line": "на идеальной линии",
+  "Ideal": "Идеал",
+  "Open tasks": "Открытые задачи",
+  "{n} finished task(s) have no completion day (they were finished before Tasks 0.7.1 kept it): they count as done from the first day.": "У завершённых задач нет дня завершения (их число: {n}); они были закрыты до того, как «Задачи» 0.7.1 стали его хранить: они считаются выполненными с первого дня.",
+  "The tasks counted are the ones the project has today; the days come from the completion day kept by Tasks.": "Учитываются задачи, которые есть в проекте сегодня; дни берутся из дня завершения, который хранят «Задачи»."
 }

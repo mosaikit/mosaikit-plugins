@@ -69,5 +69,13 @@
   "Later": "以后",
   "Close": "关闭",
   "Could not start the UI of the plugin: ": "无法启动插件界面：",
-  "Could not load the requests: ": "无法加载申请："
+  "Could not load the requests: ": "无法加载申请：",
+  "Change approvers": "更改审批人",
+  "Change the approvers": "更改审批人",
+  "People who already decided stay on the request.": "已做出决定的人会保留在申请中。",
+  "Approvers changed": "审批人已更改",
+  "Changes of the approvers": "审批人变更",
+  "added {n}": "新增 {n}",
+  "removed {n}": "移除 {n}",
+  "{who}: {what}": "{who}: {what}"
 }

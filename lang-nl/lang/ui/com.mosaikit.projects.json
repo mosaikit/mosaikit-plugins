@@ -93,5 +93,20 @@
   "Remove “{n}”?": "“{n}” verwijderen?",
   "Delete the project “{n}”? Its tasks stay in Tasks.": "Het project “{n}” verwijderen? De taken blijven in Taken.",
   "Could not start the UI of the plugin: ": "De interface van de plugin kon niet worden gestart:",
-  "Could not load the projects: ": "De projecten konden niet worden geladen:"
+  "Could not load the projects: ": "De projecten konden niet worden geladen:",
+  "Burndown": "Burndown",
+  "Burndown of": "Burndown van",
+  "The whole project": "Het hele project",
+  "No dates to draw against": "Geen data om tegen af te zetten",
+  "A burndown needs a start and an end: give the project its dates in Details, or pick a sprint.": "Een burndown heeft een begin en een einde nodig: geef het project zijn data in Details, of kies een sprint.",
+  "No tasks to burn down": "Geen taken om af te branden",
+  "Add tasks to the project (or to the sprint) and the chart draws itself.": "Voeg taken toe aan het project (of aan de sprint) en de grafiek tekent zichzelf.",
+  "{r} of {t} tasks still open, {d} done": "{r} van {t} taken nog open, {d} klaar",
+  "behind the ideal line by {n}": "{n} achter op de ideale lijn",
+  "ahead of the ideal line by {n}": "{n} voor op de ideale lijn",
+  "on the ideal line": "op de ideale lijn",
+  "Ideal": "Ideaal",
+  "Open tasks": "Open taken",
+  "{n} finished task(s) have no completion day (they were finished before Tasks 0.7.1 kept it): they count as done from the first day.": "{n} afgeronde taak/taken hebben geen afrondingsdag (ze werden afgerond voordat Taken 0.7.1 die bijhield): ze tellen mee als klaar vanaf de eerste dag.",
+  "The tasks counted are the ones the project has today; the days come from the completion day kept by Tasks.": "De getelde taken zijn die welke het project vandaag heeft; de dagen komen van de afrondingsdag die Taken bijhoudt."
 }
