@@ -104,5 +104,16 @@
   "The answer could not be sent: {error}": "Het antwoord kon niet worden verzonden: {error}",
   "Could not open the form: {error}": "Het formulier kon niet worden geopend: {error}",
   "The answer was not accepted.": "Het antwoord is niet geaccepteerd.",
-  "Check the answers: {error}": "Controleer de antwoorden: {error}"
+  "Check the answers: {error}": "Controleer de antwoorden: {error}",
+  "Anonymous": "Anoniem",
+  "Nothing links an answer to a person, not even for you; single answers cannot be deleted. It cannot be turned off later.": "Niets koppelt een antwoord aan een persoon, ook niet voor jou; losse antwoorden kunnen niet worden verwijderd. Het kan later niet worden uitgezet.",
+  "This form is anonymous: the table shows answers, never people.": "Dit formulier is anoniem: de tabel toont antwoorden, nooit personen.",
+  "Response": "Reactie",
+  "Response {n}": "Reactie {n}",
+  "Field {n}: when to show it": "Veld {n}: wanneer tonen",
+  "Always shown": "Altijd getoond",
+  "Only if field {n} is answered": "Alleen als veld {n} is ingevuld",
+  "Show this field": "Dit veld tonen",
+  "Field {n}: show it for these answers": "Veld {n}: toon het bij deze antwoorden",
+  "Field {n}: choose an earlier field with options, and at least one answer, for the condition": "Veld {n}: kies voor de voorwaarde een eerder veld met opties, en minstens één antwoord"
 }

@@ -110,5 +110,16 @@
   "Max score": "Score maximal",
   "Percent": "Pourcentage",
   "(correct)": "(correct)",
-  "CSV downloaded": "CSV téléchargé"
+  "CSV downloaded": "CSV téléchargé",
+  "Anonymous": "Anonyme",
+  "Nothing links an answer to a person, not even for you. It cannot be turned off later.": "Rien ne relie une réponse à une personne, pas même pour vous. Cela ne peut pas être désactivé ensuite.",
+  "This survey is anonymous: the results show answers, never people.": "Cette enquête est anonyme : les résultats montrent des réponses, jamais des personnes.",
+  "Response": "Réponse",
+  "Response {n}": "Réponse {n}",
+  "Question {n}: when to show it": "Question {n} : quand l'afficher",
+  "Always shown": "Toujours affichée",
+  "Only if question {n} is answered": "Seulement si l'on répond à la question {n}",
+  "Show this question": "Afficher cette question",
+  "Question {n}: show it for these answers": "Question {n} : l'afficher pour ces réponses",
+  "Question {n}: choose an earlier question with options or a scale, and at least one answer, for the condition": "Question {n} : choisissez pour la condition une question précédente avec des options ou une échelle, et au moins une réponse"
 }

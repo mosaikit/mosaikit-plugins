@@ -110,5 +110,16 @@
   "Max score": "الحد الأقصى للنتيجة",
   "Percent": "النسبة",
   "(correct)": "(صحيحة)",
-  "CSV downloaded": "تم تنزيل CSV"
+  "CSV downloaded": "تم تنزيل CSV",
+  "Anonymous": "مجهول",
+  "Nothing links an answer to a person, not even for you. It cannot be turned off later.": "لا شيء يربط الإجابة بشخص، حتى بالنسبة لك. لا يمكن إيقاف ذلك لاحقًا.",
+  "This survey is anonymous: the results show answers, never people.": "هذا الاستبيان مجهول: تعرض النتائج الإجابات لا الأشخاص.",
+  "Response": "الرد",
+  "Response {n}": "الرد {n}",
+  "Question {n}: when to show it": "السؤال {n}: متى يظهر",
+  "Always shown": "يظهر دائمًا",
+  "Only if question {n} is answered": "فقط إذا تمت الإجابة عن السؤال {n}",
+  "Show this question": "إظهار هذا السؤال",
+  "Question {n}: show it for these answers": "السؤال {n}: أظهره لهذه الإجابات",
+  "Question {n}: choose an earlier question with options or a scale, and at least one answer, for the condition": "السؤال {n}: اختر سؤالًا سابقًا ذا خيارات أو مقياس، وإجابة واحدة على الأقل، للشرط"
 }

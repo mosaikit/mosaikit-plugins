@@ -104,5 +104,16 @@
   "The answer could not be sent: {error}": "无法提交回答：{error}",
   "Could not open the form: {error}": "无法打开表单：{error}",
   "The answer was not accepted.": "回答未被接受。",
-  "Check the answers: {error}": "请检查回答：{error}"
+  "Check the answers: {error}": "请检查回答：{error}",
+  "Anonymous": "匿名",
+  "Nothing links an answer to a person, not even for you; single answers cannot be deleted. It cannot be turned off later.": "没有任何信息将回答与个人关联，对你也一样；无法删除单条回答。之后无法关闭。",
+  "This form is anonymous: the table shows answers, never people.": "此表单为匿名：表格只显示回答，不显示人员。",
+  "Response": "回答",
+  "Response {n}": "回答 {n}",
+  "Field {n}: when to show it": "字段 {n}：何时显示",
+  "Always shown": "始终显示",
+  "Only if field {n} is answered": "仅当字段 {n} 已填写时",
+  "Show this field": "显示此字段",
+  "Field {n}: show it for these answers": "字段 {n}：针对这些回答显示",
+  "Field {n}: choose an earlier field with options, and at least one answer, for the condition": "字段 {n}：请为条件选择一个带选项的前面的字段，并至少选择一个回答"
 }

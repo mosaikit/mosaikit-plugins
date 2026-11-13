@@ -1,11 +1,11 @@
 name = "Encuestas"
 description = "Series de preguntas que responden las personas con las que se comparte la encuesta, con los resultados por pregunta y cuestionarios con puntuación"
 label = "Encuestas"
-details = "Crea una encuesta con hasta 40 preguntas (una respuesta, varias respuestas, texto libre o una escala del 1 al 5), compártela y mira los resultados por pregunta: una barra por cada opción, la media de una escala y las respuestas de texto. Cada persona responde una sola vez y los resultados se exportan a CSV.\n\nEn modo cuestionario las respuestas se puntúan: marca las opciones correctas y los puntos de cada pregunta, fija una nota de aprobado y cada persona ve su puntuación y si ha aprobado; las respuestas correctas e incorrectas se muestran solo después de enviar.\n\nUna encuesta es un elemento de la plataforma: compártela con personas o grupos (lectura para responder, escritura para ver todos los resultados y editarla) y vale todo lo que ya sabes sobre compartir, buscar y la papelera."
+details = "Crea una encuesta con hasta 40 preguntas (una respuesta, varias respuestas, texto libre o una escala del 1 al 5), compártela y mira los resultados por pregunta: una barra por cada opción, la media de una escala y las respuestas de texto. Cada persona responde una sola vez y los resultados se exportan a CSV. Una pregunta puede mostrarse solo cuando coincide una respuesta anterior, y una encuesta anónima no guarda ningún nombre junto a las respuestas.\n\nEn modo cuestionario las respuestas se puntúan: marca las opciones correctas y los puntos de cada pregunta, fija una nota de aprobado y cada persona ve su puntuación y si ha aprobado; las respuestas correctas e incorrectas se muestran solo después de enviar.\n\nUna encuesta es un elemento de la plataforma: compártela con personas o grupos (lectura para responder, escritura para ver todos los resultados y editarla) y vale todo lo que ya sabes sobre compartir, buscar y la papelera."
 
 [resources.surveys]
 label = "Encuestas"
-fields = { title = "Título", intro = "Introducción", questions = "Preguntas", quiz = "Cuestionario (con puntuación)", pass_percent = "Nota de aprobado (%)", closes_on = "Se cierra el", closed = "Cerrada" }
+fields = { title = "Título", intro = "Introducción", questions = "Preguntas", quiz = "Cuestionario (con puntuación)", pass_percent = "Nota de aprobado (%)", closes_on = "Se cierra el", closed = "Cerrada", anonymous = "Anónima" }
 
 [kpi.kpi_surveys_status]
 label = "Estado de las encuestas"

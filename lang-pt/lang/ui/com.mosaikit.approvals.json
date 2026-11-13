@@ -69,5 +69,13 @@
   "Later": "Mais tarde",
   "Close": "Fechar",
   "Could not start the UI of the plugin: ": "Não foi possível iniciar a interface do plugin:",
-  "Could not load the requests: ": "Não foi possível carregar os pedidos:"
+  "Could not load the requests: ": "Não foi possível carregar os pedidos:",
+  "Change approvers": "Alterar aprovadores",
+  "Change the approvers": "Alterar os aprovadores",
+  "People who already decided stay on the request.": "As pessoas que já decidiram continuam no pedido.",
+  "Approvers changed": "Aprovadores alterados",
+  "Changes of the approvers": "Alterações dos aprovadores",
+  "added {n}": "adicionados {n}",
+  "removed {n}": "removidos {n}",
+  "{who}: {what}": "{who}: {what}"
 }

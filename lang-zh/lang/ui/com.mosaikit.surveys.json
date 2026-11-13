@@ -110,5 +110,16 @@
   "Max score": "满分",
   "Percent": "百分比",
   "(correct)": "（正确）",
-  "CSV downloaded": "CSV 已下载"
+  "CSV downloaded": "CSV 已下载",
+  "Anonymous": "匿名",
+  "Nothing links an answer to a person, not even for you. It cannot be turned off later.": "没有任何信息将回答与个人关联，对你也一样。之后无法关闭。",
+  "This survey is anonymous: the results show answers, never people.": "此问卷为匿名：结果只显示回答，不显示人员。",
+  "Response": "回答",
+  "Response {n}": "回答 {n}",
+  "Question {n}: when to show it": "问题 {n}：何时显示",
+  "Always shown": "始终显示",
+  "Only if question {n} is answered": "仅当问题 {n} 已回答时",
+  "Show this question": "显示此问题",
+  "Question {n}: show it for these answers": "问题 {n}：针对这些回答显示",
+  "Question {n}: choose an earlier question with options or a scale, and at least one answer, for the condition": "问题 {n}：请为条件选择一个带选项或量表的前面的问题，并至少选择一个回答"
 }

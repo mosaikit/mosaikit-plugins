@@ -69,5 +69,13 @@
   "Later": "Позже",
   "Close": "Закрыть",
   "Could not start the UI of the plugin: ": "Не удалось запустить интерфейс плагина: ",
-  "Could not load the requests: ": "Не удалось загрузить заявки: "
+  "Could not load the requests: ": "Не удалось загрузить заявки: ",
+  "Change approvers": "Изменить согласующих",
+  "Change the approvers": "Изменить согласующих",
+  "People who already decided stay on the request.": "Те, кто уже принял решение, остаются в заявке.",
+  "Approvers changed": "Согласующие изменены",
+  "Changes of the approvers": "Изменения согласующих",
+  "added {n}": "добавлено: {n}",
+  "removed {n}": "удалено: {n}",
+  "{who}: {what}": "{who}: {what}"
 }

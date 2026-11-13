@@ -1,11 +1,11 @@
 name = "Enquêtes"
 description = "Séries de questions auxquelles répondent les personnes avec qui l'enquête est partagée, avec les résultats par question et des quiz notés"
 label = "Enquêtes"
-details = "Créez une enquête de 40 questions maximum (une réponse, plusieurs réponses, texte libre ou une échelle de 1 à 5), partagez-la et consultez les résultats par question : une barre pour chaque option, la moyenne d'une échelle et les réponses textuelles. Chaque personne répond une seule fois et les résultats peuvent être exportés en CSV.\n\nEn mode quiz, les réponses sont notées : cochez les options correctes et les points de chaque question, fixez une note de réussite et chaque personne voit son score et si elle a réussi ; les bonnes et mauvaises réponses ne s'affichent qu'après l'envoi.\n\nUne enquête est un élément de la plateforme : partagez-la avec des personnes ou des groupes (lecture pour y répondre, écriture pour voir tous les résultats et la modifier) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique."
+details = "Créez une enquête de 40 questions maximum (une réponse, plusieurs réponses, texte libre ou une échelle de 1 à 5), partagez-la et consultez les résultats par question : une barre pour chaque option, la moyenne d'une échelle et les réponses textuelles. Chaque personne répond une seule fois et les résultats peuvent être exportés en CSV. Une question peut n'être affichée que lorsqu'une réponse précédente correspond, et une enquête anonyme ne conserve aucun nom avec les réponses.\n\nEn mode quiz, les réponses sont notées : cochez les options correctes et les points de chaque question, fixez une note de réussite et chaque personne voit son score et si elle a réussi ; les bonnes et mauvaises réponses ne s'affichent qu'après l'envoi.\n\nUne enquête est un élément de la plateforme : partagez-la avec des personnes ou des groupes (lecture pour y répondre, écriture pour voir tous les résultats et la modifier) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique."
 
 [resources.surveys]
 label = "Enquêtes"
-fields = { title = "Titre", intro = "Introduction", questions = "Questions", quiz = "Quiz (noté)", pass_percent = "Note de réussite (%)", closes_on = "Se termine le", closed = "Close" }
+fields = { title = "Titre", intro = "Introduction", questions = "Questions", quiz = "Quiz (noté)", pass_percent = "Note de réussite (%)", closes_on = "Se termine le", closed = "Close", anonymous = "Anonyme" }
 
 [kpi.kpi_surveys_status]
 label = "État des enquêtes"

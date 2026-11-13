@@ -89,5 +89,17 @@
   "Could not load the calendar: ": "تعذّر تحميل التقويم: ",
   "The task due dates are not available: ": "مواعيد استحقاق المهام غير متاحة: ",
   "Organised by {n}": "نظّمه {n}",
-  "No events to export in this month.": "لا توجد أحداث للتصدير في هذا الشهر."
+  "No events to export in this month.": "لا توجد أحداث للتصدير في هذا الشهر.",
+  "Time zone": "المنطقة الزمنية",
+  "Local time (no conversion)": "الوقت المحلي (دون تحويل)",
+  "Times are in {z}; you see them at the hour of {m}.": "الأوقات بتوقيت {z}؛ وتراها في ساعة {m}.",
+  "In the time zone of the event: {t} ({z})": "في المنطقة الزمنية للحدث: {t} ({z})",
+  "Edit the series": "تعديل السلسلة",
+  "Edit this occurrence": "تعديل هذا التكرار",
+  "Delete this occurrence": "حذف هذا التكرار",
+  "Restore this occurrence": "استعادة هذا التكرار",
+  "Delete only the occurrence of {d}? The rest of the series stays.": "حذف تكرار {d} فقط؟ تبقى بقية السلسلة.",
+  "Occurrence of {d}. The other occurrences do not change.": "تكرار {d}. لا تتغير التكرارات الأخرى.",
+  "This occurrence was changed from the series.": "تم تغيير هذا التكرار عن السلسلة.",
+  "Times in the time zone {z}.": "الأوقات في المنطقة الزمنية {z}."
 }

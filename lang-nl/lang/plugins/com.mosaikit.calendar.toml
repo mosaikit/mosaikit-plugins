@@ -1,11 +1,11 @@
 name = "Agenda"
 description = "De agenda van het team: maand-, week- en dagweergave, afspraken met uitgenodigde personen, herhalingen en de deadlines van je taken"
 label = "Agenda"
-details = "Schrijf een afspraak met dag, tijd en een herhaling (elke dag, week, maand of jaar), nodig personen uit je organization uit en bekijk alles in een maand-, week- of dagweergave. De genodigden antwoorden ja, misschien of nee, en iedereen ziet wie er komt. Tijden zijn lokale tijden, precies zoals je ze typt: er is geen tijdzoneconversie, dus een vergadering om 09:30 is voor iedereen om 09:30.\n\nDe open taken met een deadline staan naast de afspraken (je kunt ze verbergen), zodat deadlines en vergaderingen op één plek staan. Een afspraak is een item van het platform: deel hem met de genodigden zodat ze hem kunnen zien en erop kunnen antwoorden, en download hem als .ics-bestand om hem aan een andere agenda toe te voegen."
+details = "Schrijf een afspraak met dag, tijd en een herhaling (elke dag, week, maand of jaar), nodig personen uit je organization uit en bekijk alles in een maand-, week- of dagweergave. De genodigden antwoorden ja, misschien of nee, en iedereen ziet wie er komt. Tijden zijn lokale tijden, precies zoals je ze typt, tenzij je de afspraak een tijdzone geeft: dan staat hij op het juiste uur, waar iedereen ook is. In een herhalende reeks kun je één enkele herhaling wijzigen of verwijderen.\n\nDe open taken met een deadline staan naast de afspraken (je kunt ze verbergen), zodat deadlines en vergaderingen op één plek staan. Een afspraak is een item van het platform: deel hem met de genodigden zodat ze hem kunnen zien en erop kunnen antwoorden, en download hem als .ics-bestand om hem aan een andere agenda toe te voegen."
 
 [resources.events]
 label = "Afspraken"
-fields = { title = "Titel", details = "Details", location = "Locatie", starts_on = "Begint op", starts_time = "Begintijd", ends_on = "Eindigt op", ends_time = "Eindtijd", all_day = "Hele dag", repeat = "Herhalen", repeat_until = "Herhalen tot", attendees = "Genodigden", color = "Kleur" }
+fields = { title = "Titel", details = "Details", location = "Locatie", starts_on = "Begint op", starts_time = "Begintijd", ends_on = "Eindigt op", ends_time = "Eindtijd", all_day = "Hele dag", repeat = "Herhalen", repeat_until = "Herhalen tot", attendees = "Genodigden", timezone = "Tijdzone", color = "Kleur" }
 options.repeat = { none = "nooit", daily = "elke dag", weekly = "elke week", monthly = "elke maand", yearly = "elk jaar" }
 options.color = { blue = "blauw", green = "groen", red = "rood", orange = "oranje", purple = "paars", grey = "grijs" }
 

@@ -1,7 +1,7 @@
 name = "Lousa"
 description = "Uma lousa compartilhada para notas adesivas, formas, setas e desenho, editada ao vivo por várias pessoas"
 label = "Lousa"
-details = "Uma lousa livre para brainstormings, workshops e diagramas desenhados em conjunto durante uma chamada: notas adesivas, retângulos, elipses, texto, setas e desenho à mão livre, com uma paleta de cores, desfazer e refazer, zoom e deslocamento, e exportação em PNG ou SVG.\n\nTodos que estiverem com a lousa aberta veem em tempo real as alterações e os ponteiros dos outros. As alterações são salvas na lousa por quem pode editá-la; quem tem apenas leitura acompanha ao vivo, mas não pode alterar nada.\n\nUma lousa é um elemento da plataforma: compartilhe-a com pessoas ou grupos (leitura para vê-la, escrita para desenhar nela) e vale tudo o que você já sabe sobre compartilhamento, busca e lixeira."
+details = "Uma lousa livre para brainstormings, workshops e diagramas desenhados em conjunto durante uma chamada: notas adesivas, retângulos, elipses, texto, setas, molduras que agrupam o que têm dentro e desenho à mão livre, com uma paleta de cores, modelos para começar (kanban, SWOT, retrospectiva, brainstorm), desfazer e refazer, zoom e deslocamento, e exportação em PNG ou SVG.\n\nTodos que estiverem com a lousa aberta veem em tempo real as alterações e os ponteiros dos outros. As alterações são salvas na lousa por quem pode editá-la; quem tem apenas leitura acompanha ao vivo, mas não pode alterar nada.\n\nUma lousa é um elemento da plataforma: compartilhe-a com pessoas ou grupos (leitura para vê-la, escrita para desenhar nela) e vale tudo o que você já sabe sobre compartilhamento, busca e lixeira."
 
 [resources.whiteboards]
 label = "Lousas"

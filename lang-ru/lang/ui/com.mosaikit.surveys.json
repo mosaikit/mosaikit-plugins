@@ -110,5 +110,16 @@
   "Max score": "Максимальный балл",
   "Percent": "Процент",
   "(correct)": "(верно)",
-  "CSV downloaded": "CSV скачан"
+  "CSV downloaded": "CSV скачан",
+  "Anonymous": "Анонимная",
+  "Nothing links an answer to a person, not even for you. It cannot be turned off later.": "Ничто не связывает ответ с человеком, даже для вас. Позже это нельзя отключить.",
+  "This survey is anonymous: the results show answers, never people.": "Эта анкета анонимна: в результатах видны ответы, но не люди.",
+  "Response": "Ответ",
+  "Response {n}": "Ответ {n}",
+  "Question {n}: when to show it": "Вопрос {n}: когда показывать",
+  "Always shown": "Показывается всегда",
+  "Only if question {n} is answered": "Только если на вопрос {n} дан ответ",
+  "Show this question": "Показывать этот вопрос",
+  "Question {n}: show it for these answers": "Вопрос {n}: показывать при этих ответах",
+  "Question {n}: choose an earlier question with options or a scale, and at least one answer, for the condition": "Вопрос {n}: для условия выберите более ранний вопрос с вариантами или шкалой и хотя бы один ответ"
 }

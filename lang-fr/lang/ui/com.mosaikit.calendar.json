@@ -89,5 +89,17 @@
   "Could not load the calendar: ": "Impossible de charger le calendrier :",
   "The task due dates are not available: ": "Les échéances des tâches ne sont pas disponibles :",
   "Organised by {n}": "Organisé par {n}",
-  "No events to export in this month.": "Aucun événement à exporter ce mois-ci."
+  "No events to export in this month.": "Aucun événement à exporter ce mois-ci.",
+  "Time zone": "Fuseau horaire",
+  "Local time (no conversion)": "Heure locale (sans conversion)",
+  "Times are in {z}; you see them at the hour of {m}.": "Les heures sont en {z} ; vous les voyez à l'heure de {m}.",
+  "In the time zone of the event: {t} ({z})": "Dans le fuseau horaire de l'événement : {t} ({z})",
+  "Edit the series": "Modifier la série",
+  "Edit this occurrence": "Modifier cette occurrence",
+  "Delete this occurrence": "Supprimer cette occurrence",
+  "Restore this occurrence": "Restaurer cette occurrence",
+  "Delete only the occurrence of {d}? The rest of the series stays.": "Supprimer uniquement l'occurrence du {d} ? Le reste de la série est conservé.",
+  "Occurrence of {d}. The other occurrences do not change.": "Occurrence du {d}. Les autres occurrences ne changent pas.",
+  "This occurrence was changed from the series.": "Cette occurrence a été modifiée par rapport à la série.",
+  "Times in the time zone {z}.": "Heures dans le fuseau horaire {z}."
 }

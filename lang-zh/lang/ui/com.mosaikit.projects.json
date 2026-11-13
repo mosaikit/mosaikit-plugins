@@ -93,5 +93,20 @@
   "Remove “{n}”?": "移除“{n}”？",
   "Delete the project “{n}”? Its tasks stay in Tasks.": "删除项目“{n}”？其任务仍保留在任务中。",
   "Could not start the UI of the plugin: ": "无法启动插件界面：",
-  "Could not load the projects: ": "无法加载项目："
+  "Could not load the projects: ": "无法加载项目：",
+  "Burndown": "燃尽图",
+  "Burndown of": "燃尽图：",
+  "The whole project": "整个项目",
+  "No dates to draw against": "没有可绘制的日期",
+  "A burndown needs a start and an end: give the project its dates in Details, or pick a sprint.": "燃尽图需要开始和结束日期：请在详情中设置项目日期，或选择一个冲刺。",
+  "No tasks to burn down": "没有可燃尽的任务",
+  "Add tasks to the project (or to the sprint) and the chart draws itself.": "向项目（或冲刺）添加任务，图表会自动绘制。",
+  "{r} of {t} tasks still open, {d} done": "{t} 个任务中还有 {r} 个未完成，{d} 个已完成",
+  "behind the ideal line by {n}": "落后于理想线 {n}",
+  "ahead of the ideal line by {n}": "领先于理想线 {n}",
+  "on the ideal line": "在理想线上",
+  "Ideal": "理想",
+  "Open tasks": "未完成任务",
+  "{n} finished task(s) have no completion day (they were finished before Tasks 0.7.1 kept it): they count as done from the first day.": "{n} 个已完成任务没有完成日期（它们在任务 0.7.1 开始记录之前完成）：计为从第一天起已完成。",
+  "The tasks counted are the ones the project has today; the days come from the completion day kept by Tasks.": "统计的任务是项目当前拥有的任务；日期来自任务记录的完成日期。"
 }

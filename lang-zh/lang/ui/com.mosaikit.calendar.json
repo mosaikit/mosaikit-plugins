@@ -89,5 +89,17 @@
   "Could not load the calendar: ": "无法加载日历：",
   "The task due dates are not available: ": "无法获取任务截止日期：",
   "Organised by {n}": "组织者 {n}",
-  "No events to export in this month.": "本月没有可导出的日程。"
+  "No events to export in this month.": "本月没有可导出的日程。",
+  "Time zone": "时区",
+  "Local time (no conversion)": "本地时间（不转换）",
+  "Times are in {z}; you see them at the hour of {m}.": "时间为 {z}；你看到的是 {m} 的时间。",
+  "In the time zone of the event: {t} ({z})": "按日程所在时区：{t}（{z}）",
+  "Edit the series": "编辑系列",
+  "Edit this occurrence": "编辑此次重复",
+  "Delete this occurrence": "删除此次重复",
+  "Restore this occurrence": "恢复此次重复",
+  "Delete only the occurrence of {d}? The rest of the series stays.": "仅删除 {d} 的这一次？系列的其余部分保留。",
+  "Occurrence of {d}. The other occurrences do not change.": "{d} 的这一次。其他重复项不变。",
+  "This occurrence was changed from the series.": "此次重复已与系列不同。",
+  "Times in the time zone {z}.": "时间为 {z} 时区。"
 }

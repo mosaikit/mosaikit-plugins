@@ -104,5 +104,16 @@
   "The answer could not be sent: {error}": "La réponse n'a pas pu être envoyée : {error}",
   "Could not open the form: {error}": "Impossible d'ouvrir le formulaire : {error}",
   "The answer was not accepted.": "La réponse n'a pas été acceptée.",
-  "Check the answers: {error}": "Vérifiez les réponses : {error}"
+  "Check the answers: {error}": "Vérifiez les réponses : {error}",
+  "Anonymous": "Anonyme",
+  "Nothing links an answer to a person, not even for you; single answers cannot be deleted. It cannot be turned off later.": "Rien ne relie une réponse à une personne, pas même pour vous ; les réponses individuelles ne peuvent pas être supprimées. Cela ne peut pas être désactivé ensuite.",
+  "This form is anonymous: the table shows answers, never people.": "Ce formulaire est anonyme : le tableau montre des réponses, jamais des personnes.",
+  "Response": "Réponse",
+  "Response {n}": "Réponse {n}",
+  "Field {n}: when to show it": "Champ {n} : quand l'afficher",
+  "Always shown": "Toujours affiché",
+  "Only if field {n} is answered": "Seulement si le champ {n} est renseigné",
+  "Show this field": "Afficher ce champ",
+  "Field {n}: show it for these answers": "Champ {n} : l'afficher pour ces réponses",
+  "Field {n}: choose an earlier field with options, and at least one answer, for the condition": "Champ {n} : choisissez pour la condition un champ précédent avec des options et au moins une réponse"
 }

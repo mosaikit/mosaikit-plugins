@@ -1,11 +1,11 @@
 name = "Formulários"
 description = "Crie um formulário, compartilhe um link público para coletar respostas de qualquer pessoa sem conta e leia as respostas em uma tabela ou em um CSV"
 label = "Formulários"
-details = "Crie um formulário com até 30 campos (uma linha de texto, um texto longo, uma escolha, várias escolhas, um número, uma data ou um endereço de e-mail), marque quais são obrigatórios e compartilhe-o: com seus colegas, que respondem dentro da plataforma, ou com um link público que qualquer pessoa pode abrir e preencher sem conta.\n\nDefina quando o formulário fecha e o número máximo de respostas. As respostas vão para uma tabela com a contagem por opção, e você pode exportá-las para CSV ou excluir uma resposta, por exemplo uma de spam. Um visitante nunca vê as respostas dos outros, nem quantas existem.\n\nO link público exige a política do tenant «Comandos públicos», que o Tenant Manager ativa. Um formulário é um item da plataforma: compartilhe-o com pessoas ou grupos (leitura para preenchê-lo, escrita para ver as respostas e editá-lo) e vale tudo o que você já sabe sobre compartilhamento, busca e lixeira."
+details = "Crie um formulário com até 30 campos (uma linha de texto, um texto longo, uma escolha, várias escolhas, um número, uma data ou um endereço de e-mail), marque quais são obrigatórios e compartilhe-o: com seus colegas, que respondem dentro da plataforma, ou com um link público que qualquer pessoa pode abrir e preencher sem conta.\n\nDefina quando o formulário fecha e o número máximo de respostas. As respostas vão para uma tabela com a contagem por opção, e você pode exportá-las para CSV ou excluir uma resposta, por exemplo uma de spam. Um visitante nunca vê as respostas dos outros, nem quantas existem. Um campo pode ser exibido somente quando uma resposta anterior corresponde, e um formulário anônimo não guarda nenhum nome junto com as respostas.\n\nO link público exige a política do tenant «Comandos públicos», que o Tenant Manager ativa. Um formulário é um item da plataforma: compartilhe-o com pessoas ou grupos (leitura para preenchê-lo, escrita para ver as respostas e editá-lo) e vale tudo o que você já sabe sobre compartilhamento, busca e lixeira."
 
 [resources.forms]
 label = "Formulários"
-fields = { title = "Título", intro = "Introdução", fields = "Campos", open = "Aberto (aceita respostas)", closes_on = "Fecha em", max_answers = "Número máximo de respostas", thanks = "Mensagem de agradecimento" }
+fields = { title = "Título", intro = "Introdução", fields = "Campos", open = "Aberto (aceita respostas)", closes_on = "Fecha em", max_answers = "Número máximo de respostas", thanks = "Mensagem de agradecimento", anonymous = "Anônimo" }
 
 [kpi.kpi_forms_status]
 label = "Status dos formulários"

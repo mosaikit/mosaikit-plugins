@@ -104,5 +104,16 @@
   "The answer could not be sent: {error}": "تعذّر إرسال الإجابة: {error}",
   "Could not open the form: {error}": "تعذّر فتح النموذج: {error}",
   "The answer was not accepted.": "لم تُقبل الإجابة.",
-  "Check the answers: {error}": "تحقق من الإجابات: {error}"
+  "Check the answers: {error}": "تحقق من الإجابات: {error}",
+  "Anonymous": "مجهول",
+  "Nothing links an answer to a person, not even for you; single answers cannot be deleted. It cannot be turned off later.": "لا شيء يربط الإجابة بشخص، حتى بالنسبة لك؛ ولا يمكن حذف الإجابات الفردية. لا يمكن إيقاف ذلك لاحقًا.",
+  "This form is anonymous: the table shows answers, never people.": "هذا النموذج مجهول: يعرض الجدول الإجابات لا الأشخاص.",
+  "Response": "الرد",
+  "Response {n}": "الرد {n}",
+  "Field {n}: when to show it": "الحقل {n}: متى يظهر",
+  "Always shown": "يظهر دائمًا",
+  "Only if field {n} is answered": "فقط إذا تمت الإجابة عن الحقل {n}",
+  "Show this field": "إظهار هذا الحقل",
+  "Field {n}: show it for these answers": "الحقل {n}: أظهره لهذه الإجابات",
+  "Field {n}: choose an earlier field with options, and at least one answer, for the condition": "الحقل {n}: اختر حقلًا سابقًا ذا خيارات، وإجابة واحدة على الأقل، للشرط"
 }

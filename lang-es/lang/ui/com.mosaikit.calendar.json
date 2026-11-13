@@ -89,5 +89,17 @@
   "Could not load the calendar: ": "No se pudo cargar el calendario: ",
   "The task due dates are not available: ": "Los vencimientos de tareas no están disponibles: ",
   "Organised by {n}": "Organizado por {n}",
-  "No events to export in this month.": "No hay eventos que exportar en este mes."
+  "No events to export in this month.": "No hay eventos que exportar en este mes.",
+  "Time zone": "Zona horaria",
+  "Local time (no conversion)": "Hora local (sin conversión)",
+  "Times are in {z}; you see them at the hour of {m}.": "Las horas están en {z}; las ves a la hora de {m}.",
+  "In the time zone of the event: {t} ({z})": "En la zona horaria del evento: {t} ({z})",
+  "Edit the series": "Editar la serie",
+  "Edit this occurrence": "Editar esta repetición",
+  "Delete this occurrence": "Eliminar esta repetición",
+  "Restore this occurrence": "Restaurar esta repetición",
+  "Delete only the occurrence of {d}? The rest of the series stays.": "¿Eliminar solo la repetición del {d}? El resto de la serie se mantiene.",
+  "Occurrence of {d}. The other occurrences do not change.": "Repetición del {d}. Las demás repeticiones no cambian.",
+  "This occurrence was changed from the series.": "Esta repetición se ha cambiado respecto a la serie.",
+  "Times in the time zone {z}.": "Horas en la zona horaria {z}."
 }
