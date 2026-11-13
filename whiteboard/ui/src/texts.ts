@@ -22,6 +22,11 @@ const en = {
   legendView: '+ and − zoom, 0 fits the content; the mouse wheel zooms; hold Space or use the middle button to pan',
   colorNames: { yellow: 'Yellow', orange: 'Orange', red: 'Red', pink: 'Pink', purple: 'Purple', blue: 'Blue', green: 'Green', gray: 'Gray' } as Record<string, string>,
   pointers: 'Pointers of the others are shown live',
+  kFrame: 'frames', frame: 'Frame', templates: 'Templates', templatesTitle: 'Start from a template', tplKanban: 'Kanban', tplKanbanText: 'Three columns: to do, doing, done.', tplSwot: 'SWOT', tplSwotText: 'Strengths, weaknesses, opportunities and threats.',
+  tplRetro: 'Retrospective', tplRetroText: 'What went well, what to improve, actions.', tplBrainstorm: 'Brainstorm', tplBrainstormText: 'A topic in the middle with four ideas around it.',
+  tplTodo: 'To do', tplDoing: 'Doing', tplDone: 'Done', tplTask: 'A task', tplStrengths: 'Strengths', tplWeaknesses: 'Weaknesses', tplOpportunities: 'Opportunities', tplThreats: 'Threats',
+  tplWentWell: 'Went well', tplToImprove: 'To improve', tplActions: 'Actions', tplTopic: 'Topic', tplIdea: 'An idea',
+  legendFrames: 'Frames (F) group what is inside them: moving or duplicating a frame takes its contents along; double-click its title to rename it',
 }
 export type Texts = typeof en
 export type L = string
@@ -47,6 +52,11 @@ const it: Texts = {
   legendView: '+ e − fanno zoom, 0 adatta al contenuto; la rotellina fa zoom; tieni premuto Spazio o usa il tasto centrale per spostare la vista',
   colorNames: { yellow: 'Giallo', orange: 'Arancione', red: 'Rosso', pink: 'Rosa', purple: 'Viola', blue: 'Blu', green: 'Verde', gray: 'Grigio' } as Record<string, string>,
   pointers: 'I puntatori degli altri si vedono in diretta',
+  kFrame: 'cornici', frame: 'Cornice', templates: 'Modelli', templatesTitle: 'Parti da un modello', tplKanban: 'Kanban', tplKanbanText: 'Tre colonne: da fare, in corso, fatto.', tplSwot: 'SWOT', tplSwotText: 'Punti di forza, debolezze, opportunità e minacce.',
+  tplRetro: 'Retrospettiva', tplRetroText: 'Cosa è andato bene, cosa migliorare, azioni.', tplBrainstorm: 'Brainstorming', tplBrainstormText: 'Un tema al centro con quattro idee intorno.',
+  tplTodo: 'Da fare', tplDoing: 'In corso', tplDone: 'Fatto', tplTask: 'Un’attività', tplStrengths: 'Punti di forza', tplWeaknesses: 'Debolezze', tplOpportunities: 'Opportunità', tplThreats: 'Minacce',
+  tplWentWell: 'È andato bene', tplToImprove: 'Da migliorare', tplActions: 'Azioni', tplTopic: 'Tema', tplIdea: 'Un’idea',
+  legendFrames: 'Le cornici (F) raggruppano ciò che hanno dentro: spostare o duplicare una cornice porta con sé il contenuto; doppio clic sul titolo per rinominarla',
 }
 const es: Texts = {
   title: 'Pizarra', newBoard: '＋ Nueva pizarra', emptyTitle: 'Todavía no hay pizarras', emptyText: 'Crea una pizarra, compártela con quienes trabajan contigo y dibujad juntos: notas adhesivas, formas, flechas y bocetos, en directo.',
@@ -69,6 +79,11 @@ const es: Texts = {
   legendView: '+ y − hacen zoom, 0 ajusta al contenido; la rueda del ratón hace zoom; mantén Espacio o usa el botón central para desplazar la vista',
   colorNames: { yellow: 'Amarillo', orange: 'Naranja', red: 'Rojo', pink: 'Rosa', purple: 'Morado', blue: 'Azul', green: 'Verde', gray: 'Gris' } as Record<string, string>,
   pointers: 'Los punteros de los demás se ven en directo',
+  kFrame: 'marcos', frame: 'Marco', templates: 'Plantillas', templatesTitle: 'Empieza con una plantilla', tplKanban: 'Kanban', tplKanbanText: 'Tres columnas: por hacer, en curso, hecho.', tplSwot: 'DAFO', tplSwotText: 'Fortalezas, debilidades, oportunidades y amenazas.',
+  tplRetro: 'Retrospectiva', tplRetroText: 'Qué fue bien, qué mejorar, acciones.', tplBrainstorm: 'Lluvia de ideas', tplBrainstormText: 'Un tema en el centro con cuatro ideas alrededor.',
+  tplTodo: 'Por hacer', tplDoing: 'En curso', tplDone: 'Hecho', tplTask: 'Una tarea', tplStrengths: 'Fortalezas', tplWeaknesses: 'Debilidades', tplOpportunities: 'Oportunidades', tplThreats: 'Amenazas',
+  tplWentWell: 'Fue bien', tplToImprove: 'A mejorar', tplActions: 'Acciones', tplTopic: 'Tema', tplIdea: 'Una idea',
+  legendFrames: 'Los marcos (F) agrupan lo que tienen dentro: mover o duplicar un marco se lleva su contenido; doble clic en el título para renombrarlo',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
 // (`lang/ui/<plugin id>.json`, English phrase → translation, read through `msk.t`), once `bindTexts` has run; the English

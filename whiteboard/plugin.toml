@@ -1,13 +1,13 @@
 id = "com.mosaikit.whiteboard"
 name = "Whiteboard"
-version = "0.2.0"
+version = "0.3.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "presentation"
 description = "A shared board for sticky notes, shapes, arrows and drawing, edited live by several people"
 author = "Mosaikit"
 license = "Apache-2.0"
-details = "A free-form board for brainstorming, workshops and diagrams drawn together in a call: sticky notes, rectangles, ellipses, text, arrows and freehand drawing, with a colour palette, undo and redo, zoom and pan, and export as PNG or SVG.\n\nEveryone who has the board open sees the changes and the pointers of the others as they happen. Changes are saved in the board by the people who can edit it; people with read access follow along live but cannot change anything.\n\nA board is an item of the platform: share it with people or groups (read to watch it, write to draw on it) and everything you already know about sharing, search and the trash applies."
+details = "A free-form board for brainstorming, workshops and diagrams drawn together in a call: sticky notes, rectangles, ellipses, text, arrows, frames that group what is inside them and freehand drawing, with a colour palette, templates to start from (kanban, SWOT, retrospective, brainstorm), undo and redo, zoom and pan, and export as PNG or SVG.\n\nEveryone who has the board open sees the changes and the pointers of the others as they happen. Changes are saved in the board by the people who can edit it; people with read access follow along live but cannot change anything.\n\nA board is an item of the platform: share it with people or groups (read to watch it, write to draw on it) and everything you already know about sharing, search and the trash applies."
 screenshots = ["board.webp", "list.webp"]
 homepage = "https://example.org/mosaikit/plugins/whiteboard"
 
@@ -43,7 +43,7 @@ label = "Status of the whiteboards"
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
-details = "Una lavagna libera per brainstorming, workshop e diagrammi disegnati insieme in una chiamata: note adesive, rettangoli, ellissi, testo, frecce e disegno a mano libera, con una tavolozza di colori, annulla e ripeti, zoom e spostamento, ed esportazione in PNG o SVG.\n\nChiunque abbia la lavagna aperta vede in tempo reale le modifiche e i puntatori degli altri. Le modifiche vengono salvate nella lavagna da chi può modificarla; chi ha solo la lettura segue dal vivo ma non può cambiare nulla.\n\nUna lavagna è un elemento della piattaforma: condividila con persone o gruppi (lettura per guardarla, scrittura per disegnarci sopra) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
+details = "Una lavagna libera per brainstorming, workshop e diagrammi disegnati insieme in una chiamata: note adesive, rettangoli, ellissi, testo, frecce, cornici che raggruppano ciò che hanno dentro e disegno a mano libera, con modelli da cui partire (kanban, SWOT, retrospettiva, brainstorming),, con una tavolozza di colori, annulla e ripeti, zoom e spostamento, ed esportazione in PNG o SVG.\n\nChiunque abbia la lavagna aperta vede in tempo reale le modifiche e i puntatori degli altri. Le modifiche vengono salvate nella lavagna da chi può modificarla; chi ha solo la lettura segue dal vivo ma non può cambiare nulla.\n\nUna lavagna è un elemento della piattaforma: condividila con persone o gruppi (lettura per guardarla, scrittura per disegnarci sopra) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
 name = "Lavagna"
 description = "Una lavagna condivisa per note adesive, forme, frecce e disegno, modificata dal vivo da più persone"
 label = "Lavagna"

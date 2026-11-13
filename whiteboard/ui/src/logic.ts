@@ -1,8 +1,8 @@
 // Pure logic of the Whiteboard: geometry, the palette, word wrap, simplification of a drawing, ids and the rules of who may edit.
 // Nothing here touches the DOM or the network, so all of it is tested with vitest.
 
-export type ObjType = 'note' | 'rect' | 'ellipse' | 'text' | 'arrow' | 'pen'
-export const OBJ_TYPES: ObjType[] = ['note', 'rect', 'ellipse', 'text', 'arrow', 'pen']
+export type ObjType = 'note' | 'rect' | 'ellipse' | 'text' | 'arrow' | 'pen' | 'frame'
+export const OBJ_TYPES: ObjType[] = ['note', 'rect', 'ellipse', 'text', 'arrow', 'pen', 'frame']
 
 /** One thing on the board. `points` (arrow, pen) are flat `[x0, y0, x1, y1, ...]` relative to `x`, `y`: moving is one change. */
 export interface Obj {
@@ -77,6 +77,9 @@ export function newId(rand: () => number = Math.random): string {
 export const NOTE_SIZE = { w: 180, h: 140 }
 export const SHAPE_SIZE = { w: 160, h: 100 }
 export const TEXT_WIDTH = 220
+/** A frame: a titled area that groups what is inside it. */
+export const FRAME_SIZE = { w: 420, h: 300 }
+export const FRAME_TITLE_H = 34
 export const NOTE_FONT = 17
 export const SHAPE_FONT = 16
 export const TEXT_FONT = 22
@@ -214,6 +217,13 @@ export function hit(o: Obj, p: Pt, tol = 0): boolean {
       const nx = (p.x - (o.x + o.w / 2)) / rx
       const ny = (p.y - (o.y + o.h / 2)) / ry
       return nx * nx + ny * ny <= 1
+    }
+    case 'frame': {
+      const inside = p.x >= o.x - tol && p.x <= o.x + o.w + tol && p.y >= o.y - tol && p.y <= o.y + o.h + tol
+      if (!inside) return false
+      const band = p.y <= o.y + FRAME_TITLE_H
+      const edge = Math.min(p.x - o.x, o.x + o.w - p.x, p.y - o.y, o.y + o.h - p.y) <= 6 + tol
+      return band || edge
     }
     case 'arrow':
     case 'pen': {
@@ -458,4 +468,100 @@ export function cycle(objs: Obj[], id: string | undefined, dir: 1 | -1): string 
   const i = order.findIndex((o) => o.id === id)
   if (i < 0) return (dir > 0 ? order[0] : order[order.length - 1])!.id
   return order[(i + dir + order.length) % order.length]!.id
+}
+
+// ------------------------------------------------------------------------------------------------- frames and templates
+
+/** Whether `inner` lies wholly inside `outer`. */
+export const contains = (outer: Rect, inner: Rect): boolean => inner.x >= outer.x && inner.y >= outer.y && inner.x + inner.w <= outer.x + outer.w && inner.y + inner.h <= outer.y + outer.h
+
+/** What a frame holds: the objects (not other frames) whose centre is inside it. They move with the frame. */
+export function frameChildren(frame: Obj, objs: Obj[]): Obj[] {
+  if (frame.type !== 'frame') return []
+  const box = bounds(frame)
+  return objs.filter((o) => {
+    if (o.id === frame.id || o.type === 'frame') return false
+    const b = objBox(o)
+    const c = { x: b.x + b.w / 2, y: b.y + b.h / 2 }
+    return c.x >= box.x && c.x <= box.x + box.w && c.y >= box.y && c.y <= box.y + box.h
+  })
+}
+
+/** The selection with what its frames hold, each once: what a move or a copy of a frame carries along. */
+export function withFrameChildren(selected: Obj[], all: Obj[]): Obj[] {
+  const out = new Map<string, Obj>()
+  for (const o of selected) {
+    out.set(o.id, o)
+    for (const c of frameChildren(o, all)) out.set(c.id, c)
+  }
+  return [...out.values()]
+}
+
+export type TemplateId = 'kanban' | 'swot' | 'retro' | 'brainstorm'
+export const TEMPLATE_IDS: TemplateId[] = ['kanban', 'swot', 'retro', 'brainstorm']
+
+/** The texts a template writes on the board: the name of a template, and the title of each of its frames or notes. */
+export type TemplateLabel =
+  | 'tplTodo' | 'tplDoing' | 'tplDone' | 'tplTask'
+  | 'tplStrengths' | 'tplWeaknesses' | 'tplOpportunities' | 'tplThreats'
+  | 'tplWentWell' | 'tplToImprove' | 'tplActions'
+  | 'tplTopic' | 'tplIdea'
+
+export type TemplateObj = Pick<Obj, 'type' | 'x' | 'y' | 'w' | 'h' | 'text' | 'color'> & { points?: number[] }
+
+const frame = (x: number, y: number, w: number, h: number, text: string, color: string): TemplateObj => ({ type: 'frame', x, y, w, h, text, color })
+const note = (x: number, y: number, text: string, color: string): TemplateObj => ({ type: 'note', x, y, w: NOTE_SIZE.w, h: NOTE_SIZE.h, text, color })
+
+/**
+ * The objects of a template with its top left corner at `at`, the frames first (they sit behind the rest). `t` gives the text
+ * for a label in the language of the person. Nothing is random: the same template is always the same.
+ */
+export function templateObjects(id: TemplateId, t: (k: TemplateLabel) => string, at: Pt): TemplateObj[] {
+  const out: TemplateObj[] = []
+  const place = (o: TemplateObj): TemplateObj => ({ ...o, x: Math.round(at.x + o.x), y: Math.round(at.y + o.y) })
+  switch (id) {
+    case 'kanban': {
+      const w = 260
+      const cols: [TemplateLabel, string][] = [['tplTodo', 'blue'], ['tplDoing', 'orange'], ['tplDone', 'green']]
+      cols.forEach(([k, c], i) => out.push(frame(i * (w + 20), 0, w, 440, t(k), c)))
+      out.push(note(40, 60, t('tplTask'), 'yellow'))
+      break
+    }
+    case 'swot': {
+      const [w, h, gap] = [320, 240, 20]
+      const cells: [TemplateLabel, string][] = [['tplStrengths', 'green'], ['tplWeaknesses', 'red'], ['tplOpportunities', 'blue'], ['tplThreats', 'orange']]
+      cells.forEach(([k, c], i) => out.push(frame((i % 2) * (w + gap), Math.floor(i / 2) * (h + gap), w, h, t(k), c)))
+      break
+    }
+    case 'retro': {
+      const w = 300
+      const cols: [TemplateLabel, string, string][] = [['tplWentWell', 'green', 'green'], ['tplToImprove', 'orange', 'orange'], ['tplActions', 'blue', 'blue']]
+      cols.forEach(([k, c], i) => out.push(frame(i * (w + 20), 0, w, 420, t(k), c)))
+      cols.forEach(([, , n], i) => out.push(note(i * (w + 20) + 60, 60, '', n)))
+      break
+    }
+    case 'brainstorm': {
+      const cx = 300
+      const cy = 220
+      out.push({ type: 'ellipse', x: cx - 90, y: cy - 55, w: 180, h: 110, text: t('tplTopic'), color: 'purple' })
+      const spots: [number, number][] = [[cx - 90, 0], [cx + 200, cy - 70], [cx - 90, cy + 190], [cx - 380, cy - 70]]
+      for (const [x, y] of spots) out.push(note(x, y, t('tplIdea'), 'yellow'))
+      // an arrow from the topic towards each note
+      const tips: [number, number, number, number][] = [
+        [cx, cy - 55, cx, 140 + 4],
+        [cx + 90, cy, cx + 200 - 4, cy],
+        [cx, cy + 55, cx, cy + 190 - 4],
+        [cx - 90, cy, cx - 200 + 4, cy],
+      ]
+      for (const [x0, y0, x1, y1] of tips) out.push({ type: 'arrow', x: x0, y: y0, w: Math.abs(x1 - x0), h: Math.abs(y1 - y0), text: '', color: 'gray', points: [0, 0, x1 - x0, y1 - y0] })
+      break
+    }
+  }
+  // the frames come first: the editor gives them the lowest depth
+  return out.map(place).sort((a, b) => Number(b.type === 'frame') - Number(a.type === 'frame'))
+}
+
+/** The box a template covers, to put its middle in the middle of the screen. */
+export function templateBox(objs: TemplateObj[]): Rect {
+  return unionBounds(objs.map((o) => (o.type === 'arrow' ? { x: o.x, y: o.y, w: o.w, h: o.h } : { x: o.x, y: o.y, w: o.w, h: o.h }))) ?? { x: 0, y: 0, w: 0, h: 0 }
 }

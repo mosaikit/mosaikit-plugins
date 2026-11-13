@@ -215,3 +215,57 @@ describe('the editor of a reader', () => {
     expect(root.querySelectorAll('.wb-obj')).toHaveLength(1)
   })
 })
+
+describe('frames and templates', () => {
+  it('a frame is drawn behind a note, its title is edited, and moving it takes the note along', async () => {
+    const { svg, tool, root } = start('write')
+    tool('frame')
+    drag(svg, [100, 100], [500, 400])
+    const ta = root.querySelector('textarea.wb-edit') as HTMLTextAreaElement
+    await until(() => expect(ta.hidden).toBe(false))
+    ta.value = 'Plan'
+    ta.dispatchEvent(new Event('input'))
+    key(ta, 'Escape')
+    await until(() => expect(root.querySelector('.wb-obj[data-type="frame"] text')?.textContent).toContain('Plan'))
+    tool('note')
+    click(svg, 300, 250)
+    const ta2 = root.querySelector('textarea.wb-edit') as HTMLTextAreaElement
+    await until(() => expect(ta2.hidden).toBe(false))
+    key(ta2, 'Escape')
+    await until(() => expect(root.querySelectorAll('.wb-obj')).toHaveLength(2))
+    // the frame sits behind the note whatever the order they were made in
+    const order = [...root.querySelectorAll('.wb-obj')].map((g) => g.getAttribute('data-type'))
+    expect(order[0]).toBe('frame')
+    tool('select')
+    const noteX = () => Number(root.querySelector('.wb-obj[data-type="note"] rect')!.getAttribute('x'))
+    const frameX = () => Number(root.querySelector('.wb-obj[data-type="frame"] rect')!.getAttribute('x'))
+    const [n0, f0] = [noteX(), frameX()]
+    // drag the frame by its title band
+    drag(svg, [300, 110], [380, 110])
+    await until(() => {
+      expect(frameX()).toBe(f0 + 80)
+      expect(noteX()).toBe(n0 + 80)
+    })
+  })
+
+  it('a template puts its frames and notes on the board as one step and undo takes them away', async () => {
+    const { root } = start('write')
+    ;(root.querySelector('[data-testid="templates"]') as HTMLButtonElement).click()
+    const kanban = document.querySelector('[data-template="kanban"]') as HTMLButtonElement
+    expect(document.body.textContent).toContain(tr.tplKanbanText)
+    kanban.click()
+    await until(() => {
+      expect(root.querySelectorAll('.wb-obj[data-type="frame"]')).toHaveLength(3)
+      expect(root.querySelectorAll('.wb-obj[data-type="note"]')).toHaveLength(1)
+    })
+    expect(root.textContent).toContain(tr.tplTodo)
+    ;(root.querySelector('[aria-label^="Undo"]') as HTMLButtonElement).click()
+    await until(() => expect(root.querySelectorAll('.wb-obj')).toHaveLength(0))
+  })
+
+  it('a reader has no template button', () => {
+    const { root } = start('read')
+    expect(root.querySelector('[data-testid="templates"]')).toBeNull()
+  })
+})
+
