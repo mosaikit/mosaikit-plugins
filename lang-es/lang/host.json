@@ -2134,5 +2134,10 @@
   "Delete the subgroup": "Eliminar el subgrupo",
   "Add a subgroup": "Añadir un subgrupo",
   "Not in a group": "Fuera de un grupo",
-  "They show below the groups, in one list.": "Aparecen debajo de los grupos, en una sola lista."
+  "They show below the groups, in one list.": "Aparecen debajo de los grupos, en una sola lista.",
+  "Suggested by the app": "Sugeridos por la app",
+  "Level for the suggested people": "Nivel para las personas sugeridas",
+  "Already shared with them": "Ya compartido con ellos",
+  "Share with {n}": "Compartir con {n}",
+  "Shared with {n}": "Compartido con {n}"
 }
