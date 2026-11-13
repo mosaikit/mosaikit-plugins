@@ -24,6 +24,10 @@ const en = {
   create: 'Create', save: 'Save', cancel: 'Cancel', close: 'Close', edit: 'Edit', remove: 'Remove', share: 'Share…', del: 'Delete project',
   newTitle: 'New project', removeConfirm: 'Remove “{n}”?', delConfirm: 'Delete the project “{n}”? Its tasks stay in Tasks.',
   failed: 'Could not start the UI of the plugin: ', loadFailed: 'Could not load the projects: ',
+  tBurndown: 'Burndown', burnScope: 'Burndown of', burnProject: 'The whole project', burnNoDatesTitle: 'No dates to draw against', burnNoDatesText: 'A burndown needs a start and an end: give the project its dates in Details, or pick a sprint.',
+  burnNoTasksTitle: 'No tasks to burn down', burnNoTasksText: 'Add tasks to the project (or to the sprint) and the chart draws itself.',
+  burnSummary: '{r} of {t} tasks still open, {d} done', burnBehind: 'behind the ideal line by {n}', burnAhead: 'ahead of the ideal line by {n}', burnOnTrack: 'on the ideal line', burnIdeal: 'Ideal', burnActual: 'Open tasks',
+  burnUndated: '{n} finished task(s) have no completion day (they were finished before Tasks 0.7.1 kept it): they count as done from the first day.', burnScopeNote: 'The tasks counted are the ones the project has today; the days come from the completion day kept by Tasks.',
 }
 export type Texts = typeof en
 export type L = string
@@ -52,6 +56,10 @@ const it: Texts = {
   create: 'Crea', save: 'Salva', cancel: 'Annulla', close: 'Chiudi', edit: 'Modifica', remove: 'Rimuovi', share: 'Condividi…', del: 'Elimina progetto',
   newTitle: 'Nuovo progetto', removeConfirm: 'Rimuovere “{n}”?', delConfirm: 'Eliminare il progetto “{n}”? Le sue attività restano in Attività.',
   failed: 'Impossibile avviare la UI del plugin: ', loadFailed: 'Impossibile caricare i progetti: ',
+  tBurndown: 'Burndown', burnScope: 'Burndown di', burnProject: 'Tutto il progetto', burnNoDatesTitle: 'Nessuna data su cui disegnare', burnNoDatesText: 'Un burndown ha bisogno di un inizio e di una fine: dai al progetto le sue date in Dettagli, oppure scegli uno sprint.',
+  burnNoTasksTitle: 'Nessuna attività da smaltire', burnNoTasksText: 'Aggiungi attività al progetto (o allo sprint) e il grafico si disegna da solo.',
+  burnSummary: '{r} attività su {t} ancora aperte, {d} completate', burnBehind: 'indietro rispetto alla linea ideale di {n}', burnAhead: 'avanti rispetto alla linea ideale di {n}', burnOnTrack: 'sulla linea ideale', burnIdeal: 'Ideale', burnActual: 'Attività aperte',
+  burnUndated: '{n} attività completate non hanno il giorno di completamento (erano finite prima che Attività lo conservasse): contano come fatte dal primo giorno.', burnScopeNote: 'Le attività contate sono quelle che il progetto ha oggi; i giorni vengono dal giorno di completamento conservato da Attività.',
 }
 const es: Texts = {
   title: 'Proyectos', newProject: '＋ Nuevo proyecto', filter: 'Estado',
@@ -77,6 +85,10 @@ const es: Texts = {
   create: 'Crear', save: 'Guardar', cancel: 'Cancelar', close: 'Cerrar', edit: 'Editar', remove: 'Quitar', share: 'Compartir…', del: 'Eliminar proyecto',
   newTitle: 'Nuevo proyecto', removeConfirm: '¿Quitar “{n}”?', delConfirm: '¿Eliminar el proyecto “{n}”? Sus tareas siguen en Tareas.',
   failed: 'No se pudo iniciar la interfaz del plugin: ', loadFailed: 'No se pudieron cargar los proyectos: ',
+  tBurndown: 'Burndown', burnScope: 'Burndown de', burnProject: 'Todo el proyecto', burnNoDatesTitle: 'No hay fechas sobre las que dibujar', burnNoDatesText: 'Un burndown necesita un inicio y un final: da al proyecto sus fechas en Detalles, o elige un sprint.',
+  burnNoTasksTitle: 'No hay tareas que quemar', burnNoTasksText: 'Añade tareas al proyecto (o al sprint) y el gráfico se dibuja solo.',
+  burnSummary: '{r} de {t} tareas aún abiertas, {d} hechas', burnBehind: 'por detrás de la línea ideal en {n}', burnAhead: 'por delante de la línea ideal en {n}', burnOnTrack: 'sobre la línea ideal', burnIdeal: 'Ideal', burnActual: 'Tareas abiertas',
+  burnUndated: '{n} tarea(s) terminadas no tienen día de finalización (se terminaron antes de que Tareas lo guardara): cuentan como hechas desde el primer día.', burnScopeNote: 'Las tareas contadas son las que el proyecto tiene hoy; los días vienen del día de finalización que guarda Tareas.',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
 // (`lang/ui/<plugin id>.json`, English phrase → translation, read through `msk.t`), once `bindTexts` has run; the English

@@ -254,7 +254,7 @@ fn for_project(ctx: &Ctx, args: Value) -> Result<Value> {
     }
     let rows = ctx.db().query(
         "select t.resource_id::text as id, t.title, t.due::text as due, coalesce(t.done, false) as done,
-                t.priority, t.labels, v.owner_name as owner
+                t.completed_on::text as completed_on, t.priority, t.labels, v.owner_name as owner
          from tasks t join core.visible_resources v on v.id = t.resource_id
          where v.kind = 'tasks' and lower(trim(t.project)) = lower($1)
          order by t.due is null, t.due, t.title limit 500",
