@@ -29,6 +29,14 @@ export interface Occ {
   no: number
   maybe: number
   mine: string
+  /** the time zone of the event (empty: local times, nothing converted) */
+  timezone?: string
+  /** the first day of the occurrence in the series, before any change of day */
+  orig?: string
+  /** the occurrence has an exception of its own (changed title, place or times) */
+  exception?: boolean
+  /** what the event says in its own zone, when the occurrence is shown in the zone of the viewer */
+  own?: { start: string; end: string; starts_time: string; ends_time: string }
 }
 
 export interface TaskDue {
@@ -305,7 +313,112 @@ export function parsePeople(raw: unknown): Person[] {
   }
 }
 
+
+// ------------------------------------------------------------------------------------------------------- time zones
+
+/** Whether `zone` is a time zone name this browser knows (`Europe/Rome`, `UTC`). */
+export function validZone(zone: string): boolean {
+  if (!zone) return false
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: zone })
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** The time zone of the person (the one of the browser). */
+export function viewerZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  } catch {
+    return 'UTC'
+  }
+}
+
+/** The names offered in the form: the zones the browser lists, `UTC` first. */
+export function zoneNames(): string[] {
+  let all: string[] = []
+  try {
+    all = (Intl as unknown as { supportedValuesOf?: (k: string) => string[] }).supportedValuesOf?.('timeZone') ?? []
+  } catch {
+    all = []
+  }
+  return ['UTC', ...all.filter((z) => z !== 'UTC')]
+}
+
+const zoneFormats = new Map<string, Intl.DateTimeFormat>()
+function zoneFormat(zone: string): Intl.DateTimeFormat {
+  let f = zoneFormats.get(zone)
+  if (!f) {
+    f = new Intl.DateTimeFormat('en-US', { timeZone: zone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    zoneFormats.set(zone, f)
+  }
+  return f
+}
+
+/** The wall clock of an instant (ms since 1970) in a zone. */
+export function instantToWall(ms: number, zone: string): { date: string; time: string } {
+  const p: Record<string, string> = {}
+  for (const x of zoneFormat(zone).formatToParts(new Date(ms))) p[x.type] = x.value
+  return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour === '24' ? '00' : p.hour}:${p.minute}` }
+}
+
+/** The offset of a zone from UTC at an instant, in minutes (east positive). */
+function offsetMin(ms: number, zone: string): number {
+  const w = instantToWall(ms, zone)
+  const [y, m, d] = w.date.split('-').map(Number)
+  const [h, mi] = w.time.split(':').map(Number)
+  return Math.round((Date.UTC(y, m - 1, d, h, mi) - Math.floor(ms / 60000) * 60000) / 60000)
+}
+
+/** The instant (ms) of a wall clock in a zone: `2026-11-12` `09:30` in `Europe/Rome` is 08:30 UTC. */
+export function wallToInstant(date: string, time: string, zone: string): number {
+  const [y, m, d] = date.split('-').map(Number)
+  const [h, mi] = time.split(':').map(Number)
+  const guess = Date.UTC(y, m - 1, d, h, mi)
+  const o1 = offsetMin(guess, zone)
+  const first = guess - o1 * 60000
+  const o2 = offsetMin(first, zone)
+  return o2 === o1 ? first : guess - o2 * 60000
+}
+
+/**
+ * An occurrence of an event that has a time zone, shown in another zone: its days and times move to the wall clock of
+ * the viewer (the day can change). An all-day event, one with no start time and one in the viewer's own zone stay as they
+ * are. `own` keeps what the event itself says (its zone) for the edit forms and the detail.
+ */
+export function convertOcc(o: Occ, viewer: string): Occ {
+  const zone = o.timezone
+  if (!zone || o.all_day || !isTime(o.starts_time) || zone === viewer || !validZone(zone) || !validZone(viewer)) return o
+  const own = { start: o.start, end: o.end, starts_time: o.starts_time, ends_time: o.ends_time }
+  const s = instantToWall(wallToInstant(o.start, o.starts_time, zone), viewer)
+  let end = addDays(s.date, daysBetween(o.start, o.end))
+  let endTime = ''
+  if (isTime(o.ends_time)) {
+    const e = instantToWall(wallToInstant(o.end, o.ends_time, zone), viewer)
+    end = e.date
+    endTime = e.time
+  }
+  return { ...o, start: s.date, end, starts_time: s.time, ends_time: endTime, own }
+}
+
 // ------------------------------------------------------------------------------------------------------------ .ics
+
+export interface IcsException {
+  on: string
+  skipped: boolean
+  title: string | null
+  location: string | null
+  starts_time: string | null
+  ends_time: string | null
+}
+
+export interface IcsPerson {
+  id: string
+  name: string
+  answer: string
+}
 
 export interface IcsEvent {
   id: string
@@ -319,6 +432,10 @@ export interface IcsEvent {
   all_day: boolean
   repeat: string
   repeat_until: string
+  /** the time zone of the event ('' for floating local times) */
+  timezone?: string
+  attendees?: IcsPerson[]
+  exceptions?: IcsException[]
 }
 
 /** Escapes a text value (RFC 5545 3.3.11): backslash, semicolon, comma and line breaks. */
@@ -358,27 +475,60 @@ export function icsStamp(d: Date): string {
   return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`
 }
 
-/** The lines of one VEVENT. A whole-day event ends on the day after its last day (DTEND is not included). Times are floating. */
+const PARTSTAT: Record<string, string> = { yes: 'ACCEPTED', no: 'DECLINED', maybe: 'TENTATIVE' }
+
+/** `YYYYMMDDTHHMMSSZ` of an instant given in ms. */
+const utcStamp = (ms: number) => icsStamp(new Date(ms))
+
+/** The lines of one VEVENT, plus the changed occurrences of its series (VEVENT with RECURRENCE-ID). A whole-day event ends on
+ *  the day after its last day (DTEND is not included). Times are floating, or in the TZID of the event when it has a zone
+ *  (the UNTIL of a series is then in UTC, as the format asks). The invited are ATTENDEE lines with their answer. */
 export function icsEvent(e: IcsEvent, stamp: string): string[] {
   const end = e.ends_on || e.starts_on
   const timed = !e.all_day && isTime(e.starts_time)
-  const lines = ['BEGIN:VEVENT', `UID:${e.id}@mosaikit-calendar`, `DTSTAMP:${stamp}`]
-  if (timed) {
-    const endTime = isTime(e.ends_time) ? e.ends_time : endAfter(e.starts_time)
-    lines.push(`DTSTART:${compact(e.starts_on)}T${clock(e.starts_time)}`, `DTEND:${compact(end)}T${clock(endTime)}`)
-  } else {
-    lines.push(`DTSTART;VALUE=DATE:${compact(e.starts_on)}`, `DTEND;VALUE=DATE:${compact(addDays(end, 1))}`)
-  }
+  const zone = timed && e.timezone && validZone(e.timezone) ? e.timezone : ''
+  const prop = (name: string, date: string, time?: string) =>
+    time === undefined ? `${name};VALUE=DATE:${compact(date)}` : zone ? `${name};TZID=${zone}:${compact(date)}T${clock(time)}` : `${name}:${compact(date)}T${clock(time)}`
+  const uid = `UID:${e.id}@mosaikit-calendar`
+  const endTime = isTime(e.ends_time) ? e.ends_time : endAfter(e.starts_time)
+  const lines = ['BEGIN:VEVENT', uid, `DTSTAMP:${stamp}`]
+  if (timed) lines.push(prop('DTSTART', e.starts_on, e.starts_time), prop('DTEND', end, endTime))
+  else lines.push(prop('DTSTART', e.starts_on), prop('DTEND', addDays(end, 1)))
   lines.push(`SUMMARY:${icsEscape(e.title)}`)
   if (e.location) lines.push(`LOCATION:${icsEscape(e.location)}`)
   if (e.details) lines.push(`DESCRIPTION:${icsEscape(e.details)}`)
   const freq: Record<string, string> = { daily: 'DAILY', weekly: 'WEEKLY', monthly: 'MONTHLY', yearly: 'YEARLY' }
   if (freq[e.repeat]) {
     let rule = `RRULE:FREQ=${freq[e.repeat]}`
-    if (e.repeat_until) rule += `;UNTIL=${compact(e.repeat_until)}${timed ? 'T235959' : ''}`
+    if (e.repeat_until) rule += `;UNTIL=${zone ? utcStamp(wallToInstant(e.repeat_until, '23:59', zone) + 59_000) : compact(e.repeat_until) + (timed ? 'T235959' : '')}`
     lines.push(rule)
+    // an occurrence that was removed (a changed one is written again below with its RECURRENCE-ID)
+    for (const x of (e.exceptions ?? []).filter((x) => x.skipped)) lines.push(timed ? prop('EXDATE', x.on, e.starts_time) : `EXDATE;VALUE=DATE:${compact(x.on)}`)
+  }
+  for (const p of e.attendees ?? []) {
+    const name = p.name.replace(/"/g, '').replace(/\s+/g, ' ')
+    lines.push(`ATTENDEE;CN="${name}";ROLE=REQ-PARTICIPANT;PARTSTAT=${PARTSTAT[p.answer] ?? 'NEEDS-ACTION'}:urn:uuid:${p.id}`)
   }
   lines.push('END:VEVENT')
+  if (freq[e.repeat]) {
+    const days = daysBetween(e.starts_on, end)
+    for (const x of (e.exceptions ?? []).filter((x) => !x.skipped)) {
+      const st = x.starts_time ?? e.starts_time
+      const en = x.ends_time ?? e.ends_time
+      const l = ['BEGIN:VEVENT', uid, `DTSTAMP:${stamp}`]
+      const exTimed = timed && isTime(st)
+      const exEnd = addDays(x.on, days)
+      l.push(exTimed ? prop('RECURRENCE-ID', x.on, e.starts_time) : `RECURRENCE-ID;VALUE=DATE:${compact(x.on)}`)
+      if (exTimed) l.push(prop('DTSTART', x.on, st), prop('DTEND', exEnd, isTime(en) && (days > 0 || en > st) ? en : endAfter(st)))
+      else l.push(prop('DTSTART', x.on), prop('DTEND', addDays(exEnd, 1)))
+      l.push(`SUMMARY:${icsEscape(x.title || e.title)}`)
+      const place = x.location ?? e.location
+      if (place) l.push(`LOCATION:${icsEscape(place)}`)
+      if (e.details) l.push(`DESCRIPTION:${icsEscape(e.details)}`)
+      l.push('END:VEVENT')
+      lines.push(...l)
+    }
+  }
   return lines
 }
 

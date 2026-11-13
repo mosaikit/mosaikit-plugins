@@ -1,13 +1,13 @@
 id = "com.mosaikit.calendar"
 name = "Calendar"
-version = "0.2.0"
+version = "0.3.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "calendar-days"
 description = "The agenda of the team: month, week and day views, events with invited people, repeats and the due dates of your tasks"
 author = "Mosaikit"
 license = "Apache-2.0"
-details = "Write an event with its day, its time and a repeat (every day, week, month or year), invite people of your organisation and see everything in a month, week or day view. The invitees answer yes, maybe or no, and everybody sees who is coming. Times are written as local times, exactly as you type them: there is no time zone conversion, so a meeting at 09:30 is at 09:30 for everyone.\n\nThe open tasks with a due date appear next to the events (you can switch them off), so deadlines and meetings are in one place. An event is an item of the platform: share it with the invitees so that they can see it and answer, and download it as an .ics file to add it to another calendar."
+details = "Write an event with its day, its time and a repeat (every day, week, month or year), invite people of your organisation and see everything in a month, week or day view. The invitees answer yes, maybe or no, and everybody sees who is coming. Times are local times, exactly as you type them, unless you give the event a time zone: then it shows at the right hour wherever each person is. In a repeating series you can change or delete a single occurrence.\n\nThe open tasks with a due date appear next to the events (you can switch them off), so deadlines and meetings are in one place. An event is an item of the platform: share it with the invitees so that they can see it and answer, and download it as an .ics file to add it to another calendar."
 screenshots = ["month.webp", "invitation.webp"]
 homepage = "https://example.org/mosaikit/plugins/calendar"
 
@@ -35,6 +35,7 @@ fields = [
   { key = "repeat", label = "Repeat", kind = "choice", options = ["none", "daily", "weekly", "monthly", "yearly"] },
   { key = "repeat_until", label = "Repeat until", kind = "date" },
   { key = "attendees", label = "Invitees", kind = "text", hidden = true },
+  { key = "timezone", label = "Time zone", kind = "text" },
   { key = "color", label = "Color", kind = "choice", options = ["blue", "green", "red", "orange", "purple", "grey"] },
 ]
 
@@ -66,14 +67,14 @@ data = { command = "events.widget_today", kind = "list", size = "m", texts = { e
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
-details = "Scrivi un evento con il giorno, l’ora e una ripetizione (ogni giorno, settimana, mese o anno), invita le persone della tua organizzazione e guarda tutto in una vista per mese, settimana o giorno. Gli invitati rispondono sì, forse o no, e tutti vedono chi partecipa. Gli orari sono orari locali, scritti esattamente come li digiti: non c’è conversione di fuso orario, quindi una riunione alle 09:30 è alle 09:30 per tutti.\n\nLe attività aperte con una scadenza compaiono accanto agli eventi (puoi nasconderle), così scadenze e riunioni sono nello stesso posto. Un evento è un elemento della piattaforma: condividilo con gli invitati perché lo vedano e rispondano, e scaricalo come file .ics per aggiungerlo a un altro calendario."
+details = "Scrivi un evento con il giorno, l’ora e una ripetizione (ogni giorno, settimana, mese o anno), invita le persone della tua organizzazione e guarda tutto in una vista per mese, settimana o giorno. Gli invitati rispondono sì, forse o no, e tutti vedono chi partecipa. Gli orari sono orari locali, scritti esattamente come li digiti, a meno che tu non dia all’evento un fuso orario: allora compare all’ora giusta ovunque si trovi ciascuno. In una serie che si ripete puoi cambiare o eliminare una sola occorrenza.\n\nLe attività aperte con una scadenza compaiono accanto agli eventi (puoi nasconderle), così scadenze e riunioni sono nello stesso posto. Un evento è un elemento della piattaforma: condividilo con gli invitati perché lo vedano e rispondano, e scaricalo come file .ics (con gli invitati) per aggiungerlo a un altro calendario."
 name = "Calendario"
 description = "L’agenda del team: viste per mese, settimana e giorno, eventi con persone invitate, ripetizioni e le scadenze delle tue attività"
 label = "Calendario"
 
 [i18n.it.resources.events]
 label = "Eventi"
-fields = { title = "Titolo", details = "Dettagli", location = "Luogo", starts_on = "Inizia il", starts_time = "Ora di inizio", ends_on = "Finisce il", ends_time = "Ora di fine", all_day = "Tutto il giorno", repeat = "Ripeti", repeat_until = "Ripeti fino al", attendees = "Invitati", color = "Colore" }
+fields = { title = "Titolo", details = "Dettagli", location = "Luogo", starts_on = "Inizia il", starts_time = "Ora di inizio", ends_on = "Finisce il", ends_time = "Ora di fine", all_day = "Tutto il giorno", repeat = "Ripeti", repeat_until = "Ripeti fino al", attendees = "Invitati", timezone = "Fuso orario", color = "Colore" }
 options.repeat = { none = "mai", daily = "ogni giorno", weekly = "ogni settimana", monthly = "ogni mese", yearly = "ogni anno" }
 options.color = { blue = "blu", green = "verde", red = "rosso", orange = "arancione", purple = "viola", grey = "grigio" }
 

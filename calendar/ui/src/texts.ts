@@ -21,6 +21,10 @@ const en = {
   answerYes: 'Yes', answerMaybe: 'Maybe', answerNo: 'No', myAnswer: 'Your answer', noAnswer: 'No answer yet', wordYes: 'coming', wordNo: 'not coming', wordMaybe: 'maybe',
   counts: '{y} yes · {m} maybe · {n} no', answered: 'Your answer: {a}', answerSaved: 'Answer saved',
   addIcs: 'Add to my calendar (.ics)', edit: 'Edit', share: 'Share…', remove: 'Delete', removeConfirm: 'Delete the event “{n}”? Every occurrence disappears.', removeSeriesConfirm: 'Delete the event “{n}”? The whole series is deleted.',
+  fZone: 'Time zone', zoneNone: 'Local time (no conversion)', zoneNote: 'Times are in {z}; you see them at the hour of {m}.', inZone: 'In the time zone of the event: {t} ({z})',
+  editSeries: 'Edit the series', editOccurrence: 'Edit this occurrence', removeOccurrence: 'Delete this occurrence', restoreOccurrence: 'Restore this occurrence',
+  removeOccurrenceConfirm: 'Delete only the occurrence of {d}? The rest of the series stays.', occurrenceOf: 'Occurrence of {d}. The other occurrences do not change.',
+  changedOccurrence: 'This occurrence was changed from the series.', timesInZone: 'Times in the time zone {z}.',
   close: 'Close', failed: 'Could not start the UI of the plugin: ', loadFailed: 'Could not load the calendar: ', tasksFailed: 'The task due dates are not available: ',
   owner: 'Organised by {n}', exportEmpty: 'No events to export in this month.',
 }
@@ -48,6 +52,10 @@ const it: Texts = {
   answerYes: 'Sì', answerMaybe: 'Forse', answerNo: 'No', myAnswer: 'La tua risposta', noAnswer: 'Nessuna risposta', wordYes: 'partecipa', wordNo: 'non partecipa', wordMaybe: 'forse',
   counts: '{y} sì · {m} forse · {n} no', answered: 'La tua risposta: {a}', answerSaved: 'Risposta salvata',
   addIcs: 'Aggiungi al mio calendario (.ics)', edit: 'Modifica', share: 'Condividi…', remove: 'Elimina', removeConfirm: 'Eliminare l’evento “{n}”? Spariscono tutte le occorrenze.', removeSeriesConfirm: 'Eliminare l’evento “{n}”? Si elimina tutta la serie.',
+  fZone: 'Fuso orario', zoneNone: 'Ora locale (nessuna conversione)', zoneNote: 'Gli orari sono in {z}; li vedi all’ora di {m}.', inZone: 'Nel fuso orario dell’evento: {t} ({z})',
+  editSeries: 'Modifica la serie', editOccurrence: 'Modifica questa occorrenza', removeOccurrence: 'Elimina questa occorrenza', restoreOccurrence: 'Ripristina questa occorrenza',
+  removeOccurrenceConfirm: 'Eliminare solo l’occorrenza del {d}? Il resto della serie resta.', occurrenceOf: 'Occorrenza del {d}. Le altre occorrenze non cambiano.',
+  changedOccurrence: 'Questa occorrenza è stata cambiata rispetto alla serie.', timesInZone: 'Orari nel fuso orario {z}.',
   close: 'Chiudi', failed: 'Impossibile avviare la UI del plugin: ', loadFailed: 'Impossibile caricare il calendario: ', tasksFailed: 'Le scadenze delle attività non sono disponibili: ',
   owner: 'Organizzato da {n}', exportEmpty: 'Nessun evento da esportare in questo mese.',
 }
@@ -72,6 +80,10 @@ const es: Texts = {
   answerYes: 'Sí', answerMaybe: 'Quizá', answerNo: 'No', myAnswer: 'Tu respuesta', noAnswer: 'Sin respuesta', wordYes: 'asiste', wordNo: 'no asiste', wordMaybe: 'quizá',
   counts: '{y} sí · {m} quizá · {n} no', answered: 'Tu respuesta: {a}', answerSaved: 'Respuesta guardada',
   addIcs: 'Añadir a mi calendario (.ics)', edit: 'Editar', share: 'Compartir…', remove: 'Eliminar', removeConfirm: '¿Eliminar el evento “{n}”? Desaparecen todas las repeticiones.', removeSeriesConfirm: '¿Eliminar el evento “{n}”? Se elimina toda la serie.',
+  fZone: 'Zona horaria', zoneNone: 'Hora local (sin conversión)', zoneNote: 'Las horas están en {z}; las ves a la hora de {m}.', inZone: 'En la zona horaria del evento: {t} ({z})',
+  editSeries: 'Editar la serie', editOccurrence: 'Editar esta repetición', removeOccurrence: 'Eliminar esta repetición', restoreOccurrence: 'Restaurar esta repetición',
+  removeOccurrenceConfirm: '¿Eliminar solo la repetición del {d}? El resto de la serie se queda.', occurrenceOf: 'Repetición del {d}. Las demás repeticiones no cambian.',
+  changedOccurrence: 'Esta repetición se cambió respecto a la serie.', timesInZone: 'Horas en la zona horaria {z}.',
   close: 'Cerrar', failed: 'No se pudo iniciar la interfaz del plugin: ', loadFailed: 'No se pudo cargar el calendario: ', tasksFailed: 'Los vencimientos de tareas no están disponibles: ',
   owner: 'Organizado por {n}', exportEmpty: 'No hay eventos que exportar en este mes.',
 }

@@ -378,7 +378,28 @@ fn event(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     }
     let people = parse_attendees(&v.str("attendees"))?;
     v.set("attendees", attendees_json(&people));
+    let zone = v.str("timezone").trim().to_string();
+    if !zone.is_empty() && !zone_like(&zone) {
+        return Err(Error::coded(
+            "event_timezone",
+            "the time zone is a name such as Europe/Rome, or empty for local times",
+        ));
+    }
+    // an all-day event has no time of the day to convert
+    v.set("timezone", if v.bool("all_day") { String::new() } else { zone });
     Ok(Some(v))
+}
+
+/// Whether `s` looks like the name of an IANA time zone (`UTC`, `Europe/Rome`, `America/Argentina/Buenos_Aires`).
+fn zone_like(s: &str) -> bool {
+    s.len() <= 64
+        && s.split('/').count() <= 3
+        && s.split('/').all(|p| {
+            !p.is_empty()
+                && p.chars()
+                    .all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '+' | '-'))
+        })
+        && s.chars().next().is_some_and(|c| c.is_ascii_alphabetic())
 }
 
 // ---------------------------------------------------------------------------------------------------------- commands
@@ -422,7 +443,7 @@ fn date_arg(args: &Value, key: &str) -> Result<String> {
     Ok(s.to_string())
 }
 
-const EVENT_COLUMNS: &str = "resource_id::text as id, title, location, starts_on::text as starts_on, starts_time, ends_on::text as ends_on, ends_time, all_day, repeat, repeat_until::text as repeat_until, attendees, color";
+const EVENT_COLUMNS: &str = "resource_id::text as id, title, location, starts_on::text as starts_on, starts_time, ends_on::text as ends_on, ends_time, all_day, repeat, repeat_until::text as repeat_until, attendees, color, timezone";
 
 /// The date of today, from the database (the guest has no clock).
 fn today(ctx: &Ctx) -> Result<String> {
@@ -480,6 +501,267 @@ fn invited(r: &Value, user: &str) -> bool {
 const RSVPS_SQL: &str =
     "select resource_id::text as id, user_id::text as user_id, answer from rsvps";
 
+/// What an exception changes in one occurrence of a series (`skipped` removes it).
+const EXCEPTIONS_SQL: &str = "select resource_id::text as id, on_date::text as on_date, skipped, title, location, starts_time, ends_time from exceptions";
+
+/// Applies the exception row `e` to the JSON of an occurrence: a changed title, place or time.
+fn apply_exception(occ: &mut Value, e: &Value) {
+    for k in ["title", "location", "starts_time", "ends_time"] {
+        // null leaves the value of the series, an empty text clears it (a title never empties)
+        if let Some(t) = e.get(k).and_then(Value::as_str) {
+            if k != "title" || !t.is_empty() {
+                occ[k] = json!(t);
+            }
+        }
+    }
+    occ["exception"] = json!(true);
+}
+
+fn exception_for<'a>(excs: &'a [Value], id: &str, on: &str) -> Option<&'a Value> {
+    excs.iter()
+        .find(|e| text(e, "id") == id && text(e, "on_date") == on)
+}
+
+/// A time of an exception: absent (unchanged), empty (cleared) or `HH:MM`.
+fn opt_time(args: &Value, key: &str) -> Result<Option<String>> {
+    match args.get(key).and_then(Value::as_str) {
+        None => Ok(None),
+        Some(t) => {
+            let t = t.trim();
+            if !t.is_empty() && parse_time(t).is_none() {
+                return Err(Error::coded(
+                    "event_time",
+                    "a time is written HH:MM, from 00:00 to 23:59",
+                ));
+            }
+            Ok(Some(t.to_string()))
+        }
+    }
+}
+
+/// The event `id` and the first day `on` of one of its occurrences; the caller must be able to write the event, which
+/// must repeat, and `on` must be the first day of an occurrence. Gives the event row.
+fn occurrence_target(ctx: &Ctx, args: &Value) -> Result<(String, String, Value)> {
+    let id = id_arg(args)?;
+    let on = date_arg(args, "on")?;
+    let row = ctx.db().query_one(
+        &format!("select {EVENT_COLUMNS}, core.level_of(resource_id)::int as lvl from events where resource_id = $1::uuid"),
+        &[json!(id)],
+    )?;
+    let Some(r) = row else {
+        return Err(Error::coded("event_missing", "the event does not exist"));
+    };
+    if r.get("lvl").and_then(Value::as_i64).unwrap_or(0) < 2 {
+        return Err(Error::coded(
+            "permission_denied",
+            "only a person who can edit the event changes one of its occurrences",
+        ));
+    }
+    let repeat = text(&r, "repeat");
+    if repeat.is_empty() || repeat == "none" {
+        return Err(Error::coded(
+            "not_recurring",
+            "only an event that repeats has occurrences of its own",
+        ));
+    }
+    if !row_occurrences(&r, &on, &on, 1)
+        .iter()
+        .any(|(s, _)| *s == on)
+    {
+        return Err(Error::coded(
+            "occurrence_missing",
+            "the event has no occurrence starting on that day",
+        ));
+    }
+    Ok((id, on, r))
+}
+
+/// Writes the exception of one occurrence: changes the row of that day or adds it.
+fn put_exception(
+    ctx: &Ctx,
+    id: &str,
+    on: &str,
+    skipped: bool,
+    f: [Option<&str>; 4],
+) -> Result<()> {
+    let tenant = ctx.tenant.clone().unwrap_or_default();
+    let cols: Vec<Value> = f.iter().map(|x| x.map_or(Value::Null, |t| json!(t))).collect();
+    let mut p = vec![json!(skipped)];
+    p.extend(cols.iter().cloned());
+    p.extend([json!(id), json!(on)]);
+    let n = ctx.db().exec(
+        "update exceptions set skipped = $1, title = $2, location = $3, starts_time = $4, ends_time = $5 where resource_id = $6::uuid and on_date = $7::date",
+        &p,
+    )?;
+    if n == 0 {
+        let mut p = vec![json!(id), json!(tenant), json!(on), json!(skipped)];
+        p.extend(cols);
+        ctx.db().exec(
+            "insert into exceptions (resource_id, tenant_id, on_date, skipped, title, location, starts_time, ends_time) values ($1::uuid, $2::uuid, $3::date, $4, $5, $6, $7, $8)",
+            &p,
+        )?;
+    }
+    Ok(())
+}
+
+/// The caller removes one occurrence of a series (the others stay).
+fn skip(ctx: &Ctx, args: Value) -> Result<Value> {
+    let (id, on, _) = occurrence_target(ctx, &args)?;
+    put_exception(ctx, &id, &on, true, [None; 4])?;
+    Ok(json!({ "skipped": on }))
+}
+
+/// The caller changes the title, place or times of one occurrence of a series.
+fn override_one(ctx: &Ctx, args: Value) -> Result<Value> {
+    let (id, on, r) = occurrence_target(ctx, &args)?;
+    let title = match args.get("title").and_then(Value::as_str) {
+        None => None,
+        Some(t) => {
+            let t: String = t.trim().chars().take(MAX_TITLE).collect();
+            if t.is_empty() {
+                return Err(Error::coded("event_title_empty", "an event needs a title"));
+            }
+            Some(t)
+        }
+    };
+    let location = args
+        .get("location")
+        .and_then(Value::as_str)
+        .map(|l| l.trim().to_string());
+    if location
+        .as_ref()
+        .is_some_and(|l| l.chars().count() > MAX_LOCATION)
+    {
+        return Err(Error::coded(
+            "event_location",
+            format!("the location has at most {MAX_LOCATION} characters"),
+        ));
+    }
+    let (st, et) = (
+        opt_time(&args, "starts_time")?,
+        opt_time(&args, "ends_time")?,
+    );
+    if flag(&r, "all_day") && (st.is_some() || et.is_some()) {
+        return Err(Error::coded(
+            "event_time",
+            "an all-day event has no times to change",
+        ));
+    }
+    let one_day = text(&r, "ends_on").is_empty() || text(&r, "starts_on") == text(&r, "ends_on");
+    let start_now = st.clone().unwrap_or_else(|| text(&r, "starts_time"));
+    let end_now = et.clone().unwrap_or_else(|| text(&r, "ends_time"));
+    if !end_now.is_empty() && start_now.is_empty() {
+        return Err(Error::coded("event_time", "an end time needs a start time"));
+    }
+    if one_day && !start_now.is_empty() && !end_now.is_empty() && end_now < start_now {
+        return Err(Error::coded(
+            "event_end_before_start",
+            "the event cannot end before it starts",
+        ));
+    }
+    put_exception(
+        ctx,
+        &id,
+        &on,
+        false,
+        [
+            title.as_deref(),
+            location.as_deref(),
+            st.as_deref(),
+            et.as_deref(),
+        ],
+    )?;
+    Ok(json!({ "changed": on }))
+}
+
+/// The caller brings an occurrence back to what the series says (removes its exception).
+fn restore(ctx: &Ctx, args: Value) -> Result<Value> {
+    let id = id_arg(&args)?;
+    let on = date_arg(&args, "on")?;
+    let level = ctx
+        .db()
+        .query_one(
+            "select core.level_of(resource_id)::int as lvl from events where resource_id = $1::uuid",
+            &[json!(id)],
+        )?
+        .and_then(|r| r.get("lvl").and_then(Value::as_i64))
+        .unwrap_or(0);
+    if level < 2 {
+        return Err(Error::coded(
+            "permission_denied",
+            "only a person who can edit the event changes one of its occurrences",
+        ));
+    }
+    ctx.db().exec(
+        "delete from exceptions where resource_id = $1::uuid and on_date = $2::date",
+        &[json!(id), json!(on)],
+    )?;
+    Ok(json!({ "restored": on }))
+}
+
+/// What the .ics file needs besides the events: for each event the exceptions of its series and who is invited with
+/// the answer (PARTSTAT). `ids` are the events (at most 500).
+fn ics_data(ctx: &Ctx, args: Value) -> Result<Value> {
+    let ids: Vec<String> = args
+        .get("ids")
+        .and_then(Value::as_array)
+        .map(|a| {
+            a.iter()
+                .filter_map(Value::as_str)
+                .filter(|i| uuid_like(i))
+                .take(MAX_PER_EVENT)
+                .map(str::to_string)
+                .collect()
+        })
+        .unwrap_or_default();
+    let mut out = serde_json::Map::new();
+    if ids.is_empty() {
+        return Ok(Value::Object(out));
+    }
+    let events = ctx.db().query(
+        &format!("select {EVENT_COLUMNS} from events limit 2000"),
+        &[],
+    )?;
+    let excs = ctx
+        .db()
+        .query(&format!("{EXCEPTIONS_SQL} order by on_date limit 5000"), &[])?;
+    let rs = ctx.db().query(
+        "select resource_id::text as id, user_id::text as user_id, answer from rsvps",
+        &[],
+    )?;
+    for r in events.iter().filter(|r| ids.contains(&text(r, "id"))) {
+        let id = text(r, "id");
+        let people: Vec<Value> = parse_attendees(&text(r, "attendees"))
+            .unwrap_or_default()
+            .iter()
+            .map(|p| {
+                let answer = rs
+                    .iter()
+                    .find(|a| text(a, "id") == id && text(a, "user_id") == p.id)
+                    .map(|a| text(a, "answer"))
+                    .unwrap_or_default();
+                json!({ "id": p.id, "name": p.name, "answer": answer })
+            })
+            .collect();
+        let list: Vec<Value> = excs
+            .iter()
+            .filter(|e| text(e, "id") == id)
+            .map(|e| {
+                json!({
+                    "on": text(e, "on_date"),
+                    "skipped": flag(e, "skipped"),
+                    "title": e.get("title").and_then(Value::as_str),
+                    "location": e.get("location").and_then(Value::as_str),
+                    "starts_time": e.get("starts_time").and_then(Value::as_str),
+                    "ends_time": e.get("ends_time").and_then(Value::as_str),
+                })
+            })
+            .collect();
+        out.insert(id, json!({ "attendees": people, "exceptions": list }));
+    }
+    Ok(Value::Object(out))
+}
+
 /// The events the caller sees, expanded into occurrences inside `from..=to`, and the due dates of Tasks.
 fn range(ctx: &Ctx, args: Value) -> Result<Value> {
     let (from, to) = (date_arg(&args, "from")?, date_arg(&args, "to")?);
@@ -499,6 +781,10 @@ fn range(ctx: &Ctx, args: Value) -> Result<Value> {
         &[json!(to)],
     )?;
     let rs = ctx.db().query(RSVPS_SQL, &[])?;
+    let excs = ctx.db().query(
+        &format!("{EXCEPTIONS_SQL} where on_date <= $1::date limit 5000"),
+        &[json!(to)],
+    )?;
     let mut out: Vec<Value> = Vec::new();
     'rows: for r in &rows {
         let id = text(r, "id");
@@ -508,7 +794,11 @@ fn range(ctx: &Ctx, args: Value) -> Result<Value> {
             if out.len() >= MAX_OCCURRENCES {
                 break 'rows;
             }
-            out.push(json!({
+            let exc = exception_for(&excs, &id, &s);
+            if exc.is_some_and(|x| flag(x, "skipped")) {
+                continue;
+            }
+            let mut occ = json!({
                 "id": id,
                 "title": text(r, "title"),
                 "location": text(r, "location"),
@@ -522,7 +812,14 @@ fn range(ctx: &Ctx, args: Value) -> Result<Value> {
                 "invitees": people.len(),
                 "invited": invited(r, &user),
                 "yes": yes, "no": no, "maybe": maybe, "mine": mine,
-            }));
+                "timezone": text(r, "timezone"),
+                "orig": s,
+                "exception": false,
+            });
+            if let Some(x) = exc {
+                apply_exception(&mut occ, x);
+            }
+            out.push(occ);
         }
     }
     let (tasks, tasks_error) = if args.get("tasks").and_then(Value::as_bool) == Some(false) {
@@ -650,7 +947,7 @@ fn invitations(ctx: &Ctx, _args: Value) -> Result<Value> {
             json!({
                 "id": id, "title": text(r, "title"), "location": text(r, "location"), "start": s, "end": e,
                 "starts_time": time, "ends_time": text(r, "ends_time"), "all_day": flag(r, "all_day"),
-                "color": text(r, "color"),
+                "color": text(r, "color"), "timezone": text(r, "timezone"),
             }),
         ));
     }
@@ -668,8 +965,16 @@ fn widget_today(ctx: &Ctx, _args: Value) -> Result<Value> {
         &[json!(tomorrow)],
     )?;
     let mut items: Vec<(String, String, String, String)> = Vec::new();
+    let excs = ctx.db().query(
+        &format!("{EXCEPTIONS_SQL} where on_date <= $1::date limit 5000"),
+        &[json!(tomorrow)],
+    )?;
     for r in &rows {
         for (s, e) in row_occurrences(r, &t, &tomorrow, MAX_PER_EVENT) {
+            let exc = exception_for(&excs, &text(r, "id"), &s);
+            if exc.is_some_and(|x| flag(x, "skipped")) {
+                continue;
+            }
             // a multi-day event shows on the days it covers: today and tomorrow, whichever it touches
             for day in [&t, &tomorrow] {
                 if s.as_str() <= day.as_str() && e.as_str() >= day.as_str() {
@@ -683,7 +988,11 @@ fn widget_today(ctx: &Ctx, _args: Value) -> Result<Value> {
                     } else {
                         format!("{day} {time}").trim().to_string()
                     };
-                    items.push((day.clone(), time, text(r, "title"), meta));
+                    let title = exc
+                        .and_then(|x| x.get("title").and_then(Value::as_str))
+                        .filter(|t| !t.is_empty())
+                        .map_or_else(|| text(r, "title"), str::to_string);
+                    items.push((day.clone(), time, title, meta));
                 }
             }
         }
@@ -707,6 +1016,10 @@ mosaikit_plugin_sdk::plugin! {
     commands: {
         "events.range" => range,
         "events.rsvp" => rsvp,
+        "events.skip" => skip,
+        "events.override" => override_one,
+        "events.restore" => restore,
+        "events.ics_data" => ics_data,
         "events.rsvps" => rsvps,
         "events.invitations" => invitations,
         "events.widget_today" => widget_today,
@@ -1360,5 +1673,209 @@ mod tests {
         assert_eq!(items[1]["meta"], "09:30");
         assert_eq!(items[3]["meta"], "2026-11-13 08:00");
         assert_eq!(out["more"], 0);
+    }
+}
+
+#[cfg(test)]
+mod exception_tests {
+    use super::*;
+    use mosaikit_plugin_sdk::testing::MockHost;
+    use std::{cell::RefCell, rc::Rc};
+
+    const EV: &str = "99999999-9999-9999-9999-999999999999";
+
+    fn series(lvl: i64) -> Value {
+        json!([{
+            "id": EV, "title": "Standup", "location": "", "starts_on": "2026-11-02", "starts_time": "09:30",
+            "ends_on": "2026-11-02", "ends_time": "10:00", "all_day": false, "repeat": "weekly",
+            "repeat_until": "", "attendees": "[]", "color": "blue", "timezone": "", "lvl": lvl,
+        }])
+    }
+
+    fn host(lvl: i64, seen: Rc<RefCell<Vec<String>>>) -> MockHost {
+        MockHost::new()
+            .on("db.query", move |_| Ok(series(lvl)))
+            .on("db.exec", move |req| {
+                seen.borrow_mut()
+                    .push(req["sql"].as_str().unwrap_or_default().to_string());
+                Ok(json!({ "rows": 0 }))
+            })
+    }
+
+    fn run(lvl: i64, cmd: &str, args: Value) -> (std::result::Result<Value, String>, Vec<String>) {
+        let seen = Rc::new(RefCell::new(Vec::new()));
+        let out = host(lvl, seen.clone()).command(&__msk_registry(), cmd, args);
+        let log = seen.borrow().clone();
+        (out, log)
+    }
+
+    #[test]
+    fn skipping_one_occurrence_writes_an_exception() {
+        let (out, sql) = run(2, "events.skip", json!({ "id": EV, "on": "2026-11-09" }));
+        assert_eq!(out.unwrap()["skipped"], "2026-11-09");
+        // the update finds nothing, so the row is inserted
+        assert!(sql[0].starts_with("update exceptions"));
+        assert!(sql[1].starts_with("insert into exceptions"));
+    }
+
+    #[test]
+    fn only_a_writer_changes_an_occurrence_that_exists_of_a_series() {
+        let a = json!({ "id": EV, "on": "2026-11-09" });
+        assert!(run(1, "events.skip", a).0.unwrap_err().contains("can edit"));
+        // 2026-11-10 is a Tuesday: the series is on Mondays
+        assert!(run(2, "events.skip", json!({ "id": EV, "on": "2026-11-10" }))
+            .0
+            .unwrap_err()
+            .contains("no occurrence"));
+        assert!(run(2, "events.skip", json!({ "id": EV, "on": "nonsense" }))
+            .0
+            .is_err());
+    }
+
+    #[test]
+    fn an_event_that_does_not_repeat_has_no_occurrences_of_its_own() {
+        let h = MockHost::new().on("db.query", |_| {
+            let mut r = series(2);
+            r[0]["repeat"] = json!("none");
+            Ok(r)
+        });
+        let e = h
+            .command(
+                &__msk_registry(),
+                "events.skip",
+                json!({ "id": EV, "on": "2026-11-02" }),
+            )
+            .unwrap_err();
+        assert!(e.contains("repeats"));
+    }
+
+    #[test]
+    fn an_override_checks_title_place_and_times() {
+        let on = "2026-11-09";
+        let ok = run(
+            2,
+            "events.override",
+            json!({ "id": EV, "on": on, "title": " Planning ", "starts_time": "11:00", "ends_time": "12:00" }),
+        );
+        assert!(ok.0.is_ok());
+        assert!(ok.1[0].starts_with("update exceptions"));
+        let bad = |a: Value| run(2, "events.override", a).0.unwrap_err();
+        assert!(bad(json!({ "id": EV, "on": on, "title": "  " })).contains("title"));
+        assert!(bad(json!({ "id": EV, "on": on, "starts_time": "25:00" })).contains("HH:MM"));
+        // the end cannot be before the start on a one-day event
+        assert!(bad(json!({ "id": EV, "on": on, "ends_time": "09:00" })).contains("end before"));
+        assert!(
+            bad(json!({ "id": EV, "on": on, "location": "x".repeat(MAX_LOCATION + 1) }))
+                .contains("at most")
+        );
+    }
+
+    #[test]
+    fn restoring_deletes_the_exception_of_a_writer_only() {
+        let (out, sql) = run(2, "events.restore", json!({ "id": EV, "on": "2026-11-09" }));
+        assert!(out.is_ok());
+        assert!(sql[0].starts_with("delete from exceptions"));
+        assert!(run(1, "events.restore", json!({ "id": EV, "on": "2026-11-09" }))
+            .0
+            .is_err());
+    }
+
+    #[test]
+    fn an_exception_changes_the_fields_it_names_and_marks_the_occurrence() {
+        let mut occ = json!({ "title": "Standup", "location": "Room 1", "starts_time": "09:30", "ends_time": "10:00" });
+        apply_exception(
+            &mut occ,
+            &json!({ "title": "Planning", "location": "", "starts_time": null, "ends_time": "11:00" }),
+        );
+        assert_eq!(occ["title"], "Planning");
+        assert_eq!(occ["location"], "");
+        assert_eq!(occ["starts_time"], "09:30");
+        assert_eq!(occ["ends_time"], "11:00");
+        assert_eq!(occ["exception"], true);
+    }
+
+    #[test]
+    fn range_drops_skipped_occurrences_and_applies_the_changed_ones() {
+        let h = MockHost::new().on("db.query", |req| {
+            let sql = req["sql"].as_str().unwrap_or_default();
+            if sql.contains("from exceptions") {
+                Ok(json!([
+                    { "id": EV, "on_date": "2026-11-09", "skipped": true },
+                    { "id": EV, "on_date": "2026-11-16", "skipped": false, "title": "Planning", "location": null, "starts_time": "11:00", "ends_time": null },
+                ]))
+            } else if sql.contains("from rsvps") {
+                Ok(json!([]))
+            } else {
+                Ok(series(2))
+            }
+        });
+        let out = h
+            .command(
+                &__msk_registry(),
+                "events.range",
+                json!({ "from": "2026-11-02", "to": "2026-11-22", "tasks": false }),
+            )
+            .unwrap();
+        let ev = out["events"].as_array().unwrap();
+        let days: Vec<&str> = ev.iter().map(|e| e["start"].as_str().unwrap()).collect();
+        assert_eq!(days, ["2026-11-02", "2026-11-16"]);
+        assert_eq!(ev[0]["exception"], false);
+        assert_eq!(ev[1]["title"], "Planning");
+        assert_eq!(ev[1]["starts_time"], "11:00");
+        assert_eq!(ev[1]["ends_time"], "10:00");
+        assert_eq!(ev[1]["orig"], "2026-11-16");
+    }
+
+    #[test]
+    fn the_ics_data_lists_exceptions_and_answers_of_the_invited() {
+        let a = "11111111-1111-1111-1111-111111111111";
+        let h = MockHost::new().on("db.query", move |req| {
+            let sql = req["sql"].as_str().unwrap_or_default();
+            if sql.contains("from exceptions") {
+                Ok(json!([{ "id": EV, "on_date": "2026-11-09", "skipped": true }]))
+            } else if sql.contains("from rsvps") {
+                Ok(json!([{ "id": EV, "user_id": a, "answer": "yes" }]))
+            } else {
+                let mut r = series(2);
+                r[0]["attendees"] = json!(format!("[{{\"id\":\"{a}\",\"name\":\"Ann\"}}]"));
+                Ok(r)
+            }
+        });
+        let out = h
+            .command(&__msk_registry(), "events.ics_data", json!({ "ids": [EV] }))
+            .unwrap();
+        assert_eq!(out[EV]["attendees"][0]["answer"], "yes");
+        assert_eq!(out[EV]["exceptions"][0]["skipped"], true);
+        assert_eq!(out[EV]["exceptions"][0]["title"], Value::Null);
+    }
+
+    #[test]
+    fn a_time_zone_is_a_name_or_empty() {
+        assert!(zone_like("UTC"));
+        assert!(zone_like("Europe/Rome"));
+        assert!(zone_like("America/Argentina/Buenos_Aires"));
+        assert!(zone_like("Etc/GMT+5"));
+        assert!(!zone_like("Europe//Rome"));
+        assert!(!zone_like("+02:00"));
+        assert!(!zone_like("Rome; drop"));
+        assert!(!zone_like(&"a".repeat(65)));
+        let run = |tz: &str, all_day: bool| {
+            MockHost::new().hook(
+                &__msk_registry(),
+                "before_create",
+                "events",
+                json!({ "title": "x", "starts_on": "2026-11-12", "timezone": tz, "all_day": all_day }),
+            )
+        };
+        assert_eq!(
+            run("Europe/Rome", false).unwrap().unwrap().str("timezone"),
+            "Europe/Rome"
+        );
+        assert!(run("Mars time", false).unwrap_err().contains("time zone"));
+        // all-day events have no zone
+        assert_eq!(
+            run("Europe/Rome", true).unwrap().unwrap().str("timezone"),
+            ""
+        );
     }
 }
