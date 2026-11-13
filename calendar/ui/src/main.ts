@@ -977,7 +977,7 @@ function mount(msk: Msk) {
     draw()
   })
   drawHead()
-  void reload()
+  void msk.loading(reload())
 }
 
 connect()

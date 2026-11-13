@@ -103,7 +103,7 @@ function start(msk: Msk) {
     app.replaceChildren(...parts)
   }
 
-  void Promise.all([tab.item(), tab.values()])
+  void msk.loading(Promise.all([tab.item(), tab.values()]))
     .then(([i, v]) => {
       item = i
       values = v

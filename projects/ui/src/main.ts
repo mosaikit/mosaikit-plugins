@@ -761,7 +761,7 @@ function mount(msk: Msk) {
     if (openId) drawProject()
     else drawList()
   })
-  void loadList()
+  void msk.loading(loadList())
 }
 
 connect()

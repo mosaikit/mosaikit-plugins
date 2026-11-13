@@ -443,7 +443,7 @@ async function mount(msk: Msk) {
       off = open()
     })
   }
-  await refresh()
+  await msk.loading(refresh())
   off = open()
   // the view follows the host for its own texts; the title and the button are ours
   msk.onContext((ctx) => {
