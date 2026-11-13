@@ -185,7 +185,7 @@ function mount(msk: Msk) {
     if (open) drawRoomHead()
     else drawList()
   })
-  void load()
+  void msk.loading(load())
 }
 
 connect()

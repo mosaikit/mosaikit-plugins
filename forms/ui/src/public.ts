@@ -114,7 +114,7 @@ function mount(msk: Msk) {
       app.replaceChildren(el('p', { class: 'fm-notice warn', role: 'alert', 'data-testid': 'notice' }, text))
     }
   }
-  void load()
+  void msk.loading(load())
 }
 
 connect()

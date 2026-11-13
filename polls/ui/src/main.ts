@@ -463,7 +463,7 @@ function mount(msk: Msk) {
     if (current) drawDetail()
     else drawList()
   })
-  void load()
+  void msk.loading(load())
 }
 
 connect()

@@ -773,7 +773,7 @@ function mount(msk: Msk) {
   // ---------- start ----------
 
   showView('list')
-  void load().then(() => {
+  void msk.loading(load()).then(() => {
     if (restore) void openShow(restore.id, restore.hash)
   })
 }

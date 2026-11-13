@@ -242,7 +242,7 @@ export class FileManager {
     document.addEventListener('keydown', this.onKey)
     document.addEventListener('mousedown', this.onDocDown)
     window.addEventListener('blur', this.closeMenu)
-    void this.refresh()
+    void this.msk.loading(this.refresh())
     this.root.focus()
   }
 
