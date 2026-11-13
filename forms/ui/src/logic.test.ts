@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildCsv, checkValues, cleanFields, csvCell, firstProblem, isDate, isEmail, isNumber, isOpen, isUuid, moveItem, newBrowserId, newField, parseFields, pct, publicProblem, slug, validMaxAnswers, valuesToSend, type Field } from './logic.ts'
+import { branchSources, conditionProblem, removeField, visibleIds, buildCsv, checkValues, cleanFields, csvCell, firstProblem, isDate, isEmail, isNumber, isOpen, isUuid, moveItem, newBrowserId, newField, parseFields, pct, publicProblem, slug, validMaxAnswers, valuesToSend, type Field } from './logic.ts'
 
 const f = (over: Partial<Field>): Field => ({ ...newField('text', 'a'), label: 'L', ...over })
 
@@ -122,5 +122,87 @@ describe('the public page', () => {
   it('rounds percentages', () => {
     expect(pct(1, 3)).toBe(33)
     expect(pct(1, 0)).toBe(0)
+  })
+})
+
+describe('branching fields', () => {
+  const f = (id: string, kind: Field['kind'], extra: Partial<Field> = {}): Field => ({
+    id, label: id, kind, options: kind === 'choice' || kind === 'multi' ? ['Yes', 'No', 'Maybe'] : [], required: false, help: '', ...extra,
+  })
+  const list = [
+    f('a', 'choice'),
+    f('b', 'text', { required: true, show_if: { field: 'a', any_of: ['Yes'] } }),
+    f('c', 'text', { show_if: { field: 'a', any_of: ['No', 'Maybe'] } }),
+    f('d', 'text', { show_if: { field: 'c', any_of: ['x'] } }),
+  ]
+
+  it('shows a field when the answer of an earlier one is in its list', () => {
+    expect([...visibleIds(list, {})]).toEqual(['a'])
+    expect([...visibleIds(list, { a: 'Yes' })]).toEqual(['a', 'b'])
+    expect([...visibleIds(list, { a: 'Maybe' })]).toEqual(['a', 'c'])
+  })
+
+  it('looks at any of the picks of a multiple choice field', () => {
+    const m = [f('a', 'multi'), f('b', 'text', { show_if: { field: 'a', any_of: ['Maybe'] } })]
+    expect(visibleIds(m, { a: ['Yes', 'Maybe'] }).has('b')).toBe(true)
+    expect(visibleIds(m, { a: ['Yes', 'No'] }).has('b')).toBe(false)
+    expect(visibleIds(m, { a: [] }).has('b')).toBe(false)
+  })
+
+  it('checks and sends only the fields that are shown', () => {
+    expect(checkValues(list, { a: 'No' })).toEqual([])
+    expect(checkValues(list, { a: 'Yes' }).map((e) => e.id)).toEqual(['b'])
+    expect(checkValues(list, { a: 'Yes', b: 'Fiat' })).toEqual([])
+    expect(valuesToSend(list, { a: 'No', b: 'stray', c: 'bike', d: 'hidden' })).toEqual({ a: 'No', c: 'bike' })
+  })
+
+  it('offers only earlier fields with options as the source', () => {
+    expect(branchSources(list, 0)).toEqual([])
+    expect(branchSources(list, 3).map((x) => x.id)).toEqual(['a'])
+  })
+
+  it('finds a condition that cannot work', () => {
+    expect(conditionProblem(list, 1)).toBeNull()
+    expect(conditionProblem([list[1], list[0]], 0)).toBe('earlier')
+    expect(conditionProblem([list[0], f('t', 'text'), f('b', 'text', { show_if: { field: 't', any_of: ['x'] } })], 2)).toBe('kind')
+    expect(conditionProblem([list[0], f('b', 'text', { show_if: { field: 'a', any_of: ['Nope'] } })], 1)).toBe('values')
+    expect(conditionProblem([list[0], f('b', 'text', { show_if: { field: 'a', any_of: [] } })], 1)).toBe('values')
+    expect(firstProblem([list[0], f('b', 'text', { show_if: { field: 'a', any_of: [] } })])).toEqual({ index: 1, key: 'badBranch' })
+    expect(firstProblem(list.slice(0, 3))).toBeNull()
+  })
+
+  it('removes the conditions that depended on a deleted field', () => {
+    const out = removeField(list, 'a')
+    expect(out.map((x) => x.id)).toEqual(['b', 'c', 'd'])
+    expect(out[0].show_if).toBeUndefined()
+    expect(out[1].show_if).toBeUndefined()
+    expect(out[2].show_if).toEqual({ field: 'c', any_of: ['x'] })
+  })
+
+  it('keeps a valid condition when saving, in the order of the options, and drops one that cannot work', () => {
+    const clean = cleanFields([list[0], f('b', 'text', { show_if: { field: 'a', any_of: ['Maybe', 'Yes', 'Yes'] } })])
+    expect(clean[1].show_if).toEqual({ field: 'a', any_of: ['Yes', 'Maybe'] })
+    expect(cleanFields([list[1]])[0].show_if).toBeUndefined()
+  })
+
+  it('reads the conditions of a stored form and ignores broken ones', () => {
+    const raw = JSON.stringify([
+      { id: 'a', label: 'A', kind: 'choice', options: ['x', 'y'] },
+      { id: 'b', label: 'B', kind: 'text', show_if: { field: 'a', any_of: ['y'] } },
+      { id: 'c', label: 'C', kind: 'text', show_if: { field: 'a', any_of: 'no' } },
+    ])
+    const p = parseFields(raw)
+    expect(p[1].show_if).toEqual({ field: 'a', any_of: ['y'] })
+    expect(p[2].show_if).toBeUndefined()
+  })
+})
+
+describe('anonymous answers', () => {
+  const fields: Field[] = [{ id: 'a', label: 'A', kind: 'text', options: [], required: false, help: '' }]
+  const rows = [{ id: null, name: null, at: null, values: { a: 'hi' } }]
+
+  it('writes no name and no date in the CSV', () => {
+    expect(buildCsv(fields, rows, { name: 'Name', submitted: 'Submitted' }, true)).toBe('A\r\nhi\r\n')
+    expect(buildCsv(fields, rows, { name: 'Name', submitted: 'Submitted' })).toBe('Name,Submitted,A\r\n,,hi\r\n')
   })
 })

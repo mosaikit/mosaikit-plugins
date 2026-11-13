@@ -29,6 +29,8 @@ const en = {
   pClosed: 'This form is closed: it is not taking answers.', pFull: 'This form has received all the answers it can take.', pAlready: 'You have already answered this form.',
   pRate: 'Too many requests. Wait a minute and try again.', pOff: 'This form is not available: the organisation has not allowed public forms.',
   pSendFailed: 'The answer could not be sent: {error}', pOpenFailed: 'Could not open the form: {error}', pRejected: 'The answer was not accepted.', pInvalid: 'Check the answers: {error}',
+  fAnonymous: 'Anonymous', anonNote: 'Nothing links an answer to a person, not even for you; single answers cannot be deleted. It cannot be turned off later.', anonResults: 'This form is anonymous: the table shows answers, never people.', colResponse: 'Response', responseN: 'Response {n}',
+  fShowIf: 'Field {n}: when to show it', showAlways: 'Always shown', showIfQ: 'Only if field {n} is answered', showIfLabel: 'Show this field', showIfValues: 'Field {n}: show it for these answers', badBranch: 'Field {n}: choose an earlier field with options, and at least one answer, for the condition',
 }
 export type Texts = typeof en
 export type L = string
@@ -57,6 +59,8 @@ const it: Texts = {
   pClosed: 'Questo modulo è chiuso: non accetta risposte.', pFull: 'Questo modulo ha ricevuto tutte le risposte che può accettare.', pAlready: 'Hai già risposto a questo modulo.',
   pRate: 'Troppe richieste. Aspetta un minuto e riprova.', pOff: 'Questo modulo non è disponibile: l’organizzazione non ha consentito i moduli pubblici.',
   pSendFailed: 'Impossibile inviare la risposta: {error}', pOpenFailed: 'Impossibile aprire il modulo: {error}', pRejected: 'La risposta non è stata accettata.', pInvalid: 'Controlla le risposte: {error}',
+  fAnonymous: 'Anonimo', anonNote: 'Niente collega una risposta a una persona, nemmeno per te; le singole risposte non si possono eliminare. Non si può disattivare dopo.', anonResults: 'Questo modulo è anonimo: la tabella mostra le risposte, mai le persone.', colResponse: 'Risposta', responseN: 'Risposta {n}',
+  fShowIf: 'Campo {n}: quando mostrarlo', showAlways: 'Sempre visibile', showIfQ: 'Solo se il campo {n} ha risposta', showIfLabel: 'Mostra questo campo', showIfValues: 'Campo {n}: mostralo per queste risposte', badBranch: 'Campo {n}: scegli per la condizione un campo precedente con opzioni, e almeno una risposta',
 }
 const es: Texts = {
   title: 'Formularios', newForm: '＋ Nuevo formulario', filter: 'Mostrar', open: 'Abiertos', closed: 'Cerrados', all: 'Todos',
@@ -82,6 +86,8 @@ const es: Texts = {
   pClosed: 'Este formulario está cerrado: no acepta respuestas.', pFull: 'Este formulario ha recibido todas las respuestas que puede aceptar.', pAlready: 'Ya has respondido a este formulario.',
   pRate: 'Demasiadas solicitudes. Espera un minuto e inténtalo de nuevo.', pOff: 'Este formulario no está disponible: la organización no ha permitido los formularios públicos.',
   pSendFailed: 'No se pudo enviar la respuesta: {error}', pOpenFailed: 'No se pudo abrir el formulario: {error}', pRejected: 'La respuesta no se ha aceptado.', pInvalid: 'Revisa las respuestas: {error}',
+  fAnonymous: 'Anónimo', anonNote: 'Nada vincula una respuesta con una persona, ni siquiera para ti; las respuestas sueltas no se pueden eliminar. No se puede desactivar después.', anonResults: 'Este formulario es anónimo: la tabla muestra respuestas, nunca personas.', colResponse: 'Respuesta', responseN: 'Respuesta {n}',
+  fShowIf: 'Campo {n}: cuándo mostrarlo', showAlways: 'Siempre visible', showIfQ: 'Solo si el campo {n} tiene respuesta', showIfLabel: 'Mostrar este campo', showIfValues: 'Campo {n}: mostrarlo con estas respuestas', badBranch: 'Campo {n}: elige para la condición un campo anterior con opciones, y al menos una respuesta',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
 // (`lang/ui/<plugin id>.json`, English phrase → translation, read through `msk.t`), once `bindTexts` has run; the English

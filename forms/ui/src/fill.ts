@@ -2,7 +2,7 @@
 // the choices, help texts, the same checks as the logic of the plugin made before sending, an error summary with
 // `role="alert"` and, for the public page, a honeypot a person never sees. Every text is a DOM text node (never HTML).
 import { el } from '@mosaikit/plugin-api'
-import { MAX_LONG, MAX_TEXT, checkValues, valuesToSend, type Field, type Values } from './logic.ts'
+import { MAX_LONG, MAX_TEXT, checkValues, valuesToSend, visibleIds, type Field, type Values } from './logic.ts'
 import { sub, type Texts } from './texts.ts'
 
 export interface FillOptions {
@@ -26,6 +26,23 @@ export function fillForm(o: FillOptions): HTMLFormElement {
   form.append(summary)
   const inputs = new Map<string, HTMLElement>()
   const inlines = new Map<string, HTMLElement>()
+  const boxes = new Map<string, HTMLElement>()
+  // a field with a condition appears and disappears with the answers; what was answered to a hidden one is forgotten
+  const syncShown = () => {
+    const shown = visibleIds(o.fields, values)
+    for (const f of o.fields) {
+      const b = boxes.get(f.id)
+      if (!b) continue
+      b.hidden = !shown.has(f.id)
+      if (!shown.has(f.id) && values[f.id] !== undefined) {
+        delete values[f.id]
+        b.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach((x) => {
+          if (x instanceof HTMLInputElement && (x.type === 'radio' || x.type === 'checkbox')) x.checked = false
+          else x.value = ''
+        })
+      }
+    }
+  }
 
   o.fields.forEach((f, i) => {
     const base = `${o.prefix}-${i}`
@@ -48,6 +65,7 @@ export function fillForm(o: FillOptions): HTMLFormElement {
             else cur.delete(opt)
             values[f.id] = f.options.filter((x) => cur.has(x))
           } else values[f.id] = opt
+          syncShown()
         })
         if (!inputs.has(f.id)) inputs.set(f.id, input)
         box.append(el('label', { class: 'fm-pick' }, input, el('span', {}, opt)))
@@ -73,8 +91,10 @@ export function fillForm(o: FillOptions): HTMLFormElement {
       if (help) box.append(help)
     }
     box.append(err)
+    boxes.set(f.id, box)
     form.append(box)
   })
+  syncShown()
 
   let honey = ''
   if (o.honeypot) {

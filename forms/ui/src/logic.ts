@@ -11,6 +11,12 @@ export const MAX_TEXT = 200
 export const MAX_LONG = 2000
 export const MAX_ANSWERS_TOP = 5000
 
+/** A condition: the field is shown only when `field` (an earlier choice or multi one) was answered with one of `any_of` (option texts). */
+export interface ShowIf {
+  field: string
+  any_of: string[]
+}
+
 export interface Field {
   id: string
   label: string
@@ -18,6 +24,7 @@ export interface Field {
   options: string[]
   required: boolean
   help: string
+  show_if?: ShowIf
 }
 
 /** An answer to one field: a text, or the chosen options of a multi field. */
@@ -62,17 +69,74 @@ export function parseFields(raw: unknown): Field[] {
       options: Array.isArray(o.options) ? o.options.map(String) : [],
       required: o.required === true,
       help: String(o.help ?? ''),
+      ...(parseShowIf(o.show_if) ? { show_if: parseShowIf(o.show_if) } : {}),
     })
   }
   return out
 }
 
-/** What the builder sends: texts trimmed, options only where they belong. */
-export function cleanFields(list: Field[]): Field[] {
-  return list.map((f) => ({ ...f, label: f.label.trim(), help: f.help.trim(), options: hasOptions(f.kind) ? f.options.map((o) => o.trim()) : [] }))
+function parseShowIf(raw: unknown): ShowIf | undefined {
+  if (!raw || typeof raw !== 'object') return undefined
+  const o = raw as Record<string, unknown>
+  if (typeof o.field !== 'string' || !Array.isArray(o.any_of)) return undefined
+  const any_of = o.any_of.filter((x): x is string => typeof x === 'string')
+  return any_of.length ? { field: o.field, any_of } : undefined
 }
 
-export type Problem = { index: number; key: 'needLabel' | 'needOptions' | 'needOptionText' | 'needDupOption' | 'tooMany' }
+/** What the builder sends: texts trimmed, options only where they belong. */
+export function cleanFields(list: Field[]): Field[] {
+  const trimmed = list.map((f) => ({ ...f, label: f.label.trim(), help: f.help.trim(), options: hasOptions(f.kind) ? f.options.map((o) => o.trim()) : [] }))
+  return trimmed.map((f, i) => {
+    const { show_if, ...rest } = f
+    if (!show_if || conditionProblem(trimmed, i)) return rest
+    const src = trimmed.find((x) => x.id === show_if.field)!
+    // each option once, in the order of the options of the source
+    return { ...rest, show_if: { field: show_if.field, any_of: src.options.filter((o) => show_if.any_of.includes(o)) } }
+  })
+}
+
+/** The earlier fields a condition can look at: those with options. */
+export function branchSources(list: Field[], index: number): Field[] {
+  return list.slice(0, index).filter((f) => hasOptions(f.kind))
+}
+
+/** What is wrong with the condition of field `index`, or null (the same rules as the hook of the plugin). */
+export function conditionProblem(list: Field[], index: number): 'earlier' | 'kind' | 'values' | null {
+  const c = list[index]?.show_if
+  if (!c) return null
+  const src = list.slice(0, index).find((f) => f.id === c.field)
+  if (!src) return 'earlier'
+  if (!hasOptions(src.kind)) return 'kind'
+  return c.any_of.length > 0 && c.any_of.every((o) => src.options.includes(o)) ? null : 'values'
+}
+
+/** The ids of the fields a person sees with these values: no condition, or the source is shown and has one of the listed options. */
+export function visibleIds(list: Field[], values: Values): Set<string> {
+  const shown = new Set<string>()
+  for (const f of list) {
+    const c = f.show_if
+    let on = !c
+    if (c && shown.has(c.field)) {
+      const v = values[c.field]
+      on = Array.isArray(v) ? v.some((x) => c.any_of.includes(x)) : typeof v === 'string' && c.any_of.includes(v)
+    }
+    if (on) shown.add(f.id)
+  }
+  return shown
+}
+
+/** Removes the field `id` and the conditions that depended on it. */
+export function removeField(list: Field[], id: string): Field[] {
+  return list
+    .filter((f) => f.id !== id)
+    .map((f) => {
+      if (f.show_if?.field !== id) return f
+      const { show_if: _gone, ...rest } = f
+      return rest
+    })
+}
+
+export type Problem = { index: number; key: 'needLabel' | 'needOptions' | 'needOptionText' | 'needDupOption' | 'tooMany' | 'badBranch' }
 
 /** The first thing wrong with the fields (the hook of the plugin says the same), or null. `index` is 0-based. */
 export function firstProblem(list: Field[]): Problem | null {
@@ -81,6 +145,7 @@ export function firstProblem(list: Field[]): Problem | null {
   for (let i = 0; i < clean.length; i++) {
     const f = clean[i]
     if (!f.label) return { index: i, key: 'needLabel' }
+    if (conditionProblem(list.map((x, k) => (k < i ? clean[k] : x)), i)) return { index: i, key: 'badBranch' }
     if (hasOptions(f.kind)) {
       if (f.options.length < MIN_OPTIONS || f.options.length > MAX_OPTIONS) return { index: i, key: 'needOptions' }
       if (f.options.some((o) => !o)) return { index: i, key: 'needOptionText' }
@@ -156,7 +221,9 @@ export type AnswerError = { id: string; key: 'eRequired' | 'eEmail' | 'eNumber' 
 /** What is wrong with the values of an answer, field by field and in the order of the form (empty when it can be sent). */
 export function checkValues(fields: Field[], values: Values): AnswerError[] {
   const out: AnswerError[] = []
+  const shown = visibleIds(fields, values)
   for (const f of fields) {
+    if (!shown.has(f.id)) continue
     const v = values[f.id]
     if (!isAnswered(v)) {
       if (f.required) out.push({ id: f.id, key: 'eRequired', label: f.label })
@@ -177,7 +244,9 @@ export function checkValues(fields: Field[], values: Values): AnswerError[] {
 /** The values as the commands want them: only the given ones, texts trimmed. */
 export function valuesToSend(fields: Field[], values: Values): Values {
   const out: Values = {}
+  const shown = visibleIds(fields, values)
   for (const f of fields) {
+    if (!shown.has(f.id)) continue
     const v = values[f.id]
     if (isAnswered(v)) out[f.id] = typeof v === 'string' ? v.trim() : v!
   }
@@ -203,9 +272,9 @@ export function csvCell(v: string | number | null | undefined): string {
 }
 
 export interface AnswerRow {
-  id: string
-  name: string
-  at: string
+  id: string | null
+  name: string | null
+  at: string | null
   values: Record<string, Value | undefined>
 }
 
@@ -216,9 +285,9 @@ export function valueText(v: Value | undefined): string {
 }
 
 /** The CSV of the answers: a header (name, date, one column per field) and one row per answer; BOM is added by the download. */
-export function buildCsv(fields: Field[], rows: AnswerRow[], head: { name: string; submitted: string }): string {
-  const header = [head.name, head.submitted, ...fields.map((f) => f.label)]
-  const body = rows.map((r) => [r.name, r.at, ...fields.map((f) => valueText(r.values[f.id]))])
+export function buildCsv(fields: Field[], rows: AnswerRow[], head: { name: string; submitted: string }, anonymous = false): string {
+  const header = [...(anonymous ? [] : [head.name, head.submitted]), ...fields.map((f) => f.label)]
+  const body = rows.map((r) => [...(anonymous ? [] : [r.name, r.at]), ...fields.map((f) => valueText(r.values[f.id]))])
   return [header, ...body].map((r) => r.map(csvCell).join(',')).join('\r\n') + '\r\n'
 }
 
