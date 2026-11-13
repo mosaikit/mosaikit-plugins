@@ -17,7 +17,7 @@ import {
   type Row,
 } from '@mosaikit/plugin-api'
 import { KINDS, filterSnippets, firstLine, kindOf, listOrder, neighbour, normTag, parseTags, tagCounts, type Filter, type SnippetLike } from './logic.ts'
-import { TEXTS, langOf, sub } from './texts.ts'
+import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 
 const app = document.getElementById('app')!
 
@@ -51,6 +51,7 @@ async function copyText(text: string): Promise<boolean> {
 
 function mount(msk: Msk) {
   document.documentElement.classList.add('msk-fill')
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
   const api = msk.crud('snippets')

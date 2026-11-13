@@ -22,7 +22,7 @@ import {
   type Row,
 } from '@mosaikit/plugin-api'
 import { fromRow, QUICK, runs, snippet, stringifyReactions, toggleReaction, typingNames, upsert, without, type Msg } from './logic.ts'
-import { TEXTS, langOf, sub } from './texts.ts'
+import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 
 /** A call from a channel: a room of the meeting service named after the channel (nobody can guess it), opened in a new tab. */
 const callUrl = (channelId: string) => 'https://meet.jit.si/mosaikit-' + channelId.replace(/[^a-z0-9]/gi, '').toLowerCase()
@@ -33,6 +33,7 @@ const TYPING_EVERY = 3000
 
 function mount(msk: Msk) {
   document.documentElement.classList.add('msk-fill')
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
   const me = msk.user?.id ?? ''

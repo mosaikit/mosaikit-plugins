@@ -18,7 +18,7 @@ import {
   type Row,
 } from '@mosaikit/plugin-api'
 import { applyFilter, cleanTags, hostOf, parseTags, safeHref, tagCounts, toggleTag, type BookmarkLike, type Filter } from './logic.ts'
-import { TEXTS, langOf, sub } from './texts.ts'
+import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 
 const app = document.getElementById('app')!
 
@@ -29,6 +29,7 @@ interface Bookmark extends BookmarkLike {
 
 function mount(msk: Msk) {
   document.documentElement.classList.add('msk-fill')
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
   const api = msk.crud('bookmarks')

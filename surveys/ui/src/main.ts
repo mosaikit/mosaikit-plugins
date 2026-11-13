@@ -44,7 +44,7 @@ import {
   type Question,
   type Respondent,
 } from './logic.ts'
-import { TEXTS, langOf, sub, type Texts } from './texts.ts'
+import { bindTexts, TEXTS, langOf, sub, type Texts } from './texts.ts'
 
 const app = document.getElementById('app')!
 
@@ -96,6 +96,7 @@ type View = { kind: 'list' } | { kind: 'take'; s: Survey } | { kind: 'results'; 
 
 function mount(msk: Msk) {
   document.documentElement.classList.add('msk-fill')
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = (): Texts => TEXTS[lang]
   const api = msk.crud('surveys')

@@ -34,7 +34,7 @@ import {
   type Tone,
   type Widget,
 } from './logic.ts'
-import { TEXTS, langOf, sub } from './texts.ts'
+import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 
 const app = document.getElementById('app')!
 const REFRESH_MS = 60_000
@@ -65,6 +65,7 @@ const remember = (id: string) => {
 
 function mount(msk: Msk) {
   document.documentElement.classList.add('msk-fill')
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
   const api = msk.crud('boards')

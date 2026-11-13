@@ -4,8 +4,6 @@
 import type { Msk, Row } from '@mosaikit/plugin-api'
 import { errText } from '@mosaikit/plugin-api'
 
-type Lang = 'en' | 'it'
-
 const TEXTS = {
   en: {
     legend: 'Translation',
@@ -35,6 +33,18 @@ const TEXTS = {
   },
 }
 
+type Table = typeof TEXTS.en
+function localized(msk: Msk): Table {
+  const en = TEXTS.en
+  return {
+    legend: msk.t(en.legend),
+    to: msk.t(en.to),
+    button: msk.t(en.button),
+    working: msk.t(en.working),
+    reasons: Object.fromEntries(Object.entries(en.reasons).map(([k, v]) => [k, msk.t(v)])),
+  }
+}
+
 const LANGS: [string, string][] = [
   ['en', 'English'],
   ['it', 'Italiano'],
@@ -48,8 +58,9 @@ type Outcome = { ok: true; title: string; body: string; target: string } | { ok:
 const last = new Map<string, Outcome>()
 let target = 'en'
 
-export function translateTool(msk: Msk, row: Row, box: HTMLElement, lang: Lang) {
-  const tx = TEXTS[lang]
+export function translateTool(msk: Msk, row: Row, box: HTMLElement, lang: string) {
+  // English and Italian are the tables here; the other languages come from the language plugins (`msk.t`)
+  const tx = lang === 'en' || lang === 'it' ? TEXTS[lang] : localized(msk)
   const set = document.createElement('fieldset')
   set.className = 'msk-extset'
   set.dataset.testid = 'notes-translate'

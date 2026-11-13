@@ -1,6 +1,6 @@
 id = "com.mosaikit.bookmarks"
 name = "Bookmarks"
-version = "0.1.0"
+version = "0.2.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "bookmark"

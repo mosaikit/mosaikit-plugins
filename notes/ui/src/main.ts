@@ -6,70 +6,13 @@ import { checkProgress, connect, el, errText, mountCrud, progress, renderMarkdow
 import { COLORS, colorOfName, isColor, paletteCss, type Color } from './palette.ts'
 import { cleanName, hasTag, MAX_TAG, parseTags, removeTag, renameTag, sameTag, tagValues, withoutRepeats } from './tags.ts'
 import { clampSize, resizedBy, tiltOf } from './size.ts'
+import { bindTexts, TEXTS, langOf } from './texts.ts'
 import { translateTool } from './translate.ts'
 import { mdToolbar, saveText } from './mdbar.ts'
 import { editTogether } from './collab.ts'
 
 const PAGE = 100
 
-const COLOR_NAMES = {
-  en: { yellow: 'yellow', orange: 'orange', pink: 'pink', violet: 'violet', blue: 'blue', teal: 'teal', green: 'green', grey: 'grey' },
-  it: { yellow: 'giallo', orange: 'arancione', pink: 'rosa', violet: 'viola', blue: 'blu', teal: 'turchese', green: 'verde', grey: 'grigio' },
-  es: { yellow: 'amarillo', orange: 'naranja', pink: 'rosa', violet: 'violeta', blue: 'azul', teal: 'turquesa', green: 'verde', grey: 'gris' },
-}
-const TEXTS = {
-  en: {
-    title: 'Notes', all: 'All notes', newLabel: '＋ New note', postits: 'Post-its', list: 'List', emptyTitle: 'No notes yet', emptyText: 'Write the first note: it stays yours until you share it.',
-    failed: 'Could not start the UI of the plugin: ', mine: 'My notes', shared: 'Shared with me', tag: 'Tag', sharedBy: 'Shared by {n}', empty: 'No text', untitled: 'Untitled',
-    tags: 'Tags', allTags: 'All tags', filterTag: 'Filter by tag', colour: 'Colour', noteColour: 'Colour of the note', resize: 'Resize the note: drag, or press Alt and the arrow keys',
-    tagsOfNote: 'Tags of the note', newTag: 'New tag', addTag: 'Add', tagName: 'Name of the tag', manageText: 'Every tag has its own colour. Renaming or deleting a tag changes it in all your notes.',
-    nameOf: 'Name of the tag {n}', colourOf: 'Colour of the tag {n}', deleteTag: 'Delete', deleteTagOf: 'Delete the tag {n}', close: 'Close', noTags: 'No tags yet: add the first one above.',
-    notesN: '{n} notes', noteN: '1 note', tagExists: 'A tag with this name exists already', tagDeleted: 'Tag deleted', tagSaved: 'Tag saved', tagAdded: 'Tag added',
-    confirmDelete: 'Delete the tag “{n}”? It is removed from all the notes that have it.',
-    pin: 'Pin', unpin: 'Unpin', pinned: 'Pinned', archive: 'Archive', restore: 'Restore', archived: 'Archive', exportMd: 'Export as Markdown', archivedMsg: 'Note archived', restoredMsg: 'Note restored', exportedMsg: 'Note exported',
-    emptyArchive: 'Nothing in the archive', emptyArchiveText: 'Archived notes wait here; restore one to bring it back.', mdHelp: 'Markdown: **bold**, *italic*, - list, - [ ] check list',
-    bold: 'Bold', italic: 'Italic', heading: 'Heading', bullets: 'List', checks: 'Check list', quote: 'Quote', code: 'Code', link: 'Link', formatting: 'Formatting', progress: '{d} of {n} done',
-    editingWith: 'Editing together with {n}', tooLongTogether: 'This note is too long to edit together: only one person at a time should edit it.',
-  },
-  it: {
-    title: 'Note', all: 'Tutte le note', newLabel: '＋ Nuova nota', postits: 'Post-it', list: 'Elenco', emptyTitle: 'Ancora nessuna nota', emptyText: 'Scrivi la prima nota: resta tua finché non la condividi.',
-    failed: 'Impossibile avviare la UI del plugin: ', mine: 'Le mie note', shared: 'Condivise con me', tag: 'Tag', sharedBy: 'Condivisa da {n}', empty: 'Nessun testo', untitled: 'Senza titolo',
-    tags: 'Tag', allTags: 'Tutti i tag', filterTag: 'Filtra per tag', colour: 'Colore', noteColour: 'Colore della nota', resize: 'Ridimensiona la nota: trascina, oppure premi Alt e i tasti freccia',
-    tagsOfNote: 'Tag della nota', newTag: 'Nuovo tag', addTag: 'Aggiungi', tagName: 'Nome del tag', manageText: 'Ogni tag ha il suo colore. Rinominare o eliminare un tag lo cambia in tutte le tue note.',
-    nameOf: 'Nome del tag {n}', colourOf: 'Colore del tag {n}', deleteTag: 'Elimina', deleteTagOf: 'Elimina il tag {n}', close: 'Chiudi', noTags: 'Ancora nessun tag: aggiungi il primo qui sopra.',
-    notesN: '{n} note', noteN: '1 nota', tagExists: 'Esiste già un tag con questo nome', tagDeleted: 'Tag eliminato', tagSaved: 'Tag salvato', tagAdded: 'Tag aggiunto',
-    confirmDelete: 'Eliminare il tag “{n}”? Viene tolto da tutte le note che lo hanno.',
-    pin: 'Fissa', unpin: 'Stacca', pinned: 'Fissata', archive: 'Archivia', restore: 'Ripristina', archived: 'Archivio', exportMd: 'Esporta in Markdown', archivedMsg: 'Nota archiviata', restoredMsg: 'Nota ripristinata', exportedMsg: 'Nota esportata',
-    emptyArchive: 'Niente nell’archivio', emptyArchiveText: 'Le note archiviate aspettano qui; ripristinane una per riaverla.', mdHelp: 'Markdown: **grassetto**, *corsivo*, - elenco, - [ ] lista di controllo',
-    bold: 'Grassetto', italic: 'Corsivo', heading: 'Titolo', bullets: 'Elenco', checks: 'Lista di controllo', quote: 'Citazione', code: 'Codice', link: 'Link', formatting: 'Formattazione', progress: '{d} di {n} fatti',
-    editingWith: 'Stai modificando insieme a {n}', tooLongTogether: 'Questa nota è troppo lunga per essere modificata insieme: dovrebbe modificarla una persona alla volta.',
-  },
-  es: {
-    title: 'Notas', all: 'Todas las notas', newLabel: '＋ Nueva nota', postits: 'Post-its', list: 'Lista', emptyTitle: 'Todavía no hay notas', emptyText: 'Escribe la primera nota: es tuya hasta que la compartas.',
-    failed: 'No se pudo iniciar la interfaz del plugin: ', mine: 'Mis notas', shared: 'Compartidas conmigo', tag: 'Etiqueta', sharedBy: 'Compartida por {n}', empty: 'Sin texto', untitled: 'Sin título',
-    tags: 'Etiquetas', allTags: 'Todas las etiquetas', filterTag: 'Filtrar por etiqueta', colour: 'Color', noteColour: 'Color de la nota', resize: 'Cambia el tamaño de la nota: arrastra, o pulsa Alt y las flechas',
-    tagsOfNote: 'Etiquetas de la nota', newTag: 'Nueva etiqueta', addTag: 'Añadir', tagName: 'Nombre de la etiqueta', manageText: 'Cada etiqueta tiene su propio color. Cambiar el nombre o eliminar una etiqueta lo cambia en todas tus notas.',
-    nameOf: 'Nombre de la etiqueta {n}', colourOf: 'Color de la etiqueta {n}', deleteTag: 'Eliminar', deleteTagOf: 'Eliminar la etiqueta {n}', close: 'Cerrar', noTags: 'Todavía no hay etiquetas: añade la primera arriba.',
-    notesN: '{n} notas', noteN: '1 nota', tagExists: 'Ya existe una etiqueta con este nombre', tagDeleted: 'Etiqueta eliminada', tagSaved: 'Etiqueta guardada', tagAdded: 'Etiqueta añadida',
-    confirmDelete: '¿Eliminar la etiqueta “{n}”? Se quita de todas las notas que la tienen.',
-    pin: 'Fijar', unpin: 'Soltar', pinned: 'Fijada', archive: 'Archivar', restore: 'Restaurar', archived: 'Archivo', exportMd: 'Exportar como Markdown', archivedMsg: 'Nota archivada', restoredMsg: 'Nota restaurada', exportedMsg: 'Nota exportada',
-    emptyArchive: 'Nada en el archivo', emptyArchiveText: 'Las notas archivadas esperan aquí; restaura una para recuperarla.', mdHelp: 'Markdown: **negrita**, *cursiva*, - lista, - [ ] lista de control',
-    bold: 'Negrita', italic: 'Cursiva', heading: 'Título', bullets: 'Lista', checks: 'Lista de control', quote: 'Cita', code: 'Código', link: 'Enlace', formatting: 'Formato', progress: '{d} de {n} hechos',
-    editingWith: 'Editando junto a {n}', tooLongTogether: 'Esta nota es demasiado larga para editarla en conjunto: solo una persona a la vez debería editarla.',
-  },
-}
-// the three tags of the first versions keep their names in the language of the person until the person gives them a name
-const TAGS: Record<string, { en: string; it: string; es: string }> = {
-  personal: { en: 'personal', it: 'personale', es: 'personal' },
-  work: { en: 'work', it: 'lavoro', es: 'trabajo' },
-  urgent: { en: 'urgent', it: 'urgente', es: 'urgente' },
-}
-
-type Lang = keyof typeof TEXTS
-const langOf = (l: string | undefined): Lang => {
-  const x = (l ?? navigator.language).toLowerCase()
-  return x.startsWith('it') ? 'it' : x.startsWith('es') ? 'es' : 'en'
-}
 const app = document.getElementById('app')!
 
 /** Every row of a resource, a page at a time. */
@@ -87,6 +30,7 @@ async function listAll(api: CrudClient): Promise<Row[]> {
 const subst = (s: string, n: string | number) => s.replace('{n}', String(n))
 
 async function mount(msk: Msk) {
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const T = () => TEXTS[lang]
   const notesApi = msk.crud('notes')
@@ -108,7 +52,7 @@ async function mount(msk: Msk) {
     const c = defOf(name)?.values.color
     return isColor(c) ? c : colorOfName(name)
   }
-  const shownName = (name: string) => (defOf(name) ? name : (TAGS[name.toLowerCase()]?.[lang] ?? name))
+  const shownName = (name: string) => (defOf(name) ? name : (T().legacyTags[name.toLowerCase()] ?? name))
   const known = () => withoutRepeats([...defs.map(nameOfDef), ...notes.flatMap((n) => parseTags(n.values.tags))]).sort((a, b) => a.localeCompare(b))
   const tagChip = (name: string) => el('span', { class: `pi-tag pc-${tagColor(name)}` }, shownName(name))
 
@@ -128,7 +72,7 @@ async function mount(msk: Msk) {
     return navTag ? hasTag(tags, navTag) : true
   }
   // the header reads «Notes › subsection»
-  const section = () => (at === 'archive' ? T().archived : at === 'mine' ? T().mine : at === 'shared' ? T().shared : navTag ? `${T().tag}: ${TAGS[navTag]?.[lang] ?? navTag}` : T().all)
+  const section = () => (at === 'archive' ? T().archived : at === 'mine' ? T().mine : at === 'shared' ? T().shared : navTag ? `${T().tag}: ${T().legacyTags[navTag] ?? navTag}` : T().all)
   const who = (c: ItemCtx) => (c.row.owner_id !== msk.user?.id ? subst(T().sharedBy, c.row.owner_name) : '')
   const tagsRow = (tags: string[], c: ItemCtx) => el('div', { class: 'nfoot' }, ...tags.map(tagChip), ...(who(c) ? [el('span', { class: 'nwho' }, who(c))] : []))
   const colorOf = (c: ItemCtx): Color => (isColor(c.value('color')) ? (c.value('color') as Color) : 'yellow')
@@ -221,7 +165,7 @@ async function mount(msk: Msk) {
     pop.hidden = true
     const pal = el('button', { type: 'button', class: 'pi-pal', 'aria-label': T().noteColour, 'aria-haspopup': 'true', 'aria-expanded': 'false', title: T().noteColour })
     for (const col of COLORS) {
-      const sw = el('button', { type: 'button', class: `pi-sw pc-${col}`, 'aria-label': COLOR_NAMES[lang][col], 'aria-pressed': String(col === colorOf(c)), title: COLOR_NAMES[lang][col] })
+      const sw = el('button', { type: 'button', class: `pi-sw pc-${col}`, 'aria-label': T().colorNames[col], 'aria-pressed': String(col === colorOf(c)), title: T().colorNames[col] })
       sw.addEventListener('click', (e) => {
         e.stopPropagation()
         pop.hidden = true
@@ -294,7 +238,7 @@ async function mount(msk: Msk) {
     const color: Color = isColor(e.value('color')) ? (e.value('color') as Color) : 'yellow'
     let sel = parseTags(e.value('tags'))
     const swatches = COLORS.map((col) => {
-      const b = el('button', { type: 'button', role: 'radio', class: `pi-sw pc-${col}`, 'aria-label': COLOR_NAMES[lang][col], 'aria-checked': String(col === color), title: COLOR_NAMES[lang][col] })
+      const b = el('button', { type: 'button', role: 'radio', class: `pi-sw pc-${col}`, 'aria-label': T().colorNames[col], 'aria-checked': String(col === color), title: T().colorNames[col] })
       b.addEventListener('click', () => {
         e.set('color', col)
         for (const s of swatches) s.setAttribute('aria-checked', String(s === b))
@@ -363,7 +307,7 @@ async function mount(msk: Msk) {
     const fail = (e: unknown) => msk.toast(errText(e, msk.context?.lang), true)
     const colourSelect = (value: Color, label: string) => {
       const s = el('select', { class: 'pi-csel', 'aria-label': label })
-      for (const col of COLORS) s.append(el('option', { value: col }, COLOR_NAMES[lang][col]))
+      for (const col of COLORS) s.append(el('option', { value: col }, T().colorNames[col]))
       s.value = value
       return s
     }
@@ -489,7 +433,7 @@ async function mount(msk: Msk) {
         fill()
       },
       bar: [filter, manageBtn],
-      detail: (row, box) => translateTool(msk, row, box, lang === 'it' ? 'it' : 'en'),
+      detail: (row, box) => translateTool(msk, row, box, lang),
     })
   }
   let off = () => {}
