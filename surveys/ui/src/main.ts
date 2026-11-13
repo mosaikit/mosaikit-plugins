@@ -24,6 +24,8 @@ import {
   MIN_OPTIONS,
   MAX_TEXT_ANSWER,
   answersToSend,
+  branchSources,
+  branchValues,
   buildCsv,
   cleanQuestions,
   firstProblem,
@@ -38,6 +40,8 @@ import {
   pct,
   progressOf,
   removeOption,
+  removeQuestion,
+  visibleIds,
   todayLocal,
   type Answer,
   type Kind,
@@ -58,6 +62,7 @@ interface Survey {
   pass: string
   closesOn: string
   closed: boolean
+  anonymous: boolean
 }
 interface Overview {
   mine: string[]
@@ -84,12 +89,13 @@ interface Aggregate {
 }
 interface Results {
   full: boolean
+  anonymous?: boolean
   responded: boolean
   mine: Outcome | null
   total?: number
   key?: Record<string, number[]>
   questions?: Aggregate[]
-  respondents?: { id: string; name: string; at: string; score: number | null; max_score: number | null; percent: number | null; passed: boolean | null; answers: Record<string, Answer> }[]
+  respondents?: { id: string | null; name: string | null; at: string | null; score: number | null; max_score: number | null; percent: number | null; passed: boolean | null; answers: Record<string, Answer> }[]
 }
 
 type View = { kind: 'list' } | { kind: 'take'; s: Survey } | { kind: 'results'; s: Survey } | { kind: 'done'; s: Survey; out: Submitted }
@@ -130,6 +136,7 @@ function mount(msk: Msk) {
     pass: String(r.values.pass_percent ?? ''),
     closesOn: String(r.values.closes_on ?? ''),
     closed: r.values.closed === true,
+    anonymous: r.values.anonymous === true,
   })
 
   // ------------------------------------------------------------------------------------------------------ the builder
@@ -151,6 +158,10 @@ function mount(msk: Msk) {
     const quiz = el('input', { type: 'checkbox', id: 'sv-quiz' })
     const pass = el('input', { type: 'number', min: '0', max: '100', step: '1', 'aria-label': tr().fPass })
     const closed = el('input', { type: 'checkbox', id: 'sv-closed' })
+    const anon = el('input', { type: 'checkbox', id: 'sv-anon', 'data-testid': 'anonymous' })
+    anon.checked = existing?.anonymous ?? false
+    // an anonymous survey stays anonymous (the people who answered were promised it)
+    anon.disabled = existing?.anonymous === true
     title.value = existing?.title ?? ''
     intro.value = existing?.intro ?? ''
     quiz.checked = existing?.quiz ?? false
@@ -184,7 +195,7 @@ function mount(msk: Msk) {
           drawQs(`down-${q.id}`)
         })
         const del = btn('✕', 'msk-btn ghost mini danger-text', () => {
-          qs = qs.filter((x) => x.id !== q.id)
+          qs = removeQuestion(qs, q.id)
           drawQs('add')
         })
         up.setAttribute('aria-label', sub(tr().moveUp, { n }))
@@ -223,6 +234,39 @@ function mount(msk: Msk) {
           row.append(el('label', { class: 'sv-check' }, el('span', {}, tr().fPoints), pts))
         }
         block.append(text, row)
+
+        // show this question only when an earlier answer matches
+        const sources = branchSources(qs, qi)
+        if (sources.length) {
+          const src = el('select', { 'aria-label': sub(tr().fShowIf, { n }), 'data-testid': 'show-if' })
+          src.append(el('option', { value: '' }, tr().showAlways))
+          sources.forEach((s2) => src.append(el('option', { value: s2.id }, sub(tr().showIfQ, { n: qs.indexOf(s2) + 1 }))))
+          src.value = q.show_if && sources.some((s2) => s2.id === q.show_if!.question) ? q.show_if.question : ''
+          src.addEventListener('change', () => {
+            if (src.value) q.show_if = { question: src.value, any_of: [] }
+            else delete q.show_if
+            drawQs(`showif-${q.id}`)
+          })
+          src.dataset.act = `showif-${q.id}`
+          const cond = el('div', { class: 'sv-cond' }, el('span', { class: 'sv-dim' }, tr().showIfLabel), src)
+          const source = sources.find((s2) => s2.id === q.show_if?.question)
+          if (q.show_if && source) {
+            const vals = el('div', { class: 'sv-condvals', role: 'group', 'aria-label': sub(tr().showIfValues, { n }) })
+            for (const v of branchValues(source)) {
+              const c = el('input', { type: 'checkbox', 'aria-label': `${sub(tr().showIfValues, { n })}: ${v.label}` })
+              c.checked = q.show_if.any_of.includes(v.value)
+              c.addEventListener('change', () => {
+                const cur = new Set(q.show_if!.any_of)
+                if (c.checked) cur.add(v.value)
+                else cur.delete(v.value)
+                q.show_if!.any_of = [...cur].sort((a, b) => a - b)
+              })
+              vals.append(el('label', { class: 'sv-check' }, c, el('span', {}, v.label || '…')))
+            }
+            cond.append(vals)
+          }
+          block.append(cond)
+        }
 
         if (hasOptions(q.kind)) {
           const opts = el('div', { class: 'sv-opts' })
@@ -295,6 +339,8 @@ function mount(msk: Msk) {
       field(tr().fIntro, intro),
       el('div', { class: 'sv-row' }, field(tr().fCloses, closesField.el), passField),
       check(quiz, tr().fQuiz),
+      check(anon, tr().fAnonymous),
+      el('p', { class: 'sv-dim' }, tr().anonNote),
       ...(existing ? [check(closed, tr().fClosed)] : []),
       el('h3', { class: 'sv-sub' }, tr().fQuestions),
       qbox,
@@ -322,6 +368,7 @@ function mount(msk: Msk) {
         pass_percent: quiz.checked ? pass.value.trim() : '',
         closes_on: closes,
         closed: closed.checked,
+        anonymous: anon.checked,
         // the questions are stored without the correct answers; those go to the key apart, after the survey is saved
         questions: JSON.stringify(stripKey(cleanQuestions(qs, quiz.checked))),
       }
@@ -448,16 +495,36 @@ function mount(msk: Msk) {
     }
     if (s.intro.trim()) wrap.append(el('p', { class: 'sv-intro' }, s.intro))
     wrap.append(bar)
+    const sets: HTMLElement[] = []
+    // a question with a condition appears and disappears with the answers; what was answered to a hidden one is forgotten
+    const syncShown = () => {
+      const shown = visibleIds(s.questions, answers)
+      s.questions.forEach((q, i) => {
+        sets[i].hidden = !shown.has(q.id)
+        if (!shown.has(q.id) && answers[q.id] !== undefined) {
+          delete answers[q.id]
+          sets[i].querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach((x) => {
+            if (x instanceof HTMLInputElement && (x.type === 'radio' || x.type === 'checkbox')) x.checked = false
+            else x.value = ''
+          })
+        }
+      })
+    }
     s.questions.forEach((q, i) => {
       const n = i + 1
-      const set = fieldsetOf(q, n, answers, drawBar)
+      const set = fieldsetOf(q, n, answers, () => {
+        syncShown()
+        drawBar()
+      })
+      sets.push(set)
       wrap.append(set)
     })
+    syncShown()
     sendBtn.addEventListener('click', () => {
       const p = progressOf(s.questions, answers)
       if (p.firstMissing >= 0) {
         toast(sub(tr().needAnswer, { n: p.firstMissing + 1 }), { tone: 'err' })
-        wrap.querySelectorAll<HTMLElement>('.sv-q')[p.firstMissing]?.querySelector<HTMLElement>('input, textarea')?.focus()
+        sets[p.firstMissing]?.querySelector<HTMLElement>('input, textarea')?.focus()
         return
       }
       sendBtn.disabled = true
@@ -585,13 +652,14 @@ function mount(msk: Msk) {
     const questions = mergeKey(s.questions, r.key)
     const people: Respondent[] = (r.respondents ?? []).map((p) => ({ name: p.name, at: p.at, score: p.score, max_score: p.max_score, percent: p.percent, answers: p.answers }))
     const exp = btn(tr().exportCsv, 'msk-btn ghost', () => {
-      const csv = buildCsv(s.questions, people, s.quiz, { respondent: tr().csvName, submitted: tr().csvWhen, score: tr().csvScore, max: tr().csvMax, percent: tr().csvPercent })
+      const csv = buildCsv(s.questions, people, s.quiz, { respondent: tr().csvName, submitted: tr().csvWhen, score: tr().csvScore, max: tr().csvMax, percent: tr().csvPercent }, r.anonymous === true)
       download((s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'survey') + '.csv', csv)
       toast(tr().exported, { tone: 'ok' })
     })
     exp.disabled = total === 0
     pageHead(s, exp)
     wrap.append(el('p', { class: 'sv-summary', 'data-testid': 'summary' }, `${tr().responsesTotal}: ${total}`))
+    if (r.anonymous) wrap.append(el('p', { class: 'sv-dim', 'data-testid': 'anonymous-note' }, tr().anonResults))
     if (!total) wrap.append(el('p', { class: 'sv-dim' }, tr().noResponses))
     questions.forEach((q, i) => {
       const a = (r.questions ?? []).find((x) => x.id === q.id)
@@ -611,12 +679,20 @@ function mount(msk: Msk) {
     })
     if (total) {
       const table = el('table', { class: 'sv-table' })
-      const hr = el('tr', {}, el('th', { scope: 'col' }, tr().colName), el('th', { scope: 'col' }, tr().colWhen))
+      const hr = el('tr', {}, ...(r.anonymous ? [el('th', { scope: 'col' }, tr().colResponse)] : [el('th', { scope: 'col' }, tr().colName), el('th', { scope: 'col' }, tr().colWhen)]))
       if (s.quiz) hr.append(el('th', { scope: 'col' }, tr().colScore))
       table.append(el('thead', {}, hr))
       const tb = el('tbody')
+      let nth = 0
       for (const p of r.respondents ?? []) {
-        const row = el('tr', { 'data-testid': 'respondent' }, el('td', {}, p.name), el('td', {}, new Date(p.at.replace(' ', 'T')).toLocaleString(msk.context?.lang || undefined, { dateStyle: 'medium', timeStyle: 'short' })))
+        nth += 1
+        const row = el(
+          'tr',
+          { 'data-testid': 'respondent' },
+          ...(r.anonymous || !p.at
+            ? [el('td', {}, sub(tr().responseN, { n: nth }))]
+            : [el('td', {}, p.name ?? ''), el('td', {}, new Date(p.at.replace(' ', 'T')).toLocaleString(msk.context?.lang || undefined, { dateStyle: 'medium', timeStyle: 'short' }))]),
+        )
         if (s.quiz) {
           const verdict = p.passed === null || p.passed === undefined ? '' : ` · ${p.passed ? tr().passed : tr().notPassed}`
           row.append(el('td', {}, p.score === null ? '' : `${p.score}/${p.max_score} (${p.percent}%)${verdict}`))

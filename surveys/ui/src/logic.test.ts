@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { answersToSend, buildCsv, cleanQuestions, csvCell, firstProblem, isAnswered, keyOf, mergeKey, stripKey, isOpen, moveQuestion, newQuestion, parseQuestions, pct, progressOf, removeOption, todayLocal, type Question } from './logic.ts'
+import { branchSources, branchValues, conditionProblem, removeQuestion, visibleIds, answersToSend, buildCsv, cleanQuestions, csvCell, firstProblem, isAnswered, keyOf, mergeKey, stripKey, isOpen, moveQuestion, newQuestion, parseQuestions, pct, progressOf, removeOption, todayLocal, type Question } from './logic.ts'
 
 const q = (over: Partial<Question>): Question => ({ ...newQuestion('choice', 'a'), text: 'T', options: ['x', 'y'], ...over })
 
@@ -125,5 +125,99 @@ describe('the answer key apart from the questions', () => {
     expect(back.map((x) => x.correct)).toEqual([[1], [0, 2], []])
     expect(keyOf(back, true)).toEqual(keyOf(list, true))
     expect(mergeKey(back, null).every((x) => x.correct.length === 0)).toBe(true)
+  })
+})
+
+describe('branching questions', () => {
+  const q = (id: string, kind: Question['kind'], extra: Partial<Question> = {}): Question => ({
+    id, text: id, kind, options: kind === 'choice' || kind === 'multi' ? ['x', 'y', 'z'] : [], correct: [], points: 0, required: false, ...extra,
+  })
+  const list = [
+    q('a', 'choice'),
+    q('b', 'text', { required: true, show_if: { question: 'a', any_of: [0] } }),
+    q('c', 'scale', { show_if: { question: 'a', any_of: [1, 2] } }),
+    q('d', 'text', { show_if: { question: 'c', any_of: [4, 5] } }),
+  ]
+
+  it('shows a question when the answer of an earlier one is in its list', () => {
+    expect([...visibleIds(list, {})]).toEqual(['a'])
+    expect([...visibleIds(list, { a: 0 })]).toEqual(['a', 'b'])
+    expect([...visibleIds(list, { a: 1 })]).toEqual(['a', 'c'])
+    expect([...visibleIds(list, { a: 2, c: 5 })]).toEqual(['a', 'c', 'd'])
+    // the source of d is hidden: d is hidden, whatever was typed
+    expect([...visibleIds(list, { a: 0, c: 5 })]).toEqual(['a', 'b'])
+  })
+
+  it('looks at any of the picks of a multiple choice question', () => {
+    const m = [q('a', 'multi'), q('b', 'text', { show_if: { question: 'a', any_of: [2] } })]
+    expect(visibleIds(m, { a: [0, 2] }).has('b')).toBe(true)
+    expect(visibleIds(m, { a: [0, 1] }).has('b')).toBe(false)
+    expect(visibleIds(m, { a: [] }).has('b')).toBe(false)
+  })
+
+  it('counts and sends only the questions that are shown', () => {
+    expect(progressOf(list, {})).toEqual({ done: 0, total: 1, firstMissing: -1 })
+    // yes: the required b is asked and missing
+    expect(progressOf(list, { a: 0 })).toEqual({ done: 1, total: 2, firstMissing: 1 })
+    expect(progressOf(list, { a: 0, b: 'Fiat' })).toEqual({ done: 2, total: 2, firstMissing: -1 })
+    // the required question is hidden: nothing is missing
+    expect(progressOf(list, { a: 1 }).firstMissing).toBe(-1)
+    expect(answersToSend(list, { a: 1, b: 'stray', c: 3 })).toEqual({ a: 1, c: 3 })
+  })
+
+  it('offers only earlier questions with options or a scale as the source', () => {
+    expect(branchSources(list, 0)).toEqual([])
+    expect(branchSources(list, 2).map((x) => x.id)).toEqual(['a'])
+    expect(branchSources(list, 3).map((x) => x.id)).toEqual(['a', 'c'])
+    expect(branchValues(list[2]).map((v) => v.value)).toEqual([1, 2, 3, 4, 5])
+    expect(branchValues(list[0]).map((v) => v.label)).toEqual(['x', 'y', 'z'])
+  })
+
+  it('finds a condition that cannot work', () => {
+    expect(conditionProblem(list, 1)).toBeNull()
+    expect(conditionProblem([list[1], list[0]], 0)).toBe('earlier')
+    expect(conditionProblem([q('t', 'text'), q('b', 'text', { show_if: { question: 't', any_of: [0] } })], 1)).toBe('kind')
+    expect(conditionProblem([list[0], q('b', 'text', { show_if: { question: 'a', any_of: [3] } })], 1)).toBe('values')
+    expect(conditionProblem([list[0], q('b', 'text', { show_if: { question: 'a', any_of: [] } })], 1)).toBe('values')
+    const bad = [list[0], q('b', 'text', { show_if: { question: 'a', any_of: [] } })]
+    expect(firstProblem(bad, false)).toEqual({ index: 1, key: 'badBranch' })
+    expect(firstProblem(list, false)).toBeNull()
+  })
+
+  it('removes the conditions that depended on a deleted question', () => {
+    const out = removeQuestion(list, 'a')
+    expect(out.map((x) => x.id)).toEqual(['b', 'c', 'd'])
+    expect(out[0].show_if).toBeUndefined()
+    expect(out[1].show_if).toBeUndefined()
+    // d depended on c, which is still there
+    expect(out[2].show_if).toEqual({ question: 'c', any_of: [4, 5] })
+  })
+
+  it('keeps a valid condition when saving and drops one that cannot work', () => {
+    const clean = cleanQuestions([list[0], q('b', 'text', { show_if: { question: 'a', any_of: [2, 0, 2] } })], false)
+    expect(clean[1].show_if).toEqual({ question: 'a', any_of: [0, 2] })
+    expect(cleanQuestions([list[1]], false)[0].show_if).toBeUndefined()
+  })
+
+  it('reads the conditions of a stored survey and ignores broken ones', () => {
+    const raw = JSON.stringify([
+      { id: 'a', text: 'A', kind: 'choice', options: ['x', 'y'] },
+      { id: 'b', text: 'B', kind: 'text', show_if: { question: 'a', any_of: [1] } },
+      { id: 'c', text: 'C', kind: 'text', show_if: { question: 'a', any_of: 'no' } },
+    ])
+    const p = parseQuestions(raw)
+    expect(p[1].show_if).toEqual({ question: 'a', any_of: [1] })
+    expect(p[2].show_if).toBeUndefined()
+  })
+})
+
+describe('anonymous results', () => {
+  const qs: Question[] = [{ id: 'a', text: 'A', kind: 'text', options: [], correct: [], points: 0, required: false }]
+  const people = [{ name: null, at: null, score: null, max_score: null, percent: null, answers: { a: 'hi' } }]
+  const head = { respondent: 'Respondent', submitted: 'Submitted', score: 'Score', max: 'Max', percent: '%' }
+
+  it('writes no name and no date in the CSV', () => {
+    expect(buildCsv(qs, people, false, head, true)).toBe('A\r\nhi\r\n')
+    expect(buildCsv(qs, people, false, head)).toBe('Respondent,Submitted,A\r\n,,hi\r\n')
   })
 })

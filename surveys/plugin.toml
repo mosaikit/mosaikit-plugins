@@ -1,13 +1,13 @@
 id = "com.mosaikit.surveys"
 name = "Surveys"
-version = "0.2.0"
+version = "0.3.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "clipboard-list"
 description = "Series of questions answered by the people a survey is shared with, with the results per question and scored quizzes"
 author = "Mosaikit"
 license = "Apache-2.0"
-details = "Build a survey with up to 40 questions (one answer, several answers, free text or a scale from 1 to 5), share it and see the results per question: a bar for each option, the average of a scale and the text answers. Each person answers once, and the results can be exported to CSV.\n\nIn quiz mode the answers are scored: mark the correct options and the points of each question, set a pass mark and every person sees their score and whether they passed, with the right and wrong answers shown only after they submit.\n\nA survey is an item of the platform: share it with people or groups (read to answer it, write to see all the results and edit it) and everything you already know about sharing, search and the trash applies."
+details = "Build a survey with up to 40 questions (one answer, several answers, free text or a scale from 1 to 5), share it and see the results per question: a bar for each option, the average of a scale and the text answers. Each person answers once, and the results can be exported to CSV. A question can be shown only when an earlier answer matches, and an anonymous survey keeps no name with the answers.\n\nIn quiz mode the answers are scored: mark the correct options and the points of each question, set a pass mark and every person sees their score and whether they passed, with the right and wrong answers shown only after they submit.\n\nA survey is an item of the platform: share it with people or groups (read to answer it, write to see all the results and edit it) and everything you already know about sharing, search and the trash applies."
 screenshots = ["survey.webp", "results.webp"]
 homepage = "https://example.org/mosaikit/plugins/surveys"
 
@@ -33,6 +33,7 @@ fields = [
   { key = "pass_percent", label = "Pass mark (%)", kind = "text" },
   { key = "closes_on", label = "Closes on", kind = "date" },
   { key = "closed", label = "Closed", kind = "bool" },
+  { key = "anonymous", label = "Anonymous", kind = "bool" },
 ]
 
 # the answers: a reader writes the row of their own answers (command surveys.submit)
@@ -59,14 +60,14 @@ data = { command = "surveys.widget_open", kind = "number", size = "s", texts = {
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
-details = "Costruisci un sondaggio con fino a 40 domande (una risposta, più risposte, testo libero o una scala da 1 a 5), condividilo e guarda i risultati per domanda: una barra per ogni opzione, la media di una scala e le risposte di testo. Ognuno risponde una sola volta e i risultati si esportano in CSV.\n\nIn modalità quiz le risposte hanno un punteggio: segna le opzioni corrette e i punti di ogni domanda, imposta una soglia di superamento e ognuno vede il proprio punteggio e se ha superato la prova; le risposte giuste e sbagliate si mostrano solo dopo l’invio.\n\nUn sondaggio è un elemento della piattaforma: condividilo con persone o gruppi (lettura per rispondere, scrittura per vedere tutti i risultati e modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
+details = "Costruisci un sondaggio con fino a 40 domande (una risposta, più risposte, testo libero o una scala da 1 a 5), condividilo e guarda i risultati per domanda: una barra per ogni opzione, la media di una scala e le risposte di testo. Ognuno risponde una sola volta e i risultati si esportano in CSV. Una domanda può comparire solo se una risposta precedente corrisponde, e un questionario anonimo non conserva alcun nome insieme alle risposte.\n\nIn modalità quiz le risposte hanno un punteggio: segna le opzioni corrette e i punti di ogni domanda, imposta una soglia di superamento e ognuno vede il proprio punteggio e se ha superato la prova; le risposte giuste e sbagliate si mostrano solo dopo l’invio.\n\nUn sondaggio è un elemento della piattaforma: condividilo con persone o gruppi (lettura per rispondere, scrittura per vedere tutti i risultati e modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
 name = "Sondaggi"
 description = "Serie di domande a cui rispondono le persone con cui il sondaggio è condiviso, con i risultati per domanda e quiz con punteggio"
 label = "Sondaggi"
 
 [i18n.it.resources.surveys]
 label = "Sondaggi"
-fields = { title = "Titolo", intro = "Introduzione", questions = "Domande", quiz = "Quiz (con punteggio)", pass_percent = "Soglia di superamento (%)", closes_on = "Si chiude il", closed = "Chiuso" }
+fields = { title = "Titolo", intro = "Introduzione", questions = "Domande", quiz = "Quiz (con punteggio)", pass_percent = "Soglia di superamento (%)", closes_on = "Si chiude il", closed = "Chiuso", anonymous = "Anonimo" }
 
 [i18n.it.kpi.kpi_surveys_status]
 label = "Stato dei sondaggi"

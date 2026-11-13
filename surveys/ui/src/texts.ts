@@ -28,6 +28,8 @@ const en = {
   resultsOf: 'Results', responsesTotal: 'Responses', noResponses: 'Nobody has answered yet.', answeredBy: '{a} of {t} answered', average: 'Average', noTextAnswers: 'No text answers.', respondents: 'Respondents',
   colName: 'Name', colWhen: 'Submitted', colScore: 'Score', exportCsv: 'Export CSV', csvName: 'Respondent', csvWhen: 'Submitted at', csvScore: 'Score', csvMax: 'Max score', csvPercent: 'Percent', correctMark: '(correct)',
   exported: 'CSV downloaded',
+  fAnonymous: 'Anonymous', anonNote: 'Nothing links an answer to a person, not even for you. It cannot be turned off later.', anonResults: 'This survey is anonymous: the results show answers, never people.', colResponse: 'Response', responseN: 'Response {n}',
+  fShowIf: 'Question {n}: when to show it', showAlways: 'Always shown', showIfQ: 'Only if question {n} is answered', showIfLabel: 'Show this question', showIfValues: 'Question {n}: show it for these answers', badBranch: 'Question {n}: choose an earlier question with options or a scale, and at least one answer, for the condition',
 }
 export type Texts = typeof en
 export type L = string
@@ -56,6 +58,8 @@ const it: Texts = {
   resultsOf: 'Risultati', responsesTotal: 'Risposte', noResponses: 'Nessuno ha ancora risposto.', answeredBy: '{a} su {t} hanno risposto', average: 'Media', noTextAnswers: 'Nessuna risposta di testo.', respondents: 'Partecipanti',
   colName: 'Nome', colWhen: 'Inviato', colScore: 'Punteggio', exportCsv: 'Esporta CSV', csvName: 'Partecipante', csvWhen: 'Inviato il', csvScore: 'Punteggio', csvMax: 'Punteggio massimo', csvPercent: 'Percentuale', correctMark: '(corretta)',
   exported: 'CSV scaricato',
+  fAnonymous: 'Anonimo', anonNote: 'Niente collega una risposta a una persona, nemmeno per te. Non si può disattivare dopo.', anonResults: 'Questo questionario è anonimo: i risultati mostrano le risposte, mai le persone.', colResponse: 'Risposta', responseN: 'Risposta {n}',
+  fShowIf: 'Domanda {n}: quando mostrarla', showAlways: 'Sempre visibile', showIfQ: 'Solo se la domanda {n} ha risposta', showIfLabel: 'Mostra questa domanda', showIfValues: 'Domanda {n}: mostrala per queste risposte', badBranch: 'Domanda {n}: scegli per la condizione una domanda precedente con opzioni o una scala, e almeno una risposta',
 }
 const es: Texts = {
   title: 'Encuestas', newSurvey: '＋ Nueva encuesta', filter: 'Mostrar', open: 'Abiertas', closed: 'Cerradas', all: 'Todas',
@@ -81,6 +85,8 @@ const es: Texts = {
   resultsOf: 'Resultados', responsesTotal: 'Respuestas', noResponses: 'Todavía nadie ha respondido.', answeredBy: '{a} de {t} han respondido', average: 'Media', noTextAnswers: 'No hay respuestas de texto.', respondents: 'Participantes',
   colName: 'Nombre', colWhen: 'Enviado', colScore: 'Puntuación', exportCsv: 'Exportar CSV', csvName: 'Participante', csvWhen: 'Enviado el', csvScore: 'Puntuación', csvMax: 'Puntuación máxima', csvPercent: 'Porcentaje', correctMark: '(correcta)',
   exported: 'CSV descargado',
+  fAnonymous: 'Anónima', anonNote: 'Nada vincula una respuesta con una persona, ni siquiera para ti. No se puede desactivar después.', anonResults: 'Esta encuesta es anónima: los resultados muestran respuestas, nunca personas.', colResponse: 'Respuesta', responseN: 'Respuesta {n}',
+  fShowIf: 'Pregunta {n}: cuándo mostrarla', showAlways: 'Siempre visible', showIfQ: 'Solo si la pregunta {n} tiene respuesta', showIfLabel: 'Mostrar esta pregunta', showIfValues: 'Pregunta {n}: mostrarla con estas respuestas', badBranch: 'Pregunta {n}: elige para la condición una pregunta anterior con opciones o una escala, y al menos una respuesta',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
 // (`lang/ui/<plugin id>.json`, English phrase → translation, read through `msk.t`), once `bindTexts` has run; the English

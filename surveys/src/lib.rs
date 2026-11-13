@@ -33,6 +33,16 @@ struct Question {
     options: Vec<String>,
     points: i64,
     required: bool,
+    /// Shown only when an earlier question was answered with one of these values.
+    show_if: Option<ShowIf>,
+}
+
+/// A condition of a question: the earlier question `question` (a choice, multi or scale one) has one of the values in
+/// `any_of` (option indexes, or 1 to 5 for a scale) among its answers.
+#[derive(Debug, Clone, PartialEq)]
+struct ShowIf {
+    question: String,
+    any_of: Vec<i64>,
 }
 
 impl Question {
@@ -46,10 +56,14 @@ impl Question {
     }
 
     fn to_json(&self) -> Value {
-        json!({
+        let mut o = json!({
             "id": self.id, "text": self.text, "kind": self.kind, "options": self.options,
             "points": self.points, "required": self.required,
-        })
+        });
+        if let Some(c) = &self.show_if {
+            o["show_if"] = json!({ "question": c.question, "any_of": c.any_of });
+        }
+        o
     }
 }
 
@@ -157,6 +171,7 @@ fn parse_questions(raw: &str) -> Result<Vec<Question>> {
                     )
                 })?,
         };
+        let show_if = parse_show_if(q.get("show_if"), &out, n)?;
         out.push(Question {
             id: id.to_string(),
             text,
@@ -164,9 +179,78 @@ fn parse_questions(raw: &str) -> Result<Vec<Question>> {
             options,
             points,
             required: q.get("required").and_then(Value::as_bool).unwrap_or(false),
+            show_if,
         });
     }
     Ok(out)
+}
+
+/// Reads the condition of question `n` against the questions before it: it must name one of them, a choice, multi or
+/// scale question, and list at least one value that question can have.
+fn parse_show_if(raw: Option<&Value>, before: &[Question], n: usize) -> Result<Option<ShowIf>> {
+    let Some(c) = raw.filter(|c| !c.is_null()) else {
+        return Ok(None);
+    };
+    let wrong = |m: &str| bad("survey_question_branch", format!("question {n}: {m}"));
+    let source = c.get("question").and_then(Value::as_str).unwrap_or("");
+    let Some(src) = before.iter().find(|q| q.id == source) else {
+        return Err(wrong("the condition must use an earlier question"));
+    };
+    let max = match src.kind.as_str() {
+        "choice" | "multi" => src.options.len() as i64,
+        "scale" => 6,
+        _ => return Err(wrong("the condition needs a question with options or a scale")),
+    };
+    let min = if src.kind == "scale" { 1 } else { 0 };
+    let list = c
+        .get("any_of")
+        .and_then(Value::as_array)
+        .ok_or_else(|| wrong("the condition needs at least one value"))?;
+    let mut any_of: Vec<i64> = Vec::new();
+    for v in list {
+        let i = v
+            .as_i64()
+            .filter(|i| (min..max).contains(i))
+            .ok_or_else(|| wrong("the condition has a value the question cannot have"))?;
+        if !any_of.contains(&i) {
+            any_of.push(i);
+        }
+    }
+    if any_of.is_empty() {
+        return Err(wrong("the condition needs at least one value"));
+    }
+    any_of.sort_unstable();
+    Ok(Some(ShowIf {
+        question: source.to_string(),
+        any_of,
+    }))
+}
+
+/// Whether the answers meet the condition `c`: the source question has one of the listed values among its answers.
+fn condition_met(c: &ShowIf, answers: &Map<String, Value>) -> bool {
+    answers.get(&c.question).is_some_and(|a| match a {
+        Value::Array(l) => l
+            .iter()
+            .filter_map(Value::as_i64)
+            .any(|i| c.any_of.contains(&i)),
+        other => other.as_i64().is_some_and(|i| c.any_of.contains(&i)),
+    })
+}
+
+/// The ids of the questions a person sees, given the (checked) answers: a question with no condition, or whose source
+/// is shown and was answered with one of the listed values. The order of the survey is the order of the evaluation.
+fn shown_ids(questions: &[Question], answers: &Map<String, Value>) -> BTreeSet<String> {
+    let mut shown = BTreeSet::new();
+    for q in questions {
+        let on = q
+            .show_if
+            .as_ref()
+            .is_none_or(|c| shown.contains(&c.question) && condition_met(c, answers));
+        if on {
+            shown.insert(q.id.clone());
+        }
+    }
+    shown
 }
 
 /// A pass mark is empty or a whole number from 0 to 100.
@@ -314,6 +398,14 @@ fn survey(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
         Some(p) => v.set("pass_percent", p.to_string()),
         None => v.set("pass_percent", ""),
     }
+    // an anonymous survey stays anonymous: the people who answered it were promised not to be known
+    if hook.previous.as_ref().is_some_and(|p| p.bool("anonymous")) && !v.bool("anonymous") {
+        return Err(bad(
+            "survey_anonymous_fixed",
+            "an anonymous survey cannot be made named again",
+        ));
+    }
+    v.set("anonymous", v.bool("anonymous"));
     Ok(Some(v))
 }
 
@@ -392,7 +484,17 @@ fn check_answers(questions: &[Question], answers: &Value) -> Result<Map<String, 
         ));
     }
     let mut out = Map::new();
+    let mut shown: BTreeSet<String> = BTreeSet::new();
     for (i, q) in questions.iter().enumerate() {
+        // a question whose condition is not met is not asked: nothing is required and a stray answer is dropped
+        let on = q
+            .show_if
+            .as_ref()
+            .is_none_or(|c| shown.contains(&c.question) && condition_met(c, &out));
+        if !on {
+            continue;
+        }
+        shown.insert(q.id.clone());
         if let Some(a) = check_answer(q, map.get(&q.id), i + 1)? {
             out.insert(q.id.clone(), a);
         }
@@ -519,13 +621,14 @@ struct Loaded {
     quiz: bool,
     mark: Option<i64>,
     closed: bool,
+    anonymous: bool,
 }
 
 fn load(ctx: &Ctx, id: &str) -> Result<Loaded> {
     let row = ctx
         .db()
         .query_one(
-            "select questions, coalesce(quiz, false) as quiz, pass_percent, \
+            "select questions, coalesce(quiz, false) as quiz, coalesce(anonymous, false) as anonymous, pass_percent, \
              (coalesce(closed, false) or (closes_on is not null and closes_on < current_date)) as closed \
              from surveys where resource_id::text = $1",
             &[json!(id)],
@@ -552,6 +655,7 @@ fn load(ctx: &Ctx, id: &str) -> Result<Loaded> {
                 .unwrap_or(""),
         )?,
         closed: row.get("closed").and_then(Value::as_bool).unwrap_or(false),
+        anonymous: flag(row.get("anonymous")),
     })
 }
 
@@ -577,8 +681,13 @@ fn submit(ctx: &Ctx, args: Value) -> Result<Value> {
         .clone()
         .ok_or_else(|| bad("not_signed_in", "sign in to answer a survey"))?;
     let tenant = ctx.tenant.clone().unwrap_or_default();
-    let name = ctx.username.clone().unwrap_or_else(|| user.clone());
     let s = load(ctx, &id)?;
+    // an anonymous survey keeps no name with the answers (the person is still known once, to answer only once)
+    let name = if s.anonymous {
+        String::new()
+    } else {
+        ctx.username.clone().unwrap_or_else(|| user.clone())
+    };
     if s.closed {
         return Err(bad("survey_closed", "this survey is closed"));
     }
@@ -596,7 +705,27 @@ fn submit(ctx: &Ctx, args: Value) -> Result<Value> {
             "you have already answered this survey: it can be answered only once",
         ));
     }
-    let (got, max, review) = score(&s.questions, &s.key, &answers);
+    // only the questions that were shown count for the score
+    let shown = shown_ids(&s.questions, &answers);
+    let asked: Vec<Question> = s
+        .questions
+        .iter()
+        .filter(|q| shown.contains(&q.id))
+        .cloned()
+        .collect();
+    let (got, max, asked_review) = score(&asked, &s.key, &answers);
+    let mut it = asked_review.into_iter();
+    let review: Vec<Option<bool>> = s
+        .questions
+        .iter()
+        .map(|q| {
+            if shown.contains(&q.id) {
+                it.next().flatten()
+            } else {
+                None
+            }
+        })
+        .collect();
     let (sc, mx) = if s.quiz {
         (json!(got), json!(max))
     } else {
@@ -654,15 +783,25 @@ fn results(ctx: &Ctx, args: Value) -> Result<Value> {
         o
     });
     if level_of(ctx, &id)? < 2 {
-        return Ok(json!({ "full": false, "responded": mine.is_some(), "mine": mine_json }));
+        return Ok(json!({ "full": false, "responded": mine.is_some(), "mine": mine_json, "anonymous": s.anonymous }));
     }
     let all: Vec<Map<String, Value>> = rows.iter().map(parse).collect();
-    let respondents: Vec<Value> = rows
-        .iter()
+    let mut order: Vec<&Value> = rows.iter().collect();
+    if s.anonymous {
+        // nothing of the order of arrival is left: the answers are listed by their content
+        order.sort_by_key(|r| r.get("answers").and_then(Value::as_str).unwrap_or("").to_string());
+    }
+    let respondents: Vec<Value> = order
+        .into_iter()
         .map(|r| {
             let (sc, mx) = (r.get("score").and_then(Value::as_i64), r.get("max_score").and_then(Value::as_i64));
+            let (who, name, at) = if s.anonymous {
+                (Value::Null, Value::Null, Value::Null)
+            } else {
+                (r.get("user_id").cloned().unwrap_or(Value::Null), r.get("user_name").cloned().unwrap_or(Value::Null), r.get("at").cloned().unwrap_or(Value::Null))
+            };
             json!({
-                "id": r.get("user_id"), "name": r.get("user_name"), "at": r.get("at"),
+                "id": who, "name": name, "at": at,
                 "score": sc, "max_score": mx,
                 "percent": match (sc, mx) { (Some(a), Some(b)) => json!(percent(a, b)), _ => Value::Null },
                 "passed": match (sc, mx) { (Some(a), Some(b)) => json!(passed(percent(a, b), s.mark)), _ => Value::Null },
@@ -672,6 +811,7 @@ fn results(ctx: &Ctx, args: Value) -> Result<Value> {
         .collect();
     Ok(json!({
         "full": true,
+        "anonymous": s.anonymous,
         "responded": mine.is_some(),
         "mine": mine_json,
         "total": rows.len(),
@@ -1153,5 +1293,118 @@ mod tests {
             .command(&__msk_registry(), "surveys.widget_open", json!({}))
             .unwrap();
         assert_eq!(out, json!({ "value": 1, "secondary": 2, "tone": "" }));
+    }
+}
+
+#[cfg(test)]
+mod branching_tests {
+    use super::*;
+    use mosaikit_plugin_sdk::testing::MockHost;
+
+    fn qs(show_b: Value) -> Vec<Question> {
+        parse_questions(
+            &json!([
+                { "id": "a", "text": "Do you drive?", "kind": "choice", "options": ["yes", "no", "sometimes"] },
+                { "id": "b", "text": "What car?", "kind": "text", "required": true, "show_if": show_b },
+                { "id": "c", "text": "Rate it", "kind": "scale", "show_if": { "question": "a", "any_of": [0] } },
+                { "id": "d", "text": "Anything else?", "kind": "text" },
+            ])
+            .to_string(),
+        )
+        .unwrap_or_default()
+    }
+
+    fn map(v: Value) -> Map<String, Value> {
+        v.as_object().unwrap().clone()
+    }
+
+    #[test]
+    fn a_condition_names_an_earlier_question_with_options_or_a_scale() {
+        let ok = qs(json!({ "question": "a", "any_of": [0, 2] }));
+        assert_eq!(ok.len(), 4);
+        assert_eq!(ok[1].show_if.as_ref().unwrap().any_of, vec![0, 2]);
+        let bad = |c: Value, kind: &str| {
+            let raw = json!([
+                { "id": "a", "text": "A", "kind": kind, "options": ["x", "y"] },
+                { "id": "b", "text": "B", "kind": "text", "show_if": c },
+            ])
+            .to_string();
+            parse_questions(&raw).unwrap_err().to_string()
+        };
+        // a later or unknown question, a text source, a value the source cannot have, no value
+        assert!(bad(json!({ "question": "z", "any_of": [0] }), "choice").contains("earlier"));
+        assert!(bad(json!({ "question": "b", "any_of": [0] }), "choice").contains("earlier"));
+        assert!(bad(json!({ "question": "a", "any_of": [0] }), "text").contains("options or a scale"));
+        assert!(bad(json!({ "question": "a", "any_of": [2] }), "choice").contains("cannot have"));
+        assert!(bad(json!({ "question": "a", "any_of": [0] }), "scale").contains("cannot have"));
+        assert!(bad(json!({ "question": "a", "any_of": [] }), "choice").contains("at least one"));
+    }
+
+    #[test]
+    fn the_condition_is_kept_when_the_survey_is_saved() {
+        let v = MockHost::new()
+            .hook(
+                &__msk_registry(),
+                "before_create",
+                "surveys",
+                json!({ "title": "T", "questions": json!([
+                    { "id": "a", "text": "A", "kind": "choice", "options": ["x", "y"] },
+                    { "id": "b", "text": "B", "kind": "text", "show_if": { "question": "a", "any_of": [1, 1] } },
+                ]).to_string() }),
+            )
+            .unwrap()
+            .unwrap();
+        assert!(v.str("questions").contains(r#""show_if":{"any_of":[1],"question":"a"}"#));
+    }
+
+    #[test]
+    fn a_question_is_asked_only_when_the_condition_is_met() {
+        let q = qs(json!({ "question": "a", "any_of": [0] }));
+        // answered "yes": the car is asked (and required) and so is the rating (not required)
+        assert!(check_answers(&q, &json!({ "a": 0 })).unwrap_err().to_string().contains("question 2"));
+        let ok = check_answers(&q, &json!({ "a": 0, "b": "Fiat" })).unwrap();
+        assert_eq!(ok.len(), 2);
+        // answered "no": the car is not asked, a stray answer is dropped
+        let no = check_answers(&q, &json!({ "a": 1, "b": "Fiat", "d": "hi" })).unwrap();
+        assert_eq!(no.keys().cloned().collect::<Vec<_>>(), ["a", "d"]);
+    }
+
+    #[test]
+    fn a_chain_of_conditions_follows_the_shown_questions() {
+        let raw = json!([
+            { "id": "a", "text": "A", "kind": "multi", "options": ["x", "y", "z"] },
+            { "id": "b", "text": "B", "kind": "scale", "show_if": { "question": "a", "any_of": [1] } },
+            { "id": "c", "text": "C", "kind": "text", "required": true, "show_if": { "question": "b", "any_of": [4, 5] } },
+        ])
+        .to_string();
+        let q = parse_questions(&raw).unwrap();
+        // the scale is shown when y is among the picks; the text when the scale is 4 or 5
+        assert!(check_answers(&q, &json!({ "a": [0, 1], "b": 5 })).is_err());
+        assert!(check_answers(&q, &json!({ "a": [0, 1], "b": 5, "c": "why" })).is_ok());
+        assert!(check_answers(&q, &json!({ "a": [0, 1], "b": 2 })).is_ok());
+        // b hidden (no y): c hidden too, even if its own condition value was sent
+        let m = check_answers(&q, &json!({ "a": [0], "b": 5, "c": "stray" })).unwrap();
+        assert_eq!(m.keys().cloned().collect::<Vec<_>>(), ["a"]);
+        let shown = shown_ids(&q, &map(json!({ "a": [1], "b": 4 })));
+        assert_eq!(shown.len(), 3);
+        assert_eq!(shown_ids(&q, &map(json!({ "a": [2] }))).len(), 1);
+    }
+
+    #[test]
+    fn an_anonymous_survey_cannot_be_made_named_again() {
+        let h = MockHost::new();
+        let v = |anon: bool| json!({ "title": "T", "anonymous": anon });
+        let make = h
+            .hook(&__msk_registry(), "before_create", "surveys", v(true))
+            .unwrap()
+            .unwrap();
+        assert!(make.bool("anonymous"));
+        let named = h
+            .hook_with_previous(&__msk_registry(), "before_update", "surveys", v(false), v(true))
+            .unwrap_err();
+        assert!(named.contains("anonymous"));
+        assert!(h
+            .hook_with_previous(&__msk_registry(), "before_update", "surveys", v(true), v(false))
+            .is_ok());
     }
 }
