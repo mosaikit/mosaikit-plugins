@@ -26,7 +26,7 @@
 // For 5 s after the restore, a snapshot that loses the restored layers is read
 // as the start overwriting them: it is not saved and the project is loaded again.
 
-import { getLang, t } from './i18n.ts'
+import { getCode, t } from './i18n.ts'
 
 /** GeoLibre instance to embed. Hosted = no configuration; for a self-hosted
  * instance change this (and `frame_src` in the manifest). */
@@ -147,8 +147,8 @@ export class MapFrame {
     const url = new URL(GEOLIBRE_URL, window.location.href)
     url.searchParams.set('theme', THEME)
     // GeoLibre in the language of the host
-    url.searchParams.set('lang', getLang())
-    url.searchParams.set('locale', getLang())
+    url.searchParams.set('lang', getCode())
+    url.searchParams.set('locale', getCode())
     // Turns on the state bridge: without it the project is neither read nor loaded again.
     url.searchParams.set('embed', '1')
     if (readOnly) url.searchParams.set('layout', 'viewer')

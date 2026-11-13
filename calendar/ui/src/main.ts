@@ -59,7 +59,7 @@ import {
   type TaskDue,
   type View,
 } from './logic.ts'
-import { TEXTS, langOf, sub } from './texts.ts'
+import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 
 const app = document.getElementById('app')!
 
@@ -99,6 +99,7 @@ function save(text: string, name: string) {
 
 function mount(msk: Msk) {
   document.documentElement.classList.add('msk-fill')
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
   const api = msk.crud('events')

@@ -20,6 +20,11 @@ export function getLang(): Lang {
   return lang
 }
 
+/** The code of the host language as it is (`es`, `ar`, `zh`…), for what takes a language by code (the GeoLibre frame). */
+export function getCode(): string {
+  return code
+}
+
 export function setLang(l: string | undefined) {
   lang = pick(l)
   code = (l ?? '').toLowerCase().split('-')[0] || 'en'

@@ -6,13 +6,14 @@ import { avatar, confirmDialog, connect, dialog, el, emptyState, errText, skelet
 import { thumbnail } from './canvas.ts'
 import { initialOf, personColor } from './logic.ts'
 import { Board, applySnapshot } from './sync.ts'
-import { TEXTS, langOf, sub } from './texts.ts'
+import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 import { openEditor } from './editor.ts'
 
 const app = document.getElementById('app')!
 
 function mount(msk: Msk) {
   document.documentElement.classList.add('msk-fill')
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
   const api = msk.crud('whiteboards')

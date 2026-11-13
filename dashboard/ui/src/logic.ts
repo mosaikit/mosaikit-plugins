@@ -3,7 +3,7 @@
 
 export type Tone = '' | 'ok' | 'warn' | 'err'
 export type Columns = 'auto' | '2' | '3'
-export type Lang = 'en' | 'it' | 'es'
+export type Lang = string
 
 export interface WidgetTexts {
   label?: string

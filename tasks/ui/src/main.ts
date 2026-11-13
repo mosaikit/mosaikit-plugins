@@ -28,7 +28,7 @@ import {
 } from '@mosaikit/plugin-api'
 import { bucketOf, isoDate, joinLabels, splitLabels, weekDays, type Bucket } from './group.ts'
 import { parseQuickAdd, toValues } from './quickadd.ts'
-import { TEXTS, langOf, sub, type L } from './texts.ts'
+import { bindTexts, TEXTS, langOf, sub, type L } from './texts.ts'
 
 const app = document.getElementById('app')!
 
@@ -43,6 +43,7 @@ const fmt = (iso: string, lang: L) => {
 }
 
 function mount(msk: Msk) {
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
   let handle: CrudHandle | null = null

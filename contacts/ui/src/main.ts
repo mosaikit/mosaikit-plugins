@@ -25,7 +25,7 @@ import {
   type Row,
 } from '@mosaikit/plugin-api'
 import { daysToBirthday, duplicates, groupByLetter, splitTags, type Entry } from './logic.ts'
-import { TEXTS, langOf, sub, type L } from './texts.ts'
+import { bindTexts, TEXTS, langOf, sub, type L } from './texts.ts'
 import { parseCsv, parseVcf, toCsv, toVcf, type Person } from './vcard.ts'
 
 const app = document.getElementById('app')!
@@ -54,6 +54,7 @@ function link(kind: 'mail' | 'tel', value: string): HTMLElement {
 }
 
 function mount(msk: Msk) {
+  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
   let handle: CrudHandle | null = null

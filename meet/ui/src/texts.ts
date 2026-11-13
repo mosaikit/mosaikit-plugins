@@ -1,3 +1,4 @@
+import type { Msk } from '@mosaikit/plugin-api'
 // The texts of the Meet UI (English by default; Italian and Spanish follow the language of the host).
 const en = {
   title: 'Meet', newRoom: '＋ New room', roomName: 'Name', roomTopic: 'Topic (optional)', create: 'Create', save: 'Save', cancel: 'Cancel',
@@ -8,7 +9,7 @@ const en = {
   failed: 'Could not start the UI of the plugin: ', loadFailed: 'Could not load the rooms: ',
 }
 export type Texts = typeof en
-export type L = 'en' | 'it' | 'es'
+export type L = string
 
 const it: Texts = {
   title: 'Riunioni', newRoom: '＋ Nuova stanza', roomName: 'Nome', roomTopic: 'Argomento (facoltativo)', create: 'Crea', save: 'Salva', cancel: 'Annulla',
@@ -26,10 +27,28 @@ const es: Texts = {
   privacy: 'La llamada se hace en Jitsi Meet: ningún vídeo pasa por Mosaikit. El navegador pide la cámara y el micrófono la primera vez.',
   failed: 'No se pudo iniciar la interfaz del plugin: ', loadFailed: 'No se pudieron cargar las salas: ',
 }
-export const TEXTS: Record<L, Texts> = { en, it, es }
-
-export const langOf = (l: string | undefined): L => {
-  const x = (l ?? navigator.language).toLowerCase()
-  return x.startsWith('it') ? 'it' : x.startsWith('es') ? 'es' : 'en'
+// Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
+// (`lang/ui/<plugin id>.json`, English phrase → translation, read through `msk.t`), once `bindTexts` has run; the English
+// phrase is shown when a language has none. Without a host (a public page) the tables are used as they are.
+let host: Msk | undefined
+type Tree = string | { [k: string]: Tree }
+/** Connects the tables to the host: `TEXTS[code]` then reads `msk.t` for the languages that are not in the tables. */
+export function bindTexts(msk: Msk) {
+  host = msk
 }
+let built: { code: string; texts: unknown; value: Texts } | undefined
+function translated(code: string, msk: Msk): Texts {
+  const texts = msk.context?.texts
+  if (built && built.code === code && built.texts === texts) return built.value
+  const tx = (v: Tree): Tree => (typeof v === 'string' ? msk.t(v) : Object.fromEntries(Object.entries(v).map(([k, x]) => [k, tx(x)])))
+  built = { code, texts, value: tx(en as unknown as Tree) as unknown as Texts }
+  return built.value
+}
+const tables: Record<string, Texts> = { en, it, es }
+export const TEXTS = new Proxy(tables, {
+  get: (t, code) => (typeof code !== 'string' ? undefined : host && !(code in t) ? translated(code, host) : (t[code] ?? en)),
+}) as Record<string, Texts>
+
+/** The code of the language (`es`, `ar`…), `en` when none is known. */
+export const langOf = (l: string | undefined): L => ((l ?? (typeof navigator === 'undefined' ? '' : navigator.language)).toLowerCase().split('-')[0] || 'en')
 export const sub = (t: string, vars: Record<string, string | number>) => t.replace(/\{(\w+)\}/g, (_, k: string) => String(vars[k] ?? ''))
