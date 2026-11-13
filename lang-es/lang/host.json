@@ -2140,5 +2140,13 @@
   "Already shared with them": "Ya compartido con ellos",
   "Share with {n}": "Compartir con {n}",
   "Shared with {n}": "Compartido con {n}",
-  "Developer profile": "Perfil de desarrollador"
+  "Developer profile": "Perfil de desarrollador",
+  "Drag the group": "Arrastrar el grupo",
+  "Drag the subgroup": "Arrastrar el subgrupo",
+  "new notifications": "notificaciones nuevas",
+  "Keep this group in every tenant": "Mantener este grupo en cada organización",
+  "A tenant that sets its own groups still has it, first": "Una organización que define sus grupos lo conserva igualmente, primero",
+  "Whose groups": "De quién son los grupos",
+  "Of my tenant": "De mi organización",
+  "Of the platform": "De la plataforma"
 }
