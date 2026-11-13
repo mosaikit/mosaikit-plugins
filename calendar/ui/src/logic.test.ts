@@ -11,6 +11,11 @@ import {
   icsCalendar,
   icsEscape,
   icsEvent,
+  convertOcc,
+  instantToWall,
+  validZone,
+  wallToInstant,
+  zoneNames,
   icsFold,
   icsName,
   isDate,
@@ -263,5 +268,133 @@ describe('.ics', () => {
   it('names the file safely', () => {
     expect(icsName('Team lunch / plan!')).toBe('Team-lunch-plan.ics')
     expect(icsName('???')).toBe('event.ics')
+  })
+})
+
+describe('.ics: zones, exceptions and invited', () => {
+  const base: IcsEvent = {
+    id: 'abc', title: 'Standup', details: '', location: '', starts_on: '2026-11-02', starts_time: '09:30',
+    ends_on: '2026-11-02', ends_time: '10:00', all_day: false, repeat: 'weekly', repeat_until: '', timezone: 'Europe/Rome',
+  }
+  const stamp = '20261101T080000Z'
+
+  it('writes the times of an event with a zone with its TZID', () => {
+    const l = icsEvent(base, stamp)
+    expect(l).toContain('DTSTART;TZID=Europe/Rome:20261102T093000')
+    expect(l).toContain('DTEND;TZID=Europe/Rome:20261102T100000')
+  })
+
+  it('writes the end of a series with a zone in UTC, as the format asks', () => {
+    // 23:59:59 in Rome on 2026-12-31 (UTC+1) is 22:59:59 UTC
+    expect(icsEvent({ ...base, repeat_until: '2026-12-31' }, stamp)).toContain('RRULE:FREQ=WEEKLY;UNTIL=20261231T225959Z')
+  })
+
+  it('keeps floating times for an event with no zone, and ignores a zone on an all-day event', () => {
+    expect(icsEvent({ ...base, timezone: '' }, stamp)).toContain('DTSTART:20261102T093000')
+    const day = icsEvent({ ...base, all_day: true, starts_time: '', ends_time: '', timezone: 'Europe/Rome' }, stamp)
+    expect(day).toContain('DTSTART;VALUE=DATE:20261102')
+    expect(day.join('\n')).not.toContain('TZID')
+  })
+
+  it('removes a deleted occurrence with an EXDATE and writes a changed one again with its RECURRENCE-ID', () => {
+    const l = icsEvent(
+      {
+        ...base,
+        exceptions: [
+          { on: '2026-11-09', skipped: true, title: null, location: null, starts_time: null, ends_time: null },
+          { on: '2026-11-16', skipped: false, title: 'Planning', location: 'Room 2', starts_time: '11:00', ends_time: null },
+        ],
+      },
+      stamp,
+    )
+    expect(l).toContain('EXDATE;TZID=Europe/Rome:20261109T093000')
+    // the changed one is not an EXDATE
+    expect(l.filter((x) => x.startsWith('EXDATE'))).toHaveLength(1)
+    const i = l.indexOf('RECURRENCE-ID;TZID=Europe/Rome:20261116T093000')
+    expect(i).toBeGreaterThan(0)
+    const second = l.slice(i - 3)
+    expect(second[0]).toBe('BEGIN:VEVENT')
+    expect(second).toContain('UID:abc@mosaikit-calendar')
+    expect(second).toContain('DTSTART;TZID=Europe/Rome:20261116T110000')
+    expect(second).toContain('DTEND;TZID=Europe/Rome:20261116T120000')
+    expect(second).toContain('SUMMARY:Planning')
+    expect(second).toContain('LOCATION:Room 2')
+    expect(second.join('\n')).not.toContain('RRULE')
+  })
+
+  it('writes the exceptions of an all-day series with dates', () => {
+    const l = icsEvent(
+      { ...base, timezone: '', all_day: true, starts_time: '', ends_time: '', exceptions: [{ on: '2026-11-09', skipped: true, title: null, location: null, starts_time: null, ends_time: null }] },
+      stamp,
+    )
+    expect(l).toContain('EXDATE;VALUE=DATE:20261109')
+  })
+
+  it('writes the invited as attendees with their answer', () => {
+    const l = icsEvent(
+      {
+        ...base,
+        repeat: 'none',
+        attendees: [
+          { id: 'u1', name: 'Ann "A" Rossi', answer: 'yes' },
+          { id: 'u2', name: 'Bob', answer: 'no' },
+          { id: 'u3', name: 'Cy', answer: 'maybe' },
+          { id: 'u4', name: 'Di', answer: '' },
+        ],
+      },
+      stamp,
+    )
+    expect(l).toContain('ATTENDEE;CN="Ann A Rossi";ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED:urn:uuid:u1')
+    expect(l).toContain('ATTENDEE;CN="Bob";ROLE=REQ-PARTICIPANT;PARTSTAT=DECLINED:urn:uuid:u2')
+    expect(l).toContain('ATTENDEE;CN="Cy";ROLE=REQ-PARTICIPANT;PARTSTAT=TENTATIVE:urn:uuid:u3')
+    expect(l).toContain('ATTENDEE;CN="Di";ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION:urn:uuid:u4')
+  })
+})
+
+describe('time zones', () => {
+  const occ = (o: Partial<Occ>): Occ => ({
+    id: 'e', title: 'x', location: '', start: '2026-11-12', end: '2026-11-12', starts_time: '09:30', ends_time: '10:30', all_day: false, repeat: 'none',
+    color: 'blue', invitees: 0, invited: false, yes: 0, no: 0, maybe: 0, mine: '', ...o,
+  })
+
+  it('knows the zones it can use', () => {
+    expect(validZone('Europe/Rome')).toBe(true)
+    expect(validZone('Mars/Olympus')).toBe(false)
+    expect(validZone('')).toBe(false)
+    expect(zoneNames()[0]).toBe('UTC')
+  })
+
+  it('turns a wall clock into an instant and back, across a daylight-saving change', () => {
+    // Rome is UTC+1 in November and UTC+2 in July
+    expect(new Date(wallToInstant('2026-11-12', '09:30', 'Europe/Rome')).toISOString()).toBe('2026-11-12T08:30:00.000Z')
+    expect(new Date(wallToInstant('2026-07-12', '09:30', 'Europe/Rome')).toISOString()).toBe('2026-07-12T07:30:00.000Z')
+    expect(instantToWall(Date.UTC(2026, 10, 12, 8, 30), 'Europe/Rome')).toEqual({ date: '2026-11-12', time: '09:30' })
+    expect(instantToWall(Date.UTC(2026, 10, 12, 0, 5), 'Asia/Tokyo')).toEqual({ date: '2026-11-12', time: '09:05' })
+  })
+
+  it('shows an event of another zone at the hour of the viewer, the day too', () => {
+    // 09:30-10:30 in Rome is 17:30-18:30 in Tokyo
+    const t = convertOcc(occ({ timezone: 'Europe/Rome' }), 'Asia/Tokyo')
+    expect([t.start, t.starts_time, t.end, t.ends_time]).toEqual(['2026-11-12', '17:30', '2026-11-12', '18:30'])
+    expect(t.own).toEqual({ start: '2026-11-12', end: '2026-11-12', starts_time: '09:30', ends_time: '10:30' })
+    // 23:00 in Rome is 07:00 the next day in Tokyo
+    const n = convertOcc(occ({ timezone: 'Europe/Rome', starts_time: '23:00', ends_time: '23:30' }), 'Asia/Tokyo')
+    expect([n.start, n.starts_time, n.end, n.ends_time]).toEqual(['2026-11-13', '07:00', '2026-11-13', '07:30'])
+    // an event with no end time keeps none and keeps its length in days
+    const open = convertOcc(occ({ timezone: 'Europe/Rome', ends_time: '', end: '2026-11-13' }), 'Asia/Tokyo')
+    expect([open.start, open.end, open.ends_time]).toEqual(['2026-11-12', '2026-11-13', ''])
+  })
+
+  it('leaves alone what has no zone, all-day events, no time, the same zone and unknown zones', () => {
+    const base = occ({})
+    expect(convertOcc(base, 'Asia/Tokyo')).toBe(base)
+    const day = occ({ timezone: 'Europe/Rome', all_day: true })
+    expect(convertOcc(day, 'Asia/Tokyo')).toBe(day)
+    const none = occ({ timezone: 'Europe/Rome', starts_time: '' })
+    expect(convertOcc(none, 'Asia/Tokyo')).toBe(none)
+    const same = occ({ timezone: 'Europe/Rome' })
+    expect(convertOcc(same, 'Europe/Rome')).toBe(same)
+    const odd = occ({ timezone: 'Mars/Olympus' })
+    expect(convertOcc(odd, 'Asia/Tokyo')).toBe(odd)
   })
 })

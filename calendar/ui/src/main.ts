@@ -29,6 +29,7 @@ import {
   arrowTarget,
   chipText,
   colorOf,
+  convertOcc,
   endAfter,
   fixEnd,
   icsCalendar,
@@ -49,10 +50,15 @@ import {
   shift,
   spread,
   timeRange,
+  validZone,
   viewKey,
+  viewerZone,
   weekDays,
   weekdayNames,
+  zoneNames,
   type IcsEvent,
+  type IcsException,
+  type IcsPerson,
   type Occ,
   type Person,
   type Seg,
@@ -78,6 +84,7 @@ interface Invite {
   ends_time: string
   all_day: boolean
   color: string
+  timezone?: string
 }
 interface RsvpAnswer {
   attendees: Person[]
@@ -116,6 +123,8 @@ function mount(msk: Msk) {
   let loaded = false
   let loadedRange = ''
   let seq = 0
+  // the zone of the person: events that have a time zone are shown at the hour of this one
+  const zone = viewerZone()
 
   const fail = (e: unknown) => toast(errText(e, msk.context?.lang), { tone: 'err', ms: 6000 })
   const head = el('header', { class: 'cal-head' })
@@ -135,7 +144,10 @@ function mount(msk: Msk) {
   // --------------------------------------------------------------------------------------------------------- data
   const loadInvites = async () => {
     try {
-      invites = (await msk.call<{ invitations: Invite[] }>('events.invitations')).invitations
+      invites = (await msk.call<{ invitations: Invite[] }>('events.invitations')).invitations.map((i) => {
+        const c = convertOcc({ ...i, repeat: '', invitees: 0, invited: true, yes: 0, no: 0, maybe: 0, mine: '' }, zone)
+        return { ...i, start: c.start, end: c.end, starts_time: c.starts_time, ends_time: c.ends_time }
+      })
     } catch {
       invites = []
     }
@@ -147,9 +159,10 @@ function mount(msk: Msk) {
     const { from, to } = rangeFor(view, anchor)
     if (!loaded) body.replaceChildren(skeleton({ kind: 'cards', count: 3 }))
     try {
-      const r = await msk.call<RangeAnswer>('events.range', { from, to, tasks: showTasks })
+      // a day more on each side: an event of another time zone can move into the range or out of it
+      const r = await msk.call<RangeAnswer>('events.range', { from: addDays(from, -1), to: addDays(to, 1), tasks: showTasks })
       if (my !== seq) return
-      occs = r.events
+      occs = r.events.map((o) => convertOcc(o, zone)).filter((o) => o.end >= from && o.start <= to)
       tasks = showTasks ? r.tasks : []
       tasksError = showTasks && r.tasks_error ? r.tasks_error : ''
       loaded = true
@@ -480,10 +493,21 @@ function mount(msk: Msk) {
     const until = el('input', { type: 'date', 'aria-label': t.fUntil })
     until.value = sd('repeat_until')
     const untilBox = el('div', { class: 'msk-field' }, el('label', {}, t.fUntil), until)
+    // time zone of the event: empty keeps local times, nothing converted
+    const zoneSel = el('select', { 'aria-label': t.fZone, 'data-testid': 'zone' })
+    zoneSel.append(el('option', { value: '' }, t.zoneNone))
+    const zones = zoneNames()
+    const current = s('timezone')
+    if (current && !zones.includes(current)) zones.unshift(current)
+    for (const z of zones) zoneSel.append(el('option', { value: z }, z))
+    zoneSel.value = current
+    const zoneNote = el('p', { class: 'cal-dim' })
 
     const timeBox = el('div', { class: 'cal-times' })
     const syncTimes = () => {
       timeBox.hidden = allDay.checked
+      zoneBox.hidden = allDay.checked
+      zoneNote.textContent = zoneSel.value ? sub(t.zoneNote, { z: zoneSel.value, m: zone }) : t.timesNote
     }
     const syncUntil = () => {
       untilBox.hidden = repeat.value === 'none'
@@ -494,6 +518,7 @@ function mount(msk: Msk) {
       endTime.value = f.ends_time
     }
     allDay.addEventListener('change', syncTimes)
+    zoneSel.addEventListener('change', syncTimes)
     repeat.addEventListener('change', syncUntil)
     startDate.addEventListener('change', () => {
       if (!endTouched) endDate.value = startDate.value
@@ -513,6 +538,7 @@ function mount(msk: Msk) {
     })
     const field = (label: string, input: HTMLElement) => el('div', { class: 'msk-field' }, el('label', {}, label), input)
     timeBox.append(field(t.fStartTime, startTime), field(t.fEndTime, endTime))
+    const zoneBox = el('div', { class: 'cal-zone' }, field(t.fZone, zoneSel), zoneNote)
 
     // colour: swatches with the name as text for who cannot tell colours apart
     const swatches = el('div', { class: 'cal-swatches', role: 'group', 'aria-label': t.fColor })
@@ -586,7 +612,7 @@ function mount(msk: Msk) {
         el('label', { class: 'cal-check', for: 'cal-allday' }, allDay, el('span', {}, t.fAllDay)),
         el('div', { class: 'cal-dates' }, field(t.fStartDate, startDate), field(t.fEndDate, endDate)),
         timeBox,
-        el('p', { class: 'cal-dim' }, t.timesNote),
+        zoneBox,
         field(t.fLocation, location),
         field(t.fDetails, details),
         el('div', { class: 'cal-dates' }, field(t.fRepeat, repeat), untilBox),
@@ -620,6 +646,7 @@ function mount(msk: Msk) {
         repeat_until: repeat.value === 'none' || !until.value ? null : until.value,
         attendees: peopleJson(people),
         color,
+        timezone: allDay.checked || !validZone(zoneSel.value) ? '' : zoneSel.value,
       }
       ok.disabled = true
       try {
@@ -628,6 +655,60 @@ function mount(msk: Msk) {
         anchor = values.starts_on
         await reload()
         if (!row && people.length) offerShare(made.id)
+      } catch (e) {
+        fail(e)
+        ok.disabled = false
+      }
+    })
+    title.focus()
+  }
+
+  /** The form of one occurrence of a series: title, place and times, in the zone of the event. The rest stays as the series says. */
+  function occurrenceForm(o: Occ, row: Row) {
+    const t = tr()
+    const own = o.own ?? { start: o.start, end: o.end, starts_time: o.starts_time, ends_time: o.ends_time }
+    const title = el('input', { type: 'text', maxlength: '160', 'aria-label': t.fTitle })
+    title.value = o.title
+    const location = el('input', { type: 'text', maxlength: '200', 'aria-label': t.fLocation })
+    location.value = o.location
+    const startTime = el('input', { type: 'time', 'aria-label': t.fStartTime })
+    startTime.value = own.starts_time
+    const endTime = el('input', { type: 'time', 'aria-label': t.fEndTime })
+    endTime.value = own.ends_time
+    const field = (label: string, input: HTMLElement) => el('div', { class: 'msk-field' }, el('label', {}, label), input)
+    const timed = !o.all_day
+    const ok = el('button', { type: 'button', class: 'msk-btn' }, t.save)
+    const no = el('button', { type: 'button', class: 'msk-btn ghost' }, t.cancel)
+    const d = dialog({
+      title: t.editOccurrence,
+      body: el(
+        'div',
+        { class: 'cal-form' },
+        el('p', { class: 'cal-dim' }, sub(t.occurrenceOf, { d: dayLong(o.orig ?? o.start) })),
+        field(t.fTitle, title),
+        field(t.fLocation, location),
+        timed ? el('div', { class: 'cal-times' }, field(t.fStartTime, startTime), field(t.fEndTime, endTime)) : '',
+        timed && o.timezone ? el('p', { class: 'cal-dim' }, sub(t.timesInZone, { z: o.timezone })) : '',
+      ),
+      actions: [no, ok],
+    })
+    no.addEventListener('click', d.close)
+    ok.addEventListener('click', async () => {
+      if (!title.value.trim()) {
+        toast(t.needTitle, { tone: 'err' })
+        return title.focus()
+      }
+      if (timed && ((startTime.value && !isTime(startTime.value)) || (endTime.value && !isTime(endTime.value)))) return void toast(t.badTime, { tone: 'err' })
+      ok.disabled = true
+      try {
+        const args: Record<string, string> = { id: row.id, on: o.orig ?? o.start, title: title.value.trim(), location: location.value.trim() }
+        if (timed) {
+          args.starts_time = startTime.value
+          args.ends_time = endTime.value
+        }
+        await msk.call('events.override', args)
+        d.close()
+        await reload()
       } catch (e) {
         fail(e)
         ok.disabled = false
@@ -672,7 +753,23 @@ function mount(msk: Msk) {
     all_day: r.values.all_day === true,
     repeat: str(r, 'repeat'),
     repeat_until: dateOf(r, 'repeat_until'),
+    timezone: str(r, 'timezone'),
   })
+
+  interface IcsExtras {
+    attendees: IcsPerson[]
+    exceptions: IcsException[]
+  }
+  /** The events as .ics events with their exceptions and the invited with their answers (the extras are optional). */
+  const withExtras = async (rows: Row[]): Promise<IcsEvent[]> => {
+    let extras: Record<string, IcsExtras> = {}
+    try {
+      extras = await msk.call<Record<string, IcsExtras>>('events.ics_data', { ids: rows.map((r) => r.id) })
+    } catch {
+      extras = {}
+    }
+    return rows.map((r) => ({ ...toIcs(r), ...(extras[r.id] ?? {}) }))
+  }
 
   const exportMonth = async () => {
     const first = `${anchor.slice(0, 7)}-01`
@@ -682,7 +779,7 @@ function mount(msk: Msk) {
       const ids = new Set(r.events.map((e) => e.id))
       if (!ids.size) return void toast(tr().exportEmpty)
       const rows = (await api.list({ limit: 500 })).rows.filter((x) => ids.has(x.id))
-      save(icsCalendar(rows.map(toIcs), icsStamp(new Date())), `calendar-${anchor.slice(0, 7)}.ics`)
+      save(icsCalendar(await withExtras(rows), icsStamp(new Date())), `calendar-${anchor.slice(0, 7)}.ics`)
     } catch (e) {
       fail(e)
     }
@@ -716,6 +813,8 @@ function mount(msk: Msk) {
       box.replaceChildren(
         el('div', { class: 'cal-chips2' }, el('span', { class: `cal-dot c-${colorOf(row.values.color)}`, 'aria-hidden': 'true' }), el('span', { class: 'msk-chip' }, colorLabel(String(row.values.color))), rep !== 'none' ? el('span', { class: 'msk-badge' }, repeatLabel(rep) + (dateOf(row, 'repeat_until') ? ' · ' + sub(t.untilLine, { d: dateOf(row, 'repeat_until') }) : '')) : ''),
         el('p', { class: 'cal-when', 'data-testid': 'detail-when' }, el('strong', {}, t.when + ': '), when),
+        o.own ? el('p', { class: 'cal-dim', 'data-testid': 'detail-zone' }, sub(t.inZone, { t: timeRange({ all_day: false, starts_time: o.own.starts_time, ends_time: o.own.ends_time }), z: o.timezone ?? '' })) : '',
+        o.exception ? el('p', { class: 'cal-dim', 'data-testid': 'detail-exception' }, t.changedOccurrence) : '',
         str(row, 'location') ? el('p', {}, el('strong', {}, t.where + ': '), str(row, 'location')) : '',
         el('p', { class: 'cal-dim' }, sub(t.owner, { n: row.owner_name })),
         str(row, 'details').trim() ? el('p', { class: 'cal-text' }, str(row, 'details')) : el('p', { class: 'cal-dim' }, t.noDetails),
@@ -751,12 +850,43 @@ function mount(msk: Msk) {
         b.addEventListener('click', fn)
         acts.append(b)
       }
-      btn(t.addIcs, () => save(icsCalendar([toIcs(row)], icsStamp(new Date())), icsName(str(row, 'title'))))
+      btn(t.addIcs, () => void withExtras([row]).then((evs) => save(icsCalendar(evs, icsStamp(new Date())), icsName(str(row, 'title')))))
       if (level === 'write' || level === 'manage') {
-        btn(t.edit, () => {
+        btn(rep !== 'none' ? t.editSeries : t.edit, () => {
           d.close()
           eventForm({ date: o.start, row })
         })
+        if (rep !== 'none') {
+          btn(t.editOccurrence, () => {
+            d.close()
+            occurrenceForm(o, row)
+          })
+          btn(
+            t.removeOccurrence,
+            async () => {
+              if (!(await confirmDialog({ title: t.removeOccurrence, text: sub(t.removeOccurrenceConfirm, { d: dayLong(o.orig ?? o.start) }), ok: t.removeOccurrence, cancel: t.cancel, danger: true }))) return
+              try {
+                await msk.call('events.skip', { id: row.id, on: o.orig ?? o.start })
+                d.close()
+                await reload()
+              } catch (e) {
+                fail(e)
+              }
+            },
+            'danger-text',
+          )
+          if (o.exception) {
+            btn(t.restoreOccurrence, async () => {
+              try {
+                await msk.call('events.restore', { id: row.id, on: o.orig ?? o.start })
+                d.close()
+                await reload()
+              } catch (e) {
+                fail(e)
+              }
+            })
+          }
+        }
       }
       if (level === 'manage') {
         btn(t.share, () => void msk.share(row.id).catch(fail))
