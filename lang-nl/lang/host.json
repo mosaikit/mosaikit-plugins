@@ -2148,5 +2148,10 @@
   "Whose groups": "Van wie de groepen zijn",
   "groups": "groepen",
   "new notifications": "nieuwe meldingen",
-  "now in another group": "nu in een andere groep"
+  "now in another group": "nu in een andere groep",
+  "All members": "Alle leden",
+  "Every member of the organization": "Elk lid van de organisatie",
+  "Share with all members": "Delen met alle leden",
+  "Shared with all members": "Gedeeld met alle leden",
+  "Kept by the platform: new members join it, people who leave are removed.": "Beheerd door het platform: nieuwe leden worden toegevoegd, vertrekkende leden verwijderd."
 }

@@ -2148,5 +2148,10 @@
   "Whose groups": "De quem são os grupos",
   "groups": "grupos",
   "new notifications": "novas notificações",
-  "now in another group": "agora noutro grupo"
+  "now in another group": "agora noutro grupo",
+  "All members": "Todos os membros",
+  "Every member of the organization": "Todos os membros da organização",
+  "Share with all members": "Partilhar com todos os membros",
+  "Shared with all members": "Partilhado com todos os membros",
+  "Kept by the platform: new members join it, people who leave are removed.": "Gerido pela plataforma: quem entra é adicionado e quem sai é removido."
 }

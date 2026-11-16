@@ -2148,5 +2148,10 @@
   "A tenant that sets its own groups still has it, first": "Una organización que define sus grupos lo conserva igualmente, primero",
   "Whose groups": "De quién son los grupos",
   "Of my tenant": "De mi organización",
-  "Of the platform": "De la plataforma"
+  "Of the platform": "De la plataforma",
+  "All members": "Todos los miembros",
+  "Every member of the organization": "Todos los miembros de la organización",
+  "Share with all members": "Compartir con todos los miembros",
+  "Shared with all members": "Compartido con todos los miembros",
+  "Kept by the platform: new members join it, people who leave are removed.": "Lo gestiona la plataforma: quien entra se añade y quien se va se quita."
 }
