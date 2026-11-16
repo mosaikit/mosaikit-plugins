@@ -2148,5 +2148,10 @@
   "Whose groups": "لمن المجموعات",
   "groups": "المجموعات",
   "new notifications": "إشعارات جديدة",
-  "now in another group": "أصبح الآن في مجموعة أخرى"
+  "now in another group": "أصبح الآن في مجموعة أخرى",
+  "All members": "جميع الأعضاء",
+  "Every member of the organization": "كل عضو في المؤسسة",
+  "Share with all members": "المشاركة مع جميع الأعضاء",
+  "Shared with all members": "تمت المشاركة مع جميع الأعضاء",
+  "Kept by the platform: new members join it, people who leave are removed.": "تديره المنصة: يُضاف الأعضاء الجدد ويُزال من يغادر."
 }
