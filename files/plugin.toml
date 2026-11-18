@@ -1,6 +1,6 @@
 id = "com.mosaikit.files"
 name = "Documents"
-version = "0.6.1"
+version = "0.7.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "folder"
@@ -12,7 +12,7 @@ screenshots = ["files.webp", "preview.webp"]
 homepage = "https://example.org/mosaikit/plugins/files"
 
 [requires]
-mosaikit = ">=1.0, <2"
+mosaikit = ">=1.1, <2"
 api = 1
 
 [contribution]
@@ -24,6 +24,18 @@ entry = "index.html"
 
 [permissions]
 files = true
+
+# What a share of a file or a folder can carry besides the level: «Download» (the kernel checks it when the content
+# or the zip is served; a share made without the list of actions keeps allowing it).
+[[resources]]
+name = "file"
+label = "File"
+actions = ["download"]
+
+[[resources]]
+name = "folder"
+label = "Folder"
+actions = ["download"]
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
