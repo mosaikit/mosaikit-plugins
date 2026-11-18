@@ -43,3 +43,9 @@ details = "Conserva file e cartelle, guardane l’anteprima nel browser, scarica
 name = "Documenti"
 description = "File e cartelle condivisibili, con anteprima, zip e link pubblici"
 label = "Documenti"
+
+[i18n.it.resources.file]
+label = "File"
+
+[i18n.it.resources.folder]
+label = "Cartella"
