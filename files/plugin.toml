@@ -12,7 +12,7 @@ screenshots = ["files.webp", "preview.webp"]
 homepage = "https://example.org/mosaikit/plugins/files"
 
 [requires]
-mosaikit = ">=1.1, <2"
+mosaikit = ">=1.1.1, <2"
 api = 1
 
 [contribution]
