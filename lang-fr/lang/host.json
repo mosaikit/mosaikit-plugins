@@ -2153,5 +2153,11 @@
   "Every member of the organization": "Tous les membres de l'organisation",
   "Share with all members": "Partager avec tous les membres",
   "Shared with all members": "Partagé avec tous les membres",
-  "Kept by the platform: new members join it, people who leave are removed.": "Géré par la plateforme : les nouveaux membres y sont ajoutés, ceux qui partent en sont retirés."
+  "Kept by the platform: new members join it, people who leave are removed.": "Géré par la plateforme : les nouveaux membres y sont ajoutés, ceux qui partent en sont retirés.",
+  "Choose people": "Choisir des personnes",
+  "Choose groups": "Choisir des groupes",
+  "Choose people and groups": "Choisir des personnes et des groupes",
+  "Search the people and groups of the organization.": "Cherchez parmi les personnes et les groupes de l'organisation.",
+  "Chosen": "Choisis",
+  "Add {n}": "Ajouter {n}"
 }

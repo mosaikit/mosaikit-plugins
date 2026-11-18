@@ -2153,5 +2153,11 @@
   "Every member of the organization": "组织的每一位成员",
   "Share with all members": "与所有成员共享",
   "Shared with all members": "已与所有成员共享",
-  "Kept by the platform: new members join it, people who leave are removed.": "由平台维护：新成员自动加入，离开的成员自动移除。"
+  "Kept by the platform: new members join it, people who leave are removed.": "由平台维护：新成员自动加入，离开的成员自动移除。",
+  "Choose people": "选择人员",
+  "Choose groups": "选择群组",
+  "Choose people and groups": "选择人员和群组",
+  "Search the people and groups of the organization.": "在组织的人员和群组中搜索。",
+  "Chosen": "已选择",
+  "Add {n}": "添加 {n}"
 }

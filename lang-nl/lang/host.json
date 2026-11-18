@@ -2153,5 +2153,11 @@
   "Every member of the organization": "Elk lid van de organisatie",
   "Share with all members": "Delen met alle leden",
   "Shared with all members": "Gedeeld met alle leden",
-  "Kept by the platform: new members join it, people who leave are removed.": "Beheerd door het platform: nieuwe leden worden toegevoegd, vertrekkende leden verwijderd."
+  "Kept by the platform: new members join it, people who leave are removed.": "Beheerd door het platform: nieuwe leden worden toegevoegd, vertrekkende leden verwijderd.",
+  "Choose people": "Personen kiezen",
+  "Choose groups": "Groepen kiezen",
+  "Choose people and groups": "Personen en groepen kiezen",
+  "Search the people and groups of the organization.": "Zoek tussen de personen en groepen van de organisatie.",
+  "Chosen": "Gekozen",
+  "Add {n}": "{n} toevoegen"
 }

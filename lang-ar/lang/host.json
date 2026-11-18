@@ -2153,5 +2153,11 @@
   "Every member of the organization": "كل عضو في المؤسسة",
   "Share with all members": "المشاركة مع جميع الأعضاء",
   "Shared with all members": "تمت المشاركة مع جميع الأعضاء",
-  "Kept by the platform: new members join it, people who leave are removed.": "تديره المنصة: يُضاف الأعضاء الجدد ويُزال من يغادر."
+  "Kept by the platform: new members join it, people who leave are removed.": "تديره المنصة: يُضاف الأعضاء الجدد ويُزال من يغادر.",
+  "Choose people": "اختيار أشخاص",
+  "Choose groups": "اختيار مجموعات",
+  "Choose people and groups": "اختيار أشخاص ومجموعات",
+  "Search the people and groups of the organization.": "ابحث بين أشخاص ومجموعات المؤسسة.",
+  "Chosen": "المختارون",
+  "Add {n}": "إضافة {n}"
 }

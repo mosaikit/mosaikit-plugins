@@ -2153,5 +2153,11 @@
   "Every member of the organization": "Все участники организации",
   "Share with all members": "Поделиться со всеми участниками",
   "Shared with all members": "Доступ открыт всем участникам",
-  "Kept by the platform: new members join it, people who leave are removed.": "Управляется платформой: новые участники добавляются, ушедшие удаляются."
+  "Kept by the platform: new members join it, people who leave are removed.": "Управляется платформой: новые участники добавляются, ушедшие удаляются.",
+  "Choose people": "Выбрать людей",
+  "Choose groups": "Выбрать группы",
+  "Choose people and groups": "Выбрать людей и группы",
+  "Search the people and groups of the organization.": "Поиск среди людей и групп организации.",
+  "Chosen": "Выбрано",
+  "Add {n}": "Добавить {n}"
 }
