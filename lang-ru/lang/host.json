@@ -2159,5 +2159,8 @@
   "Choose people and groups": "Выбрать людей и группы",
   "Search the people and groups of the organization.": "Поиск среди людей и групп организации.",
   "Chosen": "Выбрано",
-  "Add {n}": "Добавить {n}"
+  "Add {n}": "Добавить {n}",
+  "Settings of the tenant": "Настройки тенанта",
+  "yes (sensitive: Tenant Managers change them in the settings of the tenant, and the logic receives them, secrets included)": "да (чувствительно: Tenant Manager меняют их в настройках тенанта, а логика получает их, включая секреты)",
+  "For this tenant. Secrets are encrypted and never shown again.": "Для этого тенанта. Секреты шифруются и больше не показываются."
 }

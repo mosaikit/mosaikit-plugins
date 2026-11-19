@@ -2159,5 +2159,8 @@
   "Choose people and groups": "Escolher pessoas e grupos",
   "Search the people and groups of the organization.": "Pesquise entre as pessoas e os grupos da organização.",
   "Chosen": "Escolhidos",
-  "Add {n}": "Adicionar {n}"
+  "Add {n}": "Adicionar {n}",
+  "Settings of the tenant": "Definições do tenant",
+  "yes (sensitive: Tenant Managers change them in the settings of the tenant, and the logic receives them, secrets included)": "sim (sensível: os Tenant Managers alteram-nas nas definições do tenant e a lógica recebe-as, segredos incluídos)",
+  "For this tenant. Secrets are encrypted and never shown again.": "Para este tenant. Os segredos são cifrados e não voltam a ser mostrados."
 }

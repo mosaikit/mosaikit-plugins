@@ -2159,5 +2159,8 @@
   "Choose people and groups": "选择人员和群组",
   "Search the people and groups of the organization.": "在组织的人员和群组中搜索。",
   "Chosen": "已选择",
-  "Add {n}": "添加 {n}"
+  "Add {n}": "添加 {n}",
+  "Settings of the tenant": "租户设置",
+  "yes (sensitive: Tenant Managers change them in the settings of the tenant, and the logic receives them, secrets included)": "是（敏感：租户管理员在租户设置中更改它们，逻辑会收到它们，包括密钥）",
+  "For this tenant. Secrets are encrypted and never shown again.": "适用于此租户。密钥已加密，不会再次显示。"
 }

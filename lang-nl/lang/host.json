@@ -2159,5 +2159,8 @@
   "Choose people and groups": "Personen en groepen kiezen",
   "Search the people and groups of the organization.": "Zoek tussen de personen en groepen van de organisatie.",
   "Chosen": "Gekozen",
-  "Add {n}": "{n} toevoegen"
+  "Add {n}": "{n} toevoegen",
+  "Settings of the tenant": "Instellingen van de tenant",
+  "yes (sensitive: Tenant Managers change them in the settings of the tenant, and the logic receives them, secrets included)": "ja (gevoelig: Tenant Managers wijzigen ze in de instellingen van de tenant en de logica ontvangt ze, geheimen inbegrepen)",
+  "For this tenant. Secrets are encrypted and never shown again.": "Voor deze tenant. Geheimen worden versleuteld en nooit meer getoond."
 }
