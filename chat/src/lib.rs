@@ -1,5 +1,10 @@
-//! Chat plugin: the rules of a message. The text is trimmed, never empty and at most 4000 characters (a message also travels
-//! in a real-time frame of 16 KB); a message whose text changed is marked as edited; the reactions are a small JSON object.
+//! Chat plugin. Chat 2.0 (`chats`, `chat_messages`) is the primary part: one-to-one and group chats like the Chat section of
+//! Teams (see `chats.rs`). The channels of Chat 1.x (`channels`, `messages`) stay as they were; their rules are below: the text
+//! of a message is trimmed, never empty and at most 4000 characters (a message also travels in a real-time frame of 16 KB), a
+//! message whose text changed is marked as edited, and the reactions of a channel message are a small JSON object.
+
+mod chats;
+mod text;
 
 use mosaikit_plugin_sdk::prelude::*;
 
@@ -118,15 +123,111 @@ fn widget_busy(ctx: &Ctx, _args: Value) -> Result<Value> {
     Ok(list_body(busy(&channels, &counts)))
 }
 
+// ------------------------------------------------------------------------------------------- hooks of Chat 2.0
+
+fn use_commands() -> Error {
+    Error::coded(
+        "use_commands",
+        "chats and their messages are made with the commands of the plugin",
+    )
+}
+
+/// Chats and messages are made by the commands (they keep the people, the counters and the notices together).
+fn made_by_commands(_ctx: &Ctx, _hook: &Hook) -> Result<Option<Values>> {
+    Err(use_commands())
+}
+
+/// The owner of a chat alone deletes it.
+fn chat_deleted(ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
+    if ctx.user.as_deref() != Some(hook.values.str("created_by").as_str()) {
+        return Err(Error::coded(
+            "forbidden",
+            "only the person who started a chat deletes it",
+        ));
+    }
+    Ok(None)
+}
+
+/// The text of a chat message is changed by its author, and only the text: who wrote it, what kind it is, who is
+/// mentioned, the files and the pin stay as they were.
+fn chat_message_edit(ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
+    let Some(prev) = &hook.previous else {
+        return Err(use_commands());
+    };
+    if ctx.user.as_deref() != Some(prev.str("author_id").as_str()) {
+        return Err(Error::coded(
+            "forbidden",
+            "only the author changes a message",
+        ));
+    }
+    if prev.str("kind") != "message" || prev.bool("deleted") {
+        return Err(Error::coded(
+            "not_editable",
+            "this message cannot be edited",
+        ));
+    }
+    let mut v = prev.clone();
+    let files = text::parse_json(&prev.str("attachments"), json!([]));
+    let new_text = text::clean_text(
+        &hook.values.str("text"),
+        files.as_array().is_some_and(|f| !f.is_empty()),
+    )?;
+    v.set(
+        "edited",
+        prev.bool("edited") || prev.str("text") != new_text,
+    );
+    v.set("text", new_text);
+    Ok(Some(v))
+}
+
+/// A chat message is deleted by its author (the commands soft-delete; this guards the raw API).
+fn chat_message_deleted(ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
+    if ctx.user.as_deref() != Some(hook.values.str("author_id").as_str()) {
+        return Err(Error::coded(
+            "forbidden",
+            "only the author deletes a message",
+        ));
+    }
+    Ok(None)
+}
+
 mosaikit_plugin_sdk::plugin! {
     hooks: {
         "messages.before_create" => message,
         "messages.before_update" => message,
         "channels.before_create" => channel,
         "channels.before_update" => channel,
+        "chats.before_create" => made_by_commands,
+        "chats.before_update" => made_by_commands,
+        "chats.after_delete" => chat_deleted,
+        "chat_messages.before_create" => made_by_commands,
+        "chat_messages.before_update" => chat_message_edit,
+        "chat_messages.after_delete" => chat_message_deleted,
     },
     commands: {
         "channels.widget_busy" => widget_busy,
+        "chats.overview" => chats::overview,
+        "chats.open_direct" => chats::open_direct,
+        "chats.create_group" => chats::create_group,
+        "chats.members" => chats::members,
+        "chats.add_members" => chats::add_members,
+        "chats.remove_member" => chats::remove_member,
+        "chats.leave" => chats::leave,
+        "chats.rename" => chats::rename,
+        "chats.settings" => chats::settings,
+        "chats.touch" => chats::touch,
+        "chats.mark_read" => chats::mark_read,
+        "chats.messages" => chats::messages,
+        "chats.message" => chats::message,
+        "chats.send" => chats::send,
+        "chats.delete_message" => chats::delete_message,
+        "chats.react" => chats::react,
+        "chats.pin_message" => chats::pin_message,
+        "chats.search" => chats::search,
+        "chats.call_start" => chats::call_start,
+        "chats.call_join" => chats::call_join,
+        "chats.call_leave" => chats::call_leave,
+        "chats.widget_unread" => chats::widget_unread,
     },
 }
 
