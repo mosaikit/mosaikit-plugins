@@ -23,7 +23,7 @@ const message = (id: string, author: string, text: string, min: number, extra: R
 function fakeMsk() {
   const calls: { name: string; args: Record<string, unknown> }[] = []
   const sent: unknown[] = []
-  let overview = [
+  let overview: Record<string, unknown>[] = [
     chat(C1, { unread: 2, last_preview: 'Lunch?' }),
     chat(C2, { name: 'Team', kind: 'group', pinned_at: ago(1000), last_author: BOB, last_preview: 'Ship it', members: [{ id: ME, name: 'Me Myself', last_read_at: null }, { id: ANN, name: 'Ann Rossi', last_read_at: null }, { id: BOB, name: 'Bob Verdi', last_read_at: null }] }),
     chat(C3, { last_kind: 'call', last_preview: '📞', members: [{ id: ME, name: 'Me Myself', last_read_at: null }, { id: BOB, name: 'Bob Verdi', last_read_at: null }] }),
@@ -145,7 +145,8 @@ describe('a conversation', () => {
   it('draws the day, bubbles on both sides, Markdown, the title and marks the chat read', async () => {
     const { app, calls } = await openAnn()
     expect($(app, '.cr-titles h2').textContent).toBe('Ann Rossi')
-    expect($$(app, '.cr-day').length).toBe(1)
+    // one day, or two when the test runs just after midnight
+    expect($$(app, '.cr-day').length).toBeGreaterThanOrEqual(1)
     const bubbles = $$(app, '.cb')
     expect(bubbles.map((b) => (b.classList.contains('own') ? 'own' : 'other'))).toEqual(['other', 'own', 'other'])
     expect($(bubbles[0]!, '.cb-bubble strong').textContent).toBe('there')

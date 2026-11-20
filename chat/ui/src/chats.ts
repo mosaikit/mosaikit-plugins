@@ -353,6 +353,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     }
     if (h.t === 'members') {
       void reloadMembers()
+      void refreshTail()
       overviewSoon()
       return
     }
@@ -592,16 +593,16 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     for (const e of QUICK) add(`${tr().react} ${e}`, e, () => void react(m, e))
     add(tr().moreEmoji, '☺', (b) => {
       const grid = el('div', { class: 'cc-emoji' })
-      const items_ = ['🎉', '🙏', '👀', '🔥', '✅', '👏', '💯', '🤔', '😅', '😍', '🚀', '👎']
-      const p = menuLike(b, grid)
-      for (const e of items_) {
+      let close = () => {}
+      for (const e of ['🎉', '🙏', '👀', '🔥', '✅', '👏', '💯', '🤔', '😅', '😍', '🚀', '👎']) {
         const x = el('button', { type: 'button', class: 'cc-emojibtn', 'aria-label': e }, e)
         x.addEventListener('click', () => {
-          p()
+          close()
           void react(m, e)
         })
         grid.append(x)
       }
+      close = menuLike(b, grid)
     })
     add(tr().reply, '↩', () => (compose.reply(m)))
     add(tr().moreActions, '⋯', (b) =>
@@ -621,6 +622,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     wrap.style.left = `${Math.max(8, Math.min(r.left - 100, window.innerWidth - 220))}px`
     wrap.style.top = `${r.bottom + 6}px`
     document.body.append(wrap)
+    if (r.bottom + 6 + wrap.offsetHeight > window.innerHeight && r.top - 6 - wrap.offsetHeight >= 0) wrap.style.top = `${r.top - 6 - wrap.offsetHeight}px`
     const off = (ev?: Event) => {
       if (ev && wrap.contains(ev.target as Node)) return
       wrap.remove()
@@ -777,7 +779,8 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     try {
       const r = await cmd<{ messages: ChatMsg[]; more: boolean; members: Member[] }>('chats.messages', { chat: id, limit: PAGE })
       if (current !== id) return
-      msgs = r.messages
+      // a message written while the history was on its way is not lost
+      msgs = r.messages.reduce(upsert, msgs)
       more = r.more
       members = r.members
     } catch (e) {
@@ -922,16 +925,21 @@ export function mountChats(msk: Msk, app: HTMLElement) {
   }
 
   // --------------------------------------------------------------------------------------------- new chat, people
+  /** Opens the chat once the dialog that made it has closed (the page behind a modal dialog cannot be typed in). */
+  const openSoon = (id: string) => void setTimeout(() => void open(id), 0)
+
   const startNew = () => {
     newChatDialog(msk, tr, me, async (people, name) => {
       if (people.length === 1) {
-        const r = await cmd<{ id: string }>('chats.open_direct', { user: people[0]!.id, name: people[0]!.name, my_name: myName })
+        const r = await cmd<{ id: string; created: boolean }>('chats.open_direct', { user: people[0]!.id, name: people[0]!.name, my_name: myName })
+        if (r.created) await cmd('chats.share_members', { chat: r.id })
         await loadOverview()
-        await open(r.id)
+        openSoon(r.id)
       } else {
         const r = await cmd<{ id: string }>('chats.create_group', { name, users: people, my_name: myName })
+        await cmd('chats.share_members', { chat: r.id })
         await loadOverview()
-        await open(r.id)
+        openSoon(r.id)
       }
     })
   }
@@ -944,8 +952,9 @@ export function mountChats(msk: Msk, app: HTMLElement) {
         // Teams makes a new group of the two people and the newcomers
         const users = [...c.members.filter((m) => m.id !== me), ...people].map((p) => ({ id: p.id, name: p.name }))
         const r = await cmd<{ id: string }>('chats.create_group', { name: '', users, my_name: myName })
+        await cmd('chats.share_members', { chat: r.id })
         await loadOverview()
-        return void (await open(r.id))
+        return openSoon(r.id)
       }
       const h: HistoryChoice = history
       await cmd('chats.add_members', { chat: c.id, users: people, history: h === 'week' ? new Date(Date.now() - 7 * 86_400_000).toISOString() : h })
@@ -961,7 +970,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     try {
       const r = await cmd<{ messages: ChatMsg[] }>('chats.messages', { chat: current, limit: 5 })
       for (const m of r.messages) msgs = upsert(msgs, m)
-      drawMessages(true)
+      drawMessages(false)
     } catch {
       // the next hint reads again
     }
@@ -1199,7 +1208,13 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     }
   })
   window.addEventListener('focus', () => void loadOverview())
-  setInterval(() => void loadOverview(), 60_000)
+  // a chat somebody starts with you has no channel yet: the list is read again every 15 seconds while the page is in view
+  setInterval(() => {
+    if (document.visibilityState !== 'visible') return
+    void loadOverview()
+    // what the others did to the chat that is open without a hint (somebody left, and cannot send one any more)
+    if (current && tab === 'chat') void refreshTail().then(() => reloadMembers())
+  }, 15_000)
 
   retitle()
   drawRoomEmpty()
