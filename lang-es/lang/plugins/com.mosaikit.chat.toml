@@ -1,7 +1,7 @@
 name = "Chat"
-description = "Canales y conversaciones en tiempo real con presencia, respuestas, reacciones y Markdown"
+description = "Chat como Microsoft Teams: chats individuales y de grupo con presencia, confirmaciones de lectura, reacciones, menciones, archivos y llamadas"
 label = "Chat"
-details = "Habla con tus compañeros en canales. Un mensaje llega al instante a quien tiene el canal abierto, con quién está en línea y quién está escribiendo.\n\nUn canal es un elemento de la plataforma: compártelo con personas o grupos (lectura para seguir, escritura para hablar) y vale todo lo que ya sabes sobre compartir. Los mensajes quedan como historial; escríbelos en Markdown, responde a uno, reacciona con un emoji, edita o elimina los tuyos."
+details = "Habla con tus compañeros como en Microsoft Teams: chats individuales y de grupo, una lista con los mensajes sin leer, chats fijados y silenciados, quién está en línea, quién está escribiendo y quién ha visto tu mensaje.\n\nEscribe con formato, menciona a personas con @, marca un mensaje como Importante o Urgente, responde con una cita, reacciona con un emoji, fija un mensaje, adjunta archivos desde tu dispositivo o desde Documentos y busca lo que se dijo. Los botones Llamar y Vídeo inician una llamada de grupo en el chat, y la llamada queda en la conversación con quién entró y cuánto duró.\n\nUn chat es privado para quienes participan: se comparte con cada uno y cualquiera puede añadir personas (con o sin el historial anterior). El historial que un recién llegado no ve lo oculta la página, no la plataforma. Los canales de las versiones anteriores siguen ahí, en Canales.\n\nLo que pide el plugin: encontrar a las personas de tu organización con las que chatear (directorio), avisarlas (notificaciones), mostrar el servicio de llamadas (meet.jit.si) con cámara y micrófono, y leer y añadir archivos en Documentos para los adjuntos."
 
 [resources.channels]
 label = "Canales"
@@ -10,3 +10,22 @@ fields = { name = "Nombre", topic = "Tema" }
 [resources.messages]
 label = "Mensajes"
 fields = { text = "Texto", reply_to = "Respuesta a", edited = "Editado", reactions = "Reacciones" }
+
+[resources.chats]
+label = "Chats"
+fields = { name = "Nombre", kind = "Tipo", pair = "Pareja", created_by = "Creado por" }
+options.kind = { direct = "individual", group = "de grupo" }
+
+[resources.chat_messages]
+label = "Mensajes de los chats"
+fields = { kind = "Tipo", text = "Texto", author_id = "Autor", reply_to = "Respuesta a", edited = "Editado", deleted = "Eliminado", importance = "Importancia", mentions = "Menciones", attachments = "Archivos", meta = "Detalles", pinned = "Fijado", pinned_by = "Fijado por" }
+options.kind = { message = "mensaje", system = "del sistema", call = "llamada" }
+options.importance = { normal = "normal", important = "importante", urgent = "urgente" }
+
+[nav]
+chats = "Chats"
+channels = "Canales"
+
+[kpi.kpi_chat_activity]
+label = "Actividad de los chats"
+columns = { chats = "chats", group_chats = "de grupo", direct_chats = "individuales", messages = "mensajes" }

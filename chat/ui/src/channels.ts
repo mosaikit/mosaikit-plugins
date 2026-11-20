@@ -1,4 +1,4 @@
-// UI of the Chat plugin: channels on the left, a live conversation on the right. A message is saved as an item of the channel
+// UI of the channels of Chat 1.x (the secondary entry «Channels» of the plugin): channels on the left, a live conversation on the right. A message is saved as an item of the channel
 // (so whoever sees the channel sees it, and the history stays) and announced on the real-time channel of the kernel, which only
 // carries a hint: every client reads the message again from the data, so nothing a person sends can pose as someone else.
 import '@mosaikit/plugin-api/style.css'
@@ -7,7 +7,6 @@ import {
   avatar,
   avatarStack,
   confirmDialog,
-  connect,
   dialog,
   el,
   emptyState,
@@ -22,18 +21,16 @@ import {
   type Row,
 } from '@mosaikit/plugin-api'
 import { fromRow, QUICK, runs, snippet, stringifyReactions, toggleReaction, typingNames, upsert, without, type Msg } from './logic.ts'
-import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
+import { TEXTS, langOf, sub } from './texts.ts'
 
 /** A call from a channel: a room of the meeting service named after the channel (nobody can guess it), opened in a new tab. */
 const callUrl = (channelId: string) => 'https://meet.jit.si/mosaikit-' + channelId.replace(/[^a-z0-9]/gi, '').toLowerCase()
 
-const app = document.getElementById('app')!
 const PAGE = 50
 const TYPING_EVERY = 3000
 
-function mount(msk: Msk) {
+export function mountChannels(msk: Msk, app: HTMLElement) {
   document.documentElement.classList.add('msk-fill')
-  bindTexts(msk)
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
   const me = msk.user?.id ?? ''
@@ -510,9 +507,3 @@ function mount(msk: Msk) {
     else if (channels.length === 1) void open(channels[0]!.id)
   })
 }
-
-connect()
-  .then(mount)
-  .catch((e) => {
-    app.textContent = TEXTS[langOf(undefined)].failed + errText(e)
-  })
