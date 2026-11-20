@@ -16,8 +16,8 @@
     "invitation.webp": "Calendar: an event with its invitees and their answers"
   },
   "chat": {
-    "channel.webp": "Chat: a channel with messages, replies and the list of channels",
-    "channels.webp": "Chat: another channel of the same team"
+    "channel.webp": "Chat: a channel of the Channels entry, with messages, replies and the list of channels",
+    "channels.webp": "Chat: another channel of the Channels entry"
   },
   "contacts": {
     "book.webp": "Contacts: the address book as cards with tags",
