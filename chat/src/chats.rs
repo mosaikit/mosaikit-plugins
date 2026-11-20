@@ -441,9 +441,29 @@ pub fn open_direct(ctx: &Ctx, args: Value) -> Result<Value> {
         false,
     )?;
     if other != user {
-        join(ctx, &id, &other, &other_name, &History::All, true)?;
+        join(ctx, &id, &other, &other_name, &History::All, false)?;
     }
     Ok(json!({ "id": id, "created": true }))
+}
+
+/// `chats.share_members { chat }`: shares the chat with its people (at the `manage` level). Made right after the chat is
+/// created, in a call of its own: the platform sees the chat for sharing only once the call that made it has committed.
+/// Sharing again is harmless.
+pub fn share_members(ctx: &Ctx, args: Value) -> Result<Value> {
+    let chat = arg_id(&args, "chat")?;
+    let user = me(ctx)?;
+    my_member(ctx, &chat)?;
+    let c = chat_row(ctx, &chat)?;
+    let owner = s(&c, "created_by");
+    let mut n = 0;
+    for p in active_people(ctx, &chat)? {
+        if p.id != user && p.id != owner {
+            ctx.resources()
+                .set_share(&chat, "user", Some(&p.id), "manage", None)?;
+            n += 1;
+        }
+    }
+    Ok(json!({ "shared": n }))
 }
 
 /// `chats.create_group { name?, users: [{ id, name }], my_name }`: a group chat with the people chosen (and the caller).
@@ -477,7 +497,7 @@ pub fn create_group(ctx: &Ctx, args: Value) -> Result<Value> {
         false,
     )?;
     for (uid, uname) in &people {
-        join(ctx, &id, uid, uname, &History::All, true)?;
+        join(ctx, &id, uid, uname, &History::All, false)?;
     }
     Ok(json!({ "id": id }))
 }
@@ -1289,14 +1309,11 @@ mod tests {
         assert!(sql.contains("insert into chats") && sql.contains("insert into chat_state"));
         assert_eq!(sql.matches("insert into chat_members").count(), 2);
         // only the other person is shared with
-        let shares: Vec<_> = host
+        // the sharing is a call of its own (the chat is not committed yet)
+        assert!(!host
             .calls()
-            .into_iter()
-            .filter(|(op, _)| op == "resource.share_set")
-            .collect();
-        assert_eq!(shares.len(), 1);
-        assert_eq!(shares[0].1["principal_id"], ANN);
-        assert_eq!(shares[0].1["level"], "manage");
+            .iter()
+            .any(|(op, _)| op == "resource.share_set"));
         // the key of the pair is the same whoever asks
         let key = crate::text::pair_key(ME, ANN);
         assert!(host
@@ -1344,12 +1361,10 @@ mod tests {
             )
             .is_err());
         host.command(&registry(), "chats.create_group", json!({ "name": "  Team  ", "my_name": "Me", "users": [{ "id": ANN, "name": "Ann" }, { "id": BOB, "name": "Bob" }, { "id": ANN, "name": "Ann" }] })).unwrap();
-        let shares = host
+        assert!(!host
             .calls()
-            .into_iter()
-            .filter(|(op, _)| op == "resource.share_set")
-            .count();
-        assert_eq!(shares, 2);
+            .iter()
+            .any(|(op, _)| op == "resource.share_set"));
         let created = host
             .calls()
             .into_iter()
@@ -1367,6 +1382,35 @@ mod tests {
             .as_deref(),
             Some("id_invalid")
         );
+    }
+
+    #[test]
+    fn the_chat_is_shared_with_each_person_but_the_owner_and_the_caller() {
+        let (host, _) = db(vec![
+            (
+                "from chats where resource_id",
+                json!([{ "name": "T", "kind": "group", "created_by": ME }]),
+            ),
+            (
+                "select user_id::text as id",
+                json!([{ "id": ME, "name": "Me", "muted": false }, { "id": ANN, "name": "Ann", "muted": false }, { "id": BOB, "name": "Bob", "muted": false }]),
+            ),
+            (
+                "and left_at is null",
+                json!([{ "name": "Me", "muted": false }]),
+            ),
+        ]);
+        let out = host
+            .command(&registry(), "chats.share_members", json!({ "chat": CHAT }))
+            .unwrap();
+        assert_eq!(out["shared"], 2);
+        let who: Vec<String> = host
+            .calls()
+            .into_iter()
+            .filter(|(op, _)| op == "resource.share_set")
+            .map(|(_, r)| r["principal_id"].as_str().unwrap().to_string())
+            .collect();
+        assert_eq!(who, [ANN, BOB]);
     }
 
     fn send_host(text_row: Value) -> (MockHost, Rc<RefCell<Vec<String>>>) {

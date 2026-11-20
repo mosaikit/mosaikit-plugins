@@ -209,6 +209,7 @@ mosaikit_plugin_sdk::plugin! {
         "chats.overview" => chats::overview,
         "chats.open_direct" => chats::open_direct,
         "chats.create_group" => chats::create_group,
+        "chats.share_members" => chats::share_members,
         "chats.members" => chats::members,
         "chats.add_members" => chats::add_members,
         "chats.remove_member" => chats::remove_member,

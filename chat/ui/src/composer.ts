@@ -135,15 +135,17 @@ export function composer(o: ComposerOptions): Composer {
 
   emojiBtn.addEventListener('click', () => {
     const grid = el('div', { class: 'cc-emoji', role: 'listbox', 'aria-label': tr().emoji })
-    const p = popover(emojiBtn, grid)
+    let close = () => {}
     for (const e of EMOJI) {
       const b = el('button', { type: 'button', class: 'cc-emojibtn', role: 'option', 'aria-label': e }, e)
       b.addEventListener('click', () => {
-        p.close()
+        close()
         apply(insertAt(input.value, input.selectionStart ?? input.value.length, input.selectionEnd ?? input.value.length, e))
       })
       grid.append(b)
     }
+    // the grid is complete before it opens, so that it can open above the button when the page ends below it
+    close = popover(emojiBtn, grid).close
   })
 
   const drawImportance = () => {
