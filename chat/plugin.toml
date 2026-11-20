@@ -1,13 +1,13 @@
 id = "com.mosaikit.chat"
 name = "Chat"
-version = "0.3.1"
+version = "0.4.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "message-circle"
-description = "Channels and live conversations with presence, replies, reactions and Markdown"
+description = "Chat like Microsoft Teams: one-to-one and group chats with presence, read receipts, reactions, mentions, files and calls"
 author = "Mosaikit"
 license = "Apache-2.0"
-details = "Talk with your colleagues in channels. A message arrives at once for everyone who has the channel open, with who is online and who is typing.\n\nA channel is an item of the platform: share it with people or groups (read to follow, write to talk) and everything you already know about sharing applies. Messages are kept as history; write them in Markdown, reply to one, react with an emoji, edit or delete your own."
+details = "Talk with your colleagues the way you do in Microsoft Teams: one-to-one chats and group chats, a list with unread counts, pinned and muted chats, people online, who is typing and who has seen your message.\n\nWrite with formatting, mention people with @, mark a message Important or Urgent, reply with a quote, react with an emoji, pin a message, attach files from your device or from Documents and search what was said. The Call and Video buttons start a group call in the chat, and the call stays in the conversation with who joined and how long it lasted.\n\nA chat is private to its participants: it is shared with each of them and anyone in it can add people (with or without the earlier history). The history that a newcomer does not see is hidden by the page, not by the platform. The channels of earlier versions are still there, under Channels.\n\nWhat the plugin asks: to find people of your organisation to chat with (directory), to notify them (notifications), to show the call service (meet.jit.si) with camera and microphone, and to read and add files in Documents for attachments."
 screenshots = ["channel.webp", "channels.webp"]
 homepage = "https://example.org/mosaikit/plugins/chat"
 
@@ -42,12 +42,73 @@ fields = [
   { key = "reactions", label = "Reactions", kind = "text", hidden = true, search = false },
 ]
 
+# Chat 2.0: a chat of two people or a group. Chats and their messages are made by the commands of the logic (people, counters
+# and notices stay together); the per-person data lives in the tables of the migration.
+[[resources]]
+name = "chats"
+label = "Chats"
+title_field = "name"
+fields = [
+  { key = "name", label = "Name", kind = "text", search = false },
+  { key = "kind", label = "Kind", kind = "choice", options = ["direct", "group"] },
+  # the key of a one-to-one chat: the ids of the two people in order
+  { key = "pair", label = "Pair", kind = "text", hidden = true, search = false },
+  { key = "created_by", label = "Created by", kind = "text", hidden = true, search = false },
+]
+
+# a message of a chat: a child of it, so whoever is in the chat sees it
+[[resources]]
+name = "chat_messages"
+label = "Chat messages"
+title_field = "kind"
+fields = [
+  { key = "kind", label = "Kind", kind = "choice", options = ["message", "system", "call"] },
+  { key = "text", label = "Text", kind = "text", multiline = true, search = false },
+  { key = "author_id", label = "Author", kind = "text", hidden = true, search = false },
+  { key = "reply_to", label = "Reply to", kind = "text", hidden = true, search = false },
+  { key = "edited", label = "Edited", kind = "bool", hidden = true },
+  { key = "deleted", label = "Deleted", kind = "bool", hidden = true },
+  { key = "importance", label = "Importance", kind = "choice", options = ["normal", "important", "urgent"] },
+  # JSON: the ids of the people mentioned, the files attached, and the data of a system message or a call
+  { key = "mentions", label = "Mentions", kind = "text", hidden = true, search = false },
+  { key = "attachments", label = "Files", kind = "text", hidden = true, search = false },
+  { key = "meta", label = "Details", kind = "text", hidden = true, search = false },
+  { key = "pinned", label = "Pinned", kind = "bool", hidden = true },
+  { key = "pinned_by", label = "Pinned by", kind = "text", hidden = true, search = false },
+]
+
 [ui]
 entry = "index.html"
 
 [permissions]
-hooks = ["channels", "messages"]
+hooks = ["channels", "messages", "chats", "chat_messages"]
 realtime = true
+# messages and mentions notify the people of the chat; a muted chat only notifies on mentions
+notify = true
+# the people picker of «New chat» (only for who may share, as everywhere); without it the picker of the platform is used
+directory = true
+# the call service shown inside the page, with the camera and the microphone of the person after they agree
+frame_src = ["https://meet.jit.si"]
+media = true
+# attachments: Documents are read to pick a file, and files from the device are added there; they are shared with the chat by the page
+files_read = true
+files_write = true
+resources_read = ["com.mosaikit.files"]
+
+# the pages of the app: Chats is the plugin; Channels are the channels of earlier versions
+[[nav]]
+id = "chats"
+label = "Chats"
+icon = "message-circle"
+
+[[nav]]
+id = "channels"
+label = "Channels"
+icon = "hash"
+
+[[kpi]]
+view = "kpi_chat_activity"
+label = "Chat activity"
 
 [[contributes]]
 point = "com.mosaikit.dashboard.widget"
@@ -55,10 +116,16 @@ id = "busy-channels"
 label = "Busy channels"
 data = { command = "channels.widget_busy", kind = "list", size = "m", texts = { en = { empty = "No messages in the last day" }, it = { label = "Canali attivi", empty = "Nessun messaggio nell’ultimo giorno" }, es = { label = "Canales activos", empty = "Ningún mensaje en el último día" } } }
 
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "unread-chats"
+label = "Unread chats"
+data = { command = "chats.widget_unread", kind = "list", size = "m", texts = { en = { empty = "No unread chats" }, it = { label = "Chat non lette", empty = "Nessuna chat non letta" }, es = { label = "Chats sin leer", empty = "No hay chats sin leer" } } }
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
-description = "Canali e conversazioni in tempo reale con presenza, risposte, reazioni e Markdown"
-details = "Parla con i colleghi nei canali. Un messaggio arriva subito a chi ha il canale aperto, con chi è online e chi sta scrivendo.\n\nUn canale è un elemento della piattaforma: condividilo con persone o gruppi (lettura per seguire, scrittura per parlare) e vale tutto ciò che sai già sulla condivisione. I messaggi restano come cronologia; scrivili in Markdown, rispondi a uno, reagisci con una emoji, modifica o elimina i tuoi."
+description = "Chat come Microsoft Teams: chat singole e di gruppo con presenza, conferme di lettura, reazioni, menzioni, file e chiamate"
+details = "Parla con i colleghi come in Microsoft Teams: chat singole e di gruppo, un elenco con i messaggi non letti, chat fissate e silenziate, chi è online, chi sta scrivendo e chi ha visto il tuo messaggio.\n\nScrivi con la formattazione, menziona le persone con @, segna un messaggio Importante o Urgente, rispondi con una citazione, reagisci con una emoji, fissa un messaggio, allega file dal dispositivo o da Documenti e cerca ciò che è stato detto. I pulsanti Chiama e Video avviano una chiamata di gruppo nella chat, e la chiamata resta nella conversazione con chi è entrato e quanto è durata.\n\nUna chat è privata per chi vi partecipa: è condivisa con ciascuno e chiunque può aggiungere persone (con o senza la cronologia precedente). La cronologia che un nuovo arrivato non vede è nascosta dalla pagina, non dalla piattaforma. I canali delle versioni precedenti ci sono ancora, sotto Canali.\n\nCosa chiede il plugin: trovare le persone della tua organizzazione con cui chattare (directory), avvisarle (notifiche), mostrare il servizio di chiamata (meet.jit.si) con fotocamera e microfono, e leggere e aggiungere file in Documenti per gli allegati."
 name = "Chat"
 label = "Chat"
 
@@ -69,3 +136,22 @@ fields = { name = "Nome", topic = "Argomento" }
 [i18n.it.resources.messages]
 label = "Messaggi"
 fields = { text = "Testo", reply_to = "Risposta a", edited = "Modificato", reactions = "Reazioni" }
+
+[i18n.it.resources.chats]
+label = "Chat"
+fields = { name = "Nome", kind = "Tipo", pair = "Coppia", created_by = "Creata da" }
+options.kind = { direct = "singola", group = "di gruppo" }
+
+[i18n.it.resources.chat_messages]
+label = "Messaggi delle chat"
+fields = { kind = "Tipo", text = "Testo", author_id = "Autore", reply_to = "Risposta a", edited = "Modificato", deleted = "Eliminato", importance = "Importanza", mentions = "Menzioni", attachments = "File", meta = "Dettagli", pinned = "Fissato", pinned_by = "Fissato da" }
+options.kind = { message = "messaggio", system = "di sistema", call = "chiamata" }
+options.importance = { normal = "normale", important = "importante", urgent = "urgente" }
+
+[i18n.it.nav]
+chats = "Chat"
+channels = "Canali"
+
+[i18n.it.kpi.kpi_chat_activity]
+label = "Attività delle chat"
+columns = { chats = "chat", group_chats = "di gruppo", direct_chats = "singole", messages = "messaggi" }

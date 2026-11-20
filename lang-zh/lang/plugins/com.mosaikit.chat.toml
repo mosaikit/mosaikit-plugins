@@ -1,7 +1,7 @@
 name = "聊天"
-description = "实时频道与对话，支持在线状态、回复、表情回应和 Markdown"
+description = "类似 Microsoft Teams 的聊天：单人和群聊，支持在线状态、已读回执、表情回应、提及、文件和通话"
 label = "聊天"
-details = "在频道里与同事交流。消息会即时送达已打开该频道的人，并显示谁在线、谁正在输入。\n\n频道是平台中的一个项目：可以与个人或群组共享（只读用于关注，可写用于发言），你已经熟悉的共享规则都适用。消息会保留为历史记录；用 Markdown 书写，回复某条消息，用表情回应，编辑或删除自己的消息。"
+details = "像在 Microsoft Teams 中一样与同事交流：单人聊天和群聊、带未读数的列表、置顶和静音的聊天，以及谁在线、谁正在输入、谁已查看你的消息。\n\n可以使用格式书写，用 @ 提及他人，将消息标记为重要或紧急，引用回复，用表情回应，置顶消息，从设备或文档附加文件，并搜索聊过的内容。“通话”和“视频”按钮会在聊天中发起群组通话，通话会保留在对话中，并记录谁加入以及持续了多久。\n\n聊天仅对参与者私有：它会与每位参与者共享，聊天中的任何人都可以添加人员（可包含或不包含之前的记录）。新成员看不到的记录由页面隐藏，而不是由平台隐藏。早期版本的频道仍然保留，位于“频道”中。\n\n该插件需要的权限：查找你所在组织中可以聊天的人员（通讯录），通知他们（通知），显示通话服务（meet.jit.si）并使用摄像头和麦克风，以及在文档中读取和添加文件作为附件。"
 
 [resources.channels]
 label = "频道"
@@ -10,3 +10,22 @@ fields = { name = "名称", topic = "主题" }
 [resources.messages]
 label = "消息"
 fields = { text = "文本", reply_to = "回复", edited = "已编辑", reactions = "回应" }
+
+[resources.chats]
+label = "聊天"
+fields = { name = "名称", kind = "类型", pair = "配对", created_by = "创建者" }
+options.kind = { direct = "单人", group = "群聊" }
+
+[resources.chat_messages]
+label = "聊天消息"
+fields = { kind = "类型", text = "文本", author_id = "作者", reply_to = "回复", edited = "已编辑", deleted = "已删除", importance = "重要性", mentions = "提及", attachments = "文件", meta = "详情", pinned = "已置顶", pinned_by = "置顶者" }
+options.kind = { message = "消息", system = "系统", call = "通话" }
+options.importance = { normal = "普通", important = "重要", urgent = "紧急" }
+
+[nav]
+chats = "聊天"
+channels = "频道"
+
+[kpi.kpi_chat_activity]
+label = "聊天活动"
+columns = { chats = "聊天", group_chats = "群聊", direct_chats = "单人", messages = "消息" }
