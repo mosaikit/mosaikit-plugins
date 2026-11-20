@@ -1,7 +1,7 @@
 name = "Chat"
-description = "Canaux et conversations en temps réel avec présence, réponses, réactions et Markdown"
+description = "Chat comme Microsoft Teams : chats individuels et de groupe avec présence, accusés de lecture, réactions, mentions, fichiers et appels"
 label = "Chat"
-details = "Discutez avec vos collègues dans des canaux. Un message arrive instantanément chez qui a le canal ouvert, avec les personnes en ligne et celles en train d’écrire.\n\nUn canal est un élément de la plateforme : partagez-le avec des personnes ou des groupes (lecture pour suivre, écriture pour parler) et tout ce que vous savez déjà sur le partage s’applique. Les messages restent en historique ; rédigez-les en Markdown, répondez à l’un d’eux, réagissez avec un emoji, modifiez ou supprimez les vôtres."
+details = "Discutez avec vos collègues comme dans Microsoft Teams : chats individuels et de groupe, une liste des messages non lus, des chats épinglés et en sourdine, qui est en ligne, qui est en train d’écrire et qui a vu votre message.\n\nÉcrivez avec mise en forme, mentionnez des personnes avec @, marquez un message comme Important ou Urgent, répondez avec une citation, réagissez avec un emoji, épinglez un message, joignez des fichiers depuis votre appareil ou depuis Documents et recherchez ce qui a été dit. Les boutons Appeler et Vidéo lancent un appel de groupe dans le chat, et l’appel reste dans la conversation avec qui a rejoint et combien de temps il a duré.\n\nUn chat est privé pour ses participants : il est partagé avec chacun et n’importe qui peut ajouter des personnes (avec ou sans l’historique précédent). L’historique qu’un nouvel arrivant ne voit pas est masqué par la page, pas par la plateforme. Les canaux des versions précédentes sont toujours là, dans Canaux.\n\nCe que demande le plugin : trouver les personnes de votre organisation avec qui discuter (annuaire), les prévenir (notifications), afficher le service d’appel (meet.jit.si) avec caméra et micro, et lire et ajouter des fichiers dans Documents pour les pièces jointes."
 
 [resources.channels]
 label = "Canaux"
@@ -10,3 +10,22 @@ fields = { name = "Nom", topic = "Sujet" }
 [resources.messages]
 label = "Messages"
 fields = { text = "Texte", reply_to = "Réponse à", edited = "Modifié", reactions = "Réactions" }
+
+[resources.chats]
+label = "Chats"
+fields = { name = "Nom", kind = "Type", pair = "Paire", created_by = "Créé par" }
+options.kind = { direct = "individuel", group = "de groupe" }
+
+[resources.chat_messages]
+label = "Messages des chats"
+fields = { kind = "Type", text = "Texte", author_id = "Auteur", reply_to = "Réponse à", edited = "Modifié", deleted = "Supprimé", importance = "Importance", mentions = "Mentions", attachments = "Fichiers", meta = "Détails", pinned = "Épinglé", pinned_by = "Épinglé par" }
+options.kind = { message = "message", system = "système", call = "appel" }
+options.importance = { normal = "normal", important = "important", urgent = "urgent" }
+
+[nav]
+chats = "Chats"
+channels = "Canaux"
+
+[kpi.kpi_chat_activity]
+label = "Activité des chats"
+columns = { chats = "chats", group_chats = "de groupe", direct_chats = "individuels", messages = "messages" }

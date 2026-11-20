@@ -1,7 +1,7 @@
 name = "Chat"
-description = "Kanalen en gesprekken in realtime met aanwezigheid, antwoorden, reacties en Markdown"
+description = "Chat zoals Microsoft Teams: individuele chats en groepschats met aanwezigheid, leesbevestigingen, reacties, vermeldingen, bestanden en gesprekken"
 label = "Chat"
-details = "Praat met je collega's in kanalen. Een bericht komt direct aan bij wie het kanaal open heeft, met wie online is en wie er typt.\n\nEen kanaal is een item van het platform: deel het met personen of groepen (lezen om mee te volgen, schrijven om mee te praten) en alles wat je al weet over delen geldt. Berichten blijven als geschiedenis bewaard; schrijf ze in Markdown, antwoord op een bericht, reageer met een emoji, bewerk of verwijder je eigen berichten."
+details = "Praat met je collega's zoals in Microsoft Teams: individuele chats en groepschats, een lijst met ongelezen berichten, vastgemaakte en gedempte chats, wie online is, wie er typt en wie je bericht heeft gezien.\n\nSchrijf met opmaak, vermeld personen met @, markeer een bericht als Belangrijk of Urgent, antwoord met een citaat, reageer met een emoji, maak een bericht vast, voeg bestanden toe vanaf je apparaat of uit Documenten en zoek wat er is gezegd. De knoppen Bellen en Video starten een groepsgesprek in de chat, en het gesprek blijft in de conversatie staan met wie er meedeed en hoe lang het duurde.\n\nEen chat is privé voor wie eraan deelneemt: hij wordt met iedereen gedeeld en iedereen kan personen toevoegen (met of zonder de eerdere geschiedenis). De geschiedenis die een nieuwkomer niet ziet, wordt door de pagina verborgen, niet door het platform. De kanalen van eerdere versies staan er nog, onder Kanalen.\n\nWat de plugin vraagt: de personen van je organisatie vinden om mee te chatten (map), hen waarschuwen (meldingen), de gespreksdienst (meet.jit.si) tonen met camera en microfoon, en bestanden in Documenten lezen en toevoegen voor de bijlagen."
 
 [resources.channels]
 label = "Kanalen"
@@ -10,3 +10,22 @@ fields = { name = "Naam", topic = "Onderwerp" }
 [resources.messages]
 label = "Berichten"
 fields = { text = "Tekst", reply_to = "Antwoord op", edited = "Bewerkt", reactions = "Reacties" }
+
+[resources.chats]
+label = "Chats"
+fields = { name = "Naam", kind = "Type", pair = "Paar", created_by = "Aangemaakt door" }
+options.kind = { direct = "individueel", group = "groep" }
+
+[resources.chat_messages]
+label = "Chatberichten"
+fields = { kind = "Type", text = "Tekst", author_id = "Auteur", reply_to = "Antwoord op", edited = "Bewerkt", deleted = "Verwijderd", importance = "Belangrijkheid", mentions = "Vermeldingen", attachments = "Bestanden", meta = "Details", pinned = "Vastgemaakt", pinned_by = "Vastgemaakt door" }
+options.kind = { message = "bericht", system = "systeem", call = "gesprek" }
+options.importance = { normal = "normaal", important = "belangrijk", urgent = "urgent" }
+
+[nav]
+chats = "Chats"
+channels = "Kanalen"
+
+[kpi.kpi_chat_activity]
+label = "Activiteit van de chats"
+columns = { chats = "chats", group_chats = "groepschats", direct_chats = "individueel", messages = "berichten" }
