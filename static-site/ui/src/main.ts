@@ -22,7 +22,7 @@ import './sites.css'
 import { connect, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
 import { followHost, reloadIfStale, t } from './i18n.ts'
-import { hasIndexHtml, zipEntryNames } from './zipnames.ts'
+import { LIMITS, hasIndexHtml, inspectZip, zipEntries, zipEntryNames, type ZipReport } from './zipnames.ts'
 
 const RESOURCE = 'sites' // name of the resource in the manifest
 
@@ -197,13 +197,14 @@ function mount(msk: Msk) {
   const inDesc = h('textarea', { id: 'msks-desc', rows: '3', placeholder: t('What the site is for (optional)') })
   const inZip = h('input', { type: 'file', accept: '.zip,application/zip,application/x-zip-compressed' })
   const fname = h('span', { class: 'fname' })
+  const sub_ = h('span', { class: 'sub' }, t('drag the zip here or click to choose it'))
   const drop = h(
     'label',
     { class: 'drop' },
     inZip,
     h('span', { class: 'big' }, '📦'),
     fname,
-    h('span', { class: 'sub' }, t('drag the zip here or click to choose it')),
+    sub_,
   )
   const zipReq = h('b', { class: 'req' }, '*')
   const inSrcZip = h('input', { type: 'radio', name: 'msks-src', id: 'msks-src-zip', value: 'zip', checked: true })
@@ -228,7 +229,10 @@ function mount(msk: Msk) {
     h('div', { class: 'hint' }, t('Optional. Without one, a site given by address shows its own picture (og:image, or its first image); otherwise a placeholder.')),
   )
   const zipHint = h('div', { class: 'hint' })
-  const zipRow = h('div', { class: 'frow' }, h('label', {}, t('Zip archive') + ' ', zipReq), drop, zipHint)
+  // what the zip would do as a site, shown as soon as it is chosen or dropped
+  const zipReport = h('div', { class: 'zrep', 'aria-live': 'polite', 'data-testid': 'zip-report' })
+  zipReport.hidden = true
+  const zipRow = h('div', { class: 'frow' }, h('label', {}, t('Zip archive') + ' ', zipReq), drop, zipReport, zipHint)
   const btnSave = h('button', { type: 'button', class: 'msk-btn' }, t('💾 Save'))
   const btnCancel = h('button', { type: 'button', class: 'msk-btn ghost' }, t('Cancel'))
   const formMsg = h('div', { class: 'msg', role: 'status' })
@@ -466,9 +470,80 @@ function mount(msk: Msk) {
     btnThumbClear.hidden = !src
   }
 
-  function setFile(file: File | null | undefined) {
+  // the report of the zip that is chosen: refused before the upload, with the reason, instead of after it
+  let inspected: ZipReport | null = null
+  let inspectSeq = 0
+  const limitText = (n: number) => fmtSize(n)
+  function problemText(p: ZipReport['problems'][number]): string {
+    switch (p) {
+      case 'type':
+        return t('The file must be a .zip archive.')
+      case 'zipbig':
+        return t('The zip is larger than {size}.', { size: limitText(LIMITS.zip) })
+      case 'unpackedbig':
+        return t('The site would be larger than {size} once unpacked.', { size: limitText(LIMITS.unpacked) })
+      case 'empty':
+        return t('The zip has no files.')
+      case 'noindex':
+        return t('The zip does not contain an index.html file.')
+      case 'unsafe':
+        return t('Some paths in the zip lead outside the site folder.')
+    }
+  }
+  function warningText(w: ZipReport['warnings'][number], r: ZipReport): string {
+    switch (w) {
+      case 'junk':
+        return t('System files (__MACOSX, .DS_Store) are ignored.')
+      case 'nested':
+        return t('The index.html is inside a folder ({entry}): it is used as the start page.', { entry: r.entry ?? '' })
+      case 'bigfile':
+        return t('A file is larger than {size}: the site may load slowly.', { size: limitText(LIMITS.file) })
+    }
+  }
+
+  function renderReport(file: File, r: ZipReport | null, readable: boolean) {
+    zipReport.replaceChildren()
+    zipReport.hidden = false
+    if (!r) return
+    const bad = r.problems.length > 0
+    const head = h('div', { class: `zr-head ${bad ? 'bad' : 'ok'}` }, h('span', { class: 'zr-mark', 'aria-hidden': 'true' }, bad ? '✕' : '✓'))
+    if (bad) head.append(h('span', {}, problemText(r.problems[0]!)))
+    else if (!readable) head.append(h('span', {}, t('The zip could not be read here: the server will check it.')))
+    else head.append(h('span', {}, t('Ready: {n} files, {size}. The site opens on {entry}.', { n: r.files, size: fmtSize(r.bytes), entry: r.entry ?? 'index.html' })))
+    zipReport.append(head)
+    for (const p of r.problems.slice(1)) zipReport.append(h('p', { class: 'zr-line bad' }, problemText(p)))
+    for (const w of r.warnings) zipReport.append(h('p', { class: 'zr-line warn' }, warningText(w, r)))
+    if (r.top.length) {
+      const max = Math.max(...r.top.map((x) => x.bytes), 1)
+      const list = h('ul', { class: 'zr-top' })
+      for (const x of r.top) {
+        const bar = h('span', { class: 'zr-bar' }, h('i', {}))
+        ;(bar.firstElementChild as HTMLElement).style.width = `${Math.max(3, Math.round((x.bytes / max) * 100))}%`
+        list.append(h('li', {}, h('span', { class: 'zr-name' }, x.folder ? `${x.name}/` : x.name), bar, h('span', { class: 'zr-size' }, x.folder ? `${t('{n} files', { n: x.files })} · ${fmtSize(x.bytes)}` : fmtSize(x.bytes))))
+      }
+      zipReport.append(list)
+    }
+    void file
+  }
+
+  async function setFile(file: File | null | undefined) {
     state.file = file ?? null
+    inspected = null
+    const seq = ++inspectSeq
     fname.textContent = state.file ? `${state.file.name} (${fmtSize(state.file.size)})` : ''
+    drop.classList.toggle('has', !!state.file)
+    if (!state.file) {
+      zipReport.hidden = true
+      zipReport.replaceChildren()
+      return
+    }
+    zipReport.hidden = false
+    zipReport.replaceChildren(h('p', { class: 'zr-line' }, t('Checking the zip…')))
+    const f = state.file
+    const entries = await zipEntries(f)
+    if (seq !== inspectSeq) return
+    inspected = inspectZip(entries, f)
+    renderReport(f, inspected, entries !== null)
   }
 
   function setBusy(b: boolean) {
@@ -491,7 +566,7 @@ function mount(msk: Msk) {
     inDesc.value = row ? valOf(row, 'description') : ''
     inZip.value = ''
     inThumb.value = ''
-    setFile(null)
+    void setFile(null)
     // the source of an existing site does not change
     setSource(row && isWeb(row) ? 'url' : 'zip')
     inSrcZip.disabled = inSrcUrl.disabled = !!row && hasSite(row)
@@ -616,6 +691,7 @@ function mount(msk: Msk) {
       if (!name) return msg(t('the name is required'), 'form', true)
       if (!file && !(row && hasSite(row))) return msg(t('choose the zip with the site'), 'form', true)
       if (file && !/\.zip$/i.test(file.name)) return msg(t('the file must be a .zip'), 'form', true)
+      if (file && inspected?.problems.length) return msg(problemText(inspected.problems[0]!), 'form', true)
     }
 
     setBusy(true)
@@ -720,7 +796,7 @@ function mount(msk: Msk) {
   inName.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') void save()
   })
-  inZip.addEventListener('change', () => setFile(inZip.files?.[0]))
+  inZip.addEventListener('change', () => void setFile(inZip.files?.[0]))
   inSrcZip.addEventListener('change', () => setSource('zip'))
   inSrcUrl.addEventListener('change', () => setSource('url'))
   inUrl.addEventListener('keydown', (ev) => {
@@ -761,13 +837,18 @@ function mount(msk: Msk) {
   drop.addEventListener('dragover', (ev) => {
     ev.preventDefault()
     drop.classList.add('over')
+    sub_.textContent = t('Drop the zip here')
   })
-  drop.addEventListener('dragleave', () => drop.classList.remove('over'))
+  drop.addEventListener('dragleave', () => {
+    drop.classList.remove('over')
+    sub_.textContent = t('drag the zip here or click to choose it')
+  })
   drop.addEventListener('drop', (ev) => {
     ev.preventDefault()
     drop.classList.remove('over')
+    sub_.textContent = t('drag the zip here or click to choose it')
     const f = ev.dataTransfer?.files?.[0]
-    if (f) setFile(f)
+    if (f) void setFile(f)
   })
 
   // ---------- start ----------
