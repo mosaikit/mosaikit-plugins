@@ -44,5 +44,11 @@
   "Thank you, confirmed": "Gracias, confirmado",
   "Could not start the UI of the plugin: ": "No se pudo iniciar la interfaz del plugin: ",
   "Could not load the notices: ": "No se pudieron cargar los avisos: ",
-  "Write a title": "Escribe un título"
+  "Write a title": "Escribe un título",
+  "Export CSV": "Exportar CSV",
+  "Name": "Nombre",
+  "Confirmed on": "Confirmado el",
+  "{n} confirmed": "{n} confirmado(s)",
+  "Notices": "Avisos",
+  "Keyboard shortcuts": "Atajos de teclado"
 }
