@@ -38,6 +38,8 @@ function svgEl(tag: string, attrs: Record<string, string | number>): SVGElement 
 // paths of the interface icons (stroke): constants only
 const PATHS = {
   upload: ['M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16'],
+  star: ['M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8z'],
+  clock: ['M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zM12 7v5l3.2 2'],
   folderPlus: ['M3 7.5a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 10.5v5m-2.5-2.5h5'],
   list: ['M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01'],
   grid: ['M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z'],

@@ -1,9 +1,10 @@
 // File manager: navigation by id, multiple selection, actions according to the level of permission.
-import { emptyState, pageHead, type FileEntry, type FolderSuggestion, type Listing, type Msk } from '@mosaikit/plugin-api'
+import { emptyState, pageHead, shortcuts, virtualList, type FileEntry, type FolderSuggestion, type Listing, type Msk, type Shortcuts, type VirtualList } from '@mosaikit/plugin-api'
 import { choiceDialog, closeDialog, dialogOpen, nameList, pickFolder, promptDialog } from './dialogs.ts'
 import { fileIcon, h, saveBlob, spinner, svg, type IconName } from './dom.ts'
 import { getLang, locale, t } from './i18n.ts'
 import { closeViewer, loadPreview, openViewer, viewerOpen, type Preview } from './preview.ts'
+import { columnsFor, newest, parseFavs, refreshFavs, sharedWithMe as othersFiles, toggleFavs, walk, type Fav, type Place } from './places.ts'
 import {
   THUMB_MAX,
   atLeast,
@@ -27,6 +28,10 @@ const PREF_KEY = 'msk_files_prefs'
 const DRAG_TYPE = 'application/x-mosaikit-files'
 
 type View = 'list' | 'grid'
+
+/** From this many items a folder is drawn by a virtual list (only the rows in sight), not a page at a time. */
+const VIRTUAL_FROM = 400
+const FAV_KEY = 'msk_files_favs'
 
 /** From this size a file goes up in pieces (one request is limited), and a zip is not unpacked (it is read in memory). */
 const BIG_FILE = 100 << 20
@@ -98,6 +103,8 @@ type ActId =
   | 'zipcwd'
   | 'sharecwd'
   | 'clear'
+  | 'fav'
+  | 'reveal'
 
 interface Action {
   id: ActId
@@ -156,6 +163,18 @@ export class FileManager {
   private loadSeq = 0
   /** the page was opened to share this folder: the dialog opens once the folder is listed and the person manages it */
   private shareOnOpen = false
+  /** where the list comes from: the folders, or one of the virtual folders (Recent, Favourites, Shared with me) */
+  private place: Place = 'files'
+  private favs: Fav[] = []
+  /** «Show in folder» from a virtual folder: select this item once the folder is listed */
+  private revealId: string | null = null
+  /** a note about the walk of Recent when it stopped before the end */
+  private placeNote = ''
+  private vl: VirtualList | null = null
+  private vcols = 1
+  private keys: Shortcuts | null = null
+  /** the sort of the folders while Recent (by date) is shown */
+  private savedSort: { key: SortKey; dir: 1 | -1 } | null = null
 
   private detail: { key: string; preview?: Preview; error?: string } | null = null
   private sideKey = ''
@@ -176,6 +195,7 @@ export class FileManager {
   private readonly headActs: HTMLElement
   private readonly headMore: HTMLElement
   private readonly crumbs: HTMLElement
+  private readonly places: HTMLElement
   private readonly bar: HTMLElement
   private readonly main: HTMLElement
   private readonly side: HTMLElement
@@ -212,6 +232,8 @@ export class FileManager {
     this.headActs = h('div', { class: 'fm-headacts' })
     this.headMore = h('div', { class: 'fm-headacts' })
     this.crumbs = h('nav', { class: 'fm-crumbs', 'aria-label': t('Path') })
+    this.places = h('nav', { class: 'fm-places', 'aria-label': t('Places') })
+    this.favs = parseFavs(this.readFavs())
     this.bar = h('div', { class: 'fm-bar' })
     this.main = h('div', { class: 'fm-main' })
     this.side = h('aside', { class: 'fm-side', 'aria-label': t('Details') })
@@ -233,13 +255,14 @@ export class FileManager {
         actions: [this.headActs],
         filters: [this.viewSeg, this.headMore, h('label', { class: 'fm-search' }, svg('search'), this.search)],
       }),
-      h('div', { class: 'fm-content' }, this.crumbs, this.bar, h('div', { class: 'fm-body' }, this.main, this.side), this.status),
+      h('div', { class: 'fm-content' }, this.places, this.crumbs, this.bar, h('div', { class: 'fm-body' }, this.main, this.side), this.status),
       this.picker,
     )
     el.replaceChildren(this.root)
     document.body.append(this.progress)
     this.bindMain()
     document.addEventListener('keydown', this.onKey)
+    this.registerShortcuts()
     document.addEventListener('mousedown', this.onDocDown)
     window.addEventListener('blur', this.closeMenu)
     void this.msk.loading(this.refresh())
@@ -247,6 +270,8 @@ export class FileManager {
   }
 
   dispose() {
+    this.keys?.dispose()
+    this.vl?.destroy()
     document.removeEventListener('keydown', this.onKey)
     document.removeEventListener('mousedown', this.onDocDown)
     window.removeEventListener('blur', this.closeMenu)
@@ -267,7 +292,126 @@ export class FileManager {
   }
 
   private get canCreate(): boolean {
+    if (this.place !== 'files') return false
     return atLeast(this.listing?.my_level ?? (this.parent === null ? 'write' : undefined), 'write')
+  }
+
+  // ----------------------------------------------------------- favourites, places, shortcuts
+
+  /** Favourites live in the browser of the person (one list per person): the server has no flag for them. */
+  private readFavs(): string | null {
+    try {
+      return localStorage.getItem(`${FAV_KEY}_${this.me ?? ''}`)
+    } catch {
+      return null
+    }
+  }
+
+  private saveFavs() {
+    try {
+      localStorage.setItem(`${FAV_KEY}_${this.me ?? ''}`, JSON.stringify(this.favs))
+    } catch {
+      // storage not available: the favourites last until the page closes
+    }
+  }
+
+  private isFav(id: string): boolean {
+    return this.favs.some((f) => f.id === id)
+  }
+
+  private toggleFav(items: FileEntry[]) {
+    if (!items.length) return
+    const r = toggleFavs(this.favs, items)
+    this.favs = r.favs
+    this.saveFavs()
+    this.msk.toast(r.added ? t('Added to favourites') : t('Removed from favourites'))
+    if (this.place === 'favourites') void this.refresh()
+    else this.render()
+  }
+
+  private placeTitle(p: Place): string {
+    return p === 'recent' ? t('Recent') : p === 'favourites' ? t('Favourites') : p === 'shared' ? t('Shared with me') : t('My files')
+  }
+
+  openPlace(p: Place) {
+    if (p === 'files') return this.go(null)
+    if (p === this.place) return this.act('refresh')
+    this.place = p
+    if (p === 'recent' && !this.savedSort) {
+      this.savedSort = { key: this.prefs.sortKey, dir: this.prefs.sortDir }
+      this.prefs.sortKey = 'modified'
+      this.prefs.sortDir = -1
+    } else if (p !== 'recent') this.restoreSort()
+    this.parent = null
+    this.listing = null
+    this.entries = []
+    this.filter = ''
+    this.search.value = ''
+    this.sel.clear()
+    this.anchor = null
+    this.clearThumbs()
+    this.setDetail(null)
+    try {
+      history.replaceState(null, '', location.pathname + location.search)
+    } catch {
+      // history not available
+    }
+    void this.refresh(false)
+  }
+
+  private renderPlaces() {
+    const icon: Record<Place, IconName> = { files: 'home', recent: 'clock', favourites: 'star', shared: 'users' }
+    this.places.replaceChildren(
+      ...(['files', 'recent', 'favourites', 'shared'] as Place[]).map((p) => {
+        const cur = this.place === p
+        const b = h(
+          'button',
+          { type: 'button', class: 'fm-place' + (cur ? ' cur' : ''), 'aria-current': cur ? 'page' : null, 'data-place': p },
+          svg(icon[p]),
+          h('span', null, this.placeTitle(p)),
+          p === 'favourites' && this.favs.length ? h('small', null, String(this.favs.length)) : null,
+        )
+        b.onclick = () => this.openPlace(p)
+        return b
+      }),
+    )
+  }
+
+  private registerShortcuts() {
+    const free = () => !viewerOpen() && !dialogOpen() && !this.menu
+    const g = t('Go to')
+    const sel = t('Selection')
+    const key = (keys: string, label: string, run: () => void, extra: Partial<Parameters<typeof shortcuts>[0][number]> = {}) => ({ keys, label, run, when: free, ...extra })
+    // the keys handled by the page itself (below, onKey) are listed for the help sheet only
+    const known = (keys: string, label: string, group: string) => ({ keys, label, group, run: () => {}, when: () => false })
+    this.keys = shortcuts(
+      [
+        key('/', t('Search in this folder'), () => this.search.focus()),
+        key('u', t('Upload files'), () => this.act('upload'), { when: () => free() && this.canCreate }),
+        key('n', t('New folder'), () => this.act('mkdir'), { when: () => free() && this.canCreate }),
+        key('r', t('Refresh'), () => this.act('refresh')),
+        key('v', t('Switch between list and grid'), () => {
+          this.prefs.view = this.prefs.view === 'grid' ? 'list' : 'grid'
+          this.savePrefs()
+          this.render()
+        }),
+        key('f', t('Add to favourites'), () => this.toggleFav(this.selected()), { group: sel, when: () => free() && this.selected().length > 0 }),
+        key('g m', t('My files'), () => this.openPlace('files'), { group: g }),
+        key('g r', t('Recent'), () => this.openPlace('recent'), { group: g }),
+        key('g f', t('Favourites'), () => this.openPlace('favourites'), { group: g }),
+        key('g s', t('Shared with me'), () => this.openPlace('shared'), { group: g }),
+        known('arrowdown', t('Move the selection (also ↑ ← →)'), sel),
+        known('shift+arrowdown', t('Extend the selection'), sel),
+        known('ctrl+a', t('Select all'), sel),
+        known('escape', t('Clear the selection'), sel),
+        known('enter', t('Open'), sel),
+        known('space', t('Preview'), sel),
+        known('f2', t('Rename'), sel),
+        known('delete', t('Delete'), sel),
+        known('backspace', t('Parent folder'), g),
+      ],
+      { labels: { title: t('Keyboard shortcuts'), close: t('Close'), general: t('Files'), then: t('then') } },
+    )
   }
 
   private byId(id: string): FileEntry | undefined {
@@ -284,13 +428,16 @@ export class FileManager {
 
   private savePrefs() {
     try {
-      localStorage.setItem(PREF_KEY, JSON.stringify(this.prefs))
+      // the date order of Recent is not the order of the folders: it is not kept
+      const keep = this.savedSort ? { ...this.prefs, sortKey: this.savedSort.key, sortDir: this.savedSort.dir } : this.prefs
+      localStorage.setItem(PREF_KEY, JSON.stringify(keep))
     } catch {
       // storage not available
     }
   }
 
   private folderName(): string {
+    if (this.place !== 'files') return this.placeTitle(this.place)
     const p = this.listing?.path
     return p && p.length ? p[p.length - 1].name : t('My files')
   }
@@ -299,8 +446,53 @@ export class FileManager {
     return this.parent === null && !!this.me && e.owner_id !== this.me
   }
 
+  /** The virtual folders: what the list shows is gathered from the folders (Recent), the listing of the top (Shared with me) or the saved favourites checked against their folders. */
+  private async refreshPlace(my: number, keepSel: boolean): Promise<void> {
+    const place = this.place
+    this.loading = true
+    this.placeNote = ''
+    if (!this.listing) this.render()
+    const list = (p: string | null) => this.msk.files.list(p)
+    let entries: FileEntry[] = []
+    try {
+      if (place === 'shared') entries = othersFiles((await list(null)).entries, this.me)
+      else if (place === 'favourites') {
+        // the saved entries show at once; the folders then tell what changed or is gone
+        entries = this.favs.slice() as FileEntry[]
+        this.listing = { parent: null, path: [], entries, my_level: 'read' }
+        this.entries = entries
+        this.loading = false
+        this.render()
+        const fresh = await refreshFavs(this.favs, list)
+        if (my !== this.loadSeq) return
+        this.favs = fresh
+        this.saveFavs()
+        entries = fresh as FileEntry[]
+      } else {
+        const w = await walk(list, { maxFolders: 40 })
+        entries = newest(w.entries, 60)
+        if (!w.complete) this.placeNote = t('Looked in the first {n} folders', { n: w.folders })
+      }
+      this.loadError = ''
+    } catch (e) {
+      if (my !== this.loadSeq) return
+      this.loadError = errMsg(e)
+      entries = []
+    }
+    if (my !== this.loadSeq) return
+    this.listing = { parent: null, path: [], entries, my_level: 'read' }
+    this.entries = entries
+    const ids = new Set(entries.map((e) => e.id))
+    this.sel = keepSel ? new Set([...this.sel].filter((id) => ids.has(id))) : new Set()
+    if (this.anchor && !ids.has(this.anchor)) this.anchor = null
+    this.loading = false
+    this.sideKey = ''
+    this.render()
+  }
+
   async refresh(keepSel = true): Promise<void> {
     const my = ++this.loadSeq
+    if (this.place !== 'files') return this.refreshPlace(my, keepSel)
     const parent = this.parent
     this.loading = true
     if (!this.listing) this.render()
@@ -316,6 +508,11 @@ export class FileManager {
       }
       const ids = new Set(l.entries.map((e) => e.id))
       this.sel = keepSel ? new Set([...this.sel].filter((id) => ids.has(id))) : new Set()
+      if (this.revealId && ids.has(this.revealId)) {
+        this.sel = new Set([this.revealId])
+        this.anchor = this.revealId
+      }
+      this.revealId = null
       if (this.anchor && !ids.has(this.anchor)) this.anchor = null
     } catch (e) {
       if (my !== this.loadSeq) return
@@ -332,7 +529,16 @@ export class FileManager {
     this.render()
   }
 
+  private restoreSort() {
+    if (!this.savedSort) return
+    this.prefs.sortKey = this.savedSort.key
+    this.prefs.sortDir = this.savedSort.dir
+    this.savedSort = null
+  }
+
   go(id: string | null) {
+    this.place = 'files'
+    this.restoreSort()
     this.parent = id
     this.listing = null
     this.entries = []
@@ -362,6 +568,7 @@ export class FileManager {
     if (!items.length) return out
     const one = items.length === 1 ? items[0] : null
     const allManage = items.every((e) => atLeast(e.my_level, 'manage'))
+    if (one && this.place !== 'files' && (one.parent_id !== null || this.place === 'recent' || this.place === 'favourites')) out.push({ id: 'reveal', label: t('Show in folder'), icon: 'open' })
     if (one) {
       if (one.is_dir) out.push({ id: 'open', label: t('Open'), icon: 'open', kbd: t('Enter'), primary: true })
       else if (previewable(one)) out.push({ id: 'open', label: t('Preview'), icon: 'eye', kbd: t('Enter'), primary: true })
@@ -375,6 +582,7 @@ export class FileManager {
     if (this.canCreate) out.push({ id: 'duplicate', label: t('Duplicate here'), icon: 'copy' })
     if (one?.is_dir) out.push({ id: 'profiles', label: t('Use in another app…'), icon: 'open' })
     if (one && atLeast(one.my_level, 'manage')) out.push({ id: 'share', label: t('Share'), icon: 'share' })
+    out.push({ id: 'fav', label: items.every((e) => this.isFav(e.id)) ? t('Remove from favourites') : t('Add to favourites'), icon: 'star', kbd: 'F' })
     if (allManage) out.push({ id: 'delete', label: t('Delete'), icon: 'trash', danger: true, kbd: t('Del') })
     return out
   }
@@ -461,6 +669,15 @@ export class FileManager {
       case 'clear':
         this.sel.clear()
         this.render()
+        break
+      case 'fav':
+        this.toggleFav(items)
+        break
+      case 'reveal':
+        if (one) {
+          this.revealId = one.id
+          this.go(one.parent_id)
+        }
         break
     }
   }
@@ -984,6 +1201,7 @@ export class FileManager {
   // ---------------------------------------------------------------- render
 
   render() {
+    this.renderPlaces()
     this.renderHead()
     this.renderCrumbs()
     this.renderBar()
@@ -1061,6 +1279,11 @@ export class FileManager {
   }
 
   private renderCrumbs() {
+    this.crumbs.hidden = this.place !== 'files' && !this.placeNote
+    if (this.place !== 'files') {
+      this.crumbs.replaceChildren(h('span', { class: 'msk-badge' }, this.placeNote))
+      return
+    }
     const path = this.listing?.path ?? []
     const crumb = (id: string | null, name: string, cur: boolean) => {
       const b = h('button', { type: 'button', class: 'fm-crumb' + (cur ? ' cur' : ''), 'aria-current': cur ? 'page' : null }, id ? null : svg('home'), name)
@@ -1116,6 +1339,11 @@ export class FileManager {
   }
 
   private badges(e: FileEntry): (HTMLElement | null)[] {
+    if (this.isFav(e.id)) return [h('span', { class: 'fm-star', title: t('Favourite') }, svg('star', 'fill')), ...this.sharedBadge(e)]
+    return this.sharedBadge(e)
+  }
+
+  private sharedBadge(e: FileEntry): (HTMLElement | null)[] {
     if (this.sharedWithMe(e)) return [h('span', { class: 'msk-badge acc', title: t('Shared with you') }, t('Shared by {name}', { name: e.owner_name }))]
     if (e.shared && e.owner_id === this.me) return [h('span', { class: 'msk-badge', title: t('Shared with others') }, svg('users'), t('Shared'))]
     return []
@@ -1158,6 +1386,7 @@ export class FileManager {
 
   /** The part of the folder that scrolls: the rows of the table, or the pane itself with the cards. */
   private scroller(): HTMLElement {
+    if (this.vl) return this.vl.el
     return this.main.querySelector<HTMLElement>(':scope > .fm-table > tbody') ?? this.main
   }
 
@@ -1192,8 +1421,12 @@ export class FileManager {
     const keepTop = sameView ? this.scroller().scrollTop : 0
     this.pager?.disconnect()
     this.pager = null
-    const list = full.slice(0, this.shown)
-    const foot = this.foot(list.length, full.length)
+    this.vl?.destroy()
+    this.vl = null
+    // a big folder is drawn by a virtual list: the rows in sight only, no pages
+    const virt = full.length >= VIRTUAL_FROM
+    const list = virt ? [] : full.slice(0, this.shown)
+    const foot = virt ? null : this.foot(list.length, full.length)
     const dropzone = h('div', { class: 'fm-dropzone' }, svg('upload'), h('span', null, t('Drop to upload to “{name}”', { name: this.folderName() })))
     let content: HTMLElement | HTMLElement[]
     if (this.loading && !this.listing) {
@@ -1207,15 +1440,18 @@ export class FileManager {
         content = h('div', { class: 'fm-empty' }, h('div', { class: 'big' }, svg('search')), h('b', null, t('No result')), h('span', null, t('No item contains “{text}”', { text: this.filter })))
       } else {
         const here = this.parent === null
+        const virtualPlace = this.place !== 'files'
         const es = emptyState({
           art: 'documents',
-          title: here ? t('You have no files yet') : t('This folder is empty'),
-          text: this.canCreate ? t('Drag files here, or use the buttons below.') : t('You have read-only access'),
+          title: virtualPlace ? { recent: t('Nothing recent yet'), favourites: t('No favourites yet'), shared: t('Nothing is shared with you'), files: '' }[this.place] : here ? t('You have no files yet') : t('This folder is empty'),
+          text: virtualPlace ? { recent: t('The files you add or change show up here.'), favourites: t('Select a file and press F to keep it here.'), shared: t('Files and folders that others share with you show up here.'), files: '' }[this.place] : this.canCreate ? t('Drag files here, or use the buttons below.') : t('You have read-only access'),
           actions: this.canCreate ? [this.button({ id: 'upload', label: t('Upload files'), icon: 'upload', primary: true }, true), this.button({ id: 'mkdir', label: t('New folder'), icon: 'folderPlus' })] : [],
         })
         es.classList.add('fm-empty')
         content = es
       }
+    } else if (this.prefs.view === 'grid' && virt) {
+      content = [this.virtualGrid(full)]
     } else if (this.prefs.view === 'grid') {
       content = [h(
         'div',
@@ -1227,6 +1463,7 @@ export class FileManager {
             { class: 'fm-card' + (this.sel.has(e.id) ? ' sel' : ''), title: e.name },
             this.checkbox(e.id),
             h('div', { class: 'th' }, thumb ? h('img', { src: thumb, alt: '', draggable: 'false' }) : fileIcon(e, true)),
+            this.isFav(e.id) ? h('span', { class: 'fm-cardstar', title: t('Favourite') }, svg('star', 'fill')) : null,
             h('div', { class: 'nm2' }, e.name),
             h('div', { class: 'meta' }, e.is_dir ? t('Folder') : fmtSize(e.size)),
             this.sharedWithMe(e) ? h('div', { class: 'meta acc' }, t('Shared by {name}', { name: e.owner_name })) : null,
@@ -1298,6 +1535,10 @@ export class FileManager {
         ),
       )
     }
+    if (virt && this.prefs.view === 'list' && !Array.isArray(content) && content.matches('table.fm-table')) {
+      content.classList.add('virt')
+      content.querySelector(':scope > tbody')?.replaceWith(this.virtualRows(full))
+    }
     this.main.replaceChildren(...(Array.isArray(content) ? content : [content]), dropzone)
     const sc = this.scroller()
     if (keepTop) sc.scrollTop = keepTop
@@ -1307,6 +1548,82 @@ export class FileManager {
       this.pager = new IntersectionObserver((e) => e.some((x) => x.isIntersecting) && this.more(), { root: sc, rootMargin: '200px' })
       this.pager.observe(el)
     }
+  }
+
+  /** The rows of a big folder as a virtual list (the header row of the table stays above it). */
+  private virtualRows(full: FileEntry[]): HTMLElement {
+    const vl = virtualList({
+      count: full.length,
+      estimateSize: 44,
+      getKey: (i) => full[i]!.id,
+      label: this.folderName(),
+      render: (i) => {
+        const e = full[i]!
+        const row = h(
+          'div',
+          { class: 'it fm-vrow' + (this.sel.has(e.id) ? ' sel' : '') },
+          h('div', { class: 'c-chk' }, this.checkbox(e.id)),
+          h('div', null, h('div', { class: 'nm' }, fileIcon(e), h('span', { class: 'n' + (e.is_dir ? ' is-dir' : ''), title: e.name }, e.name), ...this.badges(e))),
+          h('div', { class: 'c-kind' }, kindLabel(e)),
+          h('div', { class: 'c-owner' }, e.owner_id === this.me ? t('me') : e.owner_name),
+          h('div', { class: 'c-date', title: fmtDate(e.modified, true) }, fmtDate(e.modified)),
+          h('div', { class: 'c-size' }, e.is_dir ? '—' : fmtSize(e.size)),
+        )
+        this.bindItem(row, e)
+        return row
+      },
+    })
+    this.vl = vl
+    return vl.el
+  }
+
+  /** The cards of a big folder: rows of as many cards as fit, drawn by a virtual list; thumbnails load for the rows in sight. */
+  private virtualGrid(full: FileEntry[]): HTMLElement {
+    let cols = 1
+    const rows = () => Math.ceil(full.length / cols)
+    const vl = virtualList({
+      count: rows(),
+      estimateSize: 150,
+      getKey: (i) => full[i * cols]!.id,
+      gap: 10,
+      label: this.folderName(),
+      render: (i) => {
+        const part = full.slice(i * cols, i * cols + cols)
+        const row = h('div', { class: 'fm-grid fm-vgrid', style: `grid-template-columns: repeat(${cols}, minmax(0, 1fr))` })
+        for (const e of part) {
+          const thumb = this.thumbs.get(e.id)
+          const card = h(
+            'div',
+            { class: 'fm-card' + (this.sel.has(e.id) ? ' sel' : ''), title: e.name },
+            this.checkbox(e.id),
+            h('div', { class: 'th' }, thumb ? h('img', { src: thumb, alt: '', draggable: 'false' }) : fileIcon(e, true)),
+            this.isFav(e.id) ? h('span', { class: 'fm-cardstar', title: t('Favourite') }, svg('star', 'fill')) : null,
+            h('div', { class: 'nm2' }, e.name),
+            h('div', { class: 'meta' }, e.is_dir ? t('Folder') : fmtSize(e.size)),
+            this.sharedWithMe(e) ? h('div', { class: 'meta acc' }, t('Shared by {name}', { name: e.owner_name })) : null,
+          )
+          this.bindItem(card, e)
+          row.append(card)
+        }
+        return row
+      },
+    })
+    const thumbsInSight = () => this.loadThumbs(vl.visible().flatMap((i) => full.slice(i * cols, i * cols + cols)))
+    let timer: ReturnType<typeof setTimeout> | undefined
+    vl.el.addEventListener('scroll', () => {
+      clearTimeout(timer)
+      timer = setTimeout(thumbsInSight, 120)
+    })
+    new ResizeObserver(() => {
+      const n = columnsFor(vl.el.clientWidth - 24, 132, 10)
+      if (n === cols) return
+      cols = n
+      this.vcols = n
+      vl.setCount(rows())
+      thumbsInSight()
+    }).observe(vl.el)
+    this.vl = vl
+    return vl.el
   }
 
   private renderStatus() {
@@ -1684,7 +2001,10 @@ export class FileManager {
       // the item may not be drawn yet: draw the pages up to it, then select it
       if (ni >= this.shown) this.shown = Math.min(list.length, growFor(this.shown, ni))
       this.click(list[ni].id, { shiftKey: ev.shiftKey })
-      this.main.querySelector(`[data-id="${CSS.escape(list[ni].id)}"]`)?.scrollIntoView({ block: 'nearest' })
+      if (this.vl) {
+        this.vl.scrollToIndex(this.prefs.view === 'grid' ? Math.floor(ni / Math.max(1, this.vcols)) : ni)
+        requestAnimationFrame(() => this.main.querySelector(`[data-id="${CSS.escape(list[ni].id)}"]`)?.scrollIntoView({ block: 'nearest' }))
+      } else this.main.querySelector(`[data-id="${CSS.escape(list[ni].id)}"]`)?.scrollIntoView({ block: 'nearest' })
     }
   }
 }

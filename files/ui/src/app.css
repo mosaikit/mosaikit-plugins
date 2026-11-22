@@ -233,3 +233,39 @@
 /* the stack of progress boxes lets clicks through; the notice has buttons */
 .fm-progress .fm-note { pointer-events: auto; }
 .fm-note .lbl { flex: 1 1 14rem; white-space: normal; }
+
+/* places: the folders and the virtual folders (Recent, Favourites, Shared with me) */
+.fm-places { display: flex; gap: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); margin: -4px 0 -4px; }
+.fm-place { flex: none; white-space: nowrap; position: relative; display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border: 0; background: none; color: var(--dim); font-weight: 550; font-size: 13px; cursor: pointer; transition: color var(--dur-1), background var(--dur-1); }
+.fm-place::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; background: var(--acc); transform: scaleX(0); transition: transform var(--dur-2) var(--ease); }
+.fm-place:hover { color: var(--fg); background: var(--panel2); }
+.fm-place.cur { color: var(--fg); }
+.fm-place.cur::after { transform: scaleX(1); }
+.fm-place.cur .si { color: var(--acc); }
+.fm-place small { font-family: var(--font-mono); font-size: 11px; padding: 0 6px; line-height: 16px; border-radius: var(--r-pill); background: var(--acc-soft); color: var(--acc); }
+.fm-placetitle { display: inline-flex; align-items: center; height: 28px; padding: 0 10px; font-weight: 650; }
+.si.fill { fill: currentColor; }
+.fm-star { display: inline-flex; color: var(--acc); }
+.fm-star .si { width: 13px; height: 13px; }
+.fm-cardstar { position: absolute; top: 8px; right: 8px; color: var(--acc); display: inline-flex; }
+.fm-cardstar .si { width: 14px; height: 14px; }
+@media (max-width: 640px) { .fm-place { padding: 0 10px; } .fm-place span { font-size: 12.5px; } }
+@media (prefers-reduced-motion: reduce) { .fm-place, .fm-place::after { transition: none; } }
+
+/* a big folder: the rows are a virtual list under the header row of the table */
+.fm-table.virt > .msk-vlist { grid-column: 1 / -1; min-height: 0; scrollbar-gutter: stable; }
+.fm-table.virt > thead { padding-right: 10px; }
+.fm-crumbs[hidden] { display: none; }
+.fm-vrow { display: grid; grid-template-columns: 42px minmax(0, 1fr) 140px 130px 140px 100px; align-items: center; height: 44px; border-bottom: 1px solid var(--line); font-size: 13px; cursor: default; }
+.fm-vrow > div { min-width: 0; padding: 0 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fm-vrow > .c-chk { padding-right: 0; }
+.fm-vrow > .c-kind, .fm-vrow > .c-owner, .fm-vrow > .c-date { color: var(--dim); }
+.fm-vrow > .c-size { text-align: right; color: var(--dim); font-variant-numeric: tabular-nums; }
+.fm-vrow:hover { background: rgba(255, 255, 255, .025); }
+.fm-vrow.sel { background: var(--acc-soft); box-shadow: inset 3px 0 0 var(--acc); }
+.fm-vrow.drop { background: var(--acc-line); }
+@media (max-width: 760px) { .fm-vrow { grid-template-columns: 42px minmax(0, 1fr) 90px; } .fm-vrow > .c-kind, .fm-vrow > .c-owner, .fm-vrow > .c-date { display: none; } }
+.fm-main:has(> .msk-vlist) { overflow: hidden; }
+.fm-main > .msk-vlist { height: 100%; }
+.fm-vgrid { padding: 0 12px; }
+.fm-main > .msk-vlist .msk-vlist-inner { padding: 12px 0; }
