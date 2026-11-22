@@ -856,6 +856,26 @@ fn delete_answer(ctx: &Ctx, args: Value) -> Result<Value> {
     Ok(json!({ "deleted": n }))
 }
 
+/// Widget `answers`: the forms the caller sees with the most answers, as bars (six at most).
+fn widget_answers(ctx: &Ctx, _args: Value) -> Result<Value> {
+    let rows = ctx.db().query(
+        "select v.title as title, count(a.user_id)::int as n from core.visible_resources v          left join answers a on a.resource_id = v.id where v.kind = 'forms'          group by v.id, v.title order by n desc, v.title limit 6",
+        &[],
+    )?;
+    let title = |r: &Value| {
+        r.get("title")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_string()
+    };
+    let count = |r: &Value| r.get("n").and_then(Value::as_i64).unwrap_or(0);
+    Ok(json!({
+        "type": "bar",
+        "categories": rows.iter().map(title).collect::<Vec<_>>(),
+        "series": [{ "name": "answers", "data": rows.iter().map(count).collect::<Vec<_>>() }],
+    }))
+}
+
 mosaikit_plugin_sdk::plugin! {
     hooks: {
         "forms.before_create" => form,
@@ -865,6 +885,7 @@ mosaikit_plugin_sdk::plugin! {
         "forms.submit" => submit,
         "forms.results" => results,
         "forms.overview" => overview,
+        "forms.widget_answers" => widget_answers,
         "forms.delete_answer" => delete_answer,
         "public_form" => public_form,
         "public_submit" => public_submit,

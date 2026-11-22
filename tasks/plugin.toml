@@ -60,6 +60,24 @@ id = "due-soon"
 label = "Due this week"
 data = { command = "tasks.widget_soon", kind = "list", size = "m", texts = { en = { empty = "Nothing due in the next 7 days" }, it = { label = "In scadenza questa settimana", empty = "Nessuna scadenza nei prossimi 7 giorni" }, es = { label = "Vencen esta semana", empty = "Nada vence en los próximos 7 días" } } }
 
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "done-week"
+label = "Done this week"
+data = { command = "tasks.widget_week", kind = "number", size = "s", texts = { en = { secondary = "the week before" }, it = { label = "Fatte questa settimana", secondary = "la settimana prima" }, es = { label = "Hechas esta semana", secondary = "la semana anterior" } } }
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "done-flow"
+label = "Tasks done, last 14 days"
+data = { command = "tasks.widget_flow", kind = "chart", size = "l", texts = { en = { empty = "Nothing done yet", categories = { done = "Done" } }, it = { label = "Attività fatte, ultimi 14 giorni", empty = "Ancora niente di fatto", categories = { done = "Fatte" } }, es = { label = "Tareas hechas, últimos 14 días", empty = "Todavía no hay nada hecho", categories = { done = "Hechas" } } } }
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "by-priority"
+label = "Open by priority"
+data = { command = "tasks.widget_priority", kind = "chart", size = "m", texts = { en = { empty = "No open tasks", categories = { high = "High", medium = "Medium", low = "Low", open = "Open" } }, it = { label = "Aperte per priorità", empty = "Nessuna attività aperta", categories = { high = "Alta", medium = "Media", low = "Bassa", open = "Aperte" } }, es = { label = "Abiertas por prioridad", empty = "Sin tareas abiertas", categories = { high = "Alta", medium = "Media", low = "Baja", open = "Abiertas" } } } }
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Tieni un elenco di cose da fare, ciascuna con una scadenza e una priorità.\n\nAssegna un’attività condividendola: chi la riceve la trova nel proprio elenco. Segnala come fatta quando è finita; le attività fatte restano visibili finché non le ordini.\n\nLe attività sono elementi della piattaforma: hanno un livello di condivisione, un posto nella ricerca e nel cestino."

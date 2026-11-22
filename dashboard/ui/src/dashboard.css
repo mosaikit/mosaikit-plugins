@@ -1,19 +1,34 @@
 /* Dashboard: boards of widget cards. Colours come from the tokens of the host; a tone is always written in words and with a symbol. */
 .dsh { display: flex; flex-direction: column; height: 100%; min-height: 0; }
 .dsh-head { display: flex; align-items: center; gap: var(--sp-3); min-height: 57px; padding: 8px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-.dsh-head h1 { margin: 0; font-size: 16px; font-weight: 600; }
-.dsh-grow { flex: 1; }
-.dsh-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
+.dsh-head h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+.dsh-head h1 { flex: 1; }
+.dsh-grow { display: none; }
+.dsh-bar { display: flex; flex-wrap: nowrap; align-items: center; gap: var(--sp-2); }
 .dsh-pick { max-width: 240px; }
-.dsh-body { flex: 1; min-height: 0; overflow: auto; padding: var(--sp-4) 24px; display: flex; flex-direction: column; }
+.dsh-body { flex: 1; min-height: 0; overflow: auto; padding: var(--sp-5) 24px; display: flex; flex-direction: column; background: radial-gradient(900px 340px at 12% -8%, var(--acc-soft), transparent 70%); }
 .dsh-body > .msk-emptystate { margin: auto; }
-.dsh-grid { display: grid; gap: var(--sp-4); align-items: start; }
-.dsh-card { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; padding: var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel); transition: border-color var(--dur-1), box-shadow var(--dur-1); }
-.dsh-card:hover { border-color: var(--acc-line); box-shadow: var(--sh-2); }
-.dsh-card h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--dim); letter-spacing: 0.02em; }
+.dsh-grid { display: grid; column-gap: var(--sp-4); row-gap: 0; align-items: start; grid-auto-flow: dense; grid-auto-rows: 6px; }
+.dsh-card { position: relative; display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; padding: var(--sp-4) var(--sp-4) var(--sp-4); border: 1px solid var(--line); border-radius: var(--r-l); background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, var(--acc) 8%) 0, var(--panel) 64px); box-shadow: var(--sh-1); overflow: hidden; transition: border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease), transform var(--dur-2) var(--ease); animation: dsh-rise 420ms var(--ease) both; animation-delay: calc(var(--i, 0) * 45ms); }
+.dsh-card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, var(--acc), transparent 70%); opacity: 0.85; }
+.dsh-card.kind-chart::before { background: linear-gradient(90deg, var(--ok), var(--acc) 60%, transparent); }
+.dsh-card.kind-list::before { opacity: 0.35; }
+.dsh-card:hover { border-color: var(--acc-line); box-shadow: var(--sh-2); transform: translateY(-2px); }
+.dsh-card h2 { margin: 0; font-size: 11px; font-weight: 700; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
 .dsh-card.size-l { grid-column: span 2; }
-.dsh-value { margin: 0; font-size: 44px; line-height: 1.05; font-weight: 700; font-variant-numeric: tabular-nums; }
-.dsh-card.size-s .dsh-value { font-size: 34px; }
+.dsh-card .msk-chart { padding: 0; border: 0; box-shadow: none; background: transparent; }
+.dsh-numtop { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-3); }
+.dsh-spark { width: 42%; max-width: 132px; height: 40px; flex: none; overflow: visible; }
+.dsh-spark-line { fill: none; stroke: var(--acc); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.dsh-spark-area { fill: var(--acc-soft); stroke: none; }
+.dsh-spark-dot { fill: var(--acc); stroke: var(--panel); stroke-width: 2; }
+.dsh-delta { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--dim) 14%, transparent); color: var(--fg); }
+.dsh-delta.up { background: color-mix(in srgb, var(--ok) 18%, transparent); color: color-mix(in srgb, var(--ok) 70%, var(--fg)); }
+.dsh-delta.down { background: color-mix(in srgb, var(--err) 16%, transparent); color: color-mix(in srgb, var(--err) 70%, var(--fg)); }
+@keyframes dsh-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dsh-card { animation: none; transition: none; } .dsh-card:hover { transform: none; } }
+.dsh-value { margin: 0; font-size: 52px; line-height: 1; font-weight: 700; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.dsh-card.size-s .dsh-value { font-size: 44px; }
 .dsh-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); }
 .dsh-second { font-size: 13px; color: var(--fg); }
 .dsh-tone { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--fg); white-space: nowrap; }
@@ -21,7 +36,7 @@
 .dsh-tone.warn { border-color: #e0a93a; }
 .dsh-tone.err { border-color: var(--err); }
 .dsh-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.dsh-item { display: flex; align-items: flex-start; gap: var(--sp-2); padding: 7px 0; border-top: 1px solid var(--line); }
+.dsh-item { display: flex; align-items: flex-start; gap: var(--sp-2); padding: 9px 0; border-top: 1px dashed var(--line); }
 .dsh-item:first-child { border-top: 0; }
 .dsh-item .dsh-tone { flex: none; margin-top: 1px; }
 .dsh-itext { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
@@ -33,6 +48,10 @@
 .dsh-erow { display: flex; align-items: center; gap: var(--sp-2); padding: 4px 0; }
 .dsh-echeck { flex: 1; display: flex; align-items: center; gap: var(--sp-2); font-size: 14px; min-width: 0; }
 .msk-btn.danger-text:hover:not(:disabled) { color: var(--err); border-color: var(--err); }
+@media (max-width: 760px) {
+  .dsh-bar { flex-wrap: wrap; order: 3; flex: 1 0 100%; }
+  .dsh-head > .msk-btn { order: 2; }
+}
 @media (max-width: 640px) {
   .dsh-head, .dsh-body { padding-left: 16px; padding-right: 16px; }
   .dsh-grid { grid-template-columns: minmax(0, 1fr) !important; }

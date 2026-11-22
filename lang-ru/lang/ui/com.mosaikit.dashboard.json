@@ -39,5 +39,11 @@
   "Alert": "Тревога",
   "Could not start the UI of the plugin: ": "Не удалось запустить интерфейс плагина: ",
   "Could not load the dashboard: ": "Не удалось загрузить панель: ",
-  "Could not load the widgets: ": "Не удалось загрузить виджеты: "
+  "Could not load the widgets: ": "Не удалось загрузить виджеты: ",
+  "Up {n}%": "Рост на {n}%",
+  "Down {n}%": "Снижение на {n}%",
+  "No change": "Без изменений",
+  "Show data": "Показать данные",
+  "Loading chart": "Загрузка диаграммы",
+  "The chart could not be drawn": "Не удалось построить диаграмму"
 }

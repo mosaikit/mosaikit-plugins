@@ -39,5 +39,11 @@
   "Alert": "警报",
   "Could not start the UI of the plugin: ": "无法启动插件界面：",
   "Could not load the dashboard: ": "无法加载仪表板：",
-  "Could not load the widgets: ": "无法加载小组件："
+  "Could not load the widgets: ": "无法加载小组件：",
+  "Up {n}%": "上升 {n}%",
+  "Down {n}%": "下降 {n}%",
+  "No change": "无变化",
+  "Show data": "显示数据",
+  "Loading chart": "正在加载图表",
+  "The chart could not be drawn": "无法绘制图表"
 }

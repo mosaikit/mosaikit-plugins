@@ -4,8 +4,11 @@
 //! own access rules) and never lets one failing widget fail the others.
 //!
 //! The contract of a contribution, `data` of `[[contributes]]`: `command` (command of the contributor, called with `{}`),
-//! `kind` (`number` or `list`), `size` (`s`, `m`, `l`) and `texts` (per language: `label`, `secondary`, `empty`). A
-//! `number` command answers `{ value, secondary, tone }`; a `list` command `{ items: [{ id, title, meta, tone }], more }`.
+//! `kind` (`number`, `list` or `chart`), `size` (`s`, `m`, `l`) and `texts` (per language: `label`, `secondary`, `empty`). A
+//! `number` command answers `{ value, secondary, tone }`; a `list` command `{ items: [{ id, title, meta, tone }], more }`. A `number` may add `trend`, up to 30 numbers drawn as a
+//! sparkline. A `chart` command answers `{ type: line|bar|pie, categories: [text], series: [{ name, data: [number] }] }`
+//! (at most 31 categories and 4 series; a category that looks like a date YYYY-MM-DD is written in the language of the
+//! person, any other one is looked up in `texts.<lang>.categories` of the contribution).
 
 use mosaikit_plugin_sdk::prelude::*;
 
@@ -16,6 +19,11 @@ const MAX_ITEMS: usize = 6;
 const COLUMNS: [&str; 3] = ["auto", "2", "3"];
 const TONES: [&str; 4] = ["", "ok", "warn", "err"];
 const SIZES: [&str; 3] = ["s", "m", "l"];
+const KINDS: [&str; 3] = ["number", "list", "chart"];
+const CHARTS: [&str; 3] = ["line", "bar", "pie"];
+const MAX_CATEGORIES: usize = 31;
+const MAX_SERIES: usize = 4;
+const MAX_TREND: usize = 30;
 
 // ------------------------------------------------------------------------------------------------ the rules of a board
 
@@ -92,8 +100,8 @@ fn check_data(data: &Value) -> std::result::Result<(), &'static str> {
         return Err("the widget names no command");
     }
     let kind = data.get("kind").and_then(Value::as_str).unwrap_or_default();
-    if kind != "number" && kind != "list" {
-        return Err("the kind of the widget is number or list");
+    if !KINDS.contains(&kind) {
+        return Err("the kind of the widget is number, list or chart");
     }
     let size = data.get("size").and_then(Value::as_str).unwrap_or("m");
     if !SIZES.contains(&size) {
@@ -125,7 +133,56 @@ fn check_result(kind: &str, r: &Value) -> std::result::Result<Value, &'static st
                 .and_then(Value::as_i64)
                 .ok_or("the widget answered without a number")?;
             let secondary = r.get("secondary").and_then(Value::as_i64);
-            Ok(json!({ "value": value, "secondary": secondary, "tone": tone_of(r.get("tone")) }))
+            let trend: Vec<i64> = r
+                .get("trend")
+                .and_then(Value::as_array)
+                .map(|a| a.iter().filter_map(Value::as_i64).take(MAX_TREND).collect())
+                .unwrap_or_default();
+            let mut out =
+                json!({ "value": value, "secondary": secondary, "tone": tone_of(r.get("tone")) });
+            if !trend.is_empty() {
+                out["trend"] = json!(trend);
+            }
+            Ok(out)
+        }
+        "chart" => {
+            let kind = r.get("type").and_then(Value::as_str).unwrap_or_default();
+            let kind = CHARTS
+                .iter()
+                .copied()
+                .find(|c| *c == kind)
+                .ok_or("the chart is a line, a bar or a pie")?;
+            let categories: Vec<String> = r
+                .get("categories")
+                .and_then(Value::as_array)
+                .ok_or("the chart has no categories")?
+                .iter()
+                .take(MAX_CATEGORIES)
+                .map(|c| short(Some(c), 60))
+                .collect();
+            let series: Vec<Value> = r
+                .get("series")
+                .and_then(Value::as_array)
+                .ok_or("the chart has no series")?
+                .iter()
+                .take(MAX_SERIES)
+                .map(|s| {
+                    let data: Vec<i64> = (0..categories.len())
+                        .map(|i| {
+                            s.get("data")
+                                .and_then(Value::as_array)
+                                .and_then(|d| d.get(i))
+                                .and_then(Value::as_i64)
+                                .unwrap_or(0)
+                        })
+                        .collect();
+                    json!({ "name": short(s.get("name"), 60), "data": data })
+                })
+                .collect();
+            if series.is_empty() {
+                return Err("the chart has no series");
+            }
+            Ok(json!({ "type": kind, "categories": categories, "series": series }))
         }
         "list" => {
             let items = r
@@ -150,7 +207,7 @@ fn check_result(kind: &str, r: &Value) -> std::result::Result<Value, &'static st
             let more = r.get("more").and_then(Value::as_i64).unwrap_or(0).max(0) + extra;
             Ok(json!({ "items": out, "more": more }))
         }
-        _ => Err("the kind of the widget is number or list"),
+        _ => Err("the kind of the widget is number, list or chart"),
     }
 }
 
@@ -284,7 +341,8 @@ mod tests {
         );
         assert!(check_data(&json!({ "command": "tasks.widget", "kind": "list" })).is_ok());
         assert!(check_data(&json!({ "kind": "list" })).is_err());
-        assert!(check_data(&json!({ "command": "x", "kind": "chart" })).is_err());
+        assert!(check_data(&json!({ "command": "x", "kind": "chart" })).is_ok());
+        assert!(check_data(&json!({ "command": "x", "kind": "map" })).is_err());
         assert!(check_data(&json!({ "command": "x", "kind": "list", "size": "xl" })).is_err());
         assert!(check_data(&Value::Null).is_err());
     }
@@ -303,6 +361,8 @@ mod tests {
         )
         .unwrap();
         assert_eq!(r, json!({ "value": 0, "secondary": null, "tone": "" }));
+        let r = check_result("number", &json!({ "value": 2, "trend": [1, 2, "x", 3] })).unwrap();
+        assert_eq!(r["trend"], json!([1, 2, 3]));
         assert!(check_result("number", &json!({ "value": "4" })).is_err());
         assert!(check_result("number", &json!({ "items": [] })).is_err());
     }
@@ -323,6 +383,36 @@ mod tests {
         assert_eq!(r["more"], 0);
         assert!(check_result("list", &json!({ "value": 1 })).is_err());
         assert!(check_result("other", &json!({})).is_err());
+    }
+
+    #[test]
+    fn a_chart_result_is_clipped_to_its_categories() {
+        let r = check_result(
+            "chart",
+            &json!({ "type": "bar", "categories": ["a", "b"], "series": [{ "name": "n", "data": [3, 4, 9] }, { "name": "m", "data": [1] }], "html": "<b>" }),
+        )
+        .unwrap();
+        assert_eq!(
+            r,
+            json!({ "type": "bar", "categories": ["a", "b"], "series": [{ "name": "n", "data": [3, 4] }, { "name": "m", "data": [1, 0] }] })
+        );
+        assert!(check_result(
+            "chart",
+            &json!({ "type": "radar", "categories": [], "series": [{}] })
+        )
+        .is_err());
+        assert!(check_result(
+            "chart",
+            &json!({ "type": "pie", "categories": ["a"], "series": [] })
+        )
+        .is_err());
+        let many: Vec<String> = (0..40).map(|i| i.to_string()).collect();
+        let r = check_result(
+            "chart",
+            &json!({ "type": "line", "categories": many, "series": [{ "name": "x", "data": [] }] }),
+        )
+        .unwrap();
+        assert_eq!(r["categories"].as_array().unwrap().len(), 31);
     }
 
     #[test]

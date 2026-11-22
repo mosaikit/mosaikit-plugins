@@ -3,6 +3,8 @@
 import '@mosaikit/plugin-api/style.css'
 import './dashboard.css'
 import {
+  chart,
+  type Chart,
   confirmDialog,
   connect,
   dialog,
@@ -16,9 +18,12 @@ import {
 } from '@mosaikit/plugin-api'
 import {
   boardWidgets,
+  categoryName,
+  chartEmpty,
   chosenKeys,
   columnsOf,
   defaultKeys,
+  deltaOf,
   editorOrder,
   gridColumns,
   keepBoard,
@@ -26,8 +31,10 @@ import {
   moveItem,
   parseKeys,
   shouldRefresh,
+  sparkPoints,
   textsFor,
   toneOf,
+  type ChartResult,
   type Columns,
   type ListResult,
   type NumberResult,
@@ -205,15 +212,93 @@ function mount(msk: Msk) {
     return el('span', { class: `dsh-tone ${tone}` }, el('span', { 'aria-hidden': 'true' }, sym + ' '), tr()[tone as 'ok' | 'warn' | 'err'])
   }
 
+  const SVG = 'http://www.w3.org/2000/svg'
+  /** A tiny line of the last values; decorative (the numbers are in the text next to it). */
+  const spark = (values: number[]) => {
+    const W = 120
+    const H = 36
+    const pts = sparkPoints(values, W, H, 3)
+    if (!pts.length) return null
+    const svg = document.createElementNS(SVG, 'svg')
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`)
+    svg.setAttribute('class', 'dsh-spark')
+    svg.setAttribute('aria-hidden', 'true')
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' ')
+    const area = document.createElementNS(SVG, 'path')
+    area.setAttribute('d', `${d} L${pts[pts.length - 1]!.x} ${H} L${pts[0]!.x} ${H} Z`)
+    area.setAttribute('class', 'dsh-spark-area')
+    const line = document.createElementNS(SVG, 'path')
+    line.setAttribute('d', d)
+    line.setAttribute('class', 'dsh-spark-line')
+    const last = document.createElementNS(SVG, 'circle')
+    last.setAttribute('cx', String(pts[pts.length - 1]!.x))
+    last.setAttribute('cy', String(pts[pts.length - 1]!.y))
+    last.setAttribute('r', '2.6')
+    last.setAttribute('class', 'dsh-spark-dot')
+    svg.append(area, line, last)
+    return svg
+  }
+
   const numberBody = (w: Widget, r: NumberResult) => {
     const t = textsFor(w, lang)
     const box = el('div', { class: 'dsh-number' })
-    box.append(el('p', { class: 'dsh-value', 'data-testid': 'widget-value' }, String(r.value)))
+    const top = el('div', { class: 'dsh-numtop' }, el('p', { class: 'dsh-value', 'data-testid': 'widget-value' }, String(r.value)))
+    const sp = r.trend ? spark(r.trend) : null
+    if (sp) top.append(sp)
+    box.append(top)
     const row = el('div', { class: 'dsh-meta' })
     if (r.tone) row.append(toneMark(toneOf(r.tone)))
+    // with a trend, the second number is the period before: show the change, not only the number
+    const delta = r.trend ? deltaOf(r.value, r.secondary) : null
+    if (delta) {
+      const word = delta.dir === 'up' ? tr().up : delta.dir === 'down' ? tr().down : tr().flat
+      row.append(
+        el(
+          'span',
+          { class: `dsh-delta ${delta.dir}`, 'data-testid': 'widget-delta' },
+          el('span', { 'aria-hidden': 'true' }, delta.dir === 'up' ? '↗' : delta.dir === 'down' ? '↘' : '→'),
+          ` ${delta.dir === 'flat' ? word : sub(word, { n: Math.abs(delta.pct) })}`,
+        ),
+      )
+    }
     if (r.secondary !== null && r.secondary !== undefined) row.append(el('span', { class: 'dsh-second' }, `${r.secondary} ${t.secondary}`.trim()))
     if (row.childElementCount) box.append(row)
     return box
+  }
+
+  const clip = (t: string, n: number) => (t.length > n ? `${t.slice(0, n - 1)}…` : t)
+  /** Cards of different heights without holes: each card spans as many 6px rows as it needs, and again when its size changes (a chart that loads). */
+  const ROW = 6
+  const GAP = 16
+  const masonries: ResizeObserver[] = []
+  const masonry = (grid: HTMLElement) => {
+    if (typeof ResizeObserver === 'undefined') return
+    const fit = (c: HTMLElement) => {
+      c.style.gridRowEnd = 'span 1'
+      c.style.gridRowEnd = `span ${Math.ceil((c.getBoundingClientRect().height + GAP) / ROW)}`
+    }
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) fit(e.target as HTMLElement)
+    })
+    for (const c of Array.from(grid.children) as HTMLElement[]) ro.observe(c)
+    masonries.push(ro)
+  }
+  const charts: Chart[] = []
+  const chartBody = (w: Widget, r: ChartResult) => {
+    const t = textsFor(w, lang)
+    if (chartEmpty(r)) return el('p', { class: 'dsh-dim' }, t.empty || tr().nothing)
+    const c = chart(
+      {
+        type: r.type,
+        label: t.label || keyOf(w),
+        categories: r.categories.map((k) => clip(categoryName(k, t.categories, lang), r.type === 'bar' ? 11 : 40)),
+        series: r.series.map((s) => ({ name: categoryName(s.name, t.categories, lang), data: s.data })),
+        height: w.data.size === 'l' ? 232 : 208,
+      },
+      { data: tr().showData, category: t.label, loading: tr().chartLoading, failed: tr().chartFailed },
+    )
+    charts.push(c)
+    return c.el
   }
 
   const listBody = (w: Widget, r: ListResult) => {
@@ -233,18 +318,23 @@ function mount(msk: Msk) {
     return box
   }
 
-  const card = (w: Widget) => {
+  const card = (w: Widget, i = 0) => {
     const t = textsFor(w, lang)
     const size = w.data.size === 's' || w.data.size === 'l' ? w.data.size : 'm'
-    const c = el('article', { class: `dsh-card size-${size}`, 'data-testid': 'widget', 'data-key': keyOf(w) }, el('h2', {}, t.label || keyOf(w)))
+    const kind = ['list', 'chart'].includes(String(w.data.kind)) ? String(w.data.kind) : 'number'
+    const c = el('article', { class: `dsh-card size-${size} kind-${kind}`, 'data-testid': 'widget', 'data-key': keyOf(w) }, el('h2', {}, t.label || keyOf(w)))
+    c.style.setProperty('--i', String(Math.min(i, 12)))
     if (w.error || !w.result) c.append(el('p', { class: 'dsh-dim', 'data-testid': 'widget-error' }, tr().unavailable))
     else if (w.data.kind === 'list') c.append(listBody(w, w.result as ListResult))
+    else if (w.data.kind === 'chart') c.append(chartBody(w, w.result as ChartResult))
     else c.append(numberBody(w, w.result as NumberResult))
     return c
   }
 
   // --------------------------------------------------------------------------------------------------------- the page
   const draw = () => {
+    for (const c of charts.splice(0)) c.destroy()
+    for (const r of masonries.splice(0)) r.disconnect()
     head.replaceChildren(el('h1', {}, tr().title))
     body.replaceChildren()
     const add = btn(tr().newBoard, 'msk-btn', () => editor())
@@ -287,8 +377,9 @@ function mount(msk: Msk) {
     }
     const grid = el('div', { class: 'dsh-grid', 'data-testid': 'board' })
     grid.style.gridTemplateColumns = gridColumns(b.columns)
-    for (const w of shown) grid.append(card(w))
+    shown.forEach((w, i) => grid.append(card(w, i)))
     body.append(grid)
+    masonry(grid)
   }
 
   const loadBoards = async () => {

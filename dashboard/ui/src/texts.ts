@@ -14,6 +14,7 @@ const en = {
   emptyBoardTitle: 'This board is empty', emptyBoardText: 'Choose the widgets this board shows and put them in the order you like.', emptyBoardAction: 'Choose widgets',
   nothing: 'Nothing to show', unavailable: 'This widget is not available right now.', more: '＋{n} more',
   ok: 'OK', warn: 'Attention', err: 'Alert',
+  up: 'Up {n}%', down: 'Down {n}%', flat: 'No change', showData: 'Show data', chartLoading: 'Loading chart', chartFailed: 'The chart could not be drawn',
   failed: 'Could not start the UI of the plugin: ', loadFailed: 'Could not load the dashboard: ', widgetsFailed: 'Could not load the widgets: ',
 }
 export type Texts = typeof en
@@ -32,6 +33,7 @@ const it: Texts = {
   emptyBoardTitle: 'Questa bacheca è vuota', emptyBoardText: 'Scegli i widget che la bacheca mostra e mettili nell’ordine che preferisci.', emptyBoardAction: 'Scegli i widget',
   nothing: 'Niente da mostrare', unavailable: 'Questo widget al momento non è disponibile.', more: '＋{n} altri',
   ok: 'OK', warn: 'Attenzione', err: 'Allarme',
+  up: 'In crescita del {n}%', down: 'In calo del {n}%', flat: 'Invariato', showData: 'Mostra i dati', chartLoading: 'Caricamento del grafico', chartFailed: 'Impossibile disegnare il grafico',
   failed: 'Impossibile avviare la UI del plugin: ', loadFailed: 'Impossibile caricare la dashboard: ', widgetsFailed: 'Impossibile caricare i widget: ',
 }
 const es: Texts = {
@@ -47,6 +49,7 @@ const es: Texts = {
   emptyBoardTitle: 'Este tablero está vacío', emptyBoardText: 'Elige los widgets que muestra el tablero y ponlos en el orden que prefieras.', emptyBoardAction: 'Elegir widgets',
   nothing: 'Nada que mostrar', unavailable: 'Este widget no está disponible ahora mismo.', more: '＋{n} más',
   ok: 'OK', warn: 'Atención', err: 'Alerta',
+  up: 'Sube un {n}%', down: 'Baja un {n}%', flat: 'Sin cambios', showData: 'Mostrar datos', chartLoading: 'Cargando el gráfico', chartFailed: 'No se pudo dibujar el gráfico',
   failed: 'No se pudo iniciar la interfaz del plugin: ', loadFailed: 'No se pudo cargar el panel: ', widgetsFailed: 'No se pudieron cargar los widgets: ',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins

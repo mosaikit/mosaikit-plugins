@@ -39,5 +39,11 @@
   "Alert": "Waarschuwing",
   "Could not start the UI of the plugin: ": "De interface van de plugin kon niet worden gestart:",
   "Could not load the dashboard: ": "Het dashboard kon niet worden geladen:",
-  "Could not load the widgets: ": "De widgets konden niet worden geladen:"
+  "Could not load the widgets: ": "De widgets konden niet worden geladen:",
+  "Up {n}%": "{n}% hoger",
+  "Down {n}%": "{n}% lager",
+  "No change": "Ongewijzigd",
+  "Show data": "Gegevens tonen",
+  "Loading chart": "Grafiek laden",
+  "The chart could not be drawn": "De grafiek kon niet worden getekend"
 }
