@@ -6,7 +6,7 @@ details = "احتفظ بالنصوص والشيفرة التي يعيد فريق
 [resources.snippets]
 label = "المقتطفات"
 fields = { title = "العنوان", body = "المحتوى", kind = "النوع", tags = "الوسوم" }
-options.kind = { text = "نص", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "آخر" }
+options.kind = { text = "نص", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", typescript = "TypeScript", html = "HTML", css = "CSS", yaml = "YAML", markdown = "Markdown", other = "آخر" }
 
 [kpi.kpi_snippets_by_kind]
 label = "المقتطفات بحسب النوع"

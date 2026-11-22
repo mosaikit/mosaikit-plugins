@@ -6,7 +6,7 @@ details = "Tenha à mão os textos e o código que sua equipe reutiliza o tempo 
 [resources.snippets]
 label = "Trechos"
 fields = { title = "Título", body = "Conteúdo", kind = "Tipo", tags = "Etiquetas" }
-options.kind = { text = "texto", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "outro" }
+options.kind = { text = "texto", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", typescript = "TypeScript", html = "HTML", css = "CSS", yaml = "YAML", markdown = "Markdown", other = "outro" }
 
 [kpi.kpi_snippets_by_kind]
 label = "Trechos por tipo"

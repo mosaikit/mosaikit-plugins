@@ -6,7 +6,7 @@ details = "Gardez sous la main les textes et le code que votre équipe réutilis
 [resources.snippets]
 label = "Extraits"
 fields = { title = "Titre", body = "Contenu", kind = "Type", tags = "Étiquettes" }
-options.kind = { text = "texte", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "autre" }
+options.kind = { text = "texte", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", typescript = "TypeScript", html = "HTML", css = "CSS", yaml = "YAML", markdown = "Markdown", other = "autre" }
 
 [kpi.kpi_snippets_by_kind]
 label = "Extraits par type"
