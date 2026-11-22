@@ -2,7 +2,7 @@
 import { avatarStack, dialog, el, errText, toast, type Msk, type Row } from '@mosaikit/plugin-api'
 import { bgPattern, drawObject, exportPng, exportSvg, s, svgText } from './canvas.ts'
 import {
-  DEFAULT_COLOR, FRAME_SIZE, FRAME_TITLE_H, HANDLES, TEMPLATE_IDS, contains, templateBox, templateObjects, withFrameChildren, INK, NOTE_SIZE, PALETTE, PAPER, SHAPE_SIZE, TEXT_FONT, TEXT_WIDTH, backZ, byZ, canEdit, cycle, describeBoard, fitView, fontOf, frontZ, handlePoint,
+  DEFAULT_COLOR, FRAME_SIZE, FRAME_TITLE_H, HANDLES, TEMPLATE_IDS, contains, previewShapes, templateBox, templateObjects, withFrameChildren, INK, NOTE_SIZE, PALETTE, PAPER, SHAPE_SIZE, TEXT_FONT, TEXT_WIDTH, backZ, byZ, canEdit, cycle, describeBoard, fitView, fontOf, frontZ, handlePoint,
   intersects, lineHeightOf, newId, normRect, objBox, penFrom, penPath, resizeRect, scalePoints, stepZoom, swatchOf, textHeight, toBoard, toScreen, topAt, unionBounds, zoomAt,
   type Handle, type Obj, type ObjType, type Pt, type Rect, type TemplateId, type TemplateLabel, type View,
 } from './logic.ts'
@@ -957,9 +957,61 @@ export function openEditor(o: EditorOptions): { el: HTMLElement; destroy: () => 
   const templates = () => {
     const ok = el('button', { type: 'button', class: 'msk-btn ghost' }, tr.close)
     const list = el('div', { class: 'wb-templates', role: 'list' })
-    const names: Record<TemplateId, [string, string]> = { kanban: [tr.tplKanban, tr.tplKanbanText], swot: [tr.tplSwot, tr.tplSwotText], retro: [tr.tplRetro, tr.tplRetroText], brainstorm: [tr.tplBrainstorm, tr.tplBrainstormText] }
+    const names: Record<TemplateId, [string, string]> = {
+      kanban: [tr.tplKanban, tr.tplKanbanText],
+      swot: [tr.tplSwot, tr.tplSwotText],
+      retro: [tr.tplRetro, tr.tplRetroText],
+      brainstorm: [tr.tplBrainstorm, tr.tplBrainstormText],
+      mindmap: [tr.tplMindmap, tr.tplMindmapText],
+      journey: [tr.tplJourney, tr.tplJourneyText],
+      startstop: [tr.tplStartstop, tr.tplStartstopText],
+      impact: [tr.tplImpact, tr.tplImpactText],
+      flow: [tr.tplFlow, tr.tplFlowText],
+    }
+    const SVG = 'http://www.w3.org/2000/svg'
+    const noLabel = () => ''
+    /** A small drawing of the template: the same boxes it will put on the board, scaled into 132 x 84. */
+    const thumb = (tid: TemplateId) => {
+      const svg = document.createElementNS(SVG, 'svg')
+      svg.setAttribute('viewBox', '0 0 132 84')
+      svg.setAttribute('class', 'wb-tplthumb')
+      svg.setAttribute('aria-hidden', 'true')
+      for (const s of previewShapes(templateObjects(tid, noLabel, { x: 0, y: 0 }), 132, 84)) {
+        if (s.type === 'arrow') {
+          const l = document.createElementNS(SVG, 'line')
+          l.setAttribute('x1', String(s.x))
+          l.setAttribute('y1', String(s.y))
+          l.setAttribute('x2', String(s.x + (s.dx ?? 0)))
+          l.setAttribute('y2', String(s.y + (s.dy ?? 0)))
+          l.setAttribute('stroke', '#8b93a3')
+          l.setAttribute('stroke-width', '1')
+          svg.append(l)
+          continue
+        }
+        const shape = document.createElementNS(SVG, s.type === 'ellipse' ? 'ellipse' : 'rect')
+        if (s.type === 'ellipse') {
+          shape.setAttribute('cx', String(s.x + s.w / 2))
+          shape.setAttribute('cy', String(s.y + s.h / 2))
+          shape.setAttribute('rx', String(s.w / 2))
+          shape.setAttribute('ry', String(s.h / 2))
+        } else {
+          shape.setAttribute('x', String(s.x))
+          shape.setAttribute('y', String(s.y))
+          shape.setAttribute('width', String(s.w))
+          shape.setAttribute('height', String(s.h))
+          shape.setAttribute('rx', s.type === 'frame' ? '2' : '1')
+        }
+        const frameLike = s.type === 'frame'
+        shape.setAttribute('fill', frameLike ? 'none' : s.fill)
+        shape.setAttribute('stroke', frameLike ? s.stroke : 'none')
+        shape.setAttribute('stroke-width', frameLike ? '1' : '0')
+        shape.setAttribute('opacity', frameLike ? '0.9' : '1')
+        svg.append(shape)
+      }
+      return svg
+    }
     for (const tid of TEMPLATE_IDS) {
-      const b = el('button', { type: 'button', class: 'wb-template', role: 'listitem', 'data-template': tid }, el('strong', {}, names[tid][0]), el('span', {}, names[tid][1]))
+      const b = el('button', { type: 'button', class: 'wb-template', role: 'listitem', 'data-template': tid }, thumb(tid), el('strong', {}, names[tid][0]), el('span', {}, names[tid][1]))
       b.addEventListener('click', () => {
         insertTemplate(tid)
         d.close()

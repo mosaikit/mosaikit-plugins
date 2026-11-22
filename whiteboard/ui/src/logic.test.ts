@@ -5,6 +5,7 @@ import {
   contains,
   frameChildren,
   templateBox,
+  previewShapes,
   templateObjects,
   withFrameChildren,
   PALETTE, acceptsFrom, arrowHead, backZ, byZ, canEdit, clampLines, clampZoom, cycle, describeBoard, fitView, frontZ, hit, initialOf, newId,
@@ -308,5 +309,48 @@ describe('templates', () => {
     const task = objs.find((o) => o.type === 'note')!
     expect(frameChildren(frames[0]!, objs).map((o) => o.id)).toEqual([task.id])
     expect(frameChildren(frames[1]!, objs)).toEqual([])
+  })
+})
+
+describe('the five extra templates', () => {
+  const label = (k: string) => `<${k}>`
+  it('have a mind map with a main idea, six branches and six arrows', () => {
+    const m = templateObjects('mindmap', label, { x: 0, y: 0 })
+    expect(m.filter((o) => o.type === 'ellipse')).toHaveLength(7)
+    expect(m.filter((o) => o.type === 'arrow')).toHaveLength(6)
+    expect(m.every((o) => o.x >= 0 && o.y >= 0)).toBe(true)
+    for (const a of m.filter((o) => o.type === 'arrow')) expect(a.points).toHaveLength(4)
+  })
+  it('have a journey of five stages with three notes under each', () => {
+    const j = templateObjects('journey', label, { x: 0, y: 0 })
+    expect(j.filter((o) => o.type === 'frame')).toHaveLength(5)
+    expect(j.filter((o) => o.type === 'note')).toHaveLength(15)
+  })
+  it('keep the notes of the journey inside their stage frame', () => {
+    const objs = templateObjects('journey', label, { x: 0, y: 0 }).map((o, i) => ({ id: String(i), z: 0, author: '', points: o.points ?? [], ...o }))
+    const frames = objs.filter((o) => o.type === 'frame')
+    for (const f of frames) expect(frameChildren(f, objs)).toHaveLength(3)
+  })
+  it('have start stop continue, an impact matrix and a flow', () => {
+    expect(templateObjects('startstop', label, { x: 0, y: 0 }).filter((o) => o.type === 'frame').map((o) => o.text)).toEqual(['<tplStart>', '<tplStop>', '<tplContinue>'])
+    const impact = templateObjects('impact', label, { x: 0, y: 0 })
+    expect(impact).toHaveLength(4)
+    expect(new Set(impact.map((o) => `${o.x},${o.y}`)).size).toBe(4)
+    const flow = templateObjects('flow', label, { x: 0, y: 0 })
+    expect(flow.filter((o) => o.type !== 'arrow')).toHaveLength(5)
+    expect(flow.filter((o) => o.type === 'arrow')).toHaveLength(4)
+  })
+  it('draw a thumbnail that fits the picture', () => {
+    for (const id of TEMPLATE_IDS) {
+      const shapes = previewShapes(templateObjects(id, label, { x: 300, y: 200 }), 120, 76)
+      expect(shapes.length, id).toBeGreaterThan(2)
+      for (const s of shapes.filter((x) => x.type !== 'arrow')) {
+        expect(s.x, id).toBeGreaterThanOrEqual(0)
+        expect(s.y, id).toBeGreaterThanOrEqual(0)
+        expect(s.x + s.w, id).toBeLessThanOrEqual(120.1)
+        expect(s.y + s.h, id).toBeLessThanOrEqual(76.1)
+      }
+    }
+    expect(previewShapes([], 120, 76)).toEqual([])
   })
 })

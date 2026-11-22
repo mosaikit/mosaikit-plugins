@@ -497,8 +497,8 @@ export function withFrameChildren(selected: Obj[], all: Obj[]): Obj[] {
   return [...out.values()]
 }
 
-export type TemplateId = 'kanban' | 'swot' | 'retro' | 'brainstorm'
-export const TEMPLATE_IDS: TemplateId[] = ['kanban', 'swot', 'retro', 'brainstorm']
+export type TemplateId = 'kanban' | 'swot' | 'retro' | 'brainstorm' | 'mindmap' | 'journey' | 'startstop' | 'impact' | 'flow'
+export const TEMPLATE_IDS: TemplateId[] = ['kanban', 'swot', 'retro', 'brainstorm', 'mindmap', 'journey', 'startstop', 'impact', 'flow']
 
 /** The texts a template writes on the board: the name of a template, and the title of each of its frames or notes. */
 export type TemplateLabel =
@@ -506,6 +506,11 @@ export type TemplateLabel =
   | 'tplStrengths' | 'tplWeaknesses' | 'tplOpportunities' | 'tplThreats'
   | 'tplWentWell' | 'tplToImprove' | 'tplActions'
   | 'tplTopic' | 'tplIdea'
+  | 'tplMain' | 'tplBranch'
+  | 'tplAware' | 'tplConsider' | 'tplChoose' | 'tplUse' | 'tplRecommend' | 'tplDoes' | 'tplThinks' | 'tplFeels'
+  | 'tplStart' | 'tplStop' | 'tplContinue'
+  | 'tplQuickWins' | 'tplBigBets' | 'tplFillIns' | 'tplTimeSinks'
+  | 'tplBegin' | 'tplStep' | 'tplDecision' | 'tplEnd'
 
 export type TemplateObj = Pick<Obj, 'type' | 'x' | 'y' | 'w' | 'h' | 'text' | 'color'> & { points?: number[] }
 
@@ -556,6 +561,63 @@ export function templateObjects(id: TemplateId, t: (k: TemplateLabel) => string,
       for (const [x0, y0, x1, y1] of tips) out.push({ type: 'arrow', x: x0, y: y0, w: Math.abs(x1 - x0), h: Math.abs(y1 - y0), text: '', color: 'gray', points: [0, 0, x1 - x0, y1 - y0] })
       break
     }
+    case 'mindmap': {
+      // one main idea in the middle and six branches around it, joined by arrows
+      const cx = 420
+      const cy = 300
+      out.push({ type: 'ellipse', x: cx - 100, y: cy - 60, w: 200, h: 120, text: t('tplMain'), color: 'purple' })
+      const colors = ['blue', 'green', 'orange', 'pink', 'yellow', 'red']
+      const [rx, ry, bw, bh] = [320, 215, 160, 76]
+      for (let i = 0; i < 6; i++) {
+        const a = -Math.PI / 2 + (i * Math.PI) / 3
+        const bx = cx + Math.cos(a) * rx
+        const by = cy + Math.sin(a) * ry
+        out.push({ type: 'ellipse', x: bx - bw / 2, y: by - bh / 2, w: bw, h: bh, text: t('tplBranch'), color: colors[i]! })
+        // the arrow leaves the edge of the main idea and stops short of the branch
+        const [dx, dy] = [Math.cos(a), Math.sin(a)]
+        const x0 = cx + dx * 102
+        const y0 = cy + dy * 62
+        const x1 = bx - dx * (bw / 2 + 4)
+        const y1 = by - dy * (bh / 2 + 4)
+        out.push({ type: 'arrow', x: x0, y: y0, w: Math.abs(x1 - x0), h: Math.abs(y1 - y0), text: '', color: 'gray', points: [0, 0, x1 - x0, y1 - y0] })
+      }
+      break
+    }
+    case 'journey': {
+      // five stages across, and under each one what the person does, thinks and feels
+      const w = 230
+      const stages: [TemplateLabel, string][] = [['tplAware', 'blue'], ['tplConsider', 'purple'], ['tplChoose', 'orange'], ['tplUse', 'green'], ['tplRecommend', 'pink']]
+      stages.forEach(([k, c], i) => out.push(frame(i * (w + 16), 0, w, 560, t(k), c)))
+      const rows: [TemplateLabel, string][] = [['tplDoes', 'yellow'], ['tplThinks', 'blue'], ['tplFeels', 'pink']]
+      stages.forEach((_, i) => rows.forEach(([k, c], r) => out.push(note(i * (w + 16) + 25, 60 + r * 165, t(k), c))))
+      break
+    }
+    case 'startstop': {
+      const w = 280
+      const cols: [TemplateLabel, string][] = [['tplStart', 'green'], ['tplStop', 'red'], ['tplContinue', 'blue']]
+      cols.forEach(([k, c], i) => out.push(frame(i * (w + 20), 0, w, 420, t(k), c)))
+      cols.forEach(([, c], i) => out.push(note(i * (w + 20) + 50, 60, '', c === 'red' ? 'red' : c)))
+      break
+    }
+    case 'impact': {
+      // impact up, effort to the right: quick wins top left, big bets top right
+      const [w, h, gap] = [330, 250, 20]
+      const cells: [TemplateLabel, string][] = [['tplQuickWins', 'green'], ['tplBigBets', 'blue'], ['tplFillIns', 'gray'], ['tplTimeSinks', 'red']]
+      cells.forEach(([k, c], i) => out.push(frame((i % 2) * (w + gap), Math.floor(i / 2) * (h + gap), w, h, t(k), c)))
+      break
+    }
+    case 'flow': {
+      // a process from left to right: start, step, decision, step, end
+      const [w, h, gap] = [170, 90, 70]
+      const steps: [TemplateLabel, ObjType, string][] = [['tplBegin', 'ellipse', 'green'], ['tplStep', 'rect', 'blue'], ['tplDecision', 'rect', 'yellow'], ['tplStep', 'rect', 'blue'], ['tplEnd', 'ellipse', 'red']]
+      steps.forEach(([k, type, c], i) => out.push({ type, x: i * (w + gap), y: 0, w, h, text: t(k), color: c }))
+      for (let i = 0; i < steps.length - 1; i++) {
+        const x0 = i * (w + gap) + w + 4
+        const x1 = (i + 1) * (w + gap) - 4
+        out.push({ type: 'arrow', x: x0, y: h / 2, w: x1 - x0, h: 0, text: '', color: 'gray', points: [0, 0, x1 - x0, 0] })
+      }
+      break
+    }
   }
   // the frames come first: the editor gives them the lowest depth
   return out.map(place).sort((a, b) => Number(b.type === 'frame') - Number(a.type === 'frame'))
@@ -564,4 +626,36 @@ export function templateObjects(id: TemplateId, t: (k: TemplateLabel) => string,
 /** The box a template covers, to put its middle in the middle of the screen. */
 export function templateBox(objs: TemplateObj[]): Rect {
   return unionBounds(objs.map((o) => (o.type === 'arrow' ? { x: o.x, y: o.y, w: o.w, h: o.h } : { x: o.x, y: o.y, w: o.w, h: o.h }))) ?? { x: 0, y: 0, w: 0, h: 0 }
+}
+
+/** A template as small coloured boxes in a `w` x `h` picture (the thumbnail of the template chooser): frames are outlines, notes and
+ *  shapes are filled, arrows are lines. Pure, so it is tested without a DOM. */
+export interface PreviewShape {
+  type: ObjType
+  x: number
+  y: number
+  w: number
+  h: number
+  fill: string
+  stroke: string
+  /** arrows: the end of the line, relative to x, y, already scaled */
+  dx?: number
+  dy?: number
+}
+export function previewShapes(objs: TemplateObj[], w: number, h: number, pad = 4): PreviewShape[] {
+  const box = templateBox(objs)
+  if (!objs.length || box.w <= 0) return []
+  const k = Math.min((w - pad * 2) / box.w, (h - pad * 2) / Math.max(box.h, 1))
+  const ox = (w - box.w * k) / 2 - box.x * k
+  const oy = (h - Math.max(box.h, 1) * k) / 2 - box.y * k
+  const r = (n: number) => Math.round(n * 10) / 10
+  return objs.map((o) => {
+    const sw = swatchOf(o.color)
+    const shape: PreviewShape = { type: o.type, x: r(o.x * k + ox), y: r(o.y * k + oy), w: r(o.w * k), h: r(o.h * k), fill: sw.fill, stroke: sw.stroke }
+    if (o.type === 'arrow' && o.points && o.points.length >= 4) {
+      shape.dx = r((o.points[2]! - o.points[0]!) * k)
+      shape.dy = r((o.points[3]! - o.points[1]!) * k)
+    }
+    return shape
+  })
 }
