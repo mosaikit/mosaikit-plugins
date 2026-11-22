@@ -65,3 +65,13 @@
 .wb-template { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: var(--sp-3, 12px); text-align: left; border: 1px solid var(--line); border-radius: var(--r-m, 10px); background: var(--panel); color: inherit; cursor: pointer; font: inherit; }
 .wb-template:hover, .wb-template:focus-visible { border-color: var(--acc); }
 .wb-template span { color: var(--muted); font-size: 0.9em; }
+
+/* ---- template chooser: a gallery, each card with a drawing of what it puts on the board ---- */
+.wb-templates { grid-template-columns: repeat(auto-fill, minmax(164px, 1fr)); gap: var(--sp-3, 12px); min-width: min(560px, 76vw); max-height: 62vh; overflow: auto; padding: 2px; }
+.wb-template { gap: 6px; padding: 10px 10px 12px; transition: transform var(--dur-2, 200ms) var(--ease, ease), border-color var(--dur-1, 120ms), box-shadow var(--dur-2, 200ms); }
+.wb-template:hover, .wb-template:focus-visible { transform: translateY(-2px); box-shadow: var(--sh-2, 0 4px 14px rgba(0, 0, 0, 0.2)); }
+.wb-template strong { font-size: 14px; }
+.wb-template span { line-height: 1.35; }
+.wb-tplthumb { display: block; width: 100%; height: auto; aspect-ratio: 132 / 84; border-radius: 8px; background: #fbfbfd; border: 1px solid var(--line); }
+@media (prefers-reduced-motion: reduce) { .wb-template { transition: none; } .wb-template:hover, .wb-template:focus-visible { transform: none; } }
+@media (max-width: 640px) { .wb-templates { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; } }
