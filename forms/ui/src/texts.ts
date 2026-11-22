@@ -31,6 +31,20 @@ const en = {
   pSendFailed: 'The answer could not be sent: {error}', pOpenFailed: 'Could not open the form: {error}', pRejected: 'The answer was not accepted.', pInvalid: 'Check the answers: {error}',
   fAnonymous: 'Anonymous', anonNote: 'Nothing links an answer to a person, not even for you; single answers cannot be deleted. It cannot be turned off later.', anonResults: 'This form is anonymous: the table shows answers, never people.', colResponse: 'Response', responseN: 'Response {n}',
   fShowIf: 'Field {n}: when to show it', showAlways: 'Always shown', showIfQ: 'Only if field {n} is answered', showIfLabel: 'Show this field', showIfValues: 'Field {n}: show it for these answers', badBranch: 'Field {n}: choose an earlier field with options, and at least one answer, for the condition',
+  // templates of the builder
+  tpTitle: 'Start from a template', tpBlank: 'Blank form', tpBlankDesc: 'Add your own fields', tpApplied: 'Template applied: {n}',
+  tpEventName: 'Event registration', tpEventDesc: 'Who is coming, and with how many guests', tpEventIntro: 'Tell us if you can come.', tpEventThanks: 'Thanks, we have saved your place.',
+  tpFeedbackName: 'Feedback', tpFeedbackDesc: 'A rating and a few comments', tpFeedbackIntro: 'We read every answer.', tpFeedbackThanks: 'Thank you for your feedback.',
+  tpContactName: 'Contact request', tpContactDesc: 'A question or a quote', tpContactIntro: 'We answer within two working days.', tpContactThanks: 'Thanks, we will be in touch.',
+  tpTimeoffName: 'Time-off request', tpTimeoffDesc: 'Dates and kind of leave', tpTimeoffIntro: 'Send your dates; your manager will confirm.', tpTimeoffThanks: 'Request received.',
+  tpBugName: 'Bug report', tpBugDesc: 'What happened and how to see it', tpBugIntro: 'The more detail, the faster we fix it.', tpBugThanks: 'Thanks, the report is in.',
+  tpName: 'Full name', tpEmail: 'Email', tpAttending: 'Will you attend?', tpYes: 'Yes', tpNo: 'No', tpMaybe: 'Maybe', tpGuests: 'Number of guests', tpGuestsHelp: 'Not counting you', tpDiet: 'Dietary needs', tpComments: 'Comments',
+  tpRating: 'Overall, how was it?', tpExcellent: 'Excellent', tpGood: 'Good', tpFair: 'Fair', tpPoor: 'Poor', tpWell: 'What worked well?', tpBetter: 'What could be better?', tpContactMe: 'May we contact you about this?',
+  tpTopic: 'Topic', tpQuestion: 'A question', tpQuote: 'A quote', tpSupport: 'Support', tpOther: 'Something else', tpMessage: 'Your message',
+  tpFrom: 'From', tpTo: 'To', tpLeaveType: 'Kind of leave', tpVacation: 'Vacation', tpSick: 'Sick leave', tpPersonal: 'Personal', tpNotes: 'Notes',
+  tpSummary: 'Summary', tpSteps: 'Steps to reproduce', tpSeverity: 'How bad is it?', tpLow: 'Low', tpMedium: 'Medium', tpHigh: 'High', tpCritical: 'Critical', tpWhere: 'Where did it happen?',
+  // long lists of answers
+  answersTable: 'Answers (a long list: only the rows in sight are drawn)',
 }
 export type Texts = typeof en
 export type L = string
@@ -61,6 +75,18 @@ const it: Texts = {
   pSendFailed: 'Impossibile inviare la risposta: {error}', pOpenFailed: 'Impossibile aprire il modulo: {error}', pRejected: 'La risposta non è stata accettata.', pInvalid: 'Controlla le risposte: {error}',
   fAnonymous: 'Anonimo', anonNote: 'Niente collega una risposta a una persona, nemmeno per te; le singole risposte non si possono eliminare. Non si può disattivare dopo.', anonResults: 'Questo modulo è anonimo: la tabella mostra le risposte, mai le persone.', colResponse: 'Risposta', responseN: 'Risposta {n}',
   fShowIf: 'Campo {n}: quando mostrarlo', showAlways: 'Sempre visibile', showIfQ: 'Solo se il campo {n} ha risposta', showIfLabel: 'Mostra questo campo', showIfValues: 'Campo {n}: mostralo per queste risposte', badBranch: 'Campo {n}: scegli per la condizione un campo precedente con opzioni, e almeno una risposta',
+  tpTitle: 'Parti da un modello', tpBlank: 'Modulo vuoto', tpBlankDesc: 'Aggiungi i tuoi campi', tpApplied: 'Modello applicato: {n}',
+  tpEventName: 'Iscrizione a un evento', tpEventDesc: 'Chi viene e con quanti ospiti', tpEventIntro: 'Dicci se puoi venire.', tpEventThanks: 'Grazie, abbiamo segnato il tuo posto.',
+  tpFeedbackName: 'Opinioni', tpFeedbackDesc: 'Un voto e qualche commento', tpFeedbackIntro: 'Leggiamo ogni risposta.', tpFeedbackThanks: 'Grazie per la tua opinione.',
+  tpContactName: 'Richiesta di contatto', tpContactDesc: 'Una domanda o un preventivo', tpContactIntro: 'Rispondiamo entro due giorni lavorativi.', tpContactThanks: 'Grazie, ti ricontatteremo.',
+  tpTimeoffName: 'Richiesta di permesso', tpTimeoffDesc: 'Date e tipo di assenza', tpTimeoffIntro: 'Invia le tue date; il tuo responsabile confermerà.', tpTimeoffThanks: 'Richiesta ricevuta.',
+  tpBugName: 'Segnalazione di errore', tpBugDesc: 'Cosa è successo e come vederlo', tpBugIntro: 'Più dettagli ci sono, prima lo correggiamo.', tpBugThanks: 'Grazie, la segnalazione è arrivata.',
+  tpName: 'Nome e cognome', tpEmail: 'Email', tpAttending: 'Parteciperai?', tpYes: 'Sì', tpNo: 'No', tpMaybe: 'Forse', tpGuests: 'Numero di ospiti', tpGuestsHelp: 'Te escluso', tpDiet: 'Esigenze alimentari', tpComments: 'Commenti',
+  tpRating: 'Nel complesso, com’è andata?', tpExcellent: 'Ottimo', tpGood: 'Buono', tpFair: 'Discreto', tpPoor: 'Scarso', tpWell: 'Cosa ha funzionato bene?', tpBetter: 'Cosa si può migliorare?', tpContactMe: 'Possiamo contattarti a questo proposito?',
+  tpTopic: 'Argomento', tpQuestion: 'Una domanda', tpQuote: 'Un preventivo', tpSupport: 'Assistenza', tpOther: 'Altro', tpMessage: 'Il tuo messaggio',
+  tpFrom: 'Dal', tpTo: 'Al', tpLeaveType: 'Tipo di assenza', tpVacation: 'Ferie', tpSick: 'Malattia', tpPersonal: 'Permesso personale', tpNotes: 'Note',
+  tpSummary: 'Riepilogo', tpSteps: 'Passi per riprodurlo', tpSeverity: 'Quanto è grave?', tpLow: 'Bassa', tpMedium: 'Media', tpHigh: 'Alta', tpCritical: 'Critica', tpWhere: 'Dove è successo?',
+  answersTable: 'Risposte (un elenco lungo: si disegnano solo le righe in vista)',
 }
 const es: Texts = {
   title: 'Formularios', newForm: '＋ Nuevo formulario', filter: 'Mostrar', open: 'Abiertos', closed: 'Cerrados', all: 'Todos',
@@ -88,6 +114,18 @@ const es: Texts = {
   pSendFailed: 'No se pudo enviar la respuesta: {error}', pOpenFailed: 'No se pudo abrir el formulario: {error}', pRejected: 'La respuesta no se ha aceptado.', pInvalid: 'Revisa las respuestas: {error}',
   fAnonymous: 'Anónimo', anonNote: 'Nada vincula una respuesta con una persona, ni siquiera para ti; las respuestas sueltas no se pueden eliminar. No se puede desactivar después.', anonResults: 'Este formulario es anónimo: la tabla muestra respuestas, nunca personas.', colResponse: 'Respuesta', responseN: 'Respuesta {n}',
   fShowIf: 'Campo {n}: cuándo mostrarlo', showAlways: 'Siempre visible', showIfQ: 'Solo si el campo {n} tiene respuesta', showIfLabel: 'Mostrar este campo', showIfValues: 'Campo {n}: mostrarlo con estas respuestas', badBranch: 'Campo {n}: elige para la condición un campo anterior con opciones, y al menos una respuesta',
+  tpTitle: 'Empieza desde una plantilla', tpBlank: 'Formulario vacío', tpBlankDesc: 'Añade tus propios campos', tpApplied: 'Plantilla aplicada: {n}',
+  tpEventName: 'Inscripción a un evento', tpEventDesc: 'Quién viene y con cuántos invitados', tpEventIntro: 'Dinos si puedes venir.', tpEventThanks: 'Gracias, hemos guardado tu plaza.',
+  tpFeedbackName: 'Opiniones', tpFeedbackDesc: 'Una valoración y algunos comentarios', tpFeedbackIntro: 'Leemos cada respuesta.', tpFeedbackThanks: 'Gracias por tu opinión.',
+  tpContactName: 'Solicitud de contacto', tpContactDesc: 'Una pregunta o un presupuesto', tpContactIntro: 'Respondemos en dos días laborables.', tpContactThanks: 'Gracias, nos pondremos en contacto.',
+  tpTimeoffName: 'Solicitud de permiso', tpTimeoffDesc: 'Fechas y tipo de ausencia', tpTimeoffIntro: 'Envía tus fechas; tu responsable lo confirmará.', tpTimeoffThanks: 'Solicitud recibida.',
+  tpBugName: 'Informe de error', tpBugDesc: 'Qué pasó y cómo verlo', tpBugIntro: 'Cuantos más detalles, antes lo arreglamos.', tpBugThanks: 'Gracias, el informe ha llegado.',
+  tpName: 'Nombre y apellidos', tpEmail: 'Correo electrónico', tpAttending: '¿Asistirás?', tpYes: 'Sí', tpNo: 'No', tpMaybe: 'Quizá', tpGuests: 'Número de invitados', tpGuestsHelp: 'Sin contarte a ti', tpDiet: 'Necesidades alimentarias', tpComments: 'Comentarios',
+  tpRating: 'En general, ¿qué tal fue?', tpExcellent: 'Excelente', tpGood: 'Bien', tpFair: 'Regular', tpPoor: 'Mal', tpWell: '¿Qué funcionó bien?', tpBetter: '¿Qué se puede mejorar?', tpContactMe: '¿Podemos contactarte por esto?',
+  tpTopic: 'Asunto', tpQuestion: 'Una pregunta', tpQuote: 'Un presupuesto', tpSupport: 'Soporte', tpOther: 'Otro', tpMessage: 'Tu mensaje',
+  tpFrom: 'Desde', tpTo: 'Hasta', tpLeaveType: 'Tipo de ausencia', tpVacation: 'Vacaciones', tpSick: 'Baja por enfermedad', tpPersonal: 'Asunto personal', tpNotes: 'Notas',
+  tpSummary: 'Resumen', tpSteps: 'Pasos para reproducirlo', tpSeverity: '¿Qué gravedad tiene?', tpLow: 'Baja', tpMedium: 'Media', tpHigh: 'Alta', tpCritical: 'Crítica', tpWhere: '¿Dónde ocurrió?',
+  answersTable: 'Respuestas (una lista larga: solo se dibujan las filas visibles)',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
 // (`lang/ui/<plugin id>.json`, English phrase → translation, read through `msk.t`), once `bindTexts` has run; the English

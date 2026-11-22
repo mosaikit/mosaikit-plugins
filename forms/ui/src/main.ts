@@ -7,16 +7,19 @@ import {
   connect,
   dateField,
   dialog,
+  downloadFile,
   el,
   emptyState,
   errText,
   segmented,
   skeleton,
   toast,
+  virtualList,
   type Msk,
   type Row,
 } from '@mosaikit/plugin-api'
 import { fillForm } from './fill.ts'
+import { fieldsOf, templates, type Template } from './templates.ts'
 import {
   KINDS,
   MAX_FIELDS,
@@ -45,6 +48,8 @@ import {
 import { bindTexts, TEXTS, langOf, sub, type Texts } from './texts.ts'
 
 const app = document.getElementById('app')!
+/** From this many answers the list draws only the rows in sight. */
+const VIRTUAL_FROM = 60
 
 interface Form {
   id: string
@@ -267,11 +272,36 @@ function mount(msk: Msk) {
       }
     }
 
+    // a new form can start from a template: it fills the title, the texts and the fields, and everything stays editable
+    const strip = el('div', { class: 'fm-tpls', role: 'group', 'aria-label': tr().tpTitle })
+    const useTemplate = (tpl: Template | null, chip: HTMLElement) => {
+      strip.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === chip)))
+      if (!tpl) {
+        fs = []
+        drawFields()
+        return
+      }
+      fs = fieldsOf(tpl)
+      title.value = tpl.title
+      intro.value = tpl.intro
+      thanks.value = tpl.thanks
+      drawFields()
+      toast(sub(tr().tpApplied, { n: tpl.name }), { tone: 'ok' })
+    }
+    if (!existing) {
+      const chip = (tpl: Template | null, name: string, desc: string, id: string) => {
+        const b = el('button', { type: 'button', class: 'fm-tpl', 'aria-pressed': String(tpl === null), 'data-template': id }, el('strong', {}, name), el('span', {}, desc))
+        b.addEventListener('click', () => useTemplate(tpl, b))
+        return b
+      }
+      strip.append(chip(null, tr().tpBlank, tr().tpBlankDesc, 'blank'), ...templates(tr()).map((x) => chip(x, x.name, x.desc, x.id)))
+    }
     const ok = btn(existing ? tr().save : tr().create)
     const no = btn(tr().cancel, 'msk-btn ghost')
     const form = el(
       'div',
       { class: 'fm-form' },
+      ...(existing ? [] : [el('h3', { class: 'fm-sub' }, tr().tpTitle), strip]),
       field(tr().fTitle, title),
       field(tr().fIntro, intro),
       check(open, tr().fOpen),
@@ -455,15 +485,7 @@ function mount(msk: Msk) {
     body.replaceChildren(wrap)
   }
 
-  const download = (name: string, text: string) => {
-    const blob = new Blob(['﻿' + text], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = el('a', { href: url, download: name })
-    document.body.append(a)
-    a.click()
-    a.remove()
-    setTimeout(() => URL.revokeObjectURL(url), 2000)
-  }
+  const download = (name: string, text: string) => downloadFile(name, ['\ufeff', text], 'text/csv;charset=utf-8')
 
   const barRow = (label: string, n: number, total: number) => {
     const p = pct(n, total)
@@ -511,6 +533,40 @@ function mount(msk: Msk) {
       const c = el('section', { class: 'fm-result', 'data-testid': 'result' }, el('h3', {}, x.label), el('p', { class: 'fm-dim' }, sub(tr().countOf, { a: a.answered, t: r.total })))
       x.options.forEach((o, k) => c.append(barRow(o, a.counts?.[k] ?? 0, a.answered || r.total)))
       wrap.append(c)
+    }
+    if (r.answers.length >= VIRTUAL_FROM) {
+      // a long list: a header row and a list that draws only the rows in sight, on the same grid of columns
+      const heads = [...(anonymous ? [tr().colResponse] : [tr().colName, tr().colWhen]), ...f.fields.map((x) => x.label), ...(isManager(f) && !anonymous ? [tr().colActions] : [])]
+      const cellsOf = (a: Results['answers'][number], nth: number): (string | HTMLElement)[] => [
+        ...(anonymous || !a.at ? [sub(tr().responseN, { n: nth })] : [a.name ?? '', when(a.at)]),
+        ...f.fields.map((x) => valueText(a.values[x.id])),
+        ...(isManager(f) && !anonymous && a.id
+          ? [
+              (() => {
+                const who = a.id!
+                const b = btn(tr().deleteAnswer, 'msk-btn ghost mini danger-text', () => void removeAnswer(f, { id: who, name: a.name ?? '' }))
+                b.setAttribute('aria-label', sub(tr().deleteLabel, { n: a.name ?? '' }))
+                return b
+              })(),
+            ]
+          : []),
+      ]
+      const vl = virtualList({
+        count: r.answers.length,
+        estimateSize: 44,
+        label: tr().answersTable,
+        render: (i) => {
+          const row = el('div', { class: 'fm-vrow', 'data-testid': 'answer' })
+          for (const c of cellsOf(r.answers[i]!, i + 1)) row.append(el('div', { class: 'fm-vcell' }, c))
+          return row
+        },
+      })
+      vl.el.classList.add('fm-vlist')
+      const vt = el('div', { class: 'fm-vtable' }, el('div', { class: 'fm-vhead' }, ...heads.map((h) => el('div', { class: 'fm-vcell' }, h))), vl.el)
+      vt.style.setProperty('--cols', String(heads.length))
+      wrap.append(el('h3', { class: 'fm-sub' }, tr().total), el('div', { class: 'fm-tablewrap', tabindex: '0', role: 'region', 'aria-label': tr().total }, vt))
+      body.replaceChildren(wrap)
+      return
     }
     const table = el('table', { class: 'fm-table', 'data-testid': 'answers' })
     const hr = el('tr', {}, ...(anonymous ? [el('th', { scope: 'col' }, tr().colResponse)] : [el('th', { scope: 'col' }, tr().colName), el('th', { scope: 'col' }, tr().colWhen)]), ...f.fields.map((x) => el('th', { scope: 'col' }, x.label)))
