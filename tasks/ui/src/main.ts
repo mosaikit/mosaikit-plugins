@@ -15,9 +15,12 @@ import {
   progress,
   renderMarkdown,
   richText,
+  shortcuts,
   tagInput,
   toast,
   toggleCheck,
+  undoToast,
+  virtualList,
   type CrudHandle,
   type CrudView,
   type CustomViewApi,
@@ -48,6 +51,8 @@ function mount(msk: Msk) {
   const tr = () => TEXTS[lang]
   let handle: CrudHandle | null = null
   let known: string[] = []
+  /** deleted rows waiting for the undo time to pass: the list hides them */
+  const hidden = new Set<string>()
 
   /** The face of a task: round check box, title, and a line of chips (priority, date, project, labels, progress, repeat). */
   const content = (c: ItemCtx) => {
@@ -78,34 +83,94 @@ function mount(msk: Msk) {
   }
 
   // -------------------------------------------------------------------------------------------------- views
-  const section = (api: CustomViewApi, key: Bucket, rows: Row[]) => {
-    const sec = el('section', { class: 'tgroup g-' + key, 'aria-label': tr()[key] }, el('h2', {}, tr()[key], el('span', { class: 'msk-colcount' }, String(rows.length))))
-    const list = el('div', { class: 'tlist', role: 'list' })
-    for (const r of rows) {
-      const c = api.ctx(r)
-      const item = el('div', { class: 'msk-item tcard' + (c.selected ? ' sel' : ''), role: 'listitem', tabindex: '0', 'data-id': r.id }, content(c))
-      item.addEventListener('click', (e) => {
-        if (!(e.target as HTMLElement).closest('input,button,a')) api.open(r.id)
-      })
-      item.addEventListener('keydown', (e) => {
-        if ((e.key === 'Enter' || e.key === ' ') && e.target === item) {
-          e.preventDefault()
-          api.open(r.id)
+  /** Moves a task out of sight at once; the real delete waits for the undo time. */
+  const remove = (r: Row) => {
+    hidden.add(r.id)
+    void handle?.reload()
+    undoToast({
+      text: sub(tr().deleted, { t: String(r.values.title ?? '') }),
+      undoLabel: tr().undo,
+      commit: async () => {
+        try {
+          await msk.crud('tasks').remove(r.id)
+        } catch (err) {
+          toast(tr().deleteFailed + errText(err, msk.context?.lang), { tone: 'err', ms: 6000 })
+        } finally {
+          hidden.delete(r.id)
+          void handle?.reload()
         }
-      })
-      list.append(item)
-    }
-    sec.append(list)
-    return sec
+      },
+      undo: () => {
+        hidden.delete(r.id)
+        void handle?.reload()
+      },
+    })
   }
+  const card = (api: CustomViewApi, r: Row) => {
+    const c = api.ctx(r)
+    const item = el('div', { class: 'msk-item tcard' + (c.selected ? ' sel' : ''), role: 'listitem', tabindex: '0', 'data-id': r.id }, content(c))
+    const canDelete = c.canWrite && msk.can('delete')
+    if (canDelete) {
+      const del = el('button', { type: 'button', class: 'tdel', title: tr().del, 'aria-label': sub(tr().delTask, { t: c.text('title') }) }, '✕')
+      del.addEventListener('click', (e) => {
+        e.stopPropagation()
+        remove(r)
+      })
+      item.append(del)
+    }
+    item.addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('input,button,a')) api.open(r.id)
+    })
+    item.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target === item) {
+        e.preventDefault()
+        api.open(r.id)
+      } else if (e.key === 'Delete' && e.target === item && canDelete) {
+        e.preventDefault()
+        remove(r)
+      }
+    })
+    return item
+  }
+  const heading = (key: Bucket, n: number) => el('h2', { class: 'thead g-' + key }, tr()[key], el('span', { class: 'msk-colcount' }, String(n)))
   const byDue = (a: Row, b: Row) => dueOf(a).localeCompare(dueOf(b)) || String(a.values.title).localeCompare(String(b.values.title))
+  /** From this many tasks the list draws only the rows in view. */
+  const VIRTUAL_FROM = 60
   const listView = (api: CustomViewApi) => {
     const groups = new Map<Bucket, Row[]>()
-    for (const r of api.rows) groups.set(bucket(r), [...(groups.get(bucket(r)) ?? []), r])
-    const root = el('div', { class: 'tgroups' })
+    const shown = api.rows.filter((r) => !hidden.has(r.id))
+    for (const r of shown) groups.set(bucket(r), [...(groups.get(bucket(r)) ?? []), r])
+    const entries: ({ head: Bucket; n: number } | { row: Row })[] = []
     for (const key of ['overdue', 'today', 'week', 'later', 'nodate', 'done'] as Bucket[]) {
       const rows = (groups.get(key) ?? []).sort(key === 'done' ? (a, b) => String(b.values.completed_on ?? '').localeCompare(String(a.values.completed_on ?? '')) : byDue)
-      if (rows.length) root.append(section(api, key, rows))
+      if (!rows.length) continue
+      entries.push({ head: key, n: rows.length }, ...rows.map((row) => ({ row })))
+    }
+    if (shown.length >= VIRTUAL_FROM) {
+      const vl = virtualList({
+        count: entries.length,
+        estimateSize: (i) => ('head' in entries[i]! ? 34 : 62),
+        getKey: (i) => {
+          const e = entries[i]!
+          return 'head' in e ? 'h-' + e.head : e.row.id
+        },
+        gap: 6,
+        label: tr().title,
+        render: (i) => {
+          const e = entries[i]!
+          return 'head' in e ? el('div', { class: 'tvhead' }, heading(e.head, e.n)) : card(api, e.row)
+        },
+      })
+      vl.el.classList.add('tvlist')
+      return vl.el
+    }
+    const root = el('div', { class: 'tgroups' })
+    let list: HTMLElement | null = null
+    for (const e of entries) {
+      if ('head' in e) {
+        list = el('div', { class: 'tlist', role: 'list' })
+        root.append(el('section', { class: 'tgroup g-' + e.head, 'aria-label': tr()[e.head] }, heading(e.head, e.n), list))
+      } else list!.append(card(api, e.row))
     }
     return root
   }
@@ -138,13 +203,13 @@ function mount(msk: Msk) {
         { key: 'done', label: tr().done, tone: 'ok' },
       ],
       (r) => (isDone(r) ? 'done' : bucket(r) === 'overdue' ? 'overdue' : 'open'),
-      [...api.rows].sort(byDue),
+      api.rows.filter((r) => !hidden.has(r.id)).sort(byDue),
       (r, col) => void api.ctx(r).update({ done: col === 'done' }),
     )
   const weekView = (api: CustomViewApi) => {
     const days = weekDays(today())
     const dayLabel = (d: string) => (d === today() ? tr().today : new Date(d + 'T00:00:00').toLocaleDateString(lang, { weekday: 'short', day: 'numeric' }))
-    const open = api.rows.filter((r) => !isDone(r))
+    const open = api.rows.filter((r) => !isDone(r) && !hidden.has(r.id))
     const columnOf = (r: Row) => {
       const d = dueOf(r)
       return !d ? 'nodate' : d < today() ? 'overdue' : d > days[6]! ? 'later' : d
@@ -252,6 +317,14 @@ function mount(msk: Msk) {
     return handle
   }
   let off: () => void = open()
+  const keys = shortcuts(
+    [
+      { keys: 'n', label: tr().scNew, run: (e) => (e.preventDefault(), app.querySelector<HTMLInputElement>('.tq-input')?.focus()), when: () => msk.can('create') },
+      { keys: '/', label: tr().scSearch, run: (e) => (e.preventDefault(), app.querySelector<HTMLInputElement>('.msk-filter')?.focus()) },
+    ],
+    { labels: { title: tr().scTitle, close: tr().scClose, general: tr().scGeneral, then: tr().scThen } },
+  )
+  addEventListener('pagehide', () => keys.dispose())
   // the view follows the host for its own texts; the title and the button are ours
   msk.onContext((ctx) => {
     if (langOf(ctx.lang) === lang) return

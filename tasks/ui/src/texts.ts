@@ -12,6 +12,8 @@ const en = {
   labels: 'Labels', labelsPlaceholder: 'Add a label…', removeLabel: 'Remove label',
   write: 'Write', preview: 'Preview', bold: 'Bold', italic: 'Italic', heading: 'Heading', bullets: 'List', checks: 'Check list', quote: 'Quote', code: 'Code', link: 'Link', nothingToPreview: 'Nothing to preview',
   progress: '{d} of {n} done', colEmpty: 'Nothing here', moved: '{title} moved to {column}',
+  deleted: 'Deleted: {t}', undo: 'Undo', del: 'Delete', delTask: 'Delete: {t}', deleteFailed: 'Could not delete the task: ',
+  scNew: 'New task (go to the quick add line)', scSearch: 'Search the list', scTitle: 'Keyboard shortcuts', scClose: 'Close', scGeneral: 'Tasks', scThen: 'then',
   failed: 'Could not start the UI of the plugin: ',
 }
 export type Texts = typeof en
@@ -29,6 +31,8 @@ const it: Texts = {
   labels: 'Etichette', labelsPlaceholder: 'Aggiungi un’etichetta…', removeLabel: 'Rimuovi etichetta',
   write: 'Scrivi', preview: 'Anteprima', bold: 'Grassetto', italic: 'Corsivo', heading: 'Titolo', bullets: 'Elenco', checks: 'Lista di controllo', quote: 'Citazione', code: 'Codice', link: 'Link', nothingToPreview: 'Niente da mostrare',
   progress: '{d} di {n} fatti', colEmpty: 'Niente qui', moved: '{title} spostata in {column}',
+  deleted: 'Eliminata: {t}', undo: 'Annulla', del: 'Elimina', delTask: 'Elimina: {t}', deleteFailed: 'Impossibile eliminare l’attività: ',
+  scNew: 'Nuova attività (vai alla riga di aggiunta)', scSearch: 'Cerca nell’elenco', scTitle: 'Scorciatoie da tastiera', scClose: 'Chiudi', scGeneral: 'Attività', scThen: 'poi',
   failed: 'Impossibile avviare la UI del plugin: ',
 }
 const es: Texts = {
@@ -43,6 +47,8 @@ const es: Texts = {
   labels: 'Etiquetas', labelsPlaceholder: 'Añadir una etiqueta…', removeLabel: 'Quitar etiqueta',
   write: 'Escribir', preview: 'Vista previa', bold: 'Negrita', italic: 'Cursiva', heading: 'Título', bullets: 'Lista', checks: 'Lista de control', quote: 'Cita', code: 'Código', link: 'Enlace', nothingToPreview: 'Nada que mostrar',
   progress: '{d} de {n} hechos', colEmpty: 'Nada aquí', moved: '{title} movida a {column}',
+  deleted: 'Eliminada: {t}', undo: 'Deshacer', del: 'Eliminar', delTask: 'Eliminar: {t}', deleteFailed: 'No se pudo eliminar la tarea: ',
+  scNew: 'Nueva tarea (ir a la línea de añadir)', scSearch: 'Buscar en la lista', scTitle: 'Atajos de teclado', scClose: 'Cerrar', scGeneral: 'Tareas', scThen: 'luego',
   failed: 'No se pudo iniciar la interfaz del plugin: ',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
