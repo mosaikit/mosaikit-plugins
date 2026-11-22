@@ -8,14 +8,19 @@ import {
   confirmDialog,
   connect,
   dialog,
+  downloadCsv,
+  downloadFile,
   el,
   errText,
   menu,
   mountCrud,
+  personPicker,
   renderMarkdown,
   richText,
   tagInput,
   toast,
+  virtualList,
+  type DirectoryUser,
   type CrudHandle,
   type CrudView,
   type CustomViewApi,
@@ -24,9 +29,9 @@ import {
   type Msk,
   type Row,
 } from '@mosaikit/plugin-api'
-import { daysToBirthday, duplicates, groupByLetter, splitTags, type Entry } from './logic.ts'
+import { columnsFor, daysToBirthday, duplicates, groupByLetter, splitTags, virtualEntries, type Entry } from './logic.ts'
 import { bindTexts, TEXTS, langOf, sub, type L } from './texts.ts'
-import { parseCsv, parseVcf, toCsv, toVcf, type Person } from './vcard.ts'
+import { CSV_COLUMNS, parseCsv, parseVcf, toVcf, type Person } from './vcard.ts'
 
 const app = document.getElementById('app')!
 const MAX_IMPORT = 500
@@ -38,15 +43,6 @@ const person = (r: Row): Person => ({
   address: str(r, 'address'), birthday: str(r, 'birthday'), notes: str(r, 'notes'), tags: str(r, 'tags'),
 })
 const entry = (r: Row): Entry => ({ id: r.id, name: nameOf(r), email: str(r, 'email'), email2: str(r, 'email2'), phone: str(r, 'phone'), phone2: str(r, 'phone2'), org: str(r, 'org') })
-
-function save(text: string, name: string, type: string) {
-  const u = URL.createObjectURL(new Blob([text], { type: `${type};charset=utf-8` }))
-  const a = el('a', { href: u, download: name, style: 'display:none' })
-  document.body.append(a)
-  a.click()
-  a.remove()
-  setTimeout(() => URL.revokeObjectURL(u), 10000)
-}
 
 /** A link on a value: an address or a number. */
 function link(kind: 'mail' | 'tel', value: string): HTMLElement {
@@ -100,26 +96,66 @@ function mount(msk: Msk) {
       el('span', { class: 'crow-tel' }, str(r, 'phone')),
     )
   }
+  const boxOf = (api: CustomViewApi, r: Row, kind: 'cards' | 'list') => {
+    const c = api.ctx(r)
+    const box = el('div', { class: 'msk-item' + (c.selected ? ' sel' : ''), role: 'listitem', tabindex: '0', 'data-id': r.id }, (kind === 'cards' ? card : row)(c))
+    box.addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('a,button')) api.open(r.id)
+    })
+    box.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target === box) {
+        e.preventDefault()
+        api.open(r.id)
+      }
+    })
+    return box
+  }
+  const heading = (letter: string, n: number) => el('h2', {}, letter, el('span', { class: 'msk-colcount' }, String(n)))
+  /** From this many contacts the view draws only what is in sight. */
+  const VIRTUAL_FROM = 80
+  /** The long list: letters and rows (cards: rows of cards, as many as fit) in a box that scrolls. */
+  const virtual = (api: CustomViewApi, kind: 'cards' | 'list', rows: { r: Row; name: string }[]) => {
+    const groups = groupByLetter(rows)
+    let cols = 1
+    let entries = virtualEntries(groups, 1)
+    const vl = virtualList({
+      count: entries.length,
+      estimateSize: (i) => ('head' in entries[i]! ? 34 : kind === 'cards' ? 150 : 56),
+      getKey: (i) => {
+        const e = entries[i]!
+        return 'head' in e ? 'h-' + e.head : e.items[0]!.r.id
+      },
+      gap: kind === 'cards' ? 12 : 6,
+      label: tr().title,
+      render: (i) => {
+        const e = entries[i]!
+        if ('head' in e) return el('div', { class: 'cvhead cgroup' }, heading(e.head, e.n))
+        const holder = el('div', { class: 'cvrow ' + kind, style: `--cols:${cols}` })
+        for (const { r } of e.items) holder.append(boxOf(api, r, kind))
+        return holder
+      },
+    })
+    vl.el.classList.add('cvlist')
+    if (kind === 'cards') {
+      const fit = () => {
+        const n = columnsFor(vl.el.clientWidth, 260, 12)
+        if (n === cols) return
+        cols = n
+        entries = virtualEntries(groups, cols)
+        vl.setCount(entries.length)
+      }
+      new ResizeObserver(fit).observe(vl.el)
+    }
+    return vl.el
+  }
   const grouped = (api: CustomViewApi, kind: 'cards' | 'list') => {
     const rows = api.rows.filter(inTag).map((r) => ({ r, name: nameOf(r) || tr().noName }))
+    if (rows.length >= VIRTUAL_FROM) return virtual(api, kind, rows)
     const root = el('div', { class: 'cgroups' })
     for (const [letter, group] of groupByLetter(rows)) {
       const holder = el('div', { class: kind === 'cards' ? 'msk-items cards' : 'msk-items list', role: 'list' })
-      for (const { r } of group) {
-        const c = api.ctx(r)
-        const box = el('div', { class: 'msk-item' + (c.selected ? ' sel' : ''), role: 'listitem', tabindex: '0', 'data-id': r.id }, (kind === 'cards' ? card : row)(c))
-        box.addEventListener('click', (e) => {
-          if (!(e.target as HTMLElement).closest('a,button')) api.open(r.id)
-        })
-        box.addEventListener('keydown', (e) => {
-          if ((e.key === 'Enter' || e.key === ' ') && e.target === box) {
-            e.preventDefault()
-            api.open(r.id)
-          }
-        })
-        holder.append(box)
-      }
-      root.append(el('section', { class: 'cgroup', 'aria-label': letter }, el('h2', {}, letter, el('span', { class: 'msk-colcount' }, String(group.length))), holder))
+      for (const { r } of group) holder.append(boxOf(api, r, kind))
+      root.append(el('section', { class: 'cgroup', 'aria-label': letter }, heading(letter, group.length), holder))
     }
     return root
   }
@@ -218,9 +254,48 @@ function mount(msk: Msk) {
   const doExport = (kind: 'vcf' | 'csv') => {
     const people = all.filter(inTag).map(person)
     if (!people.length) return toast(tr().exportNone)
-    if (kind === 'vcf') save(toVcf(people), 'contacts.vcf', 'text/vcard')
-    else save('﻿' + toCsv(people), 'contacts.csv', 'text/csv')
+    if (kind === 'vcf') downloadFile('contacts.vcf', toVcf(people), 'text/vcard;charset=utf-8')
+    else downloadCsv('contacts.csv', people.map((p) => CSV_COLUMNS.map((k) => p[k] ?? '')), { header: [...CSV_COLUMNS] })
     toast(sub(tr().exported, { n: people.length }), { tone: 'ok' })
+  }
+
+  /** «From the directory»: a person of the tenant becomes a contact (the directory gives the name, never an email). */
+  const fromDirectory = async () => {
+    let chosen: DirectoryUser | null = null
+    const picker = personPicker({
+      label: tr().dirLabel,
+      placeholder: tr().dirPlaceholder,
+      value: null,
+      clearLabel: tr().dirClear,
+      noneLabel: tr().dirNone,
+      search: (q) => msk.directory.search({ kind: 'user', q }).catch((e) => (toast(tr().dirDenied + errText(e, msk.context?.lang), { tone: 'err' }), [])),
+      onChange: (u) => {
+        chosen = u
+        add.disabled = !u
+      },
+    })
+    const add = el('button', { type: 'button', class: 'msk-btn' }, tr().dirAdd)
+    add.disabled = true
+    const cancel = el('button', { type: 'button', class: 'msk-btn ghost' }, tr().cancel)
+    const d = dialog({ title: tr().dirTitle, body: el('div', { class: 'cdir' }, el('p', { class: 'cdup-hint' }, tr().dirHint), picker.el), actions: [cancel, add] })
+    cancel.addEventListener('click', d.close)
+    add.addEventListener('click', () => {
+      const u = chosen as DirectoryUser | null
+      if (!u) return
+      add.disabled = true
+      msk
+        .crud('contacts')
+        .create({ name: u.name, company: 'Internal', tags: tr().dirTag })
+        .then(() => {
+          d.close()
+          toast(sub(tr().dirAdded, { n: u.name }), { tone: 'ok' })
+          return handle?.reload()
+        })
+        .catch((e) => {
+          add.disabled = false
+          toast(tr().dirFailed + errText(e, msk.context?.lang), { tone: 'err' })
+        })
+    })
   }
 
   const showDuplicates = (go: (id: string) => void) => {
@@ -259,9 +334,12 @@ function mount(msk: Msk) {
     imp.hidden = !msk.can('create')
     const exp = el('button', { type: 'button', class: 'msk-btn ghost', 'aria-haspopup': 'menu', 'aria-expanded': 'false' }, '⤓ ' + tr().export)
     exp.addEventListener('click', () => menu(exp, [{ label: tr().exportVcf, onClick: () => doExport('vcf') }, { label: tr().exportCsv, onClick: () => doExport('csv') }]))
+    const dir = el('button', { type: 'button', class: 'msk-btn ghost' }, '👥 ' + tr().fromDirectory)
+    dir.addEventListener('click', () => void fromDirectory())
+    dir.hidden = !msk.can('create')
     const dup = el('button', { type: 'button', class: 'msk-btn ghost' }, '⧉ ' + tr().duplicates)
     dup.addEventListener('click', () => showDuplicates((id) => void openRow(id)))
-    return [tagsBar, el('span', { class: 'cgrow' }), imp, exp, dup, file]
+    return [tagsBar, el('span', { class: 'cgrow' }), dir, imp, exp, dup, file]
   }
   /** Opens the detail of a contact: select it in the list, which is the way the view opens it. */
   const openRow = async (id: string) => {

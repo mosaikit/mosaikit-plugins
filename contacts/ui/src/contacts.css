@@ -53,3 +53,16 @@
 .cdup .msk-avatar { width: 28px; height: 28px; font-size: 11px; }
 .cdup-name { font-weight: 600; }
 .cdup-meta { flex: 1; min-width: 0; color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* the long list: a box with its own height; the letters are rows, the cards come in rows of as many as fit */
+.cvlist { height: clamp(360px, calc(100dvh - 235px), 1200px); margin: 0 -6px; padding: 0 6px; }
+.cvlist .msk-vlist-inner { padding-bottom: 12px; }
+.cvhead { padding: 14px 2px 4px; }
+.cvhead h2 { margin: 0; }
+.cvrow.cards { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); gap: 12px; }
+.cvrow.list .msk-item { width: 100%; }
+.cvrow .msk-item { min-width: 0; }
+
+/* add from the directory */
+.cdir { display: flex; flex-direction: column; gap: 12px; min-width: min(420px, 78vw); min-height: 180px; }
+.cdir .cdup-hint { line-height: 1.5; }

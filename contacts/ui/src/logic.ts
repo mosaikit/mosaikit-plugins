@@ -88,3 +88,20 @@ export function splitTags(s: unknown): string[] {
       return true
     })
 }
+
+/** Entries of the virtual list: a title row per letter, then the contacts (`per` in a row: cards use several). */
+export type VirtualEntry<T> = { head: string; n: number } | { items: T[] }
+export function virtualEntries<T>(groups: [string, T[]][], per: number): VirtualEntry<T>[] {
+  const out: VirtualEntry<T>[] = []
+  const step = Math.max(1, Math.floor(per))
+  for (const [letter, list] of groups) {
+    out.push({ head: letter, n: list.length })
+    for (let i = 0; i < list.length; i += step) out.push({ items: list.slice(i, i + step) })
+  }
+  return out
+}
+
+/** How many columns of at least `min` px fit in `width` with `gap` between them (1 at least). */
+export function columnsFor(width: number, min: number, gap: number): number {
+  return Math.max(1, Math.floor((width + gap) / (min + gap)))
+}
