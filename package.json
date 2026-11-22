@@ -31,17 +31,20 @@
     "lint": "oxlint . --deny-warnings"
   },
   "dependencies": {
-    "@mosaikit/plugin-api": "file:../mosaikit/ui/plugin-api",
+    "@floating-ui/dom": "^1.8.0",
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
-    "@fontsource-variable/jetbrains-mono": "^5.3.0"
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@mosaikit/plugin-api": "file:../mosaikit/ui/plugin-api",
+    "@tanstack/virtual-core": "^3.19.12",
+    "echarts": "^6.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.19.2",
+    "happy-dom": "^21.0.3",
     "oxlint": "^1.89.0",
     "typescript": "~7.0.2",
     "vite": "^8.3.4",
-    "vitest": "^5.0.5",
-    "happy-dom": "^21.0.3"
+    "vitest": "^5.0.5"
   },
   "engines": {
     "node": ">=20"
