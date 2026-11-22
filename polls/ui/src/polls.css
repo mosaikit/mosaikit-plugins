@@ -92,6 +92,8 @@
 .po-qr-img { width: 232px; height: 232px; padding: 10px; border-radius: var(--r-m); background: #fff; box-shadow: var(--sh-2); animation: po-rise 300ms var(--ease) both; }
 .po-qr-img svg { display: block; width: 100%; height: 100%; }
 .po-qr-ph { font-size: 72px; color: var(--line); }
+.po-qr [hidden] { display: none !important; }
+.po-qr-make { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
 .po-qr .po-note { overflow-wrap: anywhere; }
 @keyframes po-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes po-grow { from { transform: scaleX(0); } to { transform: none; } }

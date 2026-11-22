@@ -153,3 +153,12 @@ export function qrTarget(raw: string): string | null {
     return null
   }
 }
+
+/** What the QR dialog offers. `state` is the answer of `msk.publicLink.get` (null: the host cannot say, or refused):
+ *  `manual` asks for the address; `create` offers to make the link; `show` draws the address kept from its creation;
+ *  `paste` is a link that exists whose address is not known any more (the host gives it only once). */
+export function qrMode(state: { active: boolean } | null, remembered: string): 'manual' | 'create' | 'show' | 'paste' {
+  if (!state) return 'manual'
+  if (!state.active) return 'create'
+  return qrTarget(remembered) ? 'show' : 'paste'
+}

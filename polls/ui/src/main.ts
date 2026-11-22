@@ -34,6 +34,7 @@ import {
   fileStem,
   isClosed,
   parseOptions,
+  qrMode,
   qrTarget,
   resultsOf,
   resultsRows,
@@ -305,9 +306,18 @@ function mount(msk: Msk) {
     downloadCsv(`poll-${fileStem(p.question)}`, resultsRows(o, withNames), { header })
   }
 
-  /** The QR code of the public link. The plugin never sees the token of a link (the host makes it), so the person pastes the address. */
+  /** The QR code of the public link. The host gives the address of a link only when it makes it, so the dialog keeps it in this
+   *  browser; where the host cannot make or tell about links (older host) the person pastes the address. */
   const qrDialog = (p: Poll) => {
     const memo = `polls.qr.${p.id}`
+    const remember = (v: string | null) => {
+      try {
+        if (v) localStorage.setItem(memo, v)
+        else localStorage.removeItem(memo)
+      } catch {
+        /* a convenience only */
+      }
+    }
     let saved = ''
     try {
       saved = localStorage.getItem(memo) ?? ''
@@ -316,18 +326,24 @@ function mount(msk: Msk) {
     }
     const input = el('input', { type: 'url', class: 'po-qr-input', 'aria-label': tr().qrLabel, placeholder: 'https://…', inputmode: 'url' })
     input.value = saved
+    const field = el('div', { class: 'msk-field' }, el('label', {}, tr().qrLabel), input)
     const stage = el('div', { class: 'po-qr-stage', 'data-testid': 'qr' })
-    const note = el('p', { class: 'po-note', role: 'status' }, tr().qrHint)
+    const note = el('p', { class: 'po-note', role: 'status' }, '')
+    const make = button(tr().qrMake, 'msk-btn')
+    const makeBox = el('div', { class: 'po-qr-make' }, el('p', { class: 'po-note' }, tr().qrMakeHint), make)
     const png = button(tr().qrDownload, 'msk-btn mini')
     const copy = button(tr().qrCopy, 'msk-btn ghost mini')
     const close = button(tr().qrClose, 'msk-btn ghost')
+    const acts = el('div', { class: 'po-acts' }, png, copy)
+    const placeholder = () => stage.replaceChildren(el('span', { class: 'po-qr-ph', 'aria-hidden': 'true' }, '▦'))
     let url: string | null = null
+    let hint = tr().qrHint
     const paint = async () => {
       url = qrTarget(input.value)
       png.disabled = copy.disabled = !url
       if (!url) {
-        stage.replaceChildren(el('span', { class: 'po-qr-ph', 'aria-hidden': 'true' }, '▦'))
-        note.textContent = input.value.trim() ? tr().qrInvalid : tr().qrHint
+        placeholder()
+        note.textContent = input.value.trim() ? tr().qrInvalid : hint
         note.classList.toggle('warn', !!input.value.trim())
         return
       }
@@ -341,16 +357,41 @@ function mount(msk: Msk) {
         const holder = el('div', { class: 'po-qr-img', role: 'img', 'aria-label': sub(tr().qrAlt, { u: url }) })
         holder.insertAdjacentHTML('afterbegin', svg)
         stage.replaceChildren(holder)
-        try {
-          localStorage.setItem(memo, url)
-        } catch {
-          /* a convenience only */
-        }
+        remember(url)
       } catch (e) {
         fail(e)
       }
     }
+    /** shows the dialog for a mode: which controls are there */
+    const setup = (mode: ReturnType<typeof qrMode>) => {
+      field.hidden = mode === 'create' || mode === 'show'
+      hint = mode === 'paste' ? tr().qrPaste : tr().qrHint
+      makeBox.hidden = mode !== 'create'
+      acts.hidden = mode === 'create'
+      if (mode === 'create') {
+        input.value = ''
+        remember(null)
+        note.textContent = ''
+      }
+      void paint()
+      if (mode === 'create') placeholder()
+    }
     input.addEventListener('input', () => void paint())
+    make.addEventListener('click', () => {
+      make.disabled = true
+      void (async () => {
+        try {
+          const made = await msk.publicLink.create(p.id)
+          input.value = made.url
+          setup('show')
+          toast(tr().qrMade, { tone: 'ok' })
+        } catch (e) {
+          fail(e)
+        } finally {
+          make.disabled = false
+        }
+      })()
+    })
     png.addEventListener('click', () => {
       if (!url) return
       const target = url
@@ -369,12 +410,23 @@ function mount(msk: Msk) {
     })
     const d = dialog({
       title: tr().qrTitle,
-      body: el('div', { class: 'po-qr' }, el('div', { class: 'msk-field' }, el('label', {}, tr().qrLabel), input), stage, note, el('div', { class: 'po-acts' }, png, copy)),
+      body: el('div', { class: 'po-qr' }, makeBox, field, stage, note, acts),
       actions: [close],
     })
     close.addEventListener('click', d.close)
-    void paint()
-    input.focus()
+    placeholder()
+    makeBox.hidden = field.hidden = true
+    // the state of the link of the poll; an older host (or a person who cannot manage it) leaves the manual way
+    void (async () => {
+      let state: { active: boolean } | null = null
+      try {
+        if (msk.publicLink) state = await msk.publicLink.get(p.id)
+      } catch {
+        state = null
+      }
+      setup(qrMode(state, saved))
+      if (!field.hidden) input.focus()
+    })()
   }
 
   const results = (p: Poll, o: Outcome) => {

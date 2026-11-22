@@ -102,5 +102,9 @@
   "Close": "关闭",
   "Back to the polls": "返回投票列表",
   "Choose option 1 to 9": "选择选项 1 至 9",
-  "Show the shortcuts": "显示快捷键"
+  "Show the shortcuts": "显示快捷键",
+  "Create the public link": "创建公开链接",
+  "This poll has no public link yet. Creating one makes the poll public: anyone who gets the address can see it and vote, without signing in. You can revoke the link from Share…": "此投票还没有公开链接。创建后投票将公开：任何拿到该地址的人都无需登录即可查看并投票。你可以在“共享…”中撤销该链接。",
+  "Public link created": "公开链接已创建",
+  "A public link already exists, but the platform shows its address only once. Paste the address you saved, or create a new link.": "公开链接已存在，但平台只显示一次其地址。请粘贴你保存的地址，或创建新链接。"
 }

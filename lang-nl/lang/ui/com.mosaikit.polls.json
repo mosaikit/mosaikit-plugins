@@ -102,5 +102,9 @@
   "Close": "Sluiten",
   "Back to the polls": "Terug naar de polls",
   "Choose option 1 to 9": "Kies optie 1 tot 9",
-  "Show the shortcuts": "Sneltoetsen tonen"
+  "Show the shortcuts": "Sneltoetsen tonen",
+  "Create the public link": "Openbare link maken",
+  "This poll has no public link yet. Creating one makes the poll public: anyone who gets the address can see it and vote, without signing in. You can revoke the link from Share…": "Deze poll heeft nog geen openbare link. Een link maken maakt de poll openbaar: iedereen die het adres krijgt kan de poll zien en stemmen, zonder in te loggen. Je kunt de link intrekken via Delen…",
+  "Public link created": "Openbare link gemaakt",
+  "A public link already exists, but the platform shows its address only once. Paste the address you saved, or create a new link.": "Er bestaat al een openbare link, maar het platform toont het adres maar één keer. Plak het adres dat je hebt bewaard of maak een nieuwe link."
 }
