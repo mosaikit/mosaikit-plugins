@@ -39,5 +39,11 @@
   "Alert": "Alerta",
   "Could not start the UI of the plugin: ": "No se pudo iniciar la interfaz del plugin: ",
   "Could not load the dashboard: ": "No se pudo cargar el panel: ",
-  "Could not load the widgets: ": "No se pudieron cargar los widgets: "
+  "Could not load the widgets: ": "No se pudieron cargar los widgets: ",
+  "Up {n}%": "Sube un {n} %",
+  "Down {n}%": "Baja un {n} %",
+  "No change": "Sin cambios",
+  "Show data": "Mostrar datos",
+  "Loading chart": "Cargando el gráfico",
+  "The chart could not be drawn": "No se pudo dibujar el gráfico"
 }
