@@ -42,3 +42,28 @@ export function todayLocal(now: Date = new Date()): string {
   const p = (n: number) => String(n).padStart(2, '0')
   return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`
 }
+
+/** The rows of the CSV of who confirmed a notice: the name and the moment (ISO 8601), the earliest first. */
+export function ackRows(acks: { name: string; at: string }[]): string[][] {
+  return [...acks].sort((a, b) => a.at.localeCompare(b.at)).map((a) => [a.name, a.at])
+}
+
+/** A file name from the title of a notice: letters and digits with dashes, at most 40 characters. */
+export function fileStem(title: string): string {
+  const s = title
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40)
+    .replace(/-+$/g, '')
+  return s || 'notice'
+}
+
+/** The initials of a name for the medallion of the author: two letters at most. */
+export function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return '?'
+  return ((parts[0]![0] ?? '') + (parts.length > 1 ? (parts[parts.length - 1]![0] ?? '') : '')).toUpperCase()
+}
