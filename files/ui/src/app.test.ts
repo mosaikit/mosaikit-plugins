@@ -35,6 +35,7 @@ const tick = () => new Promise((r) => setTimeout(r, 0))
 let fm: FileManager | null = null
 
 afterEach(() => {
+  localStorage.clear()
   suggestions = []
   fm?.dispose()
   fm = null
@@ -76,24 +77,22 @@ describe('FileManager', () => {
     expect(labels).not.toContain('Share')
   })
 
-  it('draws a big folder a page at a time and keeps the selection on all of it', async () => {
+  it('draws a long folder a page at a time and keeps the selection on all of it', async () => {
     const el = document.createElement('div')
     document.body.append(el)
-    const many = Array.from({ length: 5000 }, (_, i) => entry(`f${i}`, `file-${String(i).padStart(4, '0')}.txt`))
+    const many = Array.from({ length: 350 }, (_, i) => entry(`f${i}`, `file-${String(i).padStart(4, '0')}.txt`))
     const { msk } = fake(many)
-    const t0 = performance.now()
     fm = new FileManager(el, msk)
     await tick()
-    // a page of 100 rows, not 5000: the bound only catches drawing everything at once, and holds on a busy machine
-    expect(performance.now() - t0).toBeLessThan(15_000)
+    // a page of 100 rows, not 350
     expect(el.querySelectorAll('tr.it').length).toBe(100)
-    expect(el.querySelector('.fm-foot .msk-count')!.textContent).toBe('100 of 5000 items')
+    expect(el.querySelector('.fm-foot .msk-count')!.textContent).toBe('100 of 350 items')
     // the button draws the next page
     ;(el.querySelector('.fm-foot button') as HTMLButtonElement).click()
     expect(el.querySelectorAll('tr.it').length).toBe(200)
     // Ctrl+A selects the whole folder, drawn or not
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', ctrlKey: true, bubbles: true }))
-    expect(el.querySelector('.fm-bar .count')!.textContent).toBe('5000 items selected')
+    expect(el.querySelector('.fm-bar .count')!.textContent).toBe('350 items selected')
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
     // the arrows go on past the drawn rows: the next page is drawn up to the focused one
     ;(el.querySelectorAll('tr.it')[199] as HTMLElement).click()
@@ -101,6 +100,46 @@ describe('FileManager', () => {
     expect(el.querySelectorAll('tr.it').length).toBe(300)
     expect(el.querySelector('tr.it.sel .n')!.textContent).toBe('file-0200.txt')
   }, 60_000)
+
+  it('draws a huge folder with a virtual list: a few rows, the whole folder selectable', async () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const many = Array.from({ length: 5000 }, (_, i) => entry(`f${i}`, `file-${String(i).padStart(4, '0')}.txt`))
+    const { msk } = fake(many)
+    const t0 = performance.now()
+    fm = new FileManager(el, msk)
+    await tick()
+    expect(performance.now() - t0).toBeLessThan(15_000)
+    // no table rows and no pages: the list of the kit holds the rows in sight and says how long the list is
+    expect(el.querySelectorAll('tr.it').length).toBe(0)
+    expect(el.querySelector('.fm-foot')).toBeNull()
+    expect(el.querySelectorAll('.fm-vrow').length).toBeLessThan(100)
+    expect(el.querySelector('.msk-vlist-inner')!.getAttribute('aria-label')).not.toBeNull()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', ctrlKey: true, bubbles: true }))
+    expect(el.querySelector('.fm-bar .count')!.textContent).toBe('5000 items selected')
+  }, 60_000)
+
+  it('Favourites keeps what the person stars in the browser and shows it in its own place', async () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const { msk } = fake([entry('1', 'plan.pdf'), entry('2', 'photo.png')])
+    fm = new FileManager(el, msk)
+    await tick()
+    ;(el.querySelectorAll('tr.it')[0] as HTMLElement).click()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'f', bubbles: true }))
+    expect(el.querySelector('.fm-place[data-place="favourites"] small')!.textContent).toBe('1')
+    expect(el.querySelector('tr.it.sel .fm-star')).not.toBeNull()
+    ;(el.querySelector('.fm-place[data-place="favourites"]') as HTMLElement).click()
+    await tick()
+    expect([...el.querySelectorAll('tr.it .n')].map((n) => n.textContent)).toEqual(['photo.png'])
+    // no upload from a virtual folder
+    expect(el.textContent).not.toContain('New folder')
+    // the key `g m` goes back to the folders
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'g', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'm', bubbles: true }))
+    await tick()
+    expect(el.querySelectorAll('tr.it').length).toBe(2)
+  })
 
   it('uploads a file with a conflict choosing "keep both"', async () => {
     const el = document.createElement('div')
