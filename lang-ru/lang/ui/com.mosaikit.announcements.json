@@ -44,5 +44,11 @@
   "Thank you, confirmed": "Спасибо, подтверждено",
   "Could not start the UI of the plugin: ": "Не удалось запустить интерфейс плагина: ",
   "Could not load the notices: ": "Не удалось загрузить объявления: ",
-  "Write a title": "Напишите заголовок"
+  "Write a title": "Напишите заголовок",
+  "Export CSV": "Экспорт в CSV",
+  "Name": "Имя",
+  "Confirmed on": "Подтверждено",
+  "{n} confirmed": "Подтверждено: {n}",
+  "Notices": "Объявления",
+  "Keyboard shortcuts": "Сочетания клавиш"
 }

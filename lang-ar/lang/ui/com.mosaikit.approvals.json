@@ -77,5 +77,14 @@
   "Changes of the approvers": "تغييرات المُوافِقين",
   "added {n}": "أُضيف {n}",
   "removed {n}": "أُزيل {n}",
-  "{who}: {what}": "{who}: {what}"
+  "{who}: {what}": "{who}: {what}",
+  "Pick a request": "اختر طلبا",
+  "Choose a request in the list to read it and decide.": "اختر طلبا من القائمة لقراءته واتخاذ قرار بشأنه.",
+  "← Requests": "← الطلبات",
+  "{d} of {n} decided": "تم البت في {d} من {n}",
+  "Requests": "الطلبات",
+  "Next request": "الطلب التالي",
+  "Previous request": "الطلب السابق",
+  "Reject (asks for the reason)": "رفض (يطلب السبب)",
+  "Keyboard shortcuts": "اختصارات لوحة المفاتيح"
 }

@@ -76,5 +76,20 @@
   "enter a valid web address (http or https)": "informe um endereço web válido (http ou https)",
   "looking at the site…": "verificando o site…",
   "site created: it does not allow being shown inside Mosaikit, it opens in a new tab": "site criado: não permite ser exibido dentro do Mosaikit, abre em uma nova aba",
-  "the thumbnail must be an image (png, jpeg, webp or gif)": "a miniatura deve ser uma imagem (png, jpeg, webp ou gif)"
+  "the thumbnail must be an image (png, jpeg, webp or gif)": "a miniatura deve ser uma imagem (png, jpeg, webp ou gif)",
+  "Checking the zip…": "A verificar o zip…",
+  "Ready: {n} files, {size}. The site opens on {entry}.": "Pronto: {n} ficheiros, {size}. O site abre em {entry}.",
+  "The file must be a .zip archive.": "O ficheiro tem de ser um arquivo .zip.",
+  "The zip is larger than {size}.": "O zip é maior do que {size}.",
+  "The site would be larger than {size} once unpacked.": "Depois de descomprimido, o site seria maior do que {size}.",
+  "The zip has no files.": "O zip não tem ficheiros.",
+  "The zip does not contain an index.html file.": "O zip não contém um ficheiro index.html.",
+  "Some paths in the zip lead outside the site folder.": "Alguns caminhos do zip levam para fora da pasta do site.",
+  "System files (__MACOSX, .DS_Store) are ignored.": "Os ficheiros de sistema (__MACOSX, .DS_Store) são ignorados.",
+  "The index.html is inside a folder ({entry}): it is used as the start page.": "O index.html está dentro de uma pasta ({entry}): é usado como página inicial.",
+  "A file is larger than {size}: the site may load slowly.": "Um ficheiro é maior do que {size}: o site pode carregar lentamente.",
+  "Drop the zip here": "Largue o zip aqui",
+  "Remove the file": "Remover o ficheiro",
+  "The zip could not be read here: the server will check it.": "Não foi possível ler o zip aqui: o servidor vai verificá-lo.",
+  "{n} files": "{n} ficheiros"
 }

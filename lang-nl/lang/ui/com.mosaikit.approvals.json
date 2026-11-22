@@ -77,5 +77,14 @@
   "Changes of the approvers": "Wijzigingen van de goedkeurders",
   "added {n}": "{n} toegevoegd",
   "removed {n}": "{n} verwijderd",
-  "{who}: {what}": "{who}: {what}"
+  "{who}: {what}": "{who}: {what}",
+  "Pick a request": "Kies een verzoek",
+  "Choose a request in the list to read it and decide.": "Kies een verzoek in de lijst om het te lezen en te beslissen.",
+  "← Requests": "← Verzoeken",
+  "{d} of {n} decided": "{d} van {n} beslist",
+  "Requests": "Verzoeken",
+  "Next request": "Volgend verzoek",
+  "Previous request": "Vorig verzoek",
+  "Reject (asks for the reason)": "Afwijzen (vraagt om de reden)",
+  "Keyboard shortcuts": "Sneltoetsen"
 }

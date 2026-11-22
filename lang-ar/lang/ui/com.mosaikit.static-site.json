@@ -76,5 +76,20 @@
   "enter a valid web address (http or https)": "أدخل عنوان ويب صالحًا (http أو https)",
   "looking at the site…": "جارٍ فحص الموقع…",
   "site created: it does not allow being shown inside Mosaikit, it opens in a new tab": "تم إنشاء الموقع: لا يسمح بعرضه داخل Mosaikit، ويُفتح في تبويب جديد",
-  "the thumbnail must be an image (png, jpeg, webp or gif)": "يجب أن تكون الصورة المصغّرة صورة (png أو jpeg أو webp أو gif)"
+  "the thumbnail must be an image (png, jpeg, webp or gif)": "يجب أن تكون الصورة المصغّرة صورة (png أو jpeg أو webp أو gif)",
+  "Checking the zip…": "جارٍ فحص ملف zip…",
+  "Ready: {n} files, {size}. The site opens on {entry}.": "جاهز: {n} ملفات، {size}. يُفتح الموقع على {entry}.",
+  "The file must be a .zip archive.": "يجب أن يكون الملف أرشيف .zip.",
+  "The zip is larger than {size}.": "ملف zip أكبر من {size}.",
+  "The site would be larger than {size} once unpacked.": "سيتجاوز الموقع {size} بعد فك الضغط.",
+  "The zip has no files.": "ملف zip لا يحتوي على أي ملفات.",
+  "The zip does not contain an index.html file.": "ملف zip لا يحتوي على ملف index.html.",
+  "Some paths in the zip lead outside the site folder.": "بعض المسارات في ملف zip تشير إلى خارج مجلد الموقع.",
+  "System files (__MACOSX, .DS_Store) are ignored.": "يتم تجاهل ملفات النظام (__MACOSX، .DS_Store).",
+  "The index.html is inside a folder ({entry}): it is used as the start page.": "ملف index.html موجود داخل مجلد ({entry}): سيُستخدم كصفحة البداية.",
+  "A file is larger than {size}: the site may load slowly.": "ملف أكبر من {size}: قد يبطؤ تحميل الموقع.",
+  "Drop the zip here": "أفلت ملف zip هنا",
+  "Remove the file": "إزالة الملف",
+  "The zip could not be read here: the server will check it.": "تعذّر قراءة ملف zip هنا: سيتولى الخادم فحصه.",
+  "{n} files": "{n} ملفات"
 }

@@ -101,5 +101,17 @@
   "Delete only the occurrence of {d}? The rest of the series stays.": "حذف تكرار {d} فقط؟ تبقى بقية السلسلة.",
   "Occurrence of {d}. The other occurrences do not change.": "تكرار {d}. لا تتغير التكرارات الأخرى.",
   "This occurrence was changed from the series.": "تم تغيير هذا التكرار عن السلسلة.",
-  "Times in the time zone {z}.": "الأوقات في المنطقة الزمنية {z}."
+  "Times in the time zone {z}.": "الأوقات في المنطقة الزمنية {z}.",
+  "Agenda": "جدول الأعمال",
+  "Options": "الخيارات",
+  "Wk": "أسب.",
+  "Week {n}": "الأسبوع {n}",
+  "Working hours": "ساعات العمل",
+  "Nothing in the next 4 weeks": "لا شيء في الأسابيع الأربعة القادمة",
+  "Events and tasks that fall in this period are listed here.": "تُعرض هنا الأحداث والمهام التي تقع في هذه الفترة.",
+  "Go to today": "الانتقال إلى اليوم",
+  "Previous period": "الفترة السابقة",
+  "Next period": "الفترة التالية",
+  "Month, week, day, agenda": "شهر، أسبوع، يوم، جدول الأعمال",
+  "Keyboard shortcuts": "اختصارات لوحة المفاتيح"
 }

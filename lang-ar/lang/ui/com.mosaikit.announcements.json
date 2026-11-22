@@ -44,5 +44,11 @@
   "Thank you, confirmed": "شكرًا، تم التأكيد",
   "Could not start the UI of the plugin: ": "تعذّر تشغيل واجهة الإضافة: ",
   "Could not load the notices: ": "تعذّر تحميل الإشعارات: ",
-  "Write a title": "اكتب عنوانًا"
+  "Write a title": "اكتب عنوانًا",
+  "Export CSV": "تصدير CSV",
+  "Name": "الاسم",
+  "Confirmed on": "تم التأكيد في",
+  "{n} confirmed": "تم تأكيد {n}",
+  "Notices": "الإشعارات",
+  "Keyboard shortcuts": "اختصارات لوحة المفاتيح"
 }

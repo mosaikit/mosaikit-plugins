@@ -44,5 +44,11 @@
   "Thank you, confirmed": "谢谢，已确认",
   "Could not start the UI of the plugin: ": "无法启动插件界面：",
   "Could not load the notices: ": "无法加载公告：",
-  "Write a title": "请输入标题"
+  "Write a title": "请输入标题",
+  "Export CSV": "导出 CSV",
+  "Name": "名称",
+  "Confirmed on": "确认于",
+  "{n} confirmed": "已确认 {n} 项",
+  "Notices": "通知",
+  "Keyboard shortcuts": "键盘快捷键"
 }

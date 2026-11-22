@@ -76,5 +76,20 @@
   "enter a valid web address (http or https)": "введите корректный веб-адрес (http или https)",
   "looking at the site…": "проверка сайта…",
   "site created: it does not allow being shown inside Mosaikit, it opens in a new tab": "сайт создан: он не разрешает показ внутри Mosaikit, поэтому открывается в новой вкладке",
-  "the thumbnail must be an image (png, jpeg, webp or gif)": "миниатюра должна быть изображением (png, jpeg, webp или gif)"
+  "the thumbnail must be an image (png, jpeg, webp or gif)": "миниатюра должна быть изображением (png, jpeg, webp или gif)",
+  "Checking the zip…": "Проверка zip-архива…",
+  "Ready: {n} files, {size}. The site opens on {entry}.": "Готово: файлов — {n}, размер {size}. Сайт откроется на {entry}.",
+  "The file must be a .zip archive.": "Файл должен быть архивом .zip.",
+  "The zip is larger than {size}.": "Zip-архив больше {size}.",
+  "The site would be larger than {size} once unpacked.": "После распаковки сайт будет больше {size}.",
+  "The zip has no files.": "В zip-архиве нет файлов.",
+  "The zip does not contain an index.html file.": "В zip-архиве нет файла index.html.",
+  "Some paths in the zip lead outside the site folder.": "Некоторые пути в zip-архиве ведут за пределы папки сайта.",
+  "System files (__MACOSX, .DS_Store) are ignored.": "Системные файлы (__MACOSX, .DS_Store) пропускаются.",
+  "The index.html is inside a folder ({entry}): it is used as the start page.": "Файл index.html находится в папке ({entry}): он будет использоваться как стартовая страница.",
+  "A file is larger than {size}: the site may load slowly.": "Файл больше {size}: сайт может загружаться медленно.",
+  "Drop the zip here": "Перетащите zip-архив сюда",
+  "Remove the file": "Удалить файл",
+  "The zip could not be read here: the server will check it.": "Здесь не удалось прочитать zip-архив: его проверит сервер.",
+  "{n} files": "Файлов: {n}"
 }

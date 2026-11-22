@@ -44,5 +44,11 @@
   "Thank you, confirmed": "Bedankt, bevestigd",
   "Could not start the UI of the plugin: ": "De interface van de plugin kon niet worden gestart:",
   "Could not load the notices: ": "De mededelingen konden niet worden geladen:",
-  "Write a title": "Schrijf een titel"
+  "Write a title": "Schrijf een titel",
+  "Export CSV": "CSV exporteren",
+  "Name": "Naam",
+  "Confirmed on": "Bevestigd op",
+  "{n} confirmed": "{n} bevestigd",
+  "Notices": "Mededelingen",
+  "Keyboard shortcuts": "Sneltoetsen"
 }
