@@ -76,5 +76,20 @@
   "enter a valid web address (http or https)": "请输入有效的网址（http 或 https）",
   "looking at the site…": "正在检查站点…",
   "site created: it does not allow being shown inside Mosaikit, it opens in a new tab": "站点已创建：它不允许在 Mosaikit 内展示，将在新标签页中打开",
-  "the thumbnail must be an image (png, jpeg, webp or gif)": "缩略图必须是图片（png、jpeg、webp 或 gif）"
+  "the thumbnail must be an image (png, jpeg, webp or gif)": "缩略图必须是图片（png、jpeg、webp 或 gif）",
+  "Checking the zip…": "正在检查 zip 文件…",
+  "Ready: {n} files, {size}. The site opens on {entry}.": "已就绪：{n} 个文件，{size}。网站将从 {entry} 打开。",
+  "The file must be a .zip archive.": "文件必须是 .zip 压缩包。",
+  "The zip is larger than {size}.": "zip 文件大于 {size}。",
+  "The site would be larger than {size} once unpacked.": "解压后网站将大于 {size}。",
+  "The zip has no files.": "zip 文件中没有文件。",
+  "The zip does not contain an index.html file.": "zip 文件中不包含 index.html 文件。",
+  "Some paths in the zip lead outside the site folder.": "zip 中的部分路径指向网站文件夹之外。",
+  "System files (__MACOSX, .DS_Store) are ignored.": "系统文件（__MACOSX、.DS_Store）将被忽略。",
+  "The index.html is inside a folder ({entry}): it is used as the start page.": "index.html 位于文件夹（{entry}）中：将用作起始页。",
+  "A file is larger than {size}: the site may load slowly.": "有文件大于 {size}：网站可能加载较慢。",
+  "Drop the zip here": "将 zip 文件拖放到此处",
+  "Remove the file": "删除文件",
+  "The zip could not be read here: the server will check it.": "无法在此读取 zip 文件：将由服务器检查。",
+  "{n} files": "{n} 个文件"
 }

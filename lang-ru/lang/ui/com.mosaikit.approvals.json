@@ -77,5 +77,14 @@
   "Changes of the approvers": "Изменения согласующих",
   "added {n}": "добавлено: {n}",
   "removed {n}": "удалено: {n}",
-  "{who}: {what}": "{who}: {what}"
+  "{who}: {what}": "{who}: {what}",
+  "Pick a request": "Выберите заявку",
+  "Choose a request in the list to read it and decide.": "Выберите заявку в списке, чтобы прочитать её и принять решение.",
+  "← Requests": "← Заявки",
+  "{d} of {n} decided": "Решено: {d} из {n}",
+  "Requests": "Заявки",
+  "Next request": "Следующая заявка",
+  "Previous request": "Предыдущая заявка",
+  "Reject (asks for the reason)": "Отклонить (с указанием причины)",
+  "Keyboard shortcuts": "Сочетания клавиш"
 }

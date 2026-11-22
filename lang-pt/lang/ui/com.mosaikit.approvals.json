@@ -77,5 +77,14 @@
   "Changes of the approvers": "Alterações dos aprovadores",
   "added {n}": "adicionados {n}",
   "removed {n}": "removidos {n}",
-  "{who}: {what}": "{who}: {what}"
+  "{who}: {what}": "{who}: {what}",
+  "Pick a request": "Escolha um pedido",
+  "Choose a request in the list to read it and decide.": "Escolha um pedido na lista para o ler e decidir.",
+  "← Requests": "← Pedidos",
+  "{d} of {n} decided": "{d} de {n} decididos",
+  "Requests": "Pedidos",
+  "Next request": "Pedido seguinte",
+  "Previous request": "Pedido anterior",
+  "Reject (asks for the reason)": "Rejeitar (pede o motivo)",
+  "Keyboard shortcuts": "Atalhos de teclado"
 }

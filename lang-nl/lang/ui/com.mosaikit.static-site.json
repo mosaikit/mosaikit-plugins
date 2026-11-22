@@ -76,5 +76,20 @@
   "enter a valid web address (http or https)": "voer een geldig webadres in (http of https)",
   "looking at the site…": "site controleren…",
   "site created: it does not allow being shown inside Mosaikit, it opens in a new tab": "site aangemaakt: hij staat niet toe dat hij binnen Mosaikit wordt getoond en opent in een nieuw tabblad",
-  "the thumbnail must be an image (png, jpeg, webp or gif)": "de miniatuur moet een afbeelding zijn (png, jpeg, webp of gif)"
+  "the thumbnail must be an image (png, jpeg, webp or gif)": "de miniatuur moet een afbeelding zijn (png, jpeg, webp of gif)",
+  "Checking the zip…": "Zip wordt gecontroleerd…",
+  "Ready: {n} files, {size}. The site opens on {entry}.": "Klaar: {n} bestanden, {size}. De site opent op {entry}.",
+  "The file must be a .zip archive.": "Het bestand moet een .zip-archief zijn.",
+  "The zip is larger than {size}.": "De zip is groter dan {size}.",
+  "The site would be larger than {size} once unpacked.": "Uitgepakt zou de site groter zijn dan {size}.",
+  "The zip has no files.": "De zip bevat geen bestanden.",
+  "The zip does not contain an index.html file.": "De zip bevat geen index.html-bestand.",
+  "Some paths in the zip lead outside the site folder.": "Sommige paden in de zip leiden buiten de sitemap.",
+  "System files (__MACOSX, .DS_Store) are ignored.": "Systeembestanden (__MACOSX, .DS_Store) worden genegeerd.",
+  "The index.html is inside a folder ({entry}): it is used as the start page.": "Het index.html staat in een map ({entry}): het wordt als startpagina gebruikt.",
+  "A file is larger than {size}: the site may load slowly.": "Een bestand is groter dan {size}: de site kan traag laden.",
+  "Drop the zip here": "Zet de zip hier neer",
+  "Remove the file": "Bestand verwijderen",
+  "The zip could not be read here: the server will check it.": "De zip kan hier niet worden gelezen: de server controleert hem.",
+  "{n} files": "{n} bestanden"
 }

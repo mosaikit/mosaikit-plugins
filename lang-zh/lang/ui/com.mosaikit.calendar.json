@@ -101,5 +101,17 @@
   "Delete only the occurrence of {d}? The rest of the series stays.": "仅删除 {d} 的这一次？系列的其余部分保留。",
   "Occurrence of {d}. The other occurrences do not change.": "{d} 的这一次。其他重复项不变。",
   "This occurrence was changed from the series.": "此次重复已与系列不同。",
-  "Times in the time zone {z}.": "时间为 {z} 时区。"
+  "Times in the time zone {z}.": "时间为 {z} 时区。",
+  "Agenda": "议程",
+  "Options": "选项",
+  "Wk": "周",
+  "Week {n}": "第 {n} 周",
+  "Working hours": "工作时间",
+  "Nothing in the next 4 weeks": "未来 4 周没有安排",
+  "Events and tasks that fall in this period are listed here.": "此处列出该时段内的事件和任务。",
+  "Go to today": "转到今天",
+  "Previous period": "上一时段",
+  "Next period": "下一时段",
+  "Month, week, day, agenda": "月、周、日、议程",
+  "Keyboard shortcuts": "键盘快捷键"
 }

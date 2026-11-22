@@ -44,5 +44,11 @@
   "Thank you, confirmed": "Merci, confirmé",
   "Could not start the UI of the plugin: ": "Impossible de démarrer l'interface du plugin :",
   "Could not load the notices: ": "Impossible de charger les avis :",
-  "Write a title": "Saisissez un titre"
+  "Write a title": "Saisissez un titre",
+  "Export CSV": "Exporter en CSV",
+  "Name": "Nom",
+  "Confirmed on": "Confirmé le",
+  "{n} confirmed": "{n} confirmé(s)",
+  "Notices": "Avis",
+  "Keyboard shortcuts": "Raccourcis clavier"
 }
