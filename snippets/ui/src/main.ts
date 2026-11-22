@@ -10,13 +10,14 @@ import {
   emptyState,
   errText,
   filteredEmpty,
+  shortcuts,
   skeleton,
   tagInput,
   toast,
   type Msk,
   type Row,
 } from '@mosaikit/plugin-api'
-import { KINDS, filterSnippets, firstLine, kindOf, listOrder, neighbour, normTag, parseTags, tagCounts, type Filter, type SnippetLike } from './logic.ts'
+import { KINDS, MAX_HIGHLIGHT, filterSnippets, firstLine, kindOf, languageOf, listOrder, neighbour, normTag, parseTags, tagCounts, type Filter, type SnippetLike } from './logic.ts'
 import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 
 const app = document.getElementById('app')!
@@ -47,6 +48,27 @@ async function copyText(text: string): Promise<boolean> {
   }
   ta.remove()
   return ok
+}
+
+/**
+ * Colours the code of `pre` for its language. highlight.js and the grammars load when the first snippet is shown (a chunk of
+ * their own); until then, and for a kind with no grammar, the text stays as it is. The result of highlight.js has every
+ * character of the code escaped, and it is read into an inert template before it replaces the text.
+ */
+async function colour(pre: HTMLElement, code: string, kind: string) {
+  const language = languageOf(kind)
+  if (!language || code.length > MAX_HIGHLIGHT) return
+  try {
+    const { highlight } = await import('./highlight.ts')
+    const html = highlight(code, language)
+    if (!html || !pre.isConnected || pre.textContent !== code) return
+    const t = document.createElement('template')
+    t.innerHTML = html
+    pre.replaceChildren(t.content)
+    pre.classList.add('hl')
+  } catch {
+    // the plain text stays
+  }
 }
 
 function mount(msk: Msk) {
@@ -281,7 +303,9 @@ function mount(msk: Msk) {
     // a text node in a block that keeps the line breaks: whatever the snippet holds is only text
     const code = el('pre', { class: 'sn-code', 'data-testid': 'snippet-body', tabindex: '0', role: 'group', 'aria-label': s.title })
     code.textContent = s.body
-    detailBox.replaceChildren(back, el('h2', {}, s.title), meta, acts, code)
+    void colour(code, s.body, s.kind)
+    const box = el('div', { class: 'sn-codebox' }, el('div', { class: 'sn-codehead', 'aria-hidden': 'true' }, el('i'), el('i'), el('i'), el('span', {}, tr().kinds[kindOf(s.kind)])), code)
+    detailBox.replaceChildren(back, el('h2', {}, s.title), meta, acts, box)
   }
 
   const draw = () => {
@@ -329,6 +353,15 @@ function mount(msk: Msk) {
     draw()
   }
 
+  const keys = shortcuts(
+    [
+      { keys: 'n', label: tr().scNew, run: (e) => (e.preventDefault(), form()), when: () => msk.can('create') },
+      { keys: '/', label: tr().scSearch, run: (e) => (e.preventDefault(), search?.focus()) },
+      { keys: 'c', label: tr().scCopy, run: () => { const s = snippets.find((x) => x.id === selectedId); if (s) void copy(s) } },
+    ],
+    { labels: { title: tr().scTitle, close: tr().cancel, general: tr().title, then: tr().scThen } },
+  )
+  addEventListener('pagehide', () => keys.dispose())
   msk.onContext((ctx) => {
     if (langOf(ctx.lang) === lang) return
     lang = langOf(ctx.lang)

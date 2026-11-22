@@ -5,14 +5,14 @@
 use mosaikit_plugin_sdk::prelude::*;
 use mosaikit_plugin_sdk::serde_json;
 
-const KINDS: [&str; 9] = [
+const KINDS: [&str; 13] = [
     "text",
     "shell",
     "sql",
     "json",
-    "javascript",
+    "javascript", "typescript",
     "python",
-    "rust",
+    "rust", "html", "css", "yaml",
     "markdown",
     "other",
 ];
@@ -97,7 +97,7 @@ fn snippet(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     } else if !KINDS.contains(&kind.as_str()) {
         return Err(Error::coded(
             "snippet_kind",
-            "the kind is text, shell, sql, json, javascript, python, rust, markdown or other",
+            "the kind is text, shell, sql, json, javascript, typescript, python, rust, html, css, yaml, markdown or other",
         ));
     }
 

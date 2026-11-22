@@ -74,3 +74,24 @@ describe('tagCounts, listOrder and neighbour', () => {
     expect(neighbour([], 'a', 1)).toBeNull()
   })
 })
+
+import { KINDS, MAX_HIGHLIGHT, languageOf } from './logic.ts'
+import { highlight } from './highlight.ts'
+describe('languages of the kinds', () => {
+  it('maps every kind to a grammar or to plain text', () => {
+    expect(languageOf('shell')).toBe('bash')
+    expect(languageOf('html')).toBe('xml')
+    expect(languageOf('text')).toBeNull()
+    expect(languageOf('other')).toBeNull()
+    expect(languageOf('nope')).toBeNull()
+    for (const k of KINDS) expect(languageOf(k) === null || typeof languageOf(k) === 'string').toBe(true)
+    expect(MAX_HIGHLIGHT).toBeGreaterThan(20_000)
+  })
+  it('colours code of every registered grammar and escapes the text', () => {
+    const samples: [string, string][] = [['rust', 'fn main() { let x = 1; }'], ['sql', 'select * from t where a = 1'], ['python', 'def f(): return 1'], ['bash', 'echo "hi" | grep h'], ['yaml', 'a: 1'], ['css', 'a { color: red }'], ['javascript', 'const a = 1'], ['typescript', 'let a: number = 1'], ['json', '{"a": [1, true]}'], ['markdown', '# Title'], ['xml', '<p class="a">x</p>']]
+    for (const [lang, code] of samples) expect(highlight(code, lang), lang).toContain('<span class="hljs-')
+    const xss = highlight('<img src=x onerror=alert(1)>', 'xml')!
+    expect(xss).not.toContain('<img')
+    expect(highlight('x', 'cobol')).toBeNull()
+  })
+})
