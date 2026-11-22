@@ -35,8 +35,7 @@ import {
   weekdayIndex,
   weekdayNames,
   type IcsEvent,
-  type Occ,
-} from './logic.ts'
+  type Occ, AGENDA_DAYS, agendaDays, isoWeek, offHours, parseWorking, WORKING } from './logic.ts'
 
 const occ = (o: Partial<Occ>): Occ => ({
   id: 'e1', title: 'Standup', location: '', start: '2026-11-12', end: '2026-11-12', starts_time: '09:30', ends_time: '10:00', all_day: false,
@@ -396,5 +395,33 @@ describe('time zones', () => {
     expect(convertOcc(same, 'Europe/Rome')).toBe(same)
     const odd = occ({ timezone: 'Mars/Olympus' })
     expect(convertOcc(odd, 'Asia/Tokyo')).toBe(odd)
+  })
+})
+
+describe('agenda, week numbers and working hours', () => {
+  it('numbers the weeks as ISO 8601 does', () => {
+    expect(isoWeek('2026-01-01')).toEqual({ year: 2026, week: 1 })
+    expect(isoWeek('2026-11-22')).toEqual({ year: 2026, week: 47 })
+    // 1 January 2027 is a Friday: it still belongs to the last week of 2026 (53)
+    expect(isoWeek('2027-01-01')).toEqual({ year: 2026, week: 53 })
+    expect(isoWeek('2024-12-30')).toEqual({ year: 2025, week: 1 })
+    expect(isoWeek('2026-03-01')).toEqual({ year: 2026, week: 9 })
+  })
+  it('shades the evenings and the weekend', () => {
+    expect(offHours('2026-11-23')).toEqual([{ from: 0, to: 540 }, { from: 1080, to: 1440 }])
+    expect(offHours('2026-11-22')).toEqual([{ from: 0, to: 1440 }])
+    expect(offHours('2026-11-23', { start: 0, end: 1440, days: [0] })).toEqual([])
+  })
+  it('reads the working hours from the stored text', () => {
+    expect(parseWorking('08:30-17:00')).toEqual({ ...WORKING, start: 510, end: 1020 })
+    expect(parseWorking('off')).toBeNull()
+    expect(parseWorking('17:00-08:00')).toEqual(WORKING)
+    expect(parseWorking(undefined)).toEqual(WORKING)
+  })
+  it('lists only the days of the agenda that have something', () => {
+    const days = ['a', 'b', 'c']
+    const out = agendaDays(days, new Map([['b', [1]]]), new Map([['c', ['t']]]))
+    expect(out.map((x) => x.day)).toEqual(['b', 'c'])
+    expect(AGENDA_DAYS).toBe(28)
   })
 })

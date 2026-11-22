@@ -2,7 +2,9 @@
 // overlapping events in a day, the people invited and the .ics file. Dates are `YYYY-MM-DD` texts, times `HH:MM` texts, and
 // both are floating local values: nothing here converts a time zone.
 
-export type View = 'month' | 'week' | 'day'
+export type View = 'month' | 'week' | 'day' | 'agenda'
+/** Days the agenda lists from the day that is open. */
+export const AGENDA_DAYS = 28
 export type Answer = 'yes' | 'no' | 'maybe'
 export const COLORS = ['blue', 'green', 'red', 'orange', 'purple', 'grey'] as const
 export type Color = (typeof COLORS)[number]
@@ -117,6 +119,7 @@ export function weekDays(anchor: string): string[] {
 
 /** The days a view shows. */
 export function viewDays(view: View, anchor: string): string[] {
+  if (view === 'agenda') return Array.from({ length: AGENDA_DAYS }, (_, i) => addDays(anchor, i))
   return view === 'month' ? monthGrid(anchor) : view === 'week' ? weekDays(anchor) : [anchor]
 }
 
@@ -127,6 +130,7 @@ export function rangeFor(view: View, anchor: string): { from: string; to: string
 
 /** The day one step back (-1) or forward (1) in a view: a month, a week or a day. */
 export function shift(view: View, anchor: string, dir: -1 | 1): string {
+  if (view === 'agenda') return addDays(anchor, dir * AGENDA_DAYS)
   return view === 'month' ? addMonths(anchor, dir) : addDays(anchor, dir * (view === 'week' ? 7 : 1))
 }
 
@@ -139,7 +143,7 @@ export function arrowTarget(iso: string, key: string): string | null {
 /** The view a key asks for (`m`, `w`, `d`). */
 export function viewKey(key: string): View | null {
   const k = key.toLowerCase()
-  return k === 'm' ? 'month' : k === 'w' ? 'week' : k === 'd' ? 'day' : null
+  return k === 'm' ? 'month' : k === 'w' ? 'week' : k === 'd' ? 'day' : k === 'a' ? 'agenda' : null
 }
 
 // ------------------------------------------------------------------------------------------------------- names
@@ -158,8 +162,8 @@ export function periodTitle(view: View, anchor: string, lang: string): string {
   const d = parseDate(anchor)
   if (view === 'month') return fmt(lang, { month: 'long', year: 'numeric' }).format(d)
   if (view === 'day') return fmt(lang, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(d)
-  const days = weekDays(anchor)
-  return fmt(lang, { day: 'numeric', month: 'short', year: 'numeric' }).formatRange(parseDate(days[0]), parseDate(days[6]))
+  const days = view === 'agenda' ? viewDays('agenda', anchor) : weekDays(anchor)
+  return fmt(lang, { day: 'numeric', month: 'short', year: 'numeric' }).formatRange(parseDate(days[0]), parseDate(days[days.length - 1]))
 }
 
 export function longDate(iso: string, lang: string): string {
@@ -544,4 +548,51 @@ export function icsCalendar(events: IcsEvent[], stamp: string): string {
 export function icsName(title: string): string {
   const base = title.normalize('NFKD').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').slice(0, 40)
   return `${base || 'event'}.ics`
+}
+
+// ------------------------------------------------------------------------------------- week numbers, working hours, agenda
+
+/** The ISO 8601 week of a day (weeks start on Monday, week 1 holds the first Thursday of the year) and the year it belongs to. */
+export function isoWeek(iso: string): { year: number; week: number } {
+  const d = parseDate(iso)
+  // the Thursday of this week decides the year
+  const thursday = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 3 - ((d.getDay() + 6) % 7))
+  const jan1 = new Date(thursday.getFullYear(), 0, 1)
+  const week = 1 + Math.floor((thursday.getTime() - jan1.getTime()) / 86400000 / 7)
+  return { year: thursday.getFullYear(), week }
+}
+
+/** Working hours: minutes of the day, Monday (0) to Sunday (6). Monday to Friday, 9:00 to 18:00 unless the person says otherwise. */
+export interface WorkingHours {
+  start: number
+  end: number
+  days: number[]
+}
+export const WORKING: WorkingHours = { start: 9 * 60, end: 18 * 60, days: [0, 1, 2, 3, 4] }
+
+/** The stretches of a day that are outside the working hours, in minutes: a whole day off, or the morning and the evening. */
+export function offHours(iso: string, work: WorkingHours = WORKING): { from: number; to: number }[] {
+  if (!work.days.includes(weekdayIndex(iso))) return [{ from: 0, to: 1440 }]
+  const out: { from: number; to: number }[] = []
+  if (work.start > 0) out.push({ from: 0, to: work.start })
+  if (work.end < 1440) out.push({ from: work.end, to: 1440 })
+  return out
+}
+
+/** Working hours read from a stored text (`09:00-18:00`, `off`); anything else is the default. */
+export function parseWorking(raw: unknown): WorkingHours | null {
+  if (raw === 'off') return null
+  if (typeof raw !== 'string') return WORKING
+  const m = /^(\d{2}):(\d{2})-(\d{2}):(\d{2})$/.exec(raw)
+  if (!m) return WORKING
+  const start = Number(m[1]) * 60 + Number(m[2])
+  const end = Number(m[3]) * 60 + Number(m[4])
+  return start < end && end <= 1440 ? { ...WORKING, start, end } : WORKING
+}
+
+/** The days of the agenda that have something in them, in order: the events and the tasks due of each day. */
+export function agendaDays<E, T>(days: string[], events: Map<string, E[]>, tasks: Map<string, T[]>): { day: string; events: E[]; tasks: T[] }[] {
+  return days
+    .map((day) => ({ day, events: events.get(day) ?? [], tasks: tasks.get(day) ?? [] }))
+    .filter((x) => x.events.length + x.tasks.length > 0)
 }
