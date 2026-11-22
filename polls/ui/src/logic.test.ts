@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { applyFilter, checkOptions, debounce, isClosed, isUuid, newBrowserId, parseOptions, publicProblem, resultsOf, toggleChoice, winners } from './logic.ts'
+import { applyFilter, checkOptions, debounce, fileStem, isClosed, isUuid, newBrowserId, parseOptions, publicProblem, qrTarget, resultsOf, resultsRows, toggleChoice, winners } from './logic.ts'
 
 describe('parseOptions', () => {
   it('reads a JSON array in text or an array', () => {
@@ -95,5 +95,25 @@ describe('public voting', () => {
     expect(publicProblem({ code: 'poll_voters_cap' })).toBe('cap')
     expect(publicProblem(new Error('x'))).toBe('other')
     expect(publicProblem(null)).toBe('other')
+  })
+})
+
+describe('export and QR', () => {
+  const o = { total_voters: 3, options: [{ label: 'Pizza', votes: 2, percent: 67, voters: [{ name: 'Ada' }, { name: 'Bo' }] }, { label: 'Sushi, hot', votes: 1, percent: 33, voters: [] }] }
+  it('makes one row per option, with the names only when asked', () => {
+    expect(resultsRows(o, false)).toEqual([['Pizza', 2, 0.67], ['Sushi, hot', 1, 0.33]])
+    expect(resultsRows(o, true)[0]).toEqual(['Pizza', 2, 0.67, 'Ada; Bo'])
+  })
+  it('makes a file name from a question', () => {
+    expect(fileStem('Where do we eat on Friday? Café!')).toBe('where-do-we-eat-on-friday-cafe')
+    expect(fileStem('???')).toBe('poll')
+    expect(fileStem('x'.repeat(80)).length).toBe(40)
+  })
+  it('accepts only web addresses for the QR code', () => {
+    expect(qrTarget(' https://example.org/p/abc ')).toBe('https://example.org/p/abc')
+    expect(qrTarget('javascript:alert(1)')).toBeNull()
+    expect(qrTarget('not a url')).toBeNull()
+    expect(qrTarget('')).toBeNull()
+    expect(qrTarget('https://a.b/' + 'x'.repeat(1000))).toBeNull()
   })
 })

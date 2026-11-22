@@ -115,3 +115,41 @@ export function publicProblem(e: unknown): PublicProblem {
       return 'other'
   }
 }
+
+// ---------------------------------------------------------------------------------------------------- export and QR
+
+/** What the CSV needs of the results of a poll. */
+export interface CsvOutcome {
+  options: { label: string; votes: number; percent: number; voters: { name: string }[] }[]
+  total_voters: number
+}
+
+/** The rows of the CSV of the results: one per option with votes, share, and the names when the poll shows them. */
+export function resultsRows(o: CsvOutcome, withVoters: boolean): (string | number)[][] {
+  return o.options.map((x) => (withVoters ? [x.label, x.votes, x.percent / 100, x.voters.map((v) => v.name).join('; ')] : [x.label, x.votes, x.percent / 100]))
+}
+
+/** A file name from the question of a poll: letters and digits, dashes between words, at most 40 characters. */
+export function fileStem(question: string): string {
+  const s = question
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40)
+    .replace(/-+$/g, '')
+  return s || 'poll'
+}
+
+/** The address to turn into a QR code: only http and https, at most 1000 characters; null otherwise. */
+export function qrTarget(raw: string): string | null {
+  const t = raw.trim()
+  if (!t || t.length > 1000) return null
+  try {
+    const u = new URL(t)
+    return u.protocol === 'https:' || u.protocol === 'http:' ? u.toString() : null
+  } catch {
+    return null
+  }
+}

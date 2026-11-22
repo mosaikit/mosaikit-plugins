@@ -5,7 +5,11 @@ import '@mosaikit/plugin-api/style.css'
 import './polls.css'
 import {
   avatar,
+  chart,
+  type Chart,
   confirmDialog,
+  downloadCsv,
+  downloadFile,
   connect,
   dateField,
   dialog,
@@ -14,6 +18,7 @@ import {
   errText,
   progress,
   segmented,
+  shortcuts,
   skeleton,
   toast,
   type Msk,
@@ -26,9 +31,12 @@ import {
   applyFilter,
   checkOptions,
   debounce,
+  fileStem,
   isClosed,
   parseOptions,
+  qrTarget,
   resultsOf,
+  resultsRows,
   toggleChoice,
   todayLocal,
   winners,
@@ -80,6 +88,8 @@ function mount(msk: Msk) {
   let outcome: Outcome | null = null
   let chosen: number[] = []
   let chan: RealtimeChannel | null = null
+  let view: 'bars' | 'chart' = 'bars'
+  let drawn: Chart | null = null
 
   const fail = (e: unknown) => toast(errText(e, msk.context?.lang), { tone: 'err', ms: 6000 })
   const head = el('header', { class: 'po-head' })
@@ -289,20 +299,123 @@ function mount(msk: Msk) {
     void load()
   }
 
+  const exportCsv = (p: Poll, o: Outcome) => {
+    const withNames = !o.hide_voters && o.options.some((x) => x.voters.length)
+    const header = [tr().csvOption, tr().csvVotes, tr().csvShare, ...(withNames ? [tr().csvVoters] : [])]
+    downloadCsv(`poll-${fileStem(p.question)}`, resultsRows(o, withNames), { header })
+  }
+
+  /** The QR code of the public link. The plugin never sees the token of a link (the host makes it), so the person pastes the address. */
+  const qrDialog = (p: Poll) => {
+    const memo = `polls.qr.${p.id}`
+    let saved = ''
+    try {
+      saved = localStorage.getItem(memo) ?? ''
+    } catch {
+      /* a convenience only */
+    }
+    const input = el('input', { type: 'url', class: 'po-qr-input', 'aria-label': tr().qrLabel, placeholder: 'https://…', inputmode: 'url' })
+    input.value = saved
+    const stage = el('div', { class: 'po-qr-stage', 'data-testid': 'qr' })
+    const note = el('p', { class: 'po-note', role: 'status' }, tr().qrHint)
+    const png = button(tr().qrDownload, 'msk-btn mini')
+    const copy = button(tr().qrCopy, 'msk-btn ghost mini')
+    const close = button(tr().qrClose, 'msk-btn ghost')
+    let url: string | null = null
+    const paint = async () => {
+      url = qrTarget(input.value)
+      png.disabled = copy.disabled = !url
+      if (!url) {
+        stage.replaceChildren(el('span', { class: 'po-qr-ph', 'aria-hidden': 'true' }, '▦'))
+        note.textContent = input.value.trim() ? tr().qrInvalid : tr().qrHint
+        note.classList.toggle('warn', !!input.value.trim())
+        return
+      }
+      note.textContent = url
+      note.classList.remove('warn')
+      try {
+        // the library is loaded when somebody asks for a code: a poll that never makes one does not pay for it
+        const { default: QR } = await import('qrcode')
+        const svg = await QR.toString(url, { type: 'svg', margin: 1, errorCorrectionLevel: 'M', color: { dark: '#14161b', light: '#ffffff' } })
+        if (url !== qrTarget(input.value)) return
+        const holder = el('div', { class: 'po-qr-img', role: 'img', 'aria-label': sub(tr().qrAlt, { u: url }) })
+        holder.insertAdjacentHTML('afterbegin', svg)
+        stage.replaceChildren(holder)
+        try {
+          localStorage.setItem(memo, url)
+        } catch {
+          /* a convenience only */
+        }
+      } catch (e) {
+        fail(e)
+      }
+    }
+    input.addEventListener('input', () => void paint())
+    png.addEventListener('click', () => {
+      if (!url) return
+      const target = url
+      void import('qrcode').then(async ({ default: QR }) => {
+        const data = await QR.toDataURL(target, { margin: 2, width: 720, errorCorrectionLevel: 'M' })
+        const blob = await (await fetch(data)).blob()
+        downloadFile(`poll-${fileStem(p.question)}-qr.png`, blob, 'image/png')
+      })
+    })
+    copy.addEventListener('click', () => {
+      if (!url) return
+      void navigator.clipboard?.writeText(url).then(
+        () => toast(tr().qrCopied, { tone: 'ok' }),
+        () => undefined,
+      )
+    })
+    const d = dialog({
+      title: tr().qrTitle,
+      body: el('div', { class: 'po-qr' }, el('div', { class: 'msk-field' }, el('label', {}, tr().qrLabel), input), stage, note, el('div', { class: 'po-acts' }, png, copy)),
+      actions: [close],
+    })
+    close.addEventListener('click', d.close)
+    void paint()
+    input.focus()
+  }
+
   const results = (p: Poll, o: Outcome) => {
+    drawn?.destroy()
+    drawn = null
     const panel = el('section', { class: 'po-panel', 'aria-label': tr().results })
-    panel.append(el('h2', {}, tr().results))
+    const top = el('div', { class: 'po-ptop' }, el('h2', {}, tr().results))
+    panel.append(top)
     if (!o.visible) {
       panel.append(el('p', { class: 'po-note', role: 'status' }, p.results === 'after_close' ? tr().hiddenAfterClose : tr().hiddenAfterVote))
       return panel
     }
+    if (o.total_voters > 0) {
+      const seg = segmented({
+        label: tr().viewLabel,
+        value: view,
+        options: [
+          { key: 'bars', label: tr().viewBars },
+          { key: 'chart', label: tr().viewChart },
+        ],
+        onChange: (k) => {
+          view = k as typeof view
+          drawDetail()
+        },
+      })
+      top.append(el('div', { class: 'po-tools' }, seg.el, button(tr().exportCsv, 'msk-btn ghost mini', () => exportCsv(p, o))))
+    }
     const lead = winners(o.options.map((x) => x.votes))
+    if (view === 'chart' && o.total_voters > 0) {
+      drawn = chart(
+        { type: 'pie', label: tr().chartLabel, categories: o.options.map((x) => x.label), series: [{ name: tr().csvVotes, data: o.options.map((x) => x.votes) }], height: 260 },
+        { data: tr().showData, category: tr().csvOption, loading: tr().chartLoading, failed: tr().chartFailed },
+      )
+      panel.append(drawn.el)
+    }
     o.options.forEach((x, i) => {
-      const win = lead.includes(i)
+      const win = lead.includes(i) && x.votes > 0
       const line = el('div', { class: 'po-optline' }, el('strong', {}, x.label))
       if (win) line.append(el('span', { class: 'po-win' }, tr().winner))
       line.append(el('span', { class: 'po-num' }, sub(tr().percentOf, { p: x.percent, v: x.votes })))
-      const opt = el('div', { class: `po-opt${win ? ' win' : ''}`, 'data-testid': 'result' }, line, progress({ value: x.percent, max: 100, label: `${x.label}: ${x.percent}%` }))
+      const opt = el('div', { class: `po-opt${win ? ' win' : ''}${view === 'chart' ? ' compact' : ''}`, 'data-testid': 'result' }, line, progress({ value: x.percent, max: 100, label: `${x.label}: ${x.percent}%` }))
       if (x.voters.length) opt.append(el('div', { class: 'po-voters' }, ...x.voters.map((v) => el('span', { class: 'po-voter' }, avatar(v.name), v.name))))
       panel.append(opt)
     })
@@ -374,7 +487,7 @@ function mount(msk: Msk) {
       acts.append(button(tr().edit, 'msk-btn ghost mini', () => form(p)))
     }
     if (p.row.my_level === 'manage') {
-      acts.append(button(tr().share, 'msk-btn ghost mini', () => void msk.share(p.id).catch(fail)), button(tr().publicLink, 'msk-btn ghost mini', () => void msk.share(p.id).catch(fail)), button(tr().remove, 'msk-btn ghost mini danger-text', () => void remove(p)))
+      acts.append(button(tr().share, 'msk-btn ghost mini', () => void msk.share(p.id).catch(fail)), button(tr().publicLink, 'msk-btn ghost mini', () => void msk.share(p.id).catch(fail)), button(tr().qrButton, 'msk-btn ghost mini', () => qrDialog(p)), button(tr().remove, 'msk-btn ghost mini danger-text', () => void remove(p)))
     }
     if (acts.childElementCount) wrap.append(acts)
     if (p.row.my_level === 'manage') wrap.append(el('p', { class: 'po-note' }, tr().publicHint))
@@ -462,6 +575,26 @@ function mount(msk: Msk) {
     lang = langOf(ctx.lang)
     if (current) drawDetail()
     else drawList()
+  })
+  // keyboard: n new poll, Esc back to the list, 1-9 pick an option, v vote (the help sheet lists them on ?)
+  const voteButton = () => document.querySelector<HTMLButtonElement>('.po-choices ~ .po-acts .msk-btn')
+  const pick = (i: number) => Array.from(document.querySelectorAll<HTMLInputElement>('.po-choices input:not(:disabled)'))[i]?.click()
+  shortcuts(
+    [
+      { keys: 'n', label: tr().shNew, group: tr().shGroup, run: () => msk.can('create') && !current && form() },
+      { keys: 'escape', label: tr().shBack, group: tr().shGroup, run: () => current && leave(), when: () => !!current },
+      // 1-9 are handled below (nine keys would be nine lines of the sheet): this line only documents them
+      { keys: '1', label: tr().shPick, group: tr().shGroup, run: () => pick(0), when: () => false },
+      { keys: 'v', label: tr().shVote, group: tr().shGroup, run: () => voteButton()?.click() },
+    ],
+    { labels: { title: tr().shHelp, close: tr().qrClose } },
+  )
+  document.addEventListener('keydown', (ev) => {
+    const t = ev.target as HTMLElement | null
+    if (ev.ctrlKey || ev.metaKey || ev.altKey || !/^[1-9]$/.test(ev.key) || !current) return
+    if (t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable)) return
+    if (document.querySelector('dialog[open]')) return
+    pick(Number(ev.key) - 1)
   })
   void msk.loading(load())
 }
