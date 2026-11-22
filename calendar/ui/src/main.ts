@@ -14,6 +14,7 @@ import {
   personPicker,
   popover,
   segmented,
+  shortcuts,
   skeleton,
   toast,
   type Msk,
@@ -38,6 +39,11 @@ import {
   isDate,
   isTime,
   isoOf,
+  isoWeek,
+  parseDate,
+  offHours,
+  parseWorking,
+  agendaDays,
   layoutDay,
   longDate,
   monthGrid,
@@ -45,13 +51,13 @@ import {
   peopleJson,
   periodTitle,
   rangeFor,
+  viewDays,
   removePerson,
   repeatOf,
   shift,
   spread,
   timeRange,
   validZone,
-  viewKey,
   viewerZone,
   weekDays,
   weekdayNames,
@@ -116,6 +122,12 @@ function mount(msk: Msk) {
   let view: View = 'month'
   let anchor = todayIso()
   let showTasks = true
+  let workingOn = true
+  try {
+    workingOn = parseWorking(localStorage.getItem('calendar.working')) !== null
+  } catch {
+    /* a convenience only */
+  }
   let occs: Occ[] = []
   let tasks: TaskDue[] = []
   let tasksError = ''
@@ -236,6 +248,7 @@ function mount(msk: Msk) {
         { key: 'month', label: t.month },
         { key: 'week', label: t.week },
         { key: 'day', label: t.day },
+        { key: 'agenda', label: t.agenda },
       ],
       onChange: (k) => setView(k as View),
     })
@@ -244,6 +257,22 @@ function mount(msk: Msk) {
     sw.addEventListener('change', () => {
       showTasks = sw.checked
       void load()
+    })
+    const wh = el('input', { type: 'checkbox', role: 'switch' })
+    wh.checked = workingOn
+    wh.addEventListener('change', () => {
+      workingOn = wh.checked
+      try {
+        localStorage.setItem('calendar.working', workingOn ? 'on' : 'off')
+      } catch {
+        /* a convenience only */
+      }
+      draw()
+    })
+    // the two switches live in one popover so the header stays on one line
+    const opts = el('button', { type: 'button', class: 'msk-btn ghost mini', 'aria-haspopup': 'dialog', 'data-testid': 'cal-options' }, t.options)
+    opts.addEventListener('click', () => {
+      popover(opts, el('div', { class: 'cal-opts' }, el('label', { class: 'cal-switch' }, sw, el('span', {}, t.showTasks)), el('label', { class: 'cal-switch cal-wh' }, wh, el('span', {}, t.workHours))))
     })
     const inv = el('button', { type: 'button', class: 'msk-btn ghost mini cal-inv', 'data-testid': 'invitations' }, t.invitations)
     if (invites.length) inv.append(el('span', { class: 'cal-badge', 'data-testid': 'inv-badge' }, String(invites.length)))
@@ -259,7 +288,7 @@ function mount(msk: Msk) {
       el('h2', { class: 'cal-period', 'aria-live': 'polite', 'data-testid': 'period' }, periodTitle(view, anchor, msk.context?.lang || lang)),
       el('span', { class: 'cal-spacer' }),
       seg.el,
-      el('label', { class: 'cal-switch' }, sw, el('span', {}, t.showTasks)),
+      opts,
       inv,
       exp,
       add,
@@ -277,11 +306,13 @@ function mount(msk: Msk) {
     const monthKey = anchor.slice(0, 7)
     const table = el('table', { class: 'cal-month', 'aria-label': periodTitle('month', anchor, msk.context?.lang || lang), 'data-testid': 'month' })
     const hr = el('tr', {})
+    hr.append(el('th', { scope: 'col', class: 'cal-wk', abbr: t.weekShort }, t.weekShort))
     names.forEach((n, i) => hr.append(el('th', { scope: 'col', abbr: longNames[i] }, n)))
     table.append(el('thead', {}, hr))
     const tb = el('tbody', {})
     for (let w = 0; w < 6; w++) {
       const tr_ = el('tr', {})
+      tr_.append(el('th', { scope: 'row', class: 'cal-wk', title: sub(t.weekNo, { n: isoWeek(days[w * 7]).week }) }, String(isoWeek(days[w * 7]).week)))
       for (let c = 0; c < 7; c++) {
         const d = days[w * 7 + c]
         const segs = by.get(d) ?? []
@@ -378,7 +409,7 @@ function mount(msk: Msk) {
     const today = todayIso()
     const names = weekdayNames(msk.context?.lang || lang)
     const wrap = el('div', { class: `cal-tg ${days.length === 1 ? 'one' : 'seven'}`, style: `--cols:${days.length}`, 'data-testid': days.length === 1 ? 'day-view' : 'week-view' })
-    const heads = el('div', { class: 'cal-tg-head' }, el('span', { class: 'cal-corner' }))
+    const heads = el('div', { class: 'cal-tg-head' }, el('span', { class: 'cal-corner cal-wkn', title: sub(t.weekNo, { n: isoWeek(days[0]).week }) }, `${t.weekShort} ${isoWeek(days[0]).week}`))
     const allday = el('div', { class: 'cal-tg-allday' }, el('span', { class: 'cal-corner cal-dim' }, t.allDay))
     const cols = el('div', { class: 'cal-tg-cols' })
     const hours = el('div', { class: 'cal-hours', 'aria-hidden': 'true' })
@@ -406,6 +437,14 @@ function mount(msk: Msk) {
         const h = Math.max(0, Math.min(23, Math.floor(y / HOUR_PX)))
         eventForm({ date: d, time: `${String(h).padStart(2, '0')}:00` })
       })
+      if (workingOn) {
+        for (const band of offHours(d)) {
+          const off = el('div', { class: 'cal-off', 'aria-hidden': 'true' })
+          off.style.top = `${(band.from / 60) * HOUR_PX}px`
+          off.style.height = `${((band.to - band.from) / 60) * HOUR_PX}px`
+          col.append(off)
+        }
+      }
       const timed = segs.filter((x): x is Seg & { startMin: number; endMin: number } => x.startMin !== null && x.endMin !== null)
       for (const p of layoutDay(timed)) {
         const s = p.item
@@ -443,6 +482,43 @@ function mount(msk: Msk) {
     return [wrap]
   }
 
+  // ------------------------------------------------------------------------------------------------------- agenda
+  const agendaView = () => {
+    const t = tr()
+    const days = viewDays('agenda', anchor)
+    const by = spread(occs, days[0], days[days.length - 1])
+    const groups = agendaDays(days, by, tasksOn)
+    const today = todayIso()
+    if (!groups.length) return [el('div', { class: 'cal-hint' }, emptyState({ art: 'calendar', title: t.agendaEmpty, text: t.agendaEmptyText }))]
+    const list = el('div', { class: 'cal-agenda', 'data-testid': 'agenda' })
+    groups.forEach((g, i) => {
+      const d = parseDate(g.day)
+      const lang_ = msk.context?.lang || lang
+      const head_ = el(
+        'div',
+        { class: `cal-ag-date${g.day === today ? ' today' : ''}` },
+        el('span', { class: 'cal-ag-n' }, String(d.getDate())),
+        el('span', { class: 'cal-ag-m' }, new Intl.DateTimeFormat(lang_, { weekday: 'short', month: 'short' }).format(d)),
+      )
+      const rows = el('ul', { class: 'cal-ag-rows' })
+      for (const s_ of g.events) {
+        const o = s_.occ
+        const b = el(
+          'button',
+          { type: 'button', class: `cal-ag-ev c-${colorOf(o.color)}${o.invited && !o.mine ? ' pending' : ''}`, 'data-testid': 'cal-event' },
+          el('span', { class: 'cal-ag-time' }, (s_.startMin === null ? t.allDay : timeRange(o)) || t.allDay),
+          el('span', { class: 'cal-ag-body' }, el('strong', {}, o.title), o.location ? el('span', { class: 'cal-dim' }, o.location) : ''),
+        )
+        b.addEventListener('click', () => void openDetail(o))
+        rows.append(el('li', {}, b))
+      }
+      for (const x of g.tasks) rows.append(el('li', {}, taskChip(x)))
+      const sec = el('section', { class: 'cal-ag-day', style: `--i:${Math.min(i, 10)}`, 'aria-label': dayLong(g.day) }, head_, rows)
+      list.append(sec)
+    })
+    return [list]
+  }
+
   // --------------------------------------------------------------------------------------------------------- draw
   function draw() {
     drawHead()
@@ -450,8 +526,8 @@ function mount(msk: Msk) {
     if (!loaded) return
     const nodes: HTMLElement[] = []
     if (tasksError) nodes.push(el('p', { class: 'cal-warn', role: 'status' }, tr().tasksFailed + tasksError))
-    nodes.push(...(view === 'month' ? monthView() : view === 'week' ? timeGrid(weekDays(anchor)) : timeGrid([anchor])))
-    if (!occs.length && !tasks.length) {
+    nodes.push(...(view === 'month' ? monthView() : view === 'week' ? timeGrid(weekDays(anchor)) : view === 'agenda' ? agendaView() : timeGrid([anchor])))
+    if (view !== 'agenda' && !occs.length && !tasks.length) {
       nodes.push(el('div', { class: 'cal-hint' }, emptyState({ art: 'calendar', title: tr().emptyTitle, text: tr().emptyText })))
     }
     // the keyboard stays on the day grid while the arrows move through it
@@ -948,22 +1024,20 @@ function mount(msk: Msk) {
   }
 
   // ------------------------------------------------------------------------------------------------------- keys
-  document.addEventListener('keydown', (ev) => {
-    if (ev.ctrlKey || ev.metaKey || ev.altKey) return
-    const tg = ev.target as HTMLElement | null
-    if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT' || tg.isContentEditable)) return
-    if (document.querySelector('dialog[open]') || document.querySelector('.msk-popover')) return
-    if (ev.key === 't' || ev.key === 'T') {
-      ev.preventDefault()
-      goTo(todayIso())
-      return
-    }
-    const v = viewKey(ev.key)
-    if (v && v !== view) {
-      ev.preventDefault()
-      setView(v)
-    }
-  })
+  const t0 = () => tr()
+  shortcuts(
+    [
+      { keys: 'n', label: t0().shNew, group: t0().shGroup, run: () => msk.can('create') && eventForm({ date: anchor }) },
+      { keys: 't', label: t0().shToday, group: t0().shGroup, run: () => goTo(todayIso()) },
+      { keys: '[', label: t0().shPrev, group: t0().shGroup, run: () => goTo(shift(view, anchor, -1)) },
+      { keys: ']', label: t0().shNext, group: t0().shGroup, run: () => goTo(shift(view, anchor, 1)) },
+      { keys: 'm', label: t0().shViews, group: t0().shGroup, run: () => view !== 'month' && setView('month') },
+      { keys: 'w', label: t0().week, group: t0().shGroup, run: () => view !== 'week' && setView('week') },
+      { keys: 'd', label: t0().day, group: t0().shGroup, run: () => view !== 'day' && setView('day') },
+      { keys: 'a', label: t0().agenda, group: t0().shGroup, run: () => view !== 'agenda' && setView('agenda') },
+    ],
+    { labels: { title: t0().shHelp, close: t0().shClose } },
+  )
 
   // the line of the current time moves on
   setInterval(() => {

@@ -1,6 +1,7 @@
 import type { Msk } from '@mosaikit/plugin-api'
 // The texts of the Calendar UI (English by default; Italian and Spanish follow the language of the host).
 const en = {
+  agenda: 'Agenda', options: 'Options', weekShort: 'Wk', weekNo: 'Week {n}', workHours: 'Working hours', agendaEmpty: 'Nothing in the next 4 weeks', agendaEmptyText: 'Events and tasks that fall in this period are listed here.', shNew: 'New event', shToday: 'Go to today', shPrev: 'Previous period', shNext: 'Next period', shViews: 'Month, week, day, agenda', shGroup: 'Calendar', shHelp: 'Keyboard shortcuts', shClose: 'Close',
   title: 'Calendar', today: 'Today', prev: 'Previous', next: 'Next', month: 'Month', week: 'Week', day: 'Day', viewLabel: 'View',
   showTasks: 'Show task due dates', newEvent: '＋ New event', invitations: 'My invitations', export: 'Export month (.ics)',
   invitationsTitle: 'My invitations', noInvitations: 'No invitations waiting for an answer.', inviteBy: 'from {n}',
@@ -32,6 +33,7 @@ export type Texts = typeof en
 export type L = string
 
 const it: Texts = {
+  agenda: 'Agenda', options: 'Opzioni', weekShort: 'Sett.', weekNo: 'Settimana {n}', workHours: 'Orario di lavoro', agendaEmpty: 'Niente nelle prossime 4 settimane', agendaEmptyText: 'Gli eventi e le attività di questo periodo compaiono qui.', shNew: 'Nuovo evento', shToday: 'Vai a oggi', shPrev: 'Periodo precedente', shNext: 'Periodo successivo', shViews: 'Mese, settimana, giorno, agenda', shGroup: 'Calendario', shHelp: 'Scorciatoie da tastiera', shClose: 'Chiudi',
   title: 'Calendario', today: 'Oggi', prev: 'Precedente', next: 'Successivo', month: 'Mese', week: 'Settimana', day: 'Giorno', viewLabel: 'Vista',
   showTasks: 'Mostra le scadenze delle attività', newEvent: '＋ Nuovo evento', invitations: 'I miei inviti', export: 'Esporta il mese (.ics)',
   invitationsTitle: 'I miei inviti', noInvitations: 'Nessun invito in attesa di risposta.', inviteBy: 'da {n}',
@@ -60,6 +62,7 @@ const it: Texts = {
   owner: 'Organizzato da {n}', exportEmpty: 'Nessun evento da esportare in questo mese.',
 }
 const es: Texts = {
+  agenda: 'Agenda', options: 'Opciones', weekShort: 'Sem.', weekNo: 'Semana {n}', workHours: 'Horario laboral', agendaEmpty: 'Nada en las próximas 4 semanas', agendaEmptyText: 'Los eventos y tareas de este periodo aparecen aquí.', shNew: 'Nuevo evento', shToday: 'Ir a hoy', shPrev: 'Periodo anterior', shNext: 'Periodo siguiente', shViews: 'Mes, semana, día, agenda', shGroup: 'Calendario', shHelp: 'Atajos de teclado', shClose: 'Cerrar',
   title: 'Calendario', today: 'Hoy', prev: 'Anterior', next: 'Siguiente', month: 'Mes', week: 'Semana', day: 'Día', viewLabel: 'Vista',
   showTasks: 'Mostrar los vencimientos de tareas', newEvent: '＋ Nuevo evento', invitations: 'Mis invitaciones', export: 'Exportar el mes (.ics)',
   invitationsTitle: 'Mis invitaciones', noInvitations: 'No hay invitaciones esperando respuesta.', inviteBy: 'de {n}',
