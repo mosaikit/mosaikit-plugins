@@ -1,6 +1,6 @@
 id = "com.mosaikit.contacts"
 name = "Contacts"
-version = "0.6.0"
+version = "0.7.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "book-user"
@@ -43,6 +43,7 @@ entry = "index.html"
 
 [permissions]
 hooks = ["contacts"]
+directory = true
 
 [[kpi]]
 view = "kpi_contacts_by_company"

@@ -12,6 +12,7 @@ const en = {
   sendMail: 'Email', call: 'Call', noNotes: 'No notes.',
   today: 'today!', inDays: 'in {n} days', tomorrow: 'tomorrow',
   write: 'Write', preview: 'Preview', bold: 'Bold', italic: 'Italic', heading: 'Heading', bullets: 'List', checks: 'Check list', quote: 'Quote', code: 'Code', link: 'Link', nothingToPreview: 'Nothing to preview',
+  fromDirectory: 'From directory', dirTitle: 'Add from the directory', dirHint: 'Pick a person of this workspace: they become a contact with their name. Add their email and phone afterwards.', dirLabel: 'Person of the directory', dirPlaceholder: 'Search by name…', dirClear: 'Clear', dirNone: 'Nobody found', dirAdd: 'Add contact', dirTag: 'team', dirAdded: '{n} added to the contacts', dirFailed: 'Could not add the contact: ', dirDenied: 'The directory is not available: ',
   failed: 'Could not start the UI of the plugin: ',
 }
 export type Texts = typeof en
@@ -29,6 +30,7 @@ const it: Texts = {
   sendMail: 'Scrivi', call: 'Chiama', noNotes: 'Nessuna nota.',
   today: 'oggi!', inDays: 'tra {n} giorni', tomorrow: 'domani',
   write: 'Scrivi', preview: 'Anteprima', bold: 'Grassetto', italic: 'Corsivo', heading: 'Titolo', bullets: 'Elenco', checks: 'Lista di controllo', quote: 'Citazione', code: 'Codice', link: 'Link', nothingToPreview: 'Niente da mostrare',
+  fromDirectory: 'Dalla rubrica', dirTitle: 'Aggiungi dalla rubrica', dirHint: 'Scegli una persona di questo spazio: diventa un contatto con il suo nome. Aggiungi dopo email e telefono.', dirLabel: 'Persona della rubrica', dirPlaceholder: 'Cerca per nome…', dirClear: 'Cancella', dirNone: 'Nessuno trovato', dirAdd: 'Aggiungi contatto', dirTag: 'team', dirAdded: '{n} aggiunto ai contatti', dirFailed: 'Impossibile aggiungere il contatto: ', dirDenied: 'La rubrica non è disponibile: ',
   failed: 'Impossibile avviare la UI del plugin: ',
 }
 const es: Texts = {
@@ -43,6 +45,7 @@ const es: Texts = {
   sendMail: 'Escribir', call: 'Llamar', noNotes: 'Sin notas.',
   today: '¡hoy!', inDays: 'en {n} días', tomorrow: 'mañana',
   write: 'Escribir', preview: 'Vista previa', bold: 'Negrita', italic: 'Cursiva', heading: 'Título', bullets: 'Lista', checks: 'Lista de control', quote: 'Cita', code: 'Código', link: 'Enlace', nothingToPreview: 'Nada que mostrar',
+  fromDirectory: 'Del directorio', dirTitle: 'Añadir del directorio', dirHint: 'Elige a una persona de este espacio: se convierte en un contacto con su nombre. Añade después el correo y el teléfono.', dirLabel: 'Persona del directorio', dirPlaceholder: 'Buscar por nombre…', dirClear: 'Borrar', dirNone: 'No se encontró a nadie', dirAdd: 'Añadir contacto', dirTag: 'equipo', dirAdded: '{n} añadido a los contactos', dirFailed: 'No se pudo añadir el contacto: ', dirDenied: 'El directorio no está disponible: ',
   failed: 'No se pudo iniciar la interfaz del plugin: ',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins

@@ -79,3 +79,17 @@ describe('CSV', () => {
     expect(parseCsv(csv)[0]).toMatchObject({ name: '=HYPERLINK("x")', phone: '+39 333' })
   })
 })
+
+import { columnsFor, virtualEntries } from './logic.ts'
+describe('virtual entries', () => {
+  it('puts a title row before the contacts of each letter and cuts them in rows of `per`', () => {
+    const groups: [string, number[]][] = [['A', [1, 2, 3]], ['B', [4]]]
+    expect(virtualEntries(groups, 2)).toEqual([{ head: 'A', n: 3 }, { items: [1, 2] }, { items: [3] }, { head: 'B', n: 1 }, { items: [4] }])
+    expect(virtualEntries(groups, 0).length).toBe(6)
+  })
+  it('counts the columns that fit', () => {
+    expect(columnsFor(820, 260, 12)).toBe(3)
+    expect(columnsFor(100, 260, 12)).toBe(1)
+    expect(columnsFor(0, 260, 12)).toBe(1)
+  })
+})
