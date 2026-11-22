@@ -8,7 +8,7 @@ description = "Chat like Microsoft Teams: one-to-one and group chats with presen
 author = "Mosaikit"
 license = "Apache-2.0"
 details = "Talk with your colleagues the way you do in Microsoft Teams: one-to-one chats and group chats, a list with unread counts, pinned and muted chats, people online, who is typing and who has seen your message.\n\nWrite with formatting, mention people with @, mark a message Important or Urgent, reply with a quote, react with an emoji, pin a message, attach files from your device or from Documents and search what was said. The Call and Video buttons start a group call in the chat, and the call stays in the conversation with who joined and how long it lasted.\n\nA chat is private to its participants: it is shared with each of them and anyone in it can add people (with or without the earlier history). The history that a newcomer does not see is hidden by the page, not by the platform. The channels of earlier versions are still there, under Channels.\n\nWhat the plugin asks: to find people of your organisation to chat with (directory), to notify them (notifications), to show the call service (meet.jit.si) with camera and microphone, and to read and add files in Documents for attachments."
-screenshots = ["channel.webp", "channels.webp"]
+screenshots = ["channel.webp", "direct.webp"]
 homepage = "https://example.org/mosaikit/plugins/chat"
 
 [requires]

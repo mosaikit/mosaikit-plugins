@@ -77,7 +77,9 @@ def rc(w, plugin, res, values, parent=None):
     d = {'values': values}
     if parent: d['parent'] = parent
     return w.api('post', f'/p/{P(plugin)}/r/{res}', d)
-def call(w, plugin, name, args=None): return w.api('post', f'/p/{P(plugin)}/call/{name}', args or {})
+def call(w, plugin, name, args=None):
+    r = w.api('post', f'/p/{P(plugin)}/call/{name}', args or {})
+    return r['result'] if isinstance(r, dict) and 'result' in r else r
 def goto(w, plugin, hash='', wait=1800):
     pg = w.page if w.page else w.ctx.new_page(); w.page = pg
     url = f'{B}/#/t/{T}/p/{P(plugin)}' + hash
@@ -181,7 +183,7 @@ def snippets(W):
           ('Welcome email', 'text', 'Hi {name},\n\nWelcome to Northwind Studio! Your account is ready and your first project is waiting for you.\n\nBest regards,\nThe team', ['email']),
           ('API health response', 'json', '{\n  "status": "ok",\n  "version": "2.4.1",\n  "uptime": 86400\n}', ['api'])]
     for t, k, b, tg in ss: rc(w, 'snippets', 'snippets', {'title': t, 'kind': k, 'body': b, 'tags': json.dumps(tg)})
-    pg = goto(w, 'snippets'); fl(pg).get_by_text('Release checklist').first.click(); pg.wait_for_timeout(800); shot(pg, 'snippets', 'list')
+    pg = goto(w, 'snippets'); fl(pg).get_by_text('Debounce helper').first.click(); pg.wait_for_timeout(800); shot(pg, 'snippets', 'list')
     fl(pg).get_by_text('Recent orders by customer').first.click(); pg.wait_for_timeout(800); shot(pg, 'snippets', 'detail')
 
 
@@ -212,7 +214,11 @@ def contacts(W):
           ('Emma Wilson', 'emma.wilson@globex.example', '+44 20 5550 0188', 'Customer', 'Globex', 'Marketing Manager', ['vip']),
           ('Farid Rahimi', 'farid@printworks.example', '+49 30 555 0166', 'Supplier', 'PrintWorks', 'Sales', ['print']),
           ('Grace Okafor', 'grace@okafor-legal.example', '+234 1 555 0102', 'Partner', 'Okafor Legal', 'Lawyer', ['legal']),
-          ('Hugo Silva', 'hugo.silva@northwind.example', '+1 555 0155', 'Internal', 'Northwind Studio', 'Finance', ['team'])]
+          ('Hugo Silva', 'hugo.silva@northwind.example', '+1 555 0155', 'Internal', 'Northwind Studio', 'Finance', ['team']),
+          ('Aiko Tanaka', 'aiko.tanaka@globex.example', '+81 3 5550 0123', 'Customer', 'Globex', 'Product Owner', ['vip']),
+          ('Bianca Rossi', 'bianca@rossi-print.example', '+39 02 555 0171', 'Supplier', 'Rossi Print', 'Account Manager', ['print']),
+          ('Carlos Mendes', 'carlos.mendes@partner.example', '+351 21 555 0190', 'Partner', 'Mendes & Co', 'Architect', ['design']),
+          ('Dana Levi', 'dana.levi@acme.example', '+1 555 0177', 'Customer', 'Acme Corp', 'Operations', ['priority'])]
     for n, e, ph, co, org, job, tg in cs:
         rc(w, 'contacts', 'contacts', {'name': n, 'email': e, 'phone': ph, 'company': co, 'org': org, 'job_title': job, 'tags': ','.join(tg), 'address': '12 Market Street, Springfield', 'notes': 'Met at the spring trade fair. Prefers email, replies within a day.' if n.startswith('Alice') else ''})
     pg = goto(w, 'contacts'); shot(pg, 'contacts', 'book')
@@ -302,7 +308,10 @@ def polls(W):
     w = W['user']
     ps = [('Where should we hold the team day?', ['The lake', 'Mountain hike', 'City food tour', 'Bowling'], False, 'always'),
           ('Which days work for the workshop?', ['Tuesday', 'Wednesday', 'Thursday'], True, 'always'),
-          ('Pick the name of the new product', ['Aurora', 'Beacon', 'Compass'], False, 'after_vote')]
+          ('Pick the name of the new product', ['Aurora', 'Beacon', 'Compass'], False, 'after_vote'),
+          ('Lunch on Friday: pizza or sushi?', ['Pizza', 'Sushi'], False, 'always'),
+          ('Which tool for the weekly demo?', ['Meet', 'In person', 'Recorded video'], False, 'always'),
+          ('Office playlist: who picks the music?', ['Rotating, one person a day', 'A shared playlist', 'No music'], False, 'always')]
     rows = []
     for q, o, m, res in ps:
         r = rc(w, 'polls', 'polls', {'question': q, 'options': json.dumps(o), 'multiple': m, 'results': res, 'closes_on': d(7), 'details': 'Vote before the end of next week.'}); share(w, r, 'read'); rows.append(r)
@@ -310,6 +319,8 @@ def polls(W):
     for i, vs in votes.items():
         for u, c in vs: call(W[u], 'polls', 'polls.vote', {'id': rows[i]['id'], 'choices': c})
     call(w, 'polls', 'polls.vote', {'id': rows[0]['id'], 'choices': [0]})
+    for i, vs in {3: [('maya', [0]), ('luca', [1]), ('priya', [1]), ('tom', [1])], 4: [('sofia', [0]), ('omar', [2])], 5: [('maya', [1]), ('luca', [1]), ('tom', [0]), ('priya', [1]), ('omar', [1])]}.items():
+        for u, c in vs: call(W[u], 'polls', 'polls.vote', {'id': rows[i]['id'], 'choices': c})
     pg = goto(w, 'polls'); shot(pg, 'polls', 'poll')
     fl(pg).get_by_text('Where should we hold the team day?').first.click(); pg.wait_for_timeout(1500); shot(pg, 'polls', 'results')
 
@@ -358,30 +369,52 @@ def projects(W):
 
 
 def chat(W):
+    """Chat 2.0: one-to-one and group chats made by the commands of the plugin, each person writing from their own session."""
     w = W['user']
-    chans = {}
-    for n, t in [('general', 'Everything about the studio'), ('design', 'Design critiques and inspiration'), ('launch-plan', 'Website relaunch, dates and owners'), ('random', 'Coffee, music and memes')]:
-        c = rc(w, 'chat', 'channels', {'name': n, 'topic': t}); share(w, c, 'write'); chans[n] = c
-    ids = {u: uid(w, u) for u in ['maya', 'luca', 'priya', 'tom', 'sofia', 'omar', 'user']}
-    g = chans['launch-plan']['id']
-    script = [('maya', 'Morning all! The new home page mockups are ready for review.'),
-              ('luca', 'Great, I will look at them after the stand-up.'),
-              ('priya', 'Can we move the launch to the 3rd? The copy is not final yet.'),
-              ('user', 'The 3rd works for me. Tom, can you update the plan?'),
-              ('tom', 'Done, the board shows the new date. Review column is almost empty now.'),
-              ('sofia', 'I will test the contact form on mobile this afternoon.'),
-              ('omar', 'Thanks everyone. Reminder: the all-hands is on Thursday at 16:00.')]
-    rows = []
-    for u, t in script:
-        r = rc(W[u], 'chat', 'messages', {'text': t}, parent=g); rows.append(r)
-    rc(W['maya'], 'chat', 'messages', {'text': 'Yes please, I will bring the moodboard too.', 'reply_to': rows[-1]['id']}, parent=g)
-    # reactions are stored by the author of the message in the same field
-    W['tom'].api('put', f"/p/com.mosaikit.chat/r/messages/{rows[3]['id']}", {'values': {'reactions': json.dumps({'👍': [ids['tom'], ids['maya'], ids['sofia']], '🎉': [ids['luca']]})}}) if False else None
-    d2 = chans['design']['id']
+    ids = {u: uid(w, u) for u in ['user'] + [u for u, _ in PEOPLE]}
+    me = 'Elena Novak'
+    names = {**dict(PEOPLE), 'user': me}
+    def direct(a, b):
+        r = call(W[a], 'chat', 'chats.open_direct', {'user': ids[b], 'name': names[b], 'my_name': names[a]})
+        call(W[a], 'chat', 'chats.share_members', {'chat': r['id']})
+        return r['id']
+    def group(creator, name, members):
+        r = call(W[creator], 'chat', 'chats.create_group', {'name': name, 'users': [{'id': ids[u], 'name': names[u]} for u in members], 'my_name': names[creator]})
+        call(W[creator], 'chat', 'chats.share_members', {'chat': r['id']})
+        return r['id']
+    def say(chat, u, text, **kw):
+        r = call(W[u], 'chat', 'chats.send', {'chat': chat, 'text': text, **kw})
+        return r.get('id') or (r.get('message') or {}).get('id')
+    launch = group('user', 'Launch plan', ['maya', 'luca', 'priya', 'tom', 'sofia', 'omar'])
+    m1 = say(launch, 'maya', 'Morning all! The new home page mockups are ready for review.')
+    say(launch, 'luca', 'Great, I will look at them after the stand-up.')
+    m3 = say(launch, 'priya', 'Can we move the launch to the 3rd? The copy is not final yet.')
+    m4 = say(launch, 'user', 'The 3rd works for me. @Tom Becker, can you update the plan?')
+    say(launch, 'tom', 'Done, the board shows the new date. Review column is almost empty now.', reply_to=m4)
+    say(launch, 'sofia', 'I will test the contact form on mobile this afternoon.')
+    m7 = say(launch, 'omar', 'Reminder: the all-hands is on Thursday at 16:00.', importance='important')
+    say(launch, 'maya', 'Yes please, I will bring the moodboard too.', reply_to=m7)
+    for mid, emo, who in [(m1, '👍', ['user', 'tom', 'sofia']), (m4, '🎉', ['luca']), (m3, '👍', ['user'])]:
+        for u in who: call(W[u], 'chat', 'chats.react', {'id': mid, 'emoji': emo})
+    call(w, 'chat', 'chats.pin_message', {'id': m7, 'pinned': True})
+    design = group('priya', 'Design critiques', ['user', 'maya', 'luca'])
     for u, t in [('priya', 'Sharing the new icon set, rounded corners and a 2px stroke.'), ('luca', 'Love it. The stroke weight feels consistent with the type.'), ('maya', 'Can we try it at 16px before we decide?'), ('priya', 'Sure, exporting a test sheet now.')]:
-        rc(W[u], 'chat', 'messages', {'text': t}, parent=d2)
-    pg = goto(w, 'chat'); fl(pg).get_by_text('design').first.click(); pg.wait_for_timeout(1500); shot(pg, 'chat', 'channels')
-    fl(pg).get_by_text('launch-plan').first.click(); pg.wait_for_timeout(1800); shot(pg, 'chat', 'channel')
+        say(design, u, t)
+    cm = direct('maya', 'user')
+    say(cm, 'maya', 'Hi Elena, do you have five minutes to look at the pricing page?')
+    say(cm, 'user', 'Sure, send me the link and I will have a look after lunch.')
+    say(cm, 'maya', 'Perfect. It is the first one in the board, the one with the blue header.')
+    cl = direct('luca', 'user')
+    say(cl, 'luca', 'The client approved the new palette, I am updating the kit now.', importance='important')
+    ct = direct('tom', 'user')
+    say(ct, 'tom', 'Can you review the roadmap before Thursday?')
+    call(w, 'chat', 'chats.settings', {'chat': design, 'muted': True})
+    # a fresh page: the realtime streams of the pages seen before would use up the connections of the browser to the server
+    if w.page: w.page.close(); w.page = None
+    pg = goto(w, 'chat', wait=2500)
+    f = fl(pg)
+    f.get_by_text('Maya Chen').first.click(); pg.wait_for_timeout(4000); shot(pg, 'chat', 'direct')
+    f.get_by_text('Launch plan').first.click(); pg.wait_for_timeout(4000); shot(pg, 'chat', 'channel')
 
 
 def dashboard(W):
@@ -528,7 +561,7 @@ def whiteboard(W):
     w = W['user']; pg = goto(w, 'whiteboard'); f = fl(pg)
     f.get_by_role('button', name=re.compile('New')).first.click(); pg.wait_for_timeout(500)
     f.get_by_placeholder(re.compile('.')).first.fill('Sprint retrospective'); f.get_by_role('button', name=re.compile('Create|OK|Save', re.I)).last.click(); pg.wait_for_timeout(2500)
-    SW = {'yellow': 577, 'orange': 603, 'red': 629, 'pink': 655, 'violet': 681, 'blue': 707, 'green': 733, 'grey': 759}
+    SW = {'yellow': 649, 'orange': 675, 'red': 701, 'pink': 727, 'violet': 753, 'blue': 779, 'green': 805, 'grey': 831}
     TOOL = {'note': 344, 'rect': 380, 'ellipse': 416, 'text': 452, 'arrow': 488}
 
     def make(tool, color, x, y, x2, y2, text=''):
@@ -545,6 +578,12 @@ def whiteboard(W):
     pg.wait_for_timeout(2500)
     shot(pg, 'whiteboard', 'board')
     fl(pg).get_by_role('button', name=re.compile('^$|Back|‹')).first.click() if False else pg.mouse.click(94, 76)
+    # two more boards, so the list looks like a team's and not like a first try
+    for name, col, ns in [('Roadmap 2027', 'violet', ['Mobile app', 'Public API', 'Dark mode']), ('Logo ideas', 'yellow', ['Round and warm', 'Monogram', 'Hand drawn'])]:
+        pg.wait_for_timeout(1500); fl(pg).get_by_role('button', name=re.compile('New')).first.click(); pg.wait_for_timeout(500)
+        fl(pg).get_by_placeholder(re.compile('.')).first.fill(name); fl(pg).get_by_role('button', name=re.compile('Create|OK|Save', re.I)).last.click(); pg.wait_for_timeout(2500)
+        for j, t in enumerate(ns): make('note', col, 150 + j * 200, 250, 150 + j * 200 + 160, 375, t)
+        pg.keyboard.press('Escape'); pg.mouse.click(700, 600); pg.wait_for_timeout(2500); pg.mouse.click(94, 76)
     pg.wait_for_timeout(2500); shot(pg, 'whiteboard', 'list')
 
 
@@ -600,7 +639,7 @@ CAPTIONS = {
     'approvals': {'requests': 'Approvals: the list of requests with their state and approvers', 'decision': 'Approvals: one request, the approvers and what each decided'},
     'bookmarks': {'list': 'Bookmarks: cards with search, tags and favourites', 'edit': 'Bookmarks: the form of a bookmark with its address, note and tags'},
     'calendar': {'month': 'Calendar: the month with events, task due dates and today highlighted', 'invitation': 'Calendar: an event with its invitees and their answers'},
-    'chat': {'channel': 'Chat: a channel with messages, replies and the list of channels', 'channels': 'Chat: another channel of the same team'},
+    'chat': {'channel': 'Chat: a group chat with messages, replies, reactions and the list of chats with their unread counts', 'direct': 'Chat: a one-to-one chat next to the other chats of the person'},
     'contacts': {'book': 'Contacts: the address book as cards with tags', 'contact': 'Contacts: a contact with its details and notes'},
     'dashboard': {'board': 'Dashboard: a board with numbers and lists from the apps', 'edit': 'Dashboard: choosing and ordering the widgets of a board'},
     'files': {'files': 'Documents: folders and files', 'preview': 'Documents: preview of a picture, with sharing'},
@@ -646,6 +685,8 @@ def write(dry):
         for stem in stems:
             (folder / f'{stem}.webp').write_bytes(encode(shots[stem]))
             if dry: (folder / f'{stem}.png').write_bytes(shots[stem])
+            if os.environ.get('SHOTS_PNG_DIR'):
+                (pathlib.Path(os.environ['SHOTS_PNG_DIR']) / f'{plugin}-{stem}.png').write_bytes(shots[stem])
         if dry: continue
         manifest = ROOT / plugin / 'plugin.toml'
         text = manifest.read_text(encoding='utf-8')
@@ -693,7 +734,8 @@ def main():
         for u, _ in PEOPLE: W[u] = Who(browser, u)
         for s in steps:
             print('==', s)
-            globals()[s](W)
+            try: globals()[s](W)
+            except Exception as e: print('STEP FAILED', s, str(e)[:300])
         browser.close()
     write(a.dry_run)
 
