@@ -106,5 +106,6 @@
   "Create the public link": "Criar o link público",
   "This poll has no public link yet. Creating one makes the poll public: anyone who gets the address can see it and vote, without signing in. You can revoke the link from Share…": "Esta enquete ainda não tem link público. Criá-lo torna a enquete pública: quem receber o endereço pode vê-la e votar, sem iniciar sessão. Pode revogar o link em Partilhar…",
   "Public link created": "Link público criado",
-  "A public link already exists, but the platform shows its address only once. Paste the address you saved, or create a new link.": "Já existe um link público, mas a plataforma mostra o endereço só uma vez. Cole o endereço que guardou ou crie um novo link."
+  "A public link already exists, but the platform shows its address only once. Paste the address you saved, or create a new link.": "Já existe um link público, mas a plataforma mostra o endereço só uma vez. Cole o endereço que guardou ou crie um novo link.",
+  "Create a new link": "Criar um novo link"
 }
