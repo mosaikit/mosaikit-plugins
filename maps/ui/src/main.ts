@@ -30,6 +30,7 @@ import { connect, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type
 import { h, errText } from './dom.ts'
 import { followHost, t } from './i18n.ts'
 import { MapFrame, parseProject, type Project } from './mapframe.ts'
+import { thumbOf, type Thumb } from './thumb.ts'
 
 const RESOURCE = 'maps' // name of the resource in the manifest
 
@@ -294,11 +295,58 @@ function mount(msk: Msk) {
     grid.set(shown, null, '')
   }
 
+  // the thumbnails are drawn from the project in the row; one per version of a row, not one per redraw of the table
+  const thumbs = new Map<string, Thumb>()
+  const TW = 104
+  const TH = 68
+  const thumbSvg = (r: Row) => {
+    const key = `${r.id}@${r.updated_at}`
+    let th = thumbs.get(key)
+    if (!th) {
+      th = thumbOf(parseProject(r.values.config), valOf(r, 'name'), TW, TH)
+      thumbs.set(key, th)
+    }
+    const NS = 'http://www.w3.org/2000/svg'
+    const svg = document.createElementNS(NS, 'svg')
+    svg.setAttribute('viewBox', `0 0 ${TW} ${TH}`)
+    svg.setAttribute('class', `mp-thumb${th.generated ? ' generated' : ''}`)
+    svg.setAttribute('aria-hidden', 'true')
+    for (const sh of th.shapes) {
+      if (sh.kind === 'point') {
+        const [x, y] = sh.d.split(' ')
+        const c = document.createElementNS(NS, 'circle')
+        c.setAttribute('cx', x!)
+        c.setAttribute('cy', y!)
+        c.setAttribute('r', th.generated ? '1.8' : '2.2')
+        c.setAttribute('fill', sh.color)
+        svg.append(c)
+        continue
+      }
+      const path = document.createElementNS(NS, 'path')
+      path.setAttribute('d', sh.d)
+      if (sh.kind === 'fill') {
+        path.setAttribute('fill', sh.color)
+        path.setAttribute('fill-opacity', '0.55')
+        path.setAttribute('stroke', sh.color)
+        path.setAttribute('stroke-width', '0.8')
+      } else {
+        path.setAttribute('fill', 'none')
+        path.setAttribute('stroke', sh.color)
+        path.setAttribute('stroke-width', th.generated ? '1.4' : '1.2')
+        path.setAttribute('stroke-linecap', 'round')
+        path.setAttribute('stroke-linejoin', 'round')
+        if (th.generated) path.setAttribute('stroke-opacity', '0.75')
+      }
+      svg.append(path)
+    }
+    return svg
+  }
+
   function nameCell(r: Row) {
-    const box = h('span', {}, valOf(r, 'name'))
-    if (r.shared) box.append(h('span', { class: 'msk-badge acc' }, t('shared')))
-    if (r.my_level === 'read') box.append(h('span', { class: 'msk-badge' }, t('read only')))
-    return box
+    const title = h('span', { class: 'mp-name' }, valOf(r, 'name'))
+    if (r.shared) title.append(h('span', { class: 'msk-badge acc' }, t('shared')))
+    if (r.my_level === 'read') title.append(h('span', { class: 'msk-badge' }, t('read only')))
+    return h('span', { class: 'mp-cell' }, h('span', { class: 'mp-frame' }, thumbSvg(r)), title)
   }
 
   function rowActions(r: Row) {
