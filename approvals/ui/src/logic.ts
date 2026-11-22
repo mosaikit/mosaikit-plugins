@@ -114,3 +114,31 @@ export interface ChangeEntry {
   added: string[]
   removed: string[]
 }
+
+// ------------------------------------------------------------------------------------------------ the inbox (list + pane)
+
+/** The request the arrows move to: one up (-1) or down (1) in the list on screen; nothing selected starts at the first. */
+export function stepSelection(ids: string[], current: string | null, dir: -1 | 1): string | null {
+  if (!ids.length) return null
+  const i = current ? ids.indexOf(current) : -1
+  if (i < 0) return ids[dir === 1 ? 0 : ids.length - 1]!
+  return ids[Math.min(ids.length - 1, Math.max(0, i + dir))]!
+}
+
+/** What stays selected when the list changes (a tab, a decision, a refresh): the same request if it is still there; on a wide screen the
+ *  first one otherwise (an inbox always shows something); on a narrow screen nothing, so the list is what the person sees. */
+export function keepSelection(ids: string[], current: string | null, wide: boolean): string | null {
+  if (current && ids.includes(current)) return current
+  return wide && ids.length ? ids[0]! : null
+}
+
+/** How many approvers have decided out of how many: `2 / 3`. */
+export function progressOf(list: Pick<ApproverView, 'verdict'>[]): { done: number; total: number } {
+  return { done: list.filter((a) => a.verdict !== null).length, total: list.length }
+}
+
+/** The key that decides in the pane: `a` approves, `r` rejects (which asks for the reason), only for the person whose turn it is. */
+export function decisionKey(key: string, canDecide: boolean): 'approved' | 'rejected' | null {
+  if (!canDecide) return null
+  return key === 'a' ? 'approved' : key === 'r' ? 'rejected' : null
+}

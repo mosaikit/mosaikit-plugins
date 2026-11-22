@@ -13,6 +13,7 @@ import {
   errText,
   personPicker,
   segmented,
+  shortcuts,
   skeleton,
   toast,
   type Msk,
@@ -26,8 +27,12 @@ import {
   removable,
   type ChangeEntry,
   approversJson,
+  decisionKey,
   inTab,
+  keepSelection,
   listOrder,
+  progressOf,
+  stepSelection,
   markOf,
   modeOf,
   moveApprover,
@@ -70,7 +75,10 @@ function mount(msk: Msk) {
   const me = msk.user?.id ?? ''
   let items: Item[] = []
   let tab: Tab = 'todo'
-  let redrawDetail: (() => void) | null = null
+  let selected: string | null = null
+  let chan: RealtimeChannel | null = null
+  let decideFromKey: ((v: 'approved' | 'rejected') => void) | null = null
+  const wide = () => !window.matchMedia('(max-width: 820px)').matches
 
   const fail = (e: unknown) => toast(errText(e, msk.context?.lang), { tone: 'err', ms: 6000 })
   const head = el('header', { class: 'apr-head' })
@@ -106,32 +114,6 @@ function mount(msk: Msk) {
 
   const verdictText = (it: Item, a: ApproverView) =>
     a.verdict === 'approved' ? tr().approved : a.verdict === 'rejected' ? tr().rejected : it.state === 'pending' ? (a.waiting ? tr().vWaiting : tr().vLater) : tr().vNone
-
-  /** The approvers as avatars with a mark and the verdict in words (read by screen readers, not drawn). */
-  const people = (it: Item) => {
-    const ul = el('ul', { class: 'apr-people', 'aria-label': tr().approversTitle })
-    for (const a of it.approvers) {
-      const m = markOf(a)
-      ul.append(
-        el(
-          'li',
-          { class: 'apr-ap' },
-          el('span', { class: 'apr-avwrap' }, avatar(a.name), el('span', { class: `apr-mark ${m.kind}`, 'aria-hidden': 'true' }, m.mark)),
-          el('span', {}, a.name),
-          el('span', { class: 'apr-sr' }, `: ${verdictText(it, a)}`),
-        ),
-      )
-    }
-    return ul
-  }
-
-  const commentsOf = (it: Item) => {
-    const withText = it.approvers.filter((a) => a.verdict && a.comment)
-    if (!withText.length) return null
-    const ul = el('ul', { class: 'apr-comments' })
-    for (const a of withText) ul.append(el('li', {}, el('strong', {}, a.name), el('span', {}, ' · ' + a.comment)))
-    return ul
-  }
 
   const metaOf = (it: Item) =>
     [sub(tr().by, { n: it.row.owner_name }), stamp(it.createdAt), it.amount ? sub(tr().amountIs, { a: it.amount }) : '', it.state === 'pending' ? sub(tr().waitingFor, { n: waitingNames(it.approvers).join(', ') }) : '']
@@ -447,108 +429,135 @@ function mount(msk: Msk) {
     }
   }
 
-  // ------------------------------------------------------------------------------------------------------------ detail
-  const openDetail = (first: Item) => {
-    const id = first.id
-    const box = el('div', { class: 'apr-detail' })
-    const close = el('button', { type: 'button', class: 'msk-btn' }, tr().close)
-    let chan: RealtimeChannel | null = null
-    try {
-      chan = msk.realtime.open({ resource: id, name: 'status', state: {} })
-      chan.onMessage(() => void load())
-    } catch {
-      chan = null
+  // --------------------------------------------------------------------------------------------------- the pane (detail)
+  const select = (id: string | null) => {
+    if (id === selected) return
+    chan?.close()
+    chan = null
+    selected = id
+    if (id) {
+      try {
+        chan = msk.realtime.open({ resource: id, name: 'status', state: {} })
+        chan.onMessage(() => void load())
+      } catch {
+        chan = null
+      }
     }
-    const d = dialog({
-      title: first.title,
-      body: box,
-      actions: [close],
-      onClose: () => {
-        chan?.close()
-        redrawDetail = null
-      },
-    })
-    close.addEventListener('click', d.close)
-    const render = () => {
-      const it = items.find((x) => x.id === id)
-      if (!it) return d.close()
-      box.replaceChildren()
-      box.append(
-        el('div', { class: 'apr-chips' }, stateChip(it.state), el('span', { class: 'msk-badge' }, it.mode === 'any' ? tr().modeAny : it.mode === 'sequence' ? tr().modeSeq : tr().modeAll)),
-        el('p', { class: 'apr-meta' }, metaOf(it)),
-        el('h4', {}, tr().detailsTitle),
-        it.details.trim() ? el('p', { class: 'apr-text' }, it.details) : el('p', { class: 'apr-dim' }, tr().noDetails),
-      )
-      const mine = it.approvers.find((a) => a.id === me)
-      if (mine?.waiting && it.state === 'pending') {
-        const label = el('label', { for: 'apr-comment' }, tr().comment)
-        const comment = el('textarea', { id: 'apr-comment', rows: '3', maxlength: '1000' })
-        const yes = el('button', { type: 'button', class: 'msk-btn' }, tr().approve)
-        const no = el('button', { type: 'button', class: 'msk-btn ghost danger-text' }, tr().reject)
-        const go = async (v: 'approved' | 'rejected') => {
-          yes.disabled = no.disabled = true
-          const done = await decide(it, v, comment.value, chan)
-          if (!done) yes.disabled = no.disabled = false
-          if (!done && v === 'rejected' && !comment.value.trim()) comment.focus()
+    draw()
+    if (id && !wide()) body.querySelector<HTMLElement>('.apr-pane')?.focus()
+  }
+
+  const renderPane = (pane: HTMLElement) => {
+    decideFromKey = null
+    const it = items.find((x) => x.id === selected)
+    if (!it) {
+      pane.append(emptyState({ art: 'approvals', title: tr().pickOne, text: tr().pickOneText }))
+      return
+    }
+    // on a wide screen the inbox always shows a request; the back button is for the narrow screen, where the pane replaces the list
+    const close = el('button', { type: 'button', class: 'msk-btn ghost mini apr-close' }, tr().back)
+    close.addEventListener('click', () => select(null))
+    close.hidden = wide()
+    const p = progressOf(it.approvers)
+    pane.append(
+      el('div', { class: 'apr-pane-top' }, close, el('h2', {}, it.title)),
+      el(
+        'div',
+        { class: 'apr-chips' },
+        stateChip(it.state),
+        el('span', { class: 'msk-badge' }, it.mode === 'any' ? tr().modeAny : it.mode === 'sequence' ? tr().modeSeq : tr().modeAll),
+        p.total ? el('span', { class: 'apr-prog' }, sub(tr().progress, { d: p.done, n: p.total })) : '',
+      ),
+      el('p', { class: 'apr-meta' }, metaOf(it)),
+      el('h4', {}, tr().detailsTitle),
+      it.details.trim() ? el('p', { class: 'apr-text' }, it.details) : el('p', { class: 'apr-dim' }, tr().noDetails),
+    )
+    const mine = it.approvers.find((a) => a.id === me)
+    if (mine?.waiting && it.state === 'pending') {
+      const label = el('label', { for: 'apr-comment' }, tr().comment)
+      const comment = el('textarea', { id: 'apr-comment', rows: '3', maxlength: '1000' })
+      const yes = el('button', { type: 'button', class: 'msk-btn' }, tr().approve)
+      const no = el('button', { type: 'button', class: 'msk-btn ghost danger-text' }, tr().reject)
+      const go = async (v: 'approved' | 'rejected') => {
+        yes.disabled = no.disabled = true
+        const done = await decide(it, v, comment.value, chan)
+        if (!done) yes.disabled = no.disabled = false
+        if (!done && v === 'rejected' && !comment.value.trim()) comment.focus()
+      }
+      yes.addEventListener('click', () => void go('approved'))
+      no.addEventListener('click', () => void go('rejected'))
+      // the keys: `a` approves; `r` rejects, and asks for the reason first when the comment is empty
+      decideFromKey = (v) => {
+        if (v === 'approved') yes.click()
+        else if (comment.value.trim()) no.click()
+        else {
+          comment.focus()
+          toast(tr().needReason, { tone: 'err' })
         }
-        yes.addEventListener('click', () => void go('approved'))
-        no.addEventListener('click', () => void go('rejected'))
-        box.append(
+      }
+      pane.append(
+        el(
+          'div',
+          { class: 'apr-decision' },
+          el('strong', {}, tr().yourTurn),
+          label,
+          comment,
+          el('p', { class: 'apr-dim' }, tr().commentHint + ' ' + tr().decisionFinal),
+          el('div', { class: 'apr-acts' }, yes, no),
+        ),
+      )
+    }
+    pane.append(el('h4', {}, tr().history))
+    const hist = el('ul', { class: 'apr-hist' })
+    it.approvers.forEach((a, i) => {
+      const m = markOf(a)
+      hist.append(
+        el(
+          'li',
+          {},
+          el('span', { class: 'apr-avwrap' }, avatar(a.name), el('span', { class: `apr-mark ${m.kind}`, 'aria-hidden': 'true' }, m.mark)),
           el(
             'div',
-            { class: 'apr-decision' },
-            el('strong', {}, tr().yourTurn),
-            label,
-            comment,
-            el('p', { class: 'apr-dim' }, tr().commentHint + ' ' + tr().decisionFinal),
-            el('div', { class: 'apr-acts' }, yes, no),
-          ),
-        )
-      }
-      box.append(el('h4', {}, tr().history))
-      const hist = el('ul', { class: 'apr-hist' })
-      it.approvers.forEach((a, i) => {
-        const m = markOf(a)
-        hist.append(
-          el(
-            'li',
             {},
-            el('span', { class: 'apr-avwrap' }, avatar(a.name), el('span', { class: `apr-mark ${m.kind}`, 'aria-hidden': 'true' }, m.mark)),
-            el(
-              'div',
-              {},
-              el('p', {}, el('strong', {}, `${it.mode === 'sequence' ? `${i + 1}. ` : ''}${a.name}`), ` · ${verdictText(it, a)}`),
-              a.decided_at ? el('p', { class: 'apr-dim' }, stamp(a.decided_at)) : '',
-              a.comment ? el('p', {}, a.comment) : '',
-            ),
+            el('p', {}, el('strong', {}, `${it.mode === 'sequence' ? `${i + 1}. ` : ''}${a.name}`), ` · ${verdictText(it, a)}`),
+            a.decided_at ? el('p', { class: 'apr-dim' }, stamp(a.decided_at)) : '',
+            a.comment ? el('p', {}, a.comment) : '',
           ),
-        )
-      })
-      box.append(hist)
-      const log = el('div', {})
-      box.append(log)
-      void changeLog(it.id, log)
-      const acts = ownerActions(it, d.close)
-      if (acts.length) box.append(el('div', { class: 'apr-acts' }, ...acts))
-    }
-    redrawDetail = render
-    render()
+        ),
+      )
+    })
+    pane.append(hist)
+    const log = el('div', {})
+    pane.append(log)
+    void changeLog(it.id, log)
+    const acts = ownerActions(it, () => select(null))
+    if (acts.length) pane.append(el('div', { class: 'apr-acts' }, ...acts))
   }
 
   // -------------------------------------------------------------------------------------------------------------- list
-  const card = (it: Item) => {
-    const open = el('button', { type: 'button' }, it.title)
-    open.addEventListener('click', () => openDetail(it))
-    const c = el('article', { class: 'apr-card', 'data-testid': 'request' }, el('div', { class: 'apr-chips' }, stateChip(it.state)), el('h2', {}, open), el('p', { class: 'apr-meta' }, metaOf(it)), people(it))
-    const comments = commentsOf(it)
-    if (comments) c.append(comments)
-    const acts = el('div', { class: 'apr-acts' })
-    if (it.todo) acts.append(el('span', { class: 'apr-turn' }, tr().yourTurn))
-    const view = el('button', { type: 'button', class: it.todo ? 'msk-btn' : 'msk-btn ghost mini' }, tr().open)
-    view.addEventListener('click', () => openDetail(it))
-    acts.append(view)
-    c.append(acts)
-    return c
+  /** One request in the list: the state and whose turn it is, the title, who and when, and the approvers as avatars. */
+  const row = (it: Item) => {
+    const open = el('button', { type: 'button', class: 'apr-rowbtn', 'aria-current': it.id === selected ? 'true' : 'false' }, it.title)
+    open.addEventListener('click', () => select(it.id))
+    const strip = el('ul', { class: 'apr-strip', 'aria-label': tr().approversTitle })
+    for (const a of it.approvers) {
+      const m = markOf(a)
+      strip.append(
+        el(
+          'li',
+          { class: 'apr-ap', title: a.name },
+          el('span', { class: 'apr-avwrap' }, avatar(a.name), el('span', { class: `apr-mark ${m.kind}`, 'aria-hidden': 'true' }, m.mark)),
+          el('span', { class: 'apr-sr' }, `${a.name}: ${verdictText(it, a)}`),
+        ),
+      )
+    }
+    const top = el('div', { class: 'apr-rowtop' }, stateChip(it.state))
+    if (it.todo) top.append(el('span', { class: 'apr-turn' }, tr().yourTurn))
+    const r = el('article', { class: `apr-row s-${it.state}${it.id === selected ? ' sel' : ''}${it.todo ? ' todo' : ''}`, 'data-testid': 'request', 'data-id': it.id }, top, el('h3', {}, open), el('p', { class: 'apr-meta' }, metaOf(it)), strip)
+    r.addEventListener('click', (ev) => {
+      if (!(ev.target as HTMLElement).closest('button')) select(it.id)
+    })
+    return r
   }
 
   const draw = () => {
@@ -573,6 +582,7 @@ function mount(msk: Msk) {
     add.hidden = !msk.can('create')
     head.append(el('span', { class: 'apr-spacer' }), seg.el, add)
     body.replaceChildren()
+    decideFromKey = null
     const action = () => (msk.can('create') ? [Object.assign(el('button', { type: 'button', class: 'msk-btn' }, tr().newRequest), { onclick: newRequest })] : [])
     if (!items.length) {
       body.append(emptyState({ art: 'approvals', title: tr().emptyTitle, text: tr().emptyText, actions: action() }))
@@ -587,9 +597,30 @@ function mount(msk: Msk) {
       )
       return
     }
-    const feed = el('div', { class: 'apr-feed' })
-    for (const it of shown) feed.append(card(it))
-    body.append(feed)
+    // the open request stays open while it is in the list; on a wide screen there is always one
+    const keep = keepSelection(
+      shown.map((x) => x.id),
+      selected,
+      wide(),
+    )
+    if (keep !== selected) {
+      chan?.close()
+      chan = null
+      selected = keep
+      if (keep) {
+        try {
+          chan = msk.realtime.open({ resource: keep, name: 'status', state: {} })
+          chan.onMessage(() => void load())
+        } catch {
+          chan = null
+        }
+      }
+    }
+    const feed = el('div', { class: 'apr-feed', role: 'list', 'aria-label': tr().list })
+    for (const it of shown) feed.append(row(it))
+    const pane = el('section', { class: 'apr-pane', 'data-testid': 'detail', tabindex: '-1', 'aria-label': tr().detailsTitle })
+    renderPane(pane)
+    body.append(el('div', { class: `apr-split${selected ? ' has-sel' : ''}` }, feed, pane))
   }
 
   const load = async () => {
@@ -609,7 +640,6 @@ function mount(msk: Msk) {
       return
     }
     draw()
-    redrawDetail?.()
   }
 
   msk.onContext((ctx) => {
@@ -617,6 +647,27 @@ function mount(msk: Msk) {
     lang = langOf(ctx.lang)
     draw()
   })
+  // keyboard: j/k (or the arrows) walk the list, a approves and r rejects when it is your turn, n starts a request
+  const visibleIds = () => listOrder(inTab(items, tab, me)).map((x) => x.id)
+  const walk = (dir: -1 | 1) => {
+    const next = stepSelection(visibleIds(), selected, dir)
+    if (next) {
+      select(next)
+      body.querySelector<HTMLElement>('.apr-row.sel .apr-rowbtn')?.focus()
+    }
+  }
+  shortcuts(
+    [
+      { keys: 'n', label: tr().shNew, group: tr().shGroup, run: () => msk.can('create') && newRequest() },
+      { keys: 'j', label: tr().shNext, group: tr().shGroup, run: () => walk(1) },
+      { keys: 'k', label: tr().shPrev, group: tr().shGroup, run: () => walk(-1) },
+      { keys: 'a', label: tr().shApprove, group: tr().shGroup, run: () => decisionKey('a', !!decideFromKey) && decideFromKey?.('approved'), when: () => !!decideFromKey },
+      { keys: 'r', label: tr().shReject, group: tr().shGroup, run: () => decisionKey('r', !!decideFromKey) && decideFromKey?.('rejected'), when: () => !!decideFromKey },
+      { keys: 'escape', label: tr().closePane, group: tr().shGroup, run: () => select(null), when: () => !!selected && !wide() },
+    ],
+    { labels: { title: tr().shHelp, close: tr().shClose } },
+  )
+
   void msk.loading(load())
 }
 
