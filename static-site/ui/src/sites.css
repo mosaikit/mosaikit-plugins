@@ -75,3 +75,31 @@
 .msks.show .editbar { margin: 0; padding: 8px 24px; min-height: 57px; box-sizing: border-box; border-bottom: 1px solid var(--line); background: var(--bg); font-family: var(--msk-font, var(--font-ui)); }
 .msks.show .sv-title { font-size: 16px; font-weight: 600; line-height: 24px; }
 @media (max-width: 640px) { .msks.show .editbar { padding: 8px 16px; } }
+
+/* ---- the drop zone and the report of the zip: it reacts to the drag, and says what it found before anything is uploaded ---- */
+.msks .frow label.drop { position: relative; padding: 30px 16px 26px; border: 0; border-radius: 16px; background: var(--panel2); isolation: isolate; transition: background 0.2s, transform 0.2s var(--ease, ease); }
+.msks .drop::before { content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: -1; padding: 2px; background: repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px) top / 100% 2px no-repeat, repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px) bottom / 100% 2px no-repeat, repeating-linear-gradient(0deg, var(--line) 0 8px, transparent 8px 14px) left / 2px 100% no-repeat, repeating-linear-gradient(0deg, var(--line) 0 8px, transparent 8px 14px) right / 2px 100% no-repeat; transition: background 0.2s; }
+.msks .drop:hover::before, .msks .drop.over::before { background: repeating-linear-gradient(90deg, var(--acc) 0 8px, transparent 8px 14px) top / 100% 2px no-repeat, repeating-linear-gradient(90deg, var(--acc) 0 8px, transparent 8px 14px) bottom / 100% 2px no-repeat, repeating-linear-gradient(0deg, var(--acc) 0 8px, transparent 8px 14px) left / 2px 100% no-repeat, repeating-linear-gradient(0deg, var(--acc) 0 8px, transparent 8px 14px) right / 2px 100% no-repeat; }
+.msks .drop.over { transform: scale(1.012); }
+.msks .drop .big { font-size: 34px; transition: transform 0.25s var(--ease, ease); }
+.msks .drop.over .big { transform: translateY(-4px) scale(1.12); }
+.msks .drop.has .big { filter: none; }
+.msks .zrep { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; animation: zr-in 0.25s var(--ease, ease) both; }
+.msks .zr-head { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+.msks .zr-mark { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; flex: none; color: #fff; }
+.msks .zr-head.ok .zr-mark { background: var(--ok); }
+.msks .zr-head.bad .zr-mark { background: var(--err); }
+.msks .zr-head.bad { color: var(--err); }
+.msks .zr-line { margin: 0; font-size: 12px; color: var(--dim); }
+.msks .zr-line.warn::before { content: '▲ '; color: #d19a1f; }
+.msks .zr-line.bad { color: var(--err); }
+.msks .zr-top { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.msks .zr-top li { display: grid; grid-template-columns: minmax(70px, 28%) 1fr auto; gap: 10px; align-items: center; font-size: 12px; }
+.msks .zr-name { font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msks .zr-bar { height: 6px; border-radius: 99px; background: var(--panel2); overflow: hidden; }
+.msks .zr-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, color-mix(in srgb, var(--acc) 60%, var(--panel)), var(--acc)); animation: zr-grow 0.5s var(--ease, ease) both; transform-origin: left; }
+.msks .zr-size { color: var(--dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+@keyframes zr-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes zr-grow { from { transform: scaleX(0); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .msks .drop, .msks .drop .big, .msks .zrep, .msks .zr-bar i { animation: none; transition: none; } .msks .drop.over, .msks .drop.over .big { transform: none; } }
+@media (max-width: 640px) { .msks .zr-top li { grid-template-columns: minmax(60px, 34%) 1fr; } .msks .zr-size { grid-column: 1 / -1; } }
