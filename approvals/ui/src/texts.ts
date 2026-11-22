@@ -1,6 +1,7 @@
 import type { Msk } from '@mosaikit/plugin-api'
 // The texts of the Approvals UI (English by default; Italian and Spanish follow the language of the host).
 const en = {
+  pickOne: 'Pick a request', pickOneText: 'Choose a request in the list to read it and decide.', back: '← Requests', closePane: 'Close', progress: '{d} of {n} decided', list: 'Requests', shNew: 'New request', shNext: 'Next request', shPrev: 'Previous request', shApprove: 'Approve', shReject: 'Reject (asks for the reason)', shGroup: 'Approvals', shHelp: 'Keyboard shortcuts', shClose: 'Close',
   title: 'Approvals', newRequest: '＋ New request', toDecide: 'To decide', mine: 'My requests', all: 'All', filter: 'Show', badge: '{n} to decide',
   emptyTitle: 'No requests yet', emptyText: 'Write a request, choose who must approve it and share it with them.',
   emptyTodoTitle: 'Nothing to decide', emptyTodoText: 'When somebody asks for your approval, it shows up here.',
@@ -28,6 +29,7 @@ export type Texts = typeof en
 export type L = string
 
 const it: Texts = {
+  pickOne: 'Scegli una richiesta', pickOneText: 'Scegli una richiesta dall’elenco per leggerla e decidere.', back: '← Richieste', closePane: 'Chiudi', progress: '{d} su {n} hanno deciso', list: 'Richieste', shNew: 'Nuova richiesta', shNext: 'Richiesta successiva', shPrev: 'Richiesta precedente', shApprove: 'Approva', shReject: 'Rifiuta (chiede il motivo)', shGroup: 'Approvazioni', shHelp: 'Scorciatoie da tastiera', shClose: 'Chiudi',
   title: 'Approvazioni', newRequest: '＋ Nuova richiesta', toDecide: 'Da decidere', mine: 'Le mie richieste', all: 'Tutte', filter: 'Mostra', badge: '{n} da decidere',
   emptyTitle: 'Ancora nessuna richiesta', emptyText: 'Scrivi una richiesta, scegli chi deve approvarla e condividila con loro.',
   emptyTodoTitle: 'Niente da decidere', emptyTodoText: 'Quando qualcuno chiede la tua approvazione, la trovi qui.',
@@ -52,6 +54,7 @@ const it: Texts = {
   close: 'Chiudi', failed: 'Impossibile avviare la UI del plugin: ', loadFailed: 'Impossibile caricare le richieste: ',
 }
 const es: Texts = {
+  pickOne: 'Elige una solicitud', pickOneText: 'Elige una solicitud de la lista para leerla y decidir.', back: '← Solicitudes', closePane: 'Cerrar', progress: '{d} de {n} han decidido', list: 'Solicitudes', shNew: 'Nueva solicitud', shNext: 'Solicitud siguiente', shPrev: 'Solicitud anterior', shApprove: 'Aprobar', shReject: 'Rechazar (pide el motivo)', shGroup: 'Aprobaciones', shHelp: 'Atajos de teclado', shClose: 'Cerrar',
   title: 'Aprobaciones', newRequest: '＋ Nueva solicitud', toDecide: 'Por decidir', mine: 'Mis solicitudes', all: 'Todas', filter: 'Mostrar', badge: '{n} por decidir',
   emptyTitle: 'Todavía no hay solicitudes', emptyText: 'Escribe una solicitud, elige quién debe aprobarla y compártela con esas personas.',
   emptyTodoTitle: 'Nada por decidir', emptyTodoText: 'Cuando alguien pida tu aprobación, aparecerá aquí.',

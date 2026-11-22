@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canChangeApprovers, canMove, removable, addApprover, approversJson, inTab, listOrder, markOf, modeOf, moveApprover, removeApprover, stateOf, todoCount, waitingNames, type ApproverView, type ItemLike } from './logic.ts'
+import { canChangeApprovers, canMove, removable, addApprover, approversJson, inTab, listOrder, markOf, modeOf, moveApprover, removeApprover, stateOf, todoCount, waitingNames, type ApproverView, type ItemLike, decisionKey, keepSelection, progressOf, stepSelection } from './logic.ts'
 
 const i = (id: string, state: ItemLike['state'], o: Partial<ItemLike> = {}): ItemLike => ({ id, ownerId: 'u1', state, todo: false, createdAt: '2026-05-01T10:00:00Z', ...o })
 const p = (n: string) => ({ id: `id-${n}`, name: n })
@@ -84,5 +84,33 @@ describe('changing the approvers', () => {
     expect(canMove(list, 'b', 1)).toBe(true)
     expect(canMove(list, 'c', 1)).toBe(false)
     expect(canMove(list, 'a', 1)).toBe(false)
+  })
+})
+
+describe('the inbox', () => {
+  it('moves the selection with the arrows and stops at the ends', () => {
+    expect(stepSelection(['a', 'b', 'c'], 'a', 1)).toBe('b')
+    expect(stepSelection(['a', 'b', 'c'], 'c', 1)).toBe('c')
+    expect(stepSelection(['a', 'b', 'c'], 'a', -1)).toBe('a')
+    expect(stepSelection(['a', 'b', 'c'], null, 1)).toBe('a')
+    expect(stepSelection(['a', 'b', 'c'], null, -1)).toBe('c')
+    expect(stepSelection(['a', 'b', 'c'], 'gone', 1)).toBe('a')
+    expect(stepSelection([], 'a', 1)).toBeNull()
+  })
+  it('keeps the request selected, or the first one on a wide screen', () => {
+    expect(keepSelection(['a', 'b'], 'b', true)).toBe('b')
+    expect(keepSelection(['a', 'b'], 'x', true)).toBe('a')
+    expect(keepSelection(['a', 'b'], 'x', false)).toBeNull()
+    expect(keepSelection([], 'x', true)).toBeNull()
+  })
+  it('counts the decisions', () => {
+    expect(progressOf([{ verdict: 'approved' }, { verdict: null }, { verdict: 'rejected' }])).toEqual({ done: 2, total: 3 })
+    expect(progressOf([])).toEqual({ done: 0, total: 0 })
+  })
+  it('lets only the person whose turn it is decide with a key', () => {
+    expect(decisionKey('a', true)).toBe('approved')
+    expect(decisionKey('r', true)).toBe('rejected')
+    expect(decisionKey('x', true)).toBeNull()
+    expect(decisionKey('a', false)).toBeNull()
   })
 })
