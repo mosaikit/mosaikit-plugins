@@ -42,7 +42,7 @@
 /* cards and thumbnails */
 .msks .layoutswitch { display: inline-flex; gap: 4px; }
 .msks .layoutswitch .msk-btn.on { border-color: var(--acc-line); color: var(--acc); background: var(--acc-soft); }
-.msks .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 12px; }
+.msks .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 12px; }
 .msks .card { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
 .msks .card:hover { border-color: var(--acc-line); }
 .msks .cardthumb { display: block; padding: 0; border: 0; background: var(--panel2); cursor: pointer; aspect-ratio: 16 / 10; width: 100%; }
@@ -55,7 +55,8 @@
 .msks .cardname a.open { color: var(--fg); text-decoration: none; }
 .msks .carddesc { margin: 0 0 6px; font-size: 12.5px; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
 .msks .cardmeta { margin: 0 0 6px; font-size: 11px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.msks .card .rowacts { padding: 8px 12px 12px; white-space: normal; width: auto; }
+.msks .card .rowacts { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px 12px; white-space: normal; width: auto; }
+.msks .card .rowacts .msk-btn { margin-right: 0; padding-inline: 8px; }
 .msks .empty { color: var(--dim); padding: 18px 4px; }
 .msks td.thumbcell { width: 1%; padding-right: 0; }
 .msks .thumbsm { display: block; width: 56px; height: 36px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); }
