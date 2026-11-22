@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { boardWidgets, chosenKeys, columnsOf, defaultKeys, editorOrder, gridColumns, keepBoard, keyOf, moveItem, parseKeys, shouldRefresh, textsFor, toneOf } from './logic.ts'
+import { boardWidgets, categoryName, chartEmpty, chartTotal, chosenKeys, deltaOf, sparkPoints, columnsOf, defaultKeys, editorOrder, gridColumns, keepBoard, keyOf, moveItem, parseKeys, shouldRefresh, textsFor, toneOf } from './logic.ts'
 
 const w = (plugin: string, id: string, label: string | null = null, texts?: Record<string, { label?: string; secondary?: string; empty?: string }>) => ({
   plugin,
@@ -25,11 +25,11 @@ describe('parseKeys', () => {
 describe('textsFor', () => {
   const x = w('p', 'a', 'Open tasks', { it: { label: 'Attività aperte', secondary: 'in ritardo' }, en: { secondary: 'overdue', empty: 'Nothing open' } })
   it('takes the language of the person', () => {
-    expect(textsFor(x, 'it')).toEqual({ label: 'Attività aperte', secondary: 'in ritardo', empty: 'Nothing open' })
+    expect(textsFor(x, 'it')).toEqual({ label: 'Attività aperte', secondary: 'in ritardo', empty: 'Nothing open', categories: {} })
   })
   it('falls back to English, then to the label of the contribution', () => {
-    expect(textsFor(x, 'es')).toEqual({ label: 'Open tasks', secondary: 'overdue', empty: 'Nothing open' })
-    expect(textsFor(w('p', 'b', 'Recent notes'), 'es')).toEqual({ label: 'Recent notes', secondary: '', empty: '' })
+    expect(textsFor(x, 'es')).toEqual({ label: 'Open tasks', secondary: 'overdue', empty: 'Nothing open', categories: {} })
+    expect(textsFor(w('p', 'b', 'Recent notes'), 'es')).toEqual({ label: 'Recent notes', secondary: '', empty: '', categories: {} })
     expect(textsFor(w('p', 'c'), 'en').label).toBe('')
   })
 })
@@ -79,5 +79,35 @@ describe('small rules', () => {
     expect(keepBoard(['a', 'b'], 'b')).toBe('b')
     expect(keepBoard(['a', 'b'], 'z')).toBe('a')
     expect(keepBoard([], 'z')).toBeNull()
+  })
+})
+
+describe('charts', () => {
+  it('names a date in the language and a key from the texts', () => {
+    expect(categoryName('2026-11-03', {}, 'en')).toMatch(/Nov/)
+    expect(categoryName('2026-11-03', {}, 'it')).toMatch(/nov/)
+    expect(categoryName('high', { high: 'Alta' }, 'it')).toBe('Alta')
+    expect(categoryName('other', { high: 'Alta' }, 'it')).toBe('other')
+  })
+  it('totals the first series and knows an empty chart', () => {
+    const r = { type: 'bar' as const, categories: ['a', 'b'], series: [{ name: 'x', data: [2, 3] }] }
+    expect(chartTotal(r)).toBe(5)
+    expect(chartEmpty(r)).toBe(false)
+    expect(chartEmpty({ ...r, series: [{ name: 'x', data: [0, 0] }] })).toBe(true)
+    expect(chartEmpty({ ...r, categories: [] })).toBe(true)
+  })
+  it('draws a sparkline from low to high, flat in the middle', () => {
+    const p = sparkPoints([0, 5, 10], 100, 20, 2)
+    expect(p[0]).toEqual({ x: 2, y: 18 })
+    expect(p[2]).toEqual({ x: 98, y: 2 })
+    expect(sparkPoints([3, 3], 100, 20)[0]!.y).toBe(10)
+    expect(sparkPoints([1], 100, 20)).toEqual([])
+  })
+  it('compares a number with the one before', () => {
+    expect(deltaOf(12, 10)).toEqual({ pct: 20, dir: 'up' })
+    expect(deltaOf(5, 10)).toEqual({ pct: -50, dir: 'down' })
+    expect(deltaOf(10, 10)?.dir).toBe('flat')
+    expect(deltaOf(3, 0)).toBeNull()
+    expect(deltaOf(3, null)).toBeNull()
   })
 })

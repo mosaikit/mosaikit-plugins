@@ -9,6 +9,8 @@ export interface WidgetTexts {
   label?: string
   secondary?: string
   empty?: string
+  /** names of the categories and series of a chart: `high` -> `Alta` */
+  categories?: Record<string, string>
 }
 export interface WidgetData {
   command?: string
@@ -20,6 +22,13 @@ export interface NumberResult {
   value: number
   secondary: number | null
   tone: Tone
+  /** a few numbers over time, drawn as a sparkline */
+  trend?: number[]
+}
+export interface ChartResult {
+  type: 'line' | 'bar' | 'pie'
+  categories: string[]
+  series: { name: string; data: number[] }[]
 }
 export interface ListItem {
   id: string | null
@@ -37,7 +46,7 @@ export interface Widget {
   id: string
   label: string | null
   data: WidgetData
-  result?: NumberResult | ListResult
+  result?: NumberResult | ListResult | ChartResult
   error?: string
 }
 
@@ -67,8 +76,8 @@ export const toneOf = (v: unknown): Tone => (v === 'ok' || v === 'warn' || v ===
 /** The texts of a widget in `lang`, the English ones when a text is missing there, the label of the contribution last. */
 export function textsFor(w: Pick<Widget, 'label' | 'data'>, lang: Lang): Required<WidgetTexts> {
   const all = w.data?.texts ?? {}
-  const pick = (k: keyof WidgetTexts) => all[lang]?.[k] || all.en?.[k] || ''
-  return { label: pick('label') || w.label || '', secondary: pick('secondary'), empty: pick('empty') }
+  const str = (k: 'label' | 'secondary' | 'empty') => all[lang]?.[k] || all.en?.[k] || ''
+  return { label: str('label') || w.label || '', secondary: str('secondary'), empty: str('empty'), categories: { ...all.en?.categories, ...all[lang]?.categories } }
 }
 
 /** The widgets of a board, in the order of its keys; a key nobody offers any more is left out. */
@@ -117,3 +126,41 @@ export function gridColumns(c: Columns): string {
 
 /** The board that stays open: `id` when it is still there, else the first one. */
 export const keepBoard = (ids: string[], id: string | null): string | null => (id && ids.includes(id) ? id : (ids[0] ?? null))
+
+const ISO_DAY = /^(\d{4})-(\d{2})-(\d{2})$/
+
+/** The name of a chart category: a date is written in the language of the person (`3 Nov`), a key is looked up in the texts of the widget. */
+export function categoryName(raw: string, names: Record<string, string>, lang: Lang): string {
+  const m = ISO_DAY.exec(raw)
+  if (m) {
+    const d = new Date(Date.UTC(+m[1]!, +m[2]! - 1, +m[3]!))
+    try {
+      return new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(d)
+    } catch {
+      return raw
+    }
+  }
+  return names[raw] ?? raw
+}
+
+/** The sum of the first series: what a chart widget shows as its big number. */
+export const chartTotal = (r: ChartResult): number => (r.series[0]?.data ?? []).reduce((a, b) => a + b, 0)
+
+/** True when a chart has nothing to draw (no category, or only zeros). */
+export const chartEmpty = (r: ChartResult): boolean => !r.categories.length || r.series.every((s) => s.data.every((v) => !v))
+
+/** Points `x,y` of a sparkline in a `w` x `h` box with `pad` around it: the lowest value sits at the bottom, a flat trend in the middle. */
+export function sparkPoints(values: number[], w: number, h: number, pad = 2): { x: number; y: number }[] {
+  if (values.length < 2) return []
+  const lo = Math.min(...values)
+  const hi = Math.max(...values)
+  const step = (w - pad * 2) / (values.length - 1)
+  return values.map((v, i) => ({ x: +(pad + i * step).toFixed(2), y: +(hi === lo ? h / 2 : h - pad - ((v - lo) / (hi - lo)) * (h - pad * 2)).toFixed(2) }))
+}
+
+/** The change of a number against another (`+12%`, `-3%`); null when there is nothing to compare with. */
+export function deltaOf(now: number, before: number | null | undefined): { pct: number; dir: 'up' | 'down' | 'flat' } | null {
+  if (before === null || before === undefined || before <= 0) return null
+  const pct = Math.round(((now - before) / before) * 100)
+  return { pct, dir: pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat' }
+}

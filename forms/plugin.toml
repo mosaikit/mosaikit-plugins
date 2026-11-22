@@ -63,6 +63,12 @@ hooks = ["forms"]
 view = "kpi_forms_status"
 label = "Status of the forms"
 
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "answers"
+label = "Answers per form"
+data = { command = "forms.widget_answers", kind = "chart", size = "m", texts = { en = { empty = "No forms yet", categories = { answers = "Answers" } }, it = { label = "Risposte per modulo", empty = "Ancora nessun modulo", categories = { answers = "Risposte" } }, es = { label = "Respuestas por formulario", empty = "Todavía no hay formularios", categories = { answers = "Respuestas" } } } }
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 name = "Moduli"

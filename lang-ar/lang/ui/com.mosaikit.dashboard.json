@@ -39,5 +39,11 @@
   "Alert": "إنذار",
   "Could not start the UI of the plugin: ": "تعذّر تشغيل واجهة الإضافة: ",
   "Could not load the dashboard: ": "تعذّر تحميل لوحة المعلومات: ",
-  "Could not load the widgets: ": "تعذّر تحميل الأدوات: "
+  "Could not load the widgets: ": "تعذّر تحميل الأدوات: ",
+  "Up {n}%": "ارتفاع بنسبة {n}%",
+  "Down {n}%": "انخفاض بنسبة {n}%",
+  "No change": "دون تغيير",
+  "Show data": "عرض البيانات",
+  "Loading chart": "جارٍ تحميل الرسم البياني",
+  "The chart could not be drawn": "تعذّر رسم الرسم البياني"
 }

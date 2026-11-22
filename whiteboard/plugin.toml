@@ -1,6 +1,6 @@
 id = "com.mosaikit.whiteboard"
 name = "Whiteboard"
-version = "0.3.1"
+version = "0.4.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "presentation"
@@ -40,6 +40,12 @@ realtime = true
 [[kpi]]
 view = "kpi_whiteboards_status"
 label = "Status of the whiteboards"
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "recent"
+label = "Recent whiteboards"
+data = { command = "whiteboard.widget_recent", kind = "list", size = "m", texts = { en = { empty = "No whiteboards yet" }, it = { label = "Lavagne recenti", empty = "Ancora nessuna lavagna" }, es = { label = "Pizarras recientes", empty = "Todavía no hay pizarras" } } }
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]

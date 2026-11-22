@@ -174,6 +174,76 @@ fn widget_open(ctx: &Ctx, _args: Value) -> Result<Value> {
     }))
 }
 
+/// Days in the "done" trend.
+const FLOW_DAYS: u32 = 14;
+
+/// The last `FLOW_DAYS` days from `start`, each with the number of tasks done that day (`rows` hold `d` and `n`).
+fn flow_body(start: &str, rows: &[Value]) -> Value {
+    let Some(first) = parse_date(start) else {
+        return json!({ "type": "line", "categories": [], "series": [{ "name": "done", "data": [] }] });
+    };
+    let mut days = Vec::new();
+    let mut data = Vec::new();
+    for i in 0..FLOW_DAYS {
+        let day = fmt_date(add_days(first, i));
+        let n = rows
+            .iter()
+            .find(|r| r.get("d").and_then(Value::as_str) == Some(day.as_str()))
+            .map_or(0, |r| count_of(r, "n"));
+        days.push(day);
+        data.push(n);
+    }
+    json!({ "type": "line", "categories": days, "series": [{ "name": "done", "data": data }] })
+}
+
+/// Widget `done-flow`: the tasks I can see that were completed on each of the last 14 days.
+fn widget_flow(ctx: &Ctx, _args: Value) -> Result<Value> {
+    let start = ctx
+        .db()
+        .query_one("select (current_date - 13)::text as s", &[])?
+        .and_then(|r| r.get("s").and_then(Value::as_str).map(str::to_string))
+        .unwrap_or_default();
+    let rows = ctx.db().query(
+        "select completed_on::text as d, count(*)::int as n from tasks          where coalesce(done, false) and completed_on >= $1::date group by completed_on",
+        &[json!(start)],
+    )?;
+    Ok(flow_body(&start, &rows))
+}
+
+/// The number widget of the last 14 days: done in the last 7, done in the 7 before as secondary, a sparkline of all 14.
+fn week_body(flow: &Value) -> Value {
+    let data: Vec<i64> = flow["series"][0]["data"]
+        .as_array()
+        .map(|a| a.iter().filter_map(Value::as_i64).collect())
+        .unwrap_or_default();
+    let split = data.len().saturating_sub(7);
+    let (before, last) = data.split_at(split);
+    json!({ "value": last.iter().sum::<i64>(), "secondary": before.iter().sum::<i64>(), "tone": "", "trend": data })
+}
+
+/// Widget `done-week`: tasks done this week against the week before, with the daily trend.
+fn widget_week(ctx: &Ctx, args: Value) -> Result<Value> {
+    Ok(week_body(&widget_flow(ctx, args)?))
+}
+
+/// Widget `by-priority`: my open tasks split into high, medium and low priority.
+fn widget_priority(ctx: &Ctx, _args: Value) -> Result<Value> {
+    let rows = ctx.db().query(
+        "select coalesce(priority, 'medium') as p, count(*)::int as n from tasks          where not coalesce(done, false) group by 1",
+        &[],
+    )?;
+    let n = |k: &str| {
+        rows.iter()
+            .find(|r| r.get("p").and_then(Value::as_str) == Some(k))
+            .map_or(0, |r| count_of(r, "n"))
+    };
+    Ok(json!({
+        "type": "pie",
+        "categories": ["high", "medium", "low"],
+        "series": [{ "name": "open", "data": [n("high"), n("medium"), n("low")] }],
+    }))
+}
+
 /// The date `days` days after `today` (YYYY-MM-DD); None when `today` is not a date.
 fn soon_limit(today: &str, days: u32) -> Option<String> {
     parse_date(today).map(|d| fmt_date(add_days(d, days)))
@@ -377,6 +447,9 @@ mosaikit_plugin_sdk::plugin! {
         "tasks.overdue" => overdue,
         "tasks.widget_open" => widget_open,
         "tasks.widget_soon" => widget_soon,
+        "tasks.widget_flow" => widget_flow,
+        "tasks.widget_week" => widget_week,
+        "tasks.widget_priority" => widget_priority,
         "tasks.for_project" => for_project,
         "tasks.set_project" => set_project,
         "tasks.add_for_project" => add_for_project,
@@ -407,6 +480,34 @@ mod tests {
             .unwrap();
         assert_eq!(v.str("completed_on"), "2026-10-20");
         assert_eq!(v.str("priority"), "medium");
+    }
+
+    #[test]
+    fn the_done_flow_fills_the_days_without_tasks() {
+        let rows = vec![
+            json!({ "d": "2026-10-30", "n": 3 }),
+            json!({ "d": "2026-11-02", "n": 1 }),
+        ];
+        let out = flow_body("2026-10-30", &rows);
+        let days = out["categories"].as_array().unwrap();
+        assert_eq!(days.len(), 14);
+        assert_eq!(days[3], "2026-11-02");
+        assert_eq!(out["series"][0]["data"][0], 3);
+        assert_eq!(out["series"][0]["data"][1], 0);
+        assert_eq!(out["series"][0]["data"][3], 1);
+        assert_eq!(flow_body("nope", &rows)["categories"], json!([]));
+    }
+
+    #[test]
+    fn the_week_widget_sums_two_weeks_and_keeps_the_trend() {
+        let rows = vec![
+            json!({ "d": "2026-10-30", "n": 3 }),
+            json!({ "d": "2026-11-10", "n": 2 }),
+        ];
+        let out = week_body(&flow_body("2026-10-30", &rows));
+        assert_eq!(out["value"], 2);
+        assert_eq!(out["secondary"], 3);
+        assert_eq!(out["trend"].as_array().unwrap().len(), 14);
     }
 
     #[test]

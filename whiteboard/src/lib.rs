@@ -44,12 +44,29 @@ fn board(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
     Ok(Some(v))
 }
 
+/// Widget `recent`: the whiteboards the caller sees, the last changed first (six at most, the rest counted).
+fn widget_recent(ctx: &Ctx, _args: Value) -> Result<Value> {
+    let rows = ctx.db().query(
+        "select id::text as id, title, updated_at::date::text as day, owner_name from core.visible_resources          where kind = 'whiteboards' order by updated_at desc limit 500",
+        &[],
+    )?;
+    let items: Vec<Value> = rows
+        .iter()
+        .take(6)
+        .map(|r| {
+            let s = |k: &str| r.get(k).and_then(Value::as_str).unwrap_or_default();
+            json!({ "id": s("id"), "title": s("title"), "meta": format!("{} · {}", s("day"), s("owner_name")), "tone": "" })
+        })
+        .collect();
+    Ok(json!({ "items": items, "more": rows.len().saturating_sub(6) }))
+}
+
 mosaikit_plugin_sdk::plugin! {
     hooks: {
         "whiteboards.before_create" => board,
         "whiteboards.before_update" => board,
     },
-    commands: {},
+    commands: { "whiteboard.widget_recent" => widget_recent },
 }
 
 #[cfg(test)]

@@ -1,6 +1,6 @@
 id = "com.mosaikit.maps"
 name = "Maps"
-version = "0.8.1"
+version = "0.9.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "map"
@@ -41,6 +41,12 @@ frame_src = ["https://web.geolibre.app"]
 [[kpi]]
 view = "kpi_maps"
 label = "Maps and layers"
+
+[[contributes]]
+point = "com.mosaikit.dashboard.widget"
+id = "recent"
+label = "Recent maps"
+data = { command = "maps.widget_recent", kind = "list", size = "m", texts = { en = { empty = "No maps yet" }, it = { label = "Mappe recenti", empty = "Ancora nessuna mappa" }, es = { label = "Mapas recientes", empty = "Todavía no hay mapas" } } }
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
