@@ -330,7 +330,8 @@ function mount(msk: Msk) {
     const stage = el('div', { class: 'po-qr-stage', 'data-testid': 'qr' })
     const note = el('p', { class: 'po-note', role: 'status' }, '')
     const make = button(tr().qrMake, 'msk-btn')
-    const makeBox = el('div', { class: 'po-qr-make' }, el('p', { class: 'po-note' }, tr().qrMakeHint), make)
+    const makeHint = el('p', { class: 'po-note' }, tr().qrMakeHint)
+    const makeBox = el('div', { class: 'po-qr-make' }, makeHint, make)
     const png = button(tr().qrDownload, 'msk-btn mini')
     const copy = button(tr().qrCopy, 'msk-btn ghost mini')
     const close = button(tr().qrClose, 'msk-btn ghost')
@@ -365,8 +366,10 @@ function mount(msk: Msk) {
     /** shows the dialog for a mode: which controls are there */
     const setup = (mode: ReturnType<typeof qrMode>) => {
       field.hidden = mode === 'create' || mode === 'show'
-      hint = mode === 'paste' ? tr().qrPaste : tr().qrHint
-      makeBox.hidden = mode !== 'create'
+      hint = mode === 'paste' ? tr().qrPaste : mode === 'create' ? '' : tr().qrHint
+      makeBox.hidden = mode === 'show' || mode === 'manual'
+      makeHint.hidden = mode === 'paste'
+      make.textContent = mode === 'paste' ? tr().qrMakeNew : tr().qrMake
       acts.hidden = mode === 'create'
       if (mode === 'create') {
         input.value = ''
