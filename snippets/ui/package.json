@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mosaikit/plugin-api": "file:../../../mosaikit/ui/plugin-api"
+    "@mosaikit/plugin-api": "file:../../../mosaikit/ui/plugin-api",
+    "highlight.js": "^11.12.0"
   }
 }

@@ -1,6 +1,6 @@
 // What the list of snippets decides, with no DOM: reading the tags, the first line, the search and the counts of the tags.
 
-export const KINDS = ['text', 'shell', 'sql', 'json', 'javascript', 'python', 'rust', 'markdown', 'other'] as const
+export const KINDS = ['text', 'shell', 'sql', 'json', 'javascript', 'typescript', 'python', 'rust', 'html', 'css', 'yaml', 'markdown', 'other'] as const
 export type Kind = (typeof KINDS)[number]
 
 export interface SnippetLike {
@@ -84,3 +84,27 @@ export function neighbour(ids: string[], id: string | null, step: number): strin
   if (i < 0) return ids[step < 0 ? ids.length - 1 : 0]
   return ids[Math.min(ids.length - 1, Math.max(0, i + step))]
 }
+
+/** The highlight.js language of a kind (null: shown as plain text). */
+export const LANGUAGE: Record<Kind, string | null> = {
+  text: null,
+  other: null,
+  shell: 'bash',
+  sql: 'sql',
+  json: 'json',
+  javascript: 'javascript',
+  typescript: 'typescript',
+  python: 'python',
+  rust: 'rust',
+  html: 'xml',
+  css: 'css',
+  yaml: 'yaml',
+  markdown: 'markdown',
+}
+
+export function languageOf(kind: string): string | null {
+  return LANGUAGE[kindOf(kind)]
+}
+
+/** Longest text that is coloured; a bigger one stays plain so the page stays quick. */
+export const MAX_HIGHLIGHT = 40_000

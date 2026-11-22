@@ -1,13 +1,13 @@
 id = "com.mosaikit.snippets"
 name = "Snippets"
-version = "0.3.1"
+version = "0.4.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "code"
 description = "A shared collection of reusable texts and pieces of code with tags, copied in one click"
 author = "Mosaikit"
 license = "Apache-2.0"
-details = "Keep the texts and the code your team uses again and again: a title, the text or code itself, a kind (plain text, shell, SQL, JSON, JavaScript, Python, Rust, Markdown) and tags. Find a snippet by search, by kind or by tag and copy it to the clipboard with one click.\n\nA snippet is an item of the platform: share it with people or groups (read to use it, write to edit it) and everything you already know about sharing, search and the trash applies."
+details = "Keep the texts and the code your team uses again and again: a title, the text or code itself, a kind (plain text, shell, SQL, JSON, JavaScript, TypeScript, Python, Rust, HTML, CSS, YAML, Markdown), shown with syntax colours and tags. Find a snippet by search, by kind or by tag and copy it to the clipboard with one click.\n\nA snippet is an item of the platform: share it with people or groups (read to use it, write to edit it) and everything you already know about sharing, search and the trash applies."
 screenshots = ["list.webp", "detail.webp"]
 homepage = "https://example.org/mosaikit/plugins/snippets"
 
@@ -26,7 +26,7 @@ title_field = "title"
 fields = [
   { key = "title", label = "Title", kind = "text", required = true },
   { key = "body", label = "Content", kind = "text", multiline = true, required = true },
-  { key = "kind", label = "Kind", kind = "choice", options = ["text", "shell", "sql", "json", "javascript", "python", "rust", "markdown", "other"] },
+  { key = "kind", label = "Kind", kind = "choice", options = ["text", "shell", "sql", "json", "javascript", "typescript", "python", "rust", "html", "css", "yaml", "markdown", "other"] },
   # a JSON array of strings, edited as chips by the UI
   { key = "tags", label = "Tags", kind = "text", hidden = true },
 ]
@@ -57,7 +57,7 @@ label = "Snippet"
 [i18n.it.resources.snippets]
 label = "Snippet"
 fields = { title = "Titolo", body = "Contenuto", kind = "Tipo", tags = "Etichette" }
-options.kind = { text = "testo", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "altro" }
+options.kind = { text = "testo", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", typescript = "TypeScript", python = "Python", rust = "Rust", html = "HTML", css = "CSS", yaml = "YAML", markdown = "Markdown", other = "altro" }
 
 [i18n.it.kpi.kpi_snippets_by_kind]
 label = "Snippet per tipo"
