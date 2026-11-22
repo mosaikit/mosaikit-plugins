@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { applyFilter, checkOptions, debounce, fileStem, isClosed, isUuid, newBrowserId, parseOptions, publicProblem, qrTarget, resultsOf, resultsRows, toggleChoice, winners } from './logic.ts'
+import { applyFilter, checkOptions, debounce, fileStem, isClosed, isUuid, newBrowserId, parseOptions, publicProblem, qrMode, qrTarget, resultsOf, resultsRows, toggleChoice, winners } from './logic.ts'
 
 describe('parseOptions', () => {
   it('reads a JSON array in text or an array', () => {
@@ -115,5 +115,12 @@ describe('export and QR', () => {
     expect(qrTarget('not a url')).toBeNull()
     expect(qrTarget('')).toBeNull()
     expect(qrTarget('https://a.b/' + 'x'.repeat(1000))).toBeNull()
+  })
+  it('chooses what the QR dialog offers', () => {
+    expect(qrMode(null, '')).toBe('manual')
+    expect(qrMode({ active: false }, 'https://a.b/x')).toBe('create')
+    expect(qrMode({ active: true }, 'https://a.b/x')).toBe('show')
+    expect(qrMode({ active: true }, '')).toBe('paste')
+    expect(qrMode({ active: true }, 'javascript:1')).toBe('paste')
   })
 })

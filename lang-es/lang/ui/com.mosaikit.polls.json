@@ -77,5 +77,9 @@
   "Leave this field empty": "Deja este campo vacío",
   "You can vote once from this browser. Nobody sees who voted.": "Puedes votar una sola vez desde este navegador. Nadie ve quién ha votado.",
   "Your choice": "Tu elección",
-  "This poll closed before your vote.": "La encuesta se cerró antes de tu voto."
+  "This poll closed before your vote.": "La encuesta se cerró antes de tu voto.",
+  "Create the public link": "Crear el enlace público",
+  "This poll has no public link yet. Creating one makes the poll public: anyone who gets the address can see it and vote, without signing in. You can revoke the link from Share…": "Esta encuesta aún no tiene enlace público. Crearlo hace pública la encuesta: cualquiera que reciba la dirección puede verla y votar, sin iniciar sesión. Puedes revocar el enlace desde Compartir…",
+  "Public link created": "Enlace público creado",
+  "A public link already exists, but the platform shows its address only once. Paste the address you saved, or create a new link.": "Ya existe un enlace público, pero la plataforma muestra su dirección una sola vez. Pega la dirección que guardaste o crea un enlace nuevo."
 }
