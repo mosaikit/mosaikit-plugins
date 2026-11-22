@@ -85,3 +85,16 @@ describe('toggleTag', () => {
     expect(toggleTag(['a', 'b'], 'a')).toEqual(['b'])
   })
 })
+
+import { chunk, columnsFor } from './logic.ts'
+describe('grid rows', () => {
+  it('cuts a list in rows', () => {
+    expect(chunk([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]])
+    expect(chunk([1, 2], 0)).toEqual([[1], [2]])
+    expect(chunk([], 3)).toEqual([])
+  })
+  it('counts the columns that fit', () => {
+    expect(columnsFor(900, 280, 16)).toBe(3)
+    expect(columnsFor(0, 280, 16)).toBe(1)
+  })
+})

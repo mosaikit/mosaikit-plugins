@@ -7,20 +7,27 @@ import {
   confirmDialog,
   connect,
   dialog,
+  downloadCsv,
+  downloadFile,
   el,
   emptyState,
   errText,
   filteredEmpty,
+  menu,
+  shortcuts,
   skeleton,
   tagInput,
   toast,
+  virtualList,
   type Msk,
   type Row,
 } from '@mosaikit/plugin-api'
-import { applyFilter, cleanTags, hostOf, parseTags, safeHref, tagCounts, toggleTag, type BookmarkLike, type Filter } from './logic.ts'
+import { applyFilter, chunk, cleanTags, columnsFor, hostOf, parseTags, safeHref, tagCounts, toggleTag, type BookmarkLike, type Filter } from './logic.ts'
+import { CSV_HEADER, clip, findDuplicates, normalizeUrl, parseBrowserHtml, parseCsvBookmarks, parseCsvText, planImport, toBrowserHtml, toCsvRows } from './io.ts'
 import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 
 const app = document.getElementById('app')!
+const MAX_IMPORT = 500
 
 interface Bookmark extends BookmarkLike {
   id: string
@@ -81,6 +88,14 @@ function mount(msk: Msk) {
       removeLabel: tr().removeTag,
       onChange: (v) => (tags = v),
     })
+    const dupHint = el('p', { class: 'bk-dup-hint', role: 'status' })
+    dupHint.hidden = true
+    url.addEventListener('input', () => {
+      const key = normalizeUrl(url.value)
+      const same = key ? items.find((b) => b.id !== existing?.id && normalizeUrl(b.url) === key) : undefined
+      dupHint.hidden = !same
+      if (same) dupHint.textContent = sub(tr().alreadySaved, { n: same.title })
+    })
     title.value = existing?.title ?? ''
     url.value = existing?.url ?? ''
     note.value = existing?.note ?? ''
@@ -94,6 +109,7 @@ function mount(msk: Msk) {
         'div',
         { class: 'bk-form' },
         field(tr().fUrl, url),
+        dupHint,
         field(tr().fTitle, title),
         field(tr().fNote, note),
         field(tr().fTags, tagBox.el),
@@ -236,6 +252,8 @@ function mount(msk: Msk) {
     bar.replaceChildren(search, row)
   }
 
+  /** From this many bookmarks the list draws only what is in sight. */
+  const VIRTUAL_FROM = 60
   const drawList = () => {
     body.replaceChildren()
     const shown = applyFilter(items, filter)
@@ -243,7 +261,117 @@ function mount(msk: Msk) {
       body.append(filteredEmpty(tr().emptyFilter, tr().clearFilters, clearFilters))
       return
     }
-    body.append(el('div', { class: 'bk-grid' }, ...shown.map(card)))
+    body.classList.toggle('virt', shown.length >= VIRTUAL_FROM)
+    if (shown.length < VIRTUAL_FROM) return void body.append(el('div', { class: 'bk-grid' }, ...shown.map(card)))
+    // a long list: only the rows in sight are drawn, as many cards in a row as fit
+    let cols = 1
+    let rows = chunk(shown, 1)
+    const vl = virtualList({
+      count: rows.length,
+      estimateSize: 170,
+      getKey: (i) => rows[i]![0]!.id,
+      gap: 16,
+      label: tr().title,
+      render: (i) => el('div', { class: 'bk-vrow', style: `--cols:${cols}` }, ...rows[i]!.map(card)),
+    })
+    vl.el.classList.add('bk-vlist')
+    new ResizeObserver(() => {
+      const n = columnsFor(vl.el.clientWidth, 280, 16)
+      if (n === cols) return
+      cols = n
+      rows = chunk(shown, cols)
+      vl.setCount(rows.length)
+    }).observe(vl.el)
+    body.append(vl.el)
+  }
+
+  // ------------------------------------------------------------------------------- import, export, duplicates
+  const doImport = async (file: File) => {
+    const name = file.name.toLowerCase()
+    let found: BookmarkLike[] = []
+    try {
+      const text = await file.text()
+      found = name.endsWith('.csv') ? parseCsvBookmarks(parseCsvText(text)) : /\.html?$/.test(name) ? parseBrowserHtml(text) : []
+    } catch (e) {
+      return toast(tr().importFailed + errText(e, msk.context?.lang), { tone: 'err' })
+    }
+    if (!/\.(csv|html?)$/.test(name)) return toast(tr().importWrong, { tone: 'err' })
+    if (!found.length) return toast(sub(tr().importNone, { f: file.name }), { tone: 'err' })
+    const plan = planImport(items, found.map(clip))
+    if (!plan.fresh.length) return toast(sub(tr().importAllDup, { n: plan.duplicates.length }))
+    const todo = plan.fresh.slice(0, MAX_IMPORT)
+    const text = sub(tr().importAsk, { n: todo.length, f: file.name }) + (plan.duplicates.length ? ' ' + sub(tr().importSkip, { m: plan.duplicates.length }) : '') + (plan.fresh.length > todo.length ? ' ' + sub(tr().importCap, { max: MAX_IMPORT }) : '')
+    if (!(await confirmDialog({ title: tr().importTitle, text, ok: tr().import, cancel: tr().cancel }))) return
+    let ok = 0
+    let failed = 0
+    for (const b of todo) {
+      try {
+        await api.create(valuesOf(b))
+        ok++
+      } catch {
+        failed++
+      }
+    }
+    toast(sub(failed ? tr().importPartial : tr().importOk, { n: ok, m: failed + plan.duplicates.length }), { tone: failed ? '' : 'ok' })
+    await load(true)
+  }
+
+  const doExport = (kind: 'html' | 'csv') => {
+    if (!items.length) return toast(tr().exportNone)
+    const list = applyFilter(items, filter)
+    if (kind === 'html') downloadFile('bookmarks.html', toBrowserHtml(list, tr().title), 'text/html;charset=utf-8')
+    else downloadCsv('bookmarks.csv', toCsvRows(list), { header: CSV_HEADER })
+    toast(sub(tr().exported, { n: list.length }), { tone: 'ok' })
+  }
+
+  const showDuplicates = () => {
+    const groups = findDuplicates(items)
+    const body = el('div', { class: 'bk-dups' })
+    const close = el('button', { type: 'button', class: 'msk-btn' }, tr().close)
+    const d = dialog({ title: tr().dupTitle, body, actions: [close] })
+    close.addEventListener('click', d.close)
+    if (!groups.length) return void body.append(el('p', {}, tr().dupNone))
+    body.append(el('p', { class: 'bk-dup-lead' }, tr().dupHint))
+    for (const g of groups) {
+      const [keep, ...extra] = g as [Bookmark, ...Bookmark[]]
+      const removable = extra.filter((b) => b.row.my_level === 'manage')
+      const ul = el('ul', { class: 'bk-dup' })
+      for (const b of g) ul.append(el('li', {}, el('strong', {}, b.title), el('span', { class: 'bk-host' }, b.url)))
+      const clean = el('button', { type: 'button', class: 'msk-btn ghost mini' }, sub(tr().dupKeep, { n: keep.title }))
+      clean.disabled = !removable.length
+      clean.addEventListener('click', async () => {
+        clean.disabled = true
+        try {
+          for (const b of removable) await api.remove(b.id)
+          toast(sub(tr().dupRemoved, { n: removable.length }), { tone: 'ok' })
+          d.close()
+          await load(true)
+        } catch (e) {
+          fail(e)
+          clean.disabled = false
+        }
+      })
+      body.append(el('div', { class: 'bk-dup-group' }, ul, clean))
+    }
+  }
+
+  const tools = (): HTMLElement[] => {
+    const file = el('input', { type: 'file', accept: '.html,.htm,.csv,text/html,text/csv', class: 'msk-sr', 'aria-label': tr().import, tabindex: '-1' })
+    file.addEventListener('change', () => {
+      const f = file.files?.[0]
+      file.value = ''
+      if (f) void doImport(f)
+    })
+    const imp = el('button', { type: 'button', class: 'msk-btn ghost' }, '⤒ ' + tr().import)
+    imp.title = tr().importHint
+    imp.addEventListener('click', () => file.click())
+    imp.hidden = !msk.can('create')
+    const exp = el('button', { type: 'button', class: 'msk-btn ghost', 'aria-haspopup': 'menu' }, '⤓ ' + tr().export)
+    exp.addEventListener('click', () => menu(exp, [{ label: tr().exportHtml, onClick: () => doExport('html') }, { label: tr().exportCsv, onClick: () => doExport('csv') }]))
+    const dups = findDuplicates(items).length
+    const dup = el('button', { type: 'button', class: 'msk-btn ghost' + (dups ? ' has-dups' : '') }, '⧉ ' + tr().duplicates, ...(dups ? [el('span', { class: 'bk-count' }, String(dups))] : []))
+    dup.addEventListener('click', showDuplicates)
+    return [imp, exp, dup, file]
   }
 
   const draw = () => {
@@ -251,7 +379,7 @@ function mount(msk: Msk) {
     const add = el('button', { type: 'button', class: 'msk-btn' }, tr().newBookmark)
     add.addEventListener('click', () => form())
     add.hidden = !msk.can('create')
-    head.append(add)
+    head.append(...(items.length ? tools() : []), add)
     search.setAttribute('aria-label', tr().search)
     search.placeholder = tr().searchPlaceholder
     if (!items.length) {
@@ -284,6 +412,14 @@ function mount(msk: Msk) {
     draw()
   }
 
+  const keys = shortcuts(
+    [
+      { keys: 'n', label: tr().scNew, run: (e) => (e.preventDefault(), form()), when: () => msk.can('create') },
+      { keys: '/', label: tr().scSearch, run: (e) => (e.preventDefault(), search.focus()) },
+    ],
+    { labels: { title: tr().scTitle, close: tr().close, general: tr().title, then: tr().scThen } },
+  )
+  addEventListener('pagehide', () => keys.dispose())
   msk.onContext((ctx) => {
     if (langOf(ctx.lang) === lang) return
     lang = langOf(ctx.lang)
