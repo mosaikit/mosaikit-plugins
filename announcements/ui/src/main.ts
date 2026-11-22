@@ -8,17 +8,19 @@ import {
   connect,
   dateField,
   dialog,
+  downloadCsv,
   el,
   emptyState,
   errText,
   renderMarkdown,
   segmented,
+  shortcuts,
   skeleton,
   toast,
   type Msk,
   type Row,
 } from '@mosaikit/plugin-api'
-import { boardOrder, levelOf, periodOf, todayLocal, type Level, type NoticeLike, type Period } from './logic.ts'
+import { ackRows, boardOrder, fileStem, initials, levelOf, periodOf, todayLocal, type Level, type NoticeLike, type Period } from './logic.ts'
 import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 
 const app = document.getElementById('app')!
@@ -136,15 +138,20 @@ function mount(msk: Msk) {
 
   // ------------------------------------------------------------------------------------------------- who confirmed
   const who = async (n: Notice) => {
-    const close = el('button', { type: 'button', class: 'msk-btn' }, tr().close)
+    const close = el('button', { type: 'button', class: 'msk-btn ghost' }, tr().close)
+    const csv = el('button', { type: 'button', class: 'msk-btn mini' }, tr().exportCsv)
+    csv.disabled = true
     const list = el('div', { class: 'an-who' }, skeleton({ kind: 'rows', count: 3 }))
-    const d = dialog({ title: `${tr().whoTitle}: ${n.title}`, body: list, actions: [close] })
+    const d = dialog({ title: `${tr().whoTitle}: ${n.title}`, body: list, actions: [close, csv] })
     close.addEventListener('click', d.close)
     try {
       const rows = await msk.call<Ack[]>('notices.acks', { id: n.id })
       list.replaceChildren()
       if (!rows.length) list.append(el('p', { class: 'an-dim' }, tr().whoNone))
+      else list.append(el('p', { class: 'an-whocount', 'data-testid': 'who-count' }, sub(tr().whoCount, { n: rows.length })))
       for (const a of rows) list.append(el('div', { class: 'an-person' }, avatar(a.name), el('strong', {}, a.name), el('span', { class: 'an-dim' }, stamp(a.at))))
+      csv.disabled = !rows.length
+      csv.addEventListener('click', () => downloadCsv(`confirmations-${fileStem(n.title)}`, ackRows(rows), { header: [tr().csvName, tr().csvAt] }))
     } catch (e) {
       d.close()
       fail(e)
@@ -171,11 +178,8 @@ function mount(msk: Msk) {
     const when = [n.startsOn && period === 'upcoming' ? sub(tr().from, { d: day(n.startsOn) }) : '', n.endsOn ? sub(period === 'past' ? tr().ended : tr().until, { d: day(n.endsOn) }) : '']
       .filter(Boolean)
       .join(' · ')
-    card.append(
-      chips,
-      el('h2', {}, n.title),
-      el('p', { class: 'an-meta' }, [sub(tr().by, { n: n.row.owner_name }), day(n.createdAt.slice(0, 10)), when].filter(Boolean).join(' · ')),
-    )
+    const author = el('div', { class: 'an-author' }, el('span', { class: 'an-medal', 'aria-hidden': 'true' }, initials(n.row.owner_name)), el('p', { class: 'an-meta' }, [sub(tr().by, { n: n.row.owner_name }), day(n.createdAt.slice(0, 10)), when].filter(Boolean).join(' · ')))
+    card.append(chips, el('h2', {}, n.title), author)
     if (n.body.trim()) card.append(el('div', { class: 'an-text' }, renderMarkdown(n.body)))
     const acts = el('div', { class: 'an-acts' })
     if (n.needsAck) {
@@ -272,6 +276,8 @@ function mount(msk: Msk) {
     await refreshOverview()
     draw()
   }
+
+  shortcuts([{ keys: 'n', label: tr().shNew, group: tr().shGroup, run: () => msk.can('create') && form() }], { labels: { title: tr().shHelp, close: tr().close2 } })
 
   msk.onContext((ctx) => {
     if (langOf(ctx.lang) === lang) return

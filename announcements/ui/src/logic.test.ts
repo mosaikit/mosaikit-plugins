@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { boardOrder, levelOf, periodOf, todayLocal } from './logic.ts'
+import { boardOrder, levelOf, periodOf, todayLocal, ackRows, fileStem, initials } from './logic.ts'
 
 const n = (id: string, level: string, pinned = false, createdAt = '2026-05-01T10:00:00Z') => ({ id, level, pinned, startsOn: '', endsOn: '', createdAt })
 
@@ -32,5 +32,21 @@ describe('levelOf and todayLocal', () => {
   })
   it('writes the local day', () => {
     expect(todayLocal(new Date(2026, 0, 5, 23, 59))).toBe('2026-01-05')
+  })
+})
+
+describe('acknowledgement export', () => {
+  it('lists who confirmed, the earliest first', () => {
+    expect(ackRows([{ name: 'Bo', at: '2026-11-02T10:00:00Z' }, { name: 'Ada', at: '2026-11-01T09:00:00Z' }])).toEqual([
+      ['Ada', '2026-11-01T09:00:00Z'],
+      ['Bo', '2026-11-02T10:00:00Z'],
+    ])
+  })
+  it('makes a file name and initials', () => {
+    expect(fileStem('Office closed on Friday!')).toBe('office-closed-on-friday')
+    expect(fileStem('???')).toBe('notice')
+    expect(initials('Ada Lovelace')).toBe('AL')
+    expect(initials('plato')).toBe('P')
+    expect(initials('  ')).toBe('?')
   })
 })

@@ -9,6 +9,7 @@ const en = {
   create: 'Publish', save: 'Save', cancel: 'Cancel', edit: 'Edit', remove: 'Delete', share: 'Share…', newTitle: 'New notice', editTitle: 'Edit notice',
   removeConfirm: 'Delete the notice “{n}”?', by: 'by {n}', from: 'from {d}', until: 'until {d}', ended: 'ended {d}',
   confirm: 'I have read it', confirmed: 'You confirmed', confirmedBy: 'Confirmed by {n}', nobodyYet: 'Nobody has confirmed yet', whoTitle: 'Who confirmed', whoNone: 'Nobody has confirmed this notice yet.',
+  exportCsv: 'Export CSV', csvName: 'Name', csvAt: 'Confirmed on', whoCount: '{n} confirmed', shNew: 'New notice', shGroup: 'Notices', shHelp: 'Keyboard shortcuts', close2: 'Close',
   close: 'Close', thanks: 'Thank you, confirmed', failed: 'Could not start the UI of the plugin: ', loadFailed: 'Could not load the notices: ', needTitle: 'Write a title',
 }
 export type Texts = typeof en
@@ -23,6 +24,7 @@ const it: Texts = {
   create: 'Pubblica', save: 'Salva', cancel: 'Annulla', edit: 'Modifica', remove: 'Elimina', share: 'Condividi…', newTitle: 'Nuovo avviso', editTitle: 'Modifica avviso',
   removeConfirm: 'Eliminare l’avviso “{n}”?', by: 'di {n}', from: 'dal {d}', until: 'fino al {d}', ended: 'terminato il {d}',
   confirm: 'Ho letto', confirmed: 'Hai confermato', confirmedBy: 'Confermato da {n}', nobodyYet: 'Nessuno ha ancora confermato', whoTitle: 'Chi ha confermato', whoNone: 'Nessuno ha ancora confermato questo avviso.',
+  exportCsv: 'Esporta CSV', csvName: 'Nome', csvAt: 'Confermato il', whoCount: '{n} confermati', shNew: 'Nuovo avviso', shGroup: 'Avvisi', shHelp: 'Scorciatoie da tastiera', close2: 'Chiudi',
   close: 'Chiudi', thanks: 'Grazie, confermato', failed: 'Impossibile avviare la UI del plugin: ', loadFailed: 'Impossibile caricare gli avvisi: ', needTitle: 'Scrivi un titolo',
 }
 const es: Texts = {
@@ -34,6 +36,7 @@ const es: Texts = {
   create: 'Publicar', save: 'Guardar', cancel: 'Cancelar', edit: 'Editar', remove: 'Eliminar', share: 'Compartir…', newTitle: 'Nuevo aviso', editTitle: 'Editar aviso',
   removeConfirm: '¿Eliminar el aviso “{n}”?', by: 'de {n}', from: 'desde el {d}', until: 'hasta el {d}', ended: 'terminó el {d}',
   confirm: 'Lo he leído', confirmed: 'Has confirmado', confirmedBy: 'Confirmado por {n}', nobodyYet: 'Nadie ha confirmado todavía', whoTitle: 'Quién ha confirmado', whoNone: 'Nadie ha confirmado este aviso todavía.',
+  exportCsv: 'Exportar CSV', csvName: 'Nombre', csvAt: 'Confirmado el', whoCount: '{n} confirmaron', shNew: 'Nuevo aviso', shGroup: 'Avisos', shHelp: 'Atajos de teclado', close2: 'Cerrar',
   close: 'Cerrar', thanks: 'Gracias, confirmado', failed: 'No se pudo iniciar la interfaz del plugin: ', loadFailed: 'No se pudieron cargar los avisos: ', needTitle: 'Escribe un título',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
