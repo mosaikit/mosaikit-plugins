@@ -33,3 +33,21 @@ a.msk-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .bk-copybox { position: fixed; left: -9999px; top: 0; opacity: 0; }
 .msk-btn.danger-text:hover:not(:disabled) { color: var(--err); border-color: var(--err); }
 @media (max-width: 640px) { .bk-head, .bk-body { padding-left: 16px; padding-right: 16px; } .bk-bar { padding-left: 16px; padding-right: 16px; } }
+
+/* the tools of the header, duplicates, the long list */
+.bk-head .msk-btn .bk-count { margin-left: 6px; padding: 0 6px; border-radius: var(--r-pill); background: var(--acc-soft); color: var(--acc); font-weight: 700; }
+.bk-dup-hint { margin: -4px 0 0; padding: 6px 10px; font-size: 12px; border-radius: var(--r-s); background: var(--acc-soft); border: 1px solid var(--acc-line); }
+.bk-dups { display: flex; flex-direction: column; gap: var(--sp-3); min-width: min(560px, 78vw); max-height: 60vh; overflow: auto; }
+.bk-dup-lead { margin: 0; color: var(--dim); font-size: 13px; }
+.bk-dup-group { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); padding: var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel2); }
+.bk-dup { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.bk-dup li { display: flex; flex-direction: column; min-width: 0; }
+.bk-dup .bk-host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bk-body.virt { overflow: hidden; padding-bottom: 0; }
+.bk-vlist { flex: 1; min-height: 0; margin: 0 -8px; padding: 0 8px; }
+.bk-vlist .msk-vlist-inner { padding-bottom: var(--sp-4); }
+.bk-vrow { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); gap: var(--sp-4); align-items: start; padding: 2px; }
+.bk-grid, .bk-vrow { align-items: stretch; }
+.bk-acts { margin-top: auto; padding-top: var(--sp-2); gap: 6px; }
+.bk-acts .msk-btn.mini { padding: 4px 10px; }
+.bk-dup li + li { padding-top: 6px; border-top: 1px dashed var(--line); }

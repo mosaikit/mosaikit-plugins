@@ -9,6 +9,11 @@ const en = {
   newTitle: 'New bookmark', editTitle: 'Edit bookmark', removeConfirm: 'Delete the bookmark “{n}”?', removeTag: 'Remove tag',
   addFavorite: 'Add to favourites: {n}', removeFavorite: 'Remove from favourites: {n}', copied: 'Link copied', copyFailed: 'Could not copy the link',
   needUrl: 'Write an address', count: '{n} shown of {t}',
+  import: 'Import', importHint: 'From a browser (bookmarks .html) or a CSV file', export: 'Export', exportHtml: 'Browser file (.html)', exportCsv: 'CSV (.csv)', duplicates: 'Duplicates', close: 'Close',
+  importTitle: 'Import bookmarks', importAsk: 'Import {n} new bookmarks from “{f}”?', importSkip: '{m} already saved will be skipped.', importCap: 'Only the first {max} are imported.', importOk: 'Imported {n} bookmarks ({m} skipped)', importPartial: 'Imported {n}, {m} skipped or failed', importAllDup: 'Nothing to import: all {n} are already saved', importNone: 'No bookmarks found in “{f}”', importWrong: 'Choose a .html or .csv file', importFailed: 'Import failed: ',
+  exported: 'Exported {n} bookmarks', exportNone: 'There is nothing to export', alreadySaved: 'Already saved as “{n}”.',
+  dupTitle: 'Duplicate bookmarks', dupNone: 'No duplicates: every bookmark has its own address.', dupHint: 'The same address (www, a final slash, http or https and tracking parameters do not count).', dupKeep: 'Keep “{n}”, delete the others', dupRemoved: '{n} duplicates deleted',
+  scNew: 'New bookmark', scSearch: 'Search', scTitle: 'Keyboard shortcuts', scThen: 'then',
   failed: 'Could not start the UI of the plugin: ', loadFailed: 'Could not load the bookmarks: ',
 }
 export type Texts = typeof en
@@ -23,6 +28,11 @@ const it: Texts = {
   newTitle: 'Nuovo segnalibro', editTitle: 'Modifica segnalibro', removeConfirm: 'Eliminare il segnalibro “{n}”?', removeTag: 'Rimuovi etichetta',
   addFavorite: 'Aggiungi ai preferiti: {n}', removeFavorite: 'Togli dai preferiti: {n}', copied: 'Link copiato', copyFailed: 'Impossibile copiare il link',
   needUrl: 'Scrivi un indirizzo', count: '{n} mostrati su {t}',
+  import: 'Importa', importHint: 'Da un browser (segnalibri .html) o da un file CSV', export: 'Esporta', exportHtml: 'File del browser (.html)', exportCsv: 'CSV (.csv)', duplicates: 'Doppioni', close: 'Chiudi',
+  importTitle: 'Importa segnalibri', importAsk: 'Importare {n} nuovi segnalibri da “{f}”?', importSkip: '{m} già salvati saranno saltati.', importCap: 'Si importano solo i primi {max}.', importOk: 'Importati {n} segnalibri ({m} saltati)', importPartial: 'Importati {n}, {m} saltati o falliti', importAllDup: 'Niente da importare: tutti i {n} sono già salvati', importNone: 'Nessun segnalibro trovato in “{f}”', importWrong: 'Scegli un file .html o .csv', importFailed: 'Importazione non riuscita: ',
+  exported: 'Esportati {n} segnalibri', exportNone: 'Non c’è niente da esportare', alreadySaved: 'Già salvato come “{n}”.',
+  dupTitle: 'Segnalibri doppi', dupNone: 'Nessun doppione: ogni segnalibro ha il suo indirizzo.', dupHint: 'Lo stesso indirizzo (www, una barra finale, http o https e i parametri di tracciamento non contano).', dupKeep: 'Tieni “{n}”, elimina gli altri', dupRemoved: '{n} doppioni eliminati',
+  scNew: 'Nuovo segnalibro', scSearch: 'Cerca', scTitle: 'Scorciatoie da tastiera', scThen: 'poi',
   failed: 'Impossibile avviare la UI del plugin: ', loadFailed: 'Impossibile caricare i segnalibri: ',
 }
 const es: Texts = {
@@ -34,6 +44,11 @@ const es: Texts = {
   newTitle: 'Nuevo marcador', editTitle: 'Editar marcador', removeConfirm: '¿Eliminar el marcador “{n}”?', removeTag: 'Quitar etiqueta',
   addFavorite: 'Añadir a favoritos: {n}', removeFavorite: 'Quitar de favoritos: {n}', copied: 'Enlace copiado', copyFailed: 'No se pudo copiar el enlace',
   needUrl: 'Escribe una dirección', count: '{n} mostrados de {t}',
+  import: 'Importar', importHint: 'Desde un navegador (marcadores .html) o un archivo CSV', export: 'Exportar', exportHtml: 'Archivo del navegador (.html)', exportCsv: 'CSV (.csv)', duplicates: 'Duplicados', close: 'Cerrar',
+  importTitle: 'Importar marcadores', importAsk: '¿Importar {n} marcadores nuevos de “{f}”?', importSkip: 'Se omitirán {m} ya guardados.', importCap: 'Solo se importan los primeros {max}.', importOk: 'Importados {n} marcadores ({m} omitidos)', importPartial: 'Importados {n}, {m} omitidos o fallidos', importAllDup: 'Nada que importar: los {n} ya están guardados', importNone: 'No se encontraron marcadores en “{f}”', importWrong: 'Elige un archivo .html o .csv', importFailed: 'Falló la importación: ',
+  exported: 'Exportados {n} marcadores', exportNone: 'No hay nada que exportar', alreadySaved: 'Ya guardado como “{n}”.',
+  dupTitle: 'Marcadores duplicados', dupNone: 'Sin duplicados: cada marcador tiene su dirección.', dupHint: 'La misma dirección (www, una barra final, http o https y los parámetros de seguimiento no cuentan).', dupKeep: 'Conservar “{n}”, eliminar los demás', dupRemoved: '{n} duplicados eliminados',
+  scNew: 'Nuevo marcador', scSearch: 'Buscar', scTitle: 'Atajos de teclado', scThen: 'luego',
   failed: 'No se pudo iniciar la interfaz del plugin: ', loadFailed: 'No se pudieron cargar los marcadores: ',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins

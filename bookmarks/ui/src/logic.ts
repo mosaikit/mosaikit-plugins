@@ -85,3 +85,16 @@ export function applyFilter<T extends BookmarkLike>(list: T[], f: Filter): T[] {
 export function toggleTag(chosen: string[], tag: string): string[] {
   return chosen.includes(tag) ? chosen.filter((t) => t !== tag) : [...chosen, tag]
 }
+
+/** Cuts a list in rows of `n` (at least 1): the cards of a grid, one row of the virtual list each. */
+export function chunk<T>(list: T[], n: number): T[][] {
+  const size = Math.max(1, Math.floor(n))
+  const out: T[][] = []
+  for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size))
+  return out
+}
+
+/** How many columns of at least `min` px fit in `width` with `gap` between them (1 at least). */
+export function columnsFor(width: number, min: number, gap: number): number {
+  return Math.max(1, Math.floor((width + gap) / (min + gap)))
+}
