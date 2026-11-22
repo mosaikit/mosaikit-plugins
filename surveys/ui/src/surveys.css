@@ -87,3 +87,12 @@
   .sv-barrow .sv-track { grid-column: 1 / -1; grid-row: 2; }
 }
 .sv-warn { margin: 0; font-size: 13px; color: var(--err); font-weight: 600; }
+
+/* a long list of responses: the header row and a list on the same grid of columns */
+.sv-vtable { min-width: calc(var(--cols, 2) * 150px); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel); overflow: hidden; }
+.sv-vhead, .sv-vrow { display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(140px, 1fr)); align-items: start; }
+.sv-vhead { padding-right: 10px; border-bottom: 1px solid var(--line); background: var(--panel2); font-size: 12px; font-weight: 600; color: var(--dim); }
+.sv-vlist { height: clamp(280px, 55vh, 640px); scrollbar-gutter: stable; }
+.sv-vrow { border-bottom: 1px solid var(--line); font-size: 13px; }
+.sv-vrow:hover { background: var(--acc-soft); }
+.sv-vcell { min-width: 0; padding: 10px 12px; overflow-wrap: anywhere; }

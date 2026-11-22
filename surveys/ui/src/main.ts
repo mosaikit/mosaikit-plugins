@@ -7,6 +7,7 @@ import {
   connect,
   dateField,
   dialog,
+  downloadFile,
   el,
   emptyState,
   errText,
@@ -14,6 +15,7 @@ import {
   segmented,
   skeleton,
   toast,
+  virtualList,
   type Msk,
   type Row,
 } from '@mosaikit/plugin-api'
@@ -51,6 +53,8 @@ import {
 import { bindTexts, TEXTS, langOf, sub, type Texts } from './texts.ts'
 
 const app = document.getElementById('app')!
+/** From this many responses the list draws only the rows in sight. */
+const VIRTUAL_FROM = 60
 
 interface Survey {
   id: string
@@ -610,15 +614,7 @@ function mount(msk: Msk) {
   }
 
   // -------------------------------------------------------------------------------------------------------- the results
-  const download = (name: string, text: string) => {
-    const blob = new Blob(['﻿' + text], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = el('a', { href: url, download: name })
-    document.body.append(a)
-    a.click()
-    a.remove()
-    setTimeout(() => URL.revokeObjectURL(url), 2000)
-  }
+  const download = (name: string, text: string) => downloadFile(name, ['\ufeff', text], 'text/csv;charset=utf-8')
 
   const barRow = (label: string, n: number, total: number, mark = '') => {
     const p = pct(n, total)
@@ -677,7 +673,29 @@ function mount(msk: Msk) {
       }
       wrap.append(c)
     })
-    if (total) {
+    if (total && (r.respondents ?? []).length >= VIRTUAL_FROM) {
+      // a long list: a header row and a list that draws only the rows in sight, on the same grid of columns
+      const list = r.respondents ?? []
+      const heads = [...(r.anonymous ? [tr().colResponse] : [tr().colName, tr().colWhen]), ...(s.quiz ? [tr().colScore] : [])]
+      const cellsOf = (p: (typeof list)[number], nth: number): string[] => [
+        ...(r.anonymous || !p.at ? [sub(tr().responseN, { n: nth })] : [p.name ?? '', new Date(p.at.replace(' ', 'T')).toLocaleString(msk.context?.lang || undefined, { dateStyle: 'medium', timeStyle: 'short' })]),
+        ...(s.quiz ? [p.score === null ? '' : `${p.score}/${p.max_score} (${p.percent}%)${p.passed === null || p.passed === undefined ? '' : ` · ${p.passed ? tr().passed : tr().notPassed}`}`] : []),
+      ]
+      const vl = virtualList({
+        count: list.length,
+        estimateSize: 42,
+        label: tr().respondents,
+        render: (i) => {
+          const row = el('div', { class: 'sv-vrow', 'data-testid': 'respondent' })
+          for (const c of cellsOf(list[i]!, i + 1)) row.append(el('div', { class: 'sv-vcell' }, c))
+          return row
+        },
+      })
+      vl.el.classList.add('sv-vlist')
+      const vt = el('div', { class: 'sv-vtable' }, el('div', { class: 'sv-vhead' }, ...heads.map((h) => el('div', { class: 'sv-vcell' }, h))), vl.el)
+      vt.style.setProperty('--cols', String(heads.length))
+      wrap.append(el('h3', { class: 'sv-sub' }, tr().respondents), el('div', { class: 'sv-tablewrap' }, vt))
+    } else if (total) {
       const table = el('table', { class: 'sv-table' })
       const hr = el('tr', {}, ...(r.anonymous ? [el('th', { scope: 'col' }, tr().colResponse)] : [el('th', { scope: 'col' }, tr().colName), el('th', { scope: 'col' }, tr().colWhen)]))
       if (s.quiz) hr.append(el('th', { scope: 'col' }, tr().colScore))

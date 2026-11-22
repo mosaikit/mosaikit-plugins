@@ -24,7 +24,7 @@
 .fm-titlebtn:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 4px; }
 
 /* builder */
-.fm-form { display: flex; flex-direction: column; gap: var(--sp-3); min-width: min(680px, 80vw); max-height: 68vh; overflow: auto; padding-right: 4px; }
+.fm-form { display: flex; flex-direction: column; gap: var(--sp-3); min-width: min(600px, 78vw); max-height: 68vh; overflow: auto; padding-right: 4px; }
 .fm-form textarea { min-height: 70px; resize: vertical; }
 .fm-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--sp-3); align-items: end; }
 .fm-check { display: flex; align-items: center; gap: var(--sp-2); font-size: 14px; }
@@ -95,3 +95,21 @@
     --ok: #17683f; --err: #b3261e; color-scheme: light;
   }
 }
+
+/* templates of the builder */
+.fm-tpls { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-2); }
+.fm-tpl { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; text-align: left; font: inherit; color: var(--fg); padding: var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel2); cursor: pointer; transition: border-color var(--dur-1), background var(--dur-1), transform var(--dur-1) var(--ease); }
+.fm-tpl strong { font-size: 13px; }
+.fm-tpl span { font-size: 12px; color: var(--dim); line-height: 1.35; }
+.fm-tpl:hover { border-color: var(--acc-line); transform: translateY(-1px); }
+.fm-tpl[aria-pressed='true'] { border-color: var(--acc); background: var(--acc-soft); box-shadow: inset 0 -2px 0 var(--acc); }
+@media (prefers-reduced-motion: reduce) { .fm-tpl { transition: none; } .fm-tpl:hover { transform: none; } }
+
+/* a long list of answers: the header row and a list on the same grid of columns, the box scrolls across if it must */
+.fm-vtable { min-width: calc(var(--cols, 2) * 150px); border: 1px solid var(--line); border-radius: var(--r-m); background: var(--panel); overflow: hidden; }
+.fm-vhead, .fm-vrow { display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(140px, 1fr)); align-items: start; }
+.fm-vhead { padding-right: 10px; border-bottom: 1px solid var(--line); background: var(--panel2); font-size: 12px; font-weight: 600; color: var(--dim); }
+.fm-vlist { height: clamp(280px, 55vh, 640px); scrollbar-gutter: stable; }
+.fm-vrow { border-bottom: 1px solid var(--line); font-size: 13px; }
+.fm-vrow:hover { background: var(--acc-soft); }
+.fm-vcell { min-width: 0; padding: 10px 12px; overflow-wrap: anywhere; white-space: pre-wrap; }
