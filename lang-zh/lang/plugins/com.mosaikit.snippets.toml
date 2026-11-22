@@ -6,7 +6,7 @@ details = "随手备好团队反复使用的文本和代码:标题、文本或�
 [resources.snippets]
 label = "片段"
 fields = { title = "标题", body = "内容", kind = "类型", tags = "标签" }
-options.kind = { text = "文本", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", markdown = "Markdown", other = "其他" }
+options.kind = { text = "文本", shell = "shell", sql = "SQL", json = "JSON", javascript = "JavaScript", python = "Python", rust = "Rust", typescript = "TypeScript", html = "HTML", css = "CSS", yaml = "YAML", markdown = "Markdown", other = "其他" }
 
 [kpi.kpi_snippets_by_kind]
 label = "按类型统计的片段"
