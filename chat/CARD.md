@@ -1,6 +1,6 @@
 # Chat
 
-Chat the way you do in Microsoft Teams: one-to-one and group chats in a list with unread counts, pinned and muted chats, who is online, who is typing and who has seen your message. Write with formatting, mention people with @, mark a message Important or Urgent, reply with a quote, react with an emoji, pin messages, attach files from your device or from Documents and search what was said. The Call and Video buttons start a group call in the chat, which stays in the conversation with who joined and how long it lasted. The channels of earlier versions are still there.
+Chat the way you do in Microsoft Teams: one-to-one and group chats in a list with unread counts, pinned and muted chats, who is online, who is typing and who has seen your message. Write with formatting, mention people with @, mark a message Important or Urgent, reply with a quote, react with an emoji, pin messages, attach files from your device or from Documents and search what was said. The Call and Video buttons start a group call in the chat, which stays in the conversation with who joined and how long it lasted. The channels of earlier versions are still there: one switch at the top of the list goes from Chats to Channels and back.
 
 Uses:
 - A quick question to a colleague without opening a mail thread

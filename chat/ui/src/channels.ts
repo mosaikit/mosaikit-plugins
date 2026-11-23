@@ -30,7 +30,7 @@ const callUrl = (channelId: string) => 'https://meet.jit.si/mosaikit-' + channel
 const PAGE = 50
 const TYPING_EVERY = 3000
 
-export function mountChannels(msk: Msk, app: HTMLElement) {
+export function mountChannels(msk: Msk, app: HTMLElement, opts: { nav?: HTMLElement } = {}) {
   document.documentElement.classList.add('msk-fill')
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]
@@ -54,7 +54,7 @@ export function mountChannels(msk: Msk, app: HTMLElement) {
   // ----------------------------------------------------------------------------------------------- skeleton of the page
   const listBox = el('div', { class: 'cch-channels', role: 'list' })
   const newBtn = el('button', { type: 'button', class: 'msk-btn ghost mini', 'aria-label': tr().newChannel, title: tr().newChannel }, icon('plus', 16))
-  const side = el('aside', { class: 'cch-side', 'aria-label': tr().channels }, el('div', { class: 'cch-sidehead' }, el('h1', {}, tr().channels), newBtn), listBox)
+  const side = el('aside', { class: 'cch-side', 'aria-label': tr().channels }, el('div', { class: 'cch-sidehead' }, el('h1', {}, tr().channels), newBtn), ...(opts.nav ? [el('div', { class: 'cv-row' }, opts.nav)] : []), listBox)
   const roomHead = el('header', { class: 'cch-head' })
   const banner = el('div', { class: 'cch-banner', role: 'status' })
   banner.hidden = true
