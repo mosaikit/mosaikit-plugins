@@ -172,7 +172,7 @@
 .cc-barx:hover, .cc-x:hover { background: var(--acc-soft); }
 .cc-box { position: relative; border: 1px solid var(--line); border-radius: var(--r-l, 12px) var(--r-l, 12px) 0 0; background: var(--panel); transition: border-color var(--dur-1), box-shadow var(--dur-1); }
 .cc-box:focus-within { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-soft); }
-.cc-input { display: block; width: 100%; box-sizing: border-box; resize: none; max-height: 180px; border: 0; background: none; box-shadow: none; padding: 10px 12px; line-height: 1.4; }
+.cc-input { display: block; width: 100%; box-sizing: border-box; resize: none; min-height: 64px; max-height: 190px; overflow-y: auto; border: 0; background: none; box-shadow: none; padding: 10px 12px; line-height: 1.4; }
 .cc-input:focus { box-shadow: none; outline: none; }
 .cc-tools { display: flex; align-items: center; gap: 2px; padding: 4px 6px; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 var(--r-l, 12px) var(--r-l, 12px); background: var(--panel); margin-top: -5px; }
 .cc-grow { flex: 1; }

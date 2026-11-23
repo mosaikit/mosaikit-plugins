@@ -76,7 +76,7 @@
 .cch-replybar[hidden] { display: none; }
 .cch-row { display: flex; align-items: flex-end; gap: var(--sp-2); padding: 6px 6px 6px 12px; border: 1px solid var(--line); border-radius: var(--r-l); background: var(--panel); transition: border-color var(--dur-1), box-shadow var(--dur-1); }
 .cch-row:focus-within { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-soft); }
-.cch-input { flex: 1; min-width: 0; resize: none; max-height: 160px; border: 0; background: none; box-shadow: none; padding: 8px 4px; line-height: 1.4; }
+.cch-input { flex: 1; min-width: 0; box-sizing: border-box; resize: none; min-height: 64px; max-height: 160px; overflow-y: auto; border: 0; background: none; box-shadow: none; padding: 8px 4px; line-height: 1.4; }
 .cch-input:focus { box-shadow: none; }
 .cch-form { display: flex; flex-direction: column; gap: var(--sp-2); min-width: min(380px, 70vw); }
 

@@ -61,7 +61,7 @@ export function mountChannels(msk: Msk, app: HTMLElement) {
   const typingLine = el('div', { class: 'cch-typing', 'aria-live': 'polite' })
   const replyBar = el('div', { class: 'cch-replybar' })
   replyBar.hidden = true
-  const input = el('textarea', { class: 'cch-input', rows: '1', 'aria-label': tr().placeholder, placeholder: tr().placeholder, maxlength: '4000' })
+  const input = el('textarea', { class: 'cch-input', rows: '2', 'aria-label': tr().placeholder, placeholder: tr().placeholder, maxlength: '4000' })
   const sendBtn = el('button', { type: 'button', class: 'msk-btn' }, tr().send)
   const composer = el('div', { class: 'cch-composer' }, replyBar, el('div', { class: 'cch-row' }, input, sendBtn))
   const room = el('section', { class: 'cch-room' }, roomHead, banner, scroller, typingLine, composer)
