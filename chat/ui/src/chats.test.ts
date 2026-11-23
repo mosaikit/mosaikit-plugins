@@ -20,7 +20,22 @@ const message = (id: string, author: string, text: string, min: number, extra: R
   id, chat: C1, at: ago(min), kind: 'message', text, author, reply_to: '', edited: false, deleted: false, importance: 'normal', mentions: [], attachments: [], meta: {}, pinned: false, pinned_by: '', reactions: {}, ...extra,
 })
 
-function fakeMsk() {
+/** The presence of the platform as the shell publishes it (`msk.presence`). */
+function fakePresence(supported: boolean, live: boolean, users: Record<string, 'available' | 'away'> = {}) {
+  const subs = new Set<() => void>()
+  const p = {
+    supported,
+    live,
+    users,
+    get: () => p.users,
+    status: (id: string) => p.users[id] ?? 'offline',
+    onChange: (f: () => void) => (subs.add(f), () => void subs.delete(f)),
+    emit: () => subs.forEach((f) => f()),
+  }
+  return p
+}
+
+function fakeMsk(presence?: ReturnType<typeof fakePresence>) {
   const calls: { name: string; args: Record<string, unknown> }[] = []
   const sent: unknown[] = []
   let overview: Record<string, unknown>[] = [
@@ -40,6 +55,7 @@ function fakeMsk() {
     onContext: () => () => undefined,
     open: async () => undefined,
     realtime: { open: () => channel },
+    presence,
     t: (s: string) => s,
     directory: { search: async () => [{ id: ANN, username: 'ann', name: 'Ann Rossi' }, { id: BOB, username: 'bob', name: 'Bob Verdi' }] },
     files: { list: async () => ({ entries: [] }) },
@@ -82,8 +98,8 @@ afterEach(() => {
   document.body.replaceChildren()
 })
 
-async function start() {
-  const host = fakeMsk()
+async function start(presence?: ReturnType<typeof fakePresence>) {
+  const host = fakeMsk(presence)
   const app = document.createElement('div')
   document.body.append(app)
   mountChats(host.msk, app)
@@ -230,5 +246,30 @@ describe('a conversation', () => {
     ;($(document, '.ccall .msk-btn.danger') as HTMLButtonElement).click()
     await until(() => expect(calls.some((c) => c.name === 'chats.call_leave')).toBe(true))
     expect($(document, 'iframe.ccall-frame')).toBeNull()
+  })
+})
+
+describe('presence of the platform', () => {
+  const dotOf = (app: HTMLElement, name: string) =>
+    $<HTMLElement>($$(app, '.cl-row').find((r) => r.textContent?.includes(name))!, '.cl-dot')
+
+  it('shows a person as online from the platform list, in a page where no channel holds them, and offline when they leave', async () => {
+    const p = fakePresence(true, true, { [ANN]: 'available' })
+    const { app } = await start(p)
+    expect(dotOf(app, 'Ann Rossi').classList.contains('available')).toBe(true)
+    expect(dotOf(app, 'Ann Rossi').getAttribute('aria-label')).toBe('Available')
+    p.users = { [ANN]: 'away' }
+    p.emit()
+    await until(() => expect(dotOf(app, 'Ann Rossi').classList.contains('away')).toBe(true))
+    p.users = {}
+    p.emit()
+    await until(() => expect(dotOf(app, 'Ann Rossi').classList.contains('off')).toBe(true))
+  })
+
+  it('an older shell, or a connection that is down: the dot stays grey (the channels are the only source)', async () => {
+    const old = await start(fakePresence(false, false, { [ANN]: 'available' }))
+    expect(dotOf(old.app, 'Ann Rossi').classList.contains('off')).toBe(true)
+    const down = await start(fakePresence(true, false, { [ANN]: 'available' }))
+    expect(dotOf(down.app, 'Ann Rossi').classList.contains('off')).toBe(true)
   })
 })
