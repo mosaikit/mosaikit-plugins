@@ -19,7 +19,7 @@ const en = {
   pickChatTitle: 'Pick a chat', pickChatText: 'Choose a chat on the left, or start a new one.', noChatMatch: 'No chat matches.', moreActions: 'More actions',
   pin: 'Pin', unpin: 'Unpin', mute: 'Mute', unmute: 'Unmute', markUnread: 'Mark as unread', markRead: 'Mark as read', hideChat: 'Hide', leaveChat: 'Leave',
   leaveTitle: 'Leave this chat?', leaveText: 'You will not get its messages any more. Someone can add you again.', backToList: 'Back to the chats',
-  presenceAvailable: 'Available', presenceAway: 'Away', unreadCount: '{n} unread', mentionedYou: 'You were mentioned', mutedChat: 'Muted', pinnedChat: 'Pinned', clearFilters: 'Clear filters',
+  presenceAvailable: 'Available', presenceAway: 'Away', presenceOffline: 'Offline', unreadCount: '{n} unread', mentionedYou: 'You were mentioned', mutedChat: 'Muted', pinnedChat: 'Pinned', clearFilters: 'Clear filters',
   // the header and its tabs
   tabs: 'Sections of the chat', tabChat: 'Chat', tabFiles: 'Files', tabPinned: 'Pinned', people: 'People', addPeople: 'Add people', callVideo: 'Video call', callAudio: 'Audio call',
   searchInChat: 'Search in this chat', peopleCount: '{n} people', renameChat: 'Rename the chat', chatNameLabel: 'Chat name', groupChat: 'Group chat',
@@ -44,7 +44,7 @@ const en = {
   searchMessages: 'Search messages', searchNone: 'No messages found.', searchResults: 'Messages', searchClose: 'Close the search',
   // calls
   startedCall: '{n} started a call', startedVoice: '{n} started a voice call', joinCall: 'Join', leaveCall: 'Leave the call', inCall: 'In the call: {n}', callEnded: 'Call ended',
-  callEndedLine: 'Call ended · {d}', callJoined: '{n} took part', callFailed: 'Could not start the call: ', callPrivacy: 'The call runs on the Jitsi Meet service: no video goes through Mosaikit.', callTitle: 'Call',
+  callEndedLine: 'Call ended · {d}', callJoined: '{n} took part', callFailed: 'Could not start the call: ', callPrivacy: 'The call runs on the Jitsi Meet service: no video goes through Mosaikit.', callTitle: 'Call', callFullscreen: 'Full screen',
 }
 export type Texts = typeof en
 export type L = string
@@ -68,7 +68,7 @@ const it: Texts = {
   pickChatTitle: 'Scegli una chat', pickChatText: 'Scegli una chat a sinistra, oppure avviane una nuova.', noChatMatch: 'Nessuna chat corrisponde.', moreActions: 'Altre azioni',
   pin: 'Fissa', unpin: 'Non fissare più', mute: 'Silenzia', unmute: 'Riattiva le notifiche', markUnread: 'Segna come non letta', markRead: 'Segna come letta', hideChat: 'Nascondi', leaveChat: 'Esci',
   leaveTitle: 'Uscire da questa chat?', leaveText: 'Non riceverai più i suoi messaggi. Qualcuno può aggiungerti di nuovo.', backToList: 'Torna alle chat',
-  presenceAvailable: 'Disponibile', presenceAway: 'Assente', unreadCount: '{n} non letti', mentionedYou: 'Sei stato menzionato', mutedChat: 'Silenziata', pinnedChat: 'Fissata', clearFilters: 'Cancella i filtri',
+  presenceAvailable: 'Disponibile', presenceAway: 'Assente', presenceOffline: 'Non in linea', unreadCount: '{n} non letti', mentionedYou: 'Sei stato menzionato', mutedChat: 'Silenziata', pinnedChat: 'Fissata', clearFilters: 'Cancella i filtri',
   tabs: 'Sezioni della chat', tabChat: 'Chat', tabFiles: 'File', tabPinned: 'Fissati', people: 'Persone', addPeople: 'Aggiungi persone', callVideo: 'Videochiamata', callAudio: 'Chiamata audio',
   searchInChat: 'Cerca in questa chat', peopleCount: '{n} persone', renameChat: 'Rinomina la chat', chatNameLabel: 'Nome della chat', groupChat: 'Chat di gruppo',
   newChatTitle: 'Nuova chat', to: 'A', toPlaceholder: 'Scrivi un nome', groupName: 'Nome del gruppo (facoltativo)', startChat: 'Avvia la chat', groupHint: 'Con più di una persona crei una chat di gruppo.',
@@ -86,7 +86,7 @@ const it: Texts = {
   docsUp: 'Su', attachSelected: 'Allega', attachFailed: 'Impossibile allegare: ', shareFailed: 'Impossibile condividere {n} con la chat: ',
   searchMessages: 'Cerca nei messaggi', searchNone: 'Nessun messaggio trovato.', searchResults: 'Messaggi', searchClose: 'Chiudi la ricerca',
   startedCall: '{n} ha avviato una chiamata', startedVoice: '{n} ha avviato una chiamata audio', joinCall: 'Entra', leaveCall: 'Esci dalla chiamata', inCall: 'Nella chiamata: {n}', callEnded: 'Chiamata terminata',
-  callEndedLine: 'Chiamata terminata · {d}', callJoined: '{n} hanno partecipato', callFailed: 'Impossibile avviare la chiamata: ', callPrivacy: 'La chiamata passa dal servizio Jitsi Meet: nessun video passa da Mosaikit.', callTitle: 'Chiamata',
+  callEndedLine: 'Chiamata terminata · {d}', callJoined: '{n} hanno partecipato', callFailed: 'Impossibile avviare la chiamata: ', callPrivacy: 'La chiamata passa dal servizio Jitsi Meet: nessun video passa da Mosaikit.', callTitle: 'Chiamata', callFullscreen: 'Schermo intero',
 }
 const es: Texts = {
   title: 'Chat', channels: 'Canales', newChannel: 'Nuevo canal', channelName: 'Nombre', channelTopic: 'Tema (opcional)', create: 'Crear', save: 'Guardar', cancel: 'Cancelar', close: 'Cerrar',
@@ -107,7 +107,7 @@ const es: Texts = {
   pickChatTitle: 'Elige un chat', pickChatText: 'Elige un chat a la izquierda o empieza uno nuevo.', noChatMatch: 'Ningún chat coincide.', moreActions: 'Más acciones',
   pin: 'Fijar', unpin: 'Dejar de fijar', mute: 'Silenciar', unmute: 'Activar las notificaciones', markUnread: 'Marcar como no leído', markRead: 'Marcar como leído', hideChat: 'Ocultar', leaveChat: 'Salir',
   leaveTitle: '¿Salir de este chat?', leaveText: 'Ya no recibirás sus mensajes. Alguien puede volver a añadirte.', backToList: 'Volver a los chats',
-  presenceAvailable: 'Disponible', presenceAway: 'Ausente', unreadCount: '{n} sin leer', mentionedYou: 'Te han mencionado', mutedChat: 'Silenciado', pinnedChat: 'Fijado', clearFilters: 'Borrar los filtros',
+  presenceAvailable: 'Disponible', presenceAway: 'Ausente', presenceOffline: 'Sin conexión', unreadCount: '{n} sin leer', mentionedYou: 'Te han mencionado', mutedChat: 'Silenciado', pinnedChat: 'Fijado', clearFilters: 'Borrar los filtros',
   tabs: 'Secciones del chat', tabChat: 'Chat', tabFiles: 'Archivos', tabPinned: 'Fijados', people: 'Personas', addPeople: 'Añadir personas', callVideo: 'Videollamada', callAudio: 'Llamada de audio',
   searchInChat: 'Buscar en este chat', peopleCount: '{n} personas', renameChat: 'Cambiar el nombre del chat', chatNameLabel: 'Nombre del chat', groupChat: 'Chat de grupo',
   newChatTitle: 'Nuevo chat', to: 'Para', toPlaceholder: 'Escribe un nombre', groupName: 'Nombre del grupo (opcional)', startChat: 'Iniciar el chat', groupHint: 'Con más de una persona creas un chat de grupo.',
@@ -125,7 +125,7 @@ const es: Texts = {
   docsUp: 'Subir', attachSelected: 'Adjuntar', attachFailed: 'No se pudo adjuntar: ', shareFailed: 'No se pudo compartir {n} con el chat: ',
   searchMessages: 'Buscar mensajes', searchNone: 'No se encontraron mensajes.', searchResults: 'Mensajes', searchClose: 'Cerrar la búsqueda',
   startedCall: '{n} inició una llamada', startedVoice: '{n} inició una llamada de audio', joinCall: 'Unirse', leaveCall: 'Salir de la llamada', inCall: 'En la llamada: {n}', callEnded: 'Llamada terminada',
-  callEndedLine: 'Llamada terminada · {d}', callJoined: 'Participaron {n}', callFailed: 'No se pudo iniciar la llamada: ', callPrivacy: 'La llamada se hace en el servicio Jitsi Meet: ningún vídeo pasa por Mosaikit.', callTitle: 'Llamada',
+  callEndedLine: 'Llamada terminada · {d}', callJoined: 'Participaron {n}', callFailed: 'No se pudo iniciar la llamada: ', callPrivacy: 'La llamada se hace en el servicio Jitsi Meet: ningún vídeo pasa por Mosaikit.', callTitle: 'Llamada', callFullscreen: 'Pantalla completa',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
 // (`lang/ui/<plugin id>.json`, English phrase → translation, read through `msk.t`), once `bindTexts` has run; the English

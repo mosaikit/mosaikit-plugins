@@ -21,6 +21,7 @@ import {
   type Row,
 } from '@mosaikit/plugin-api'
 import { fromRow, QUICK, runs, snippet, stringifyReactions, toggleReaction, typingNames, upsert, without, type Msg } from './logic.ts'
+import { icon, type IconName } from './icons.ts'
 import { TEXTS, langOf, sub } from './texts.ts'
 
 /** A call from a channel: a room of the meeting service named after the channel (nobody can guess it), opened in a new tab. */
@@ -52,7 +53,7 @@ export function mountChannels(msk: Msk, app: HTMLElement) {
 
   // ----------------------------------------------------------------------------------------------- skeleton of the page
   const listBox = el('div', { class: 'cch-channels', role: 'list' })
-  const newBtn = el('button', { type: 'button', class: 'msk-btn ghost mini', 'aria-label': tr().newChannel, title: tr().newChannel }, '＋')
+  const newBtn = el('button', { type: 'button', class: 'msk-btn ghost mini', 'aria-label': tr().newChannel, title: tr().newChannel }, icon('plus', 16))
   const side = el('aside', { class: 'cch-side', 'aria-label': tr().channels }, el('div', { class: 'cch-sidehead' }, el('h1', {}, tr().channels), newBtn), listBox)
   const roomHead = el('header', { class: 'cch-head' })
   const banner = el('div', { class: 'cch-banner', role: 'status' })
@@ -134,13 +135,13 @@ export function mountChannels(msk: Msk, app: HTMLElement) {
   const drawHead = () => {
     roomHead.replaceChildren()
     if (!current) return
-    const back = el('button', { type: 'button', class: 'msk-btn ghost mini cch-back', 'aria-label': tr().back }, '‹')
+    const back = el('button', { type: 'button', class: 'msk-btn ghost mini cch-back', 'aria-label': tr().back }, icon('chevronLeft', 18))
     back.addEventListener('click', () => root.setAttribute('data-view', 'list'))
     const others = people.filter((p) => p.id !== me)
     const who = others.length ? el('span', { class: 'cch-who', title: others.map((p) => p.name).join(', ') }, avatarStack(others.map((p) => p.name), 4), el('span', { class: 'cch-online' }, sub(tr().online, { n: others.length + 1 }))) : el('span', { class: 'cch-online' }, tr().alone)
     const acts = el('div', { class: 'cch-acts' })
     if (can(current)) {
-      const call = el('button', { type: 'button', class: 'msk-btn ghost mini' }, '📞 ' + tr().call)
+      const call = el('button', { type: 'button', class: 'msk-btn ghost mini' }, icon('phone', 14), ' ' + tr().call)
       call.addEventListener('click', () => {
         const url = callUrl(current!.id)
         window.open(url, '_blank', 'noopener,noreferrer')
@@ -225,17 +226,17 @@ export function mountChannels(msk: Msk, app: HTMLElement) {
     // the buttons that show on hover and on focus
     if (editing !== m.id) {
       const acts = el('div', { class: 'cm-actions', role: 'toolbar', 'aria-label': tr().react })
-      const btn = (label: string, glyph: string, fn: (b: HTMLElement) => void) => {
-        const b = el('button', { type: 'button', class: 'cm-act', 'aria-label': label, title: label }, glyph)
+      const btn = (label: string, glyph: IconName, fn: (b: HTMLElement) => void) => {
+        const b = el('button', { type: 'button', class: 'cm-act', 'aria-label': label, title: label }, icon(glyph, 16))
         b.addEventListener('click', () => fn(b))
         acts.append(b)
       }
       if (can(current)) {
-        btn(tr().react, '☺', (b) => menu(b, QUICK.map((e) => ({ label: e, onClick: () => void react(m, e) }))))
-        btn(tr().reply, '↩', () => setReply(m))
+        btn(tr().react, 'smile', (b) => menu(b, QUICK.map((e) => ({ label: e, onClick: () => void react(m, e) }))))
+        btn(tr().reply, 'reply', () => setReply(m))
       }
-      if (own && can(current)) btn(tr().edit, '✎', () => ((editing = m.id), drawMessages(false)))
-      if (own || current?.my_level === 'manage') btn(tr().delete, '🗑', () => void removeMessage(m))
+      if (own && can(current)) btn(tr().edit, 'pencil', () => ((editing = m.id), drawMessages(false)))
+      if (own || current?.my_level === 'manage') btn(tr().delete, 'trash', () => void removeMessage(m))
       if (acts.childElementCount) row.append(acts)
     }
     return row
@@ -287,7 +288,7 @@ export function mountChannels(msk: Msk, app: HTMLElement) {
     if (replyTo) {
       replyBar.hidden = false
       replyBar.replaceChildren(el('span', {}, sub(tr().replyingTo, { n: replyTo.from.name }), ' — ', snippet(replyTo.text, 80)))
-      const x = el('button', { type: 'button', class: 'msk-btn ghost mini', 'aria-label': tr().cancelReply }, '×')
+      const x = el('button', { type: 'button', class: 'msk-btn ghost mini', 'aria-label': tr().cancelReply }, icon('x', 14))
       x.addEventListener('click', () => setReply(null))
       replyBar.append(x)
     } else replyBar.hidden = true

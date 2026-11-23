@@ -3,6 +3,7 @@
 // send button. It knows nothing of the data: the page gives it the people and what to do with a message.
 import { avatar, el, menu, popover } from '@mosaikit/plugin-api'
 import { applyFormat, EMOJI, insertAt, mentionAt, mentionChoices, sendsOnEnter, fileSize, type Attachment, type ChatMsg, type Format, type Member, type Person } from './chats-logic.ts'
+import { icon, type IconName } from './icons.ts'
 import { snippet } from './logic.ts'
 import { sub, type Texts } from './texts.ts'
 
@@ -42,16 +43,16 @@ export interface Composer {
   value(): string
 }
 
-const FORMATS: { f: Format; glyph: string; key: keyof Texts; shortcut?: string }[] = [
-  { f: 'bold', glyph: 'B', key: 'bold', shortcut: 'b' },
-  { f: 'italic', glyph: 'I', key: 'italic', shortcut: 'i' },
-  { f: 'underline', glyph: 'U', key: 'underline', shortcut: 'u' },
-  { f: 'strike', glyph: 'S', key: 'strike' },
-  { f: 'bullets', glyph: '•', key: 'bullets' },
-  { f: 'numbers', glyph: '1.', key: 'numbers' },
-  { f: 'quote', glyph: '❝', key: 'quote' },
-  { f: 'code', glyph: '</>', key: 'codeBtn' },
-  { f: 'link', glyph: '🔗', key: 'linkBtn', shortcut: 'k' },
+const FORMATS: { f: Format; glyph: IconName; key: keyof Texts; shortcut?: string }[] = [
+  { f: 'bold', glyph: 'bold', key: 'bold', shortcut: 'b' },
+  { f: 'italic', glyph: 'italic', key: 'italic', shortcut: 'i' },
+  { f: 'underline', glyph: 'underline', key: 'underline', shortcut: 'u' },
+  { f: 'strike', glyph: 'strike', key: 'strike' },
+  { f: 'bullets', glyph: 'list', key: 'bullets' },
+  { f: 'numbers', glyph: 'listOrdered', key: 'numbers' },
+  { f: 'quote', glyph: 'quote', key: 'quote' },
+  { f: 'code', glyph: 'code', key: 'codeBtn' },
+  { f: 'link', glyph: 'link', key: 'linkBtn', shortcut: 'k' },
 ]
 
 const TYPING_EVERY = 3000
@@ -77,11 +78,11 @@ export function composer(o: ComposerOptions): Composer {
   pop.hidden = true
   const fmtBar = el('div', { class: 'cc-fmt', role: 'toolbar' })
   fmtBar.hidden = true
-  const send = el('button', { type: 'button', class: 'cc-send' }, '➤')
-  const fmtBtn = el('button', { type: 'button', class: 'cc-tool', 'aria-pressed': 'false' }, 'Aa')
-  const impBtn = el('button', { type: 'button', class: 'cc-tool' }, '❗')
-  const emojiBtn = el('button', { type: 'button', class: 'cc-tool' }, '☺')
-  const attachBtn = el('button', { type: 'button', class: 'cc-tool' }, '📎')
+  const send = el('button', { type: 'button', class: 'cc-send' }, icon('send', 16))
+  const fmtBtn = el('button', { type: 'button', class: 'cc-tool', 'aria-pressed': 'false' }, icon('type'))
+  const impBtn = el('button', { type: 'button', class: 'cc-tool' }, icon('alert'))
+  const emojiBtn = el('button', { type: 'button', class: 'cc-tool' }, icon('smile'))
+  const attachBtn = el('button', { type: 'button', class: 'cc-tool' }, icon('paperclip'))
   attachBtn.hidden = !o.canAttach
   const file = el('input', { type: 'file', multiple: '', class: 'cc-hidden', tabindex: '-1', 'aria-hidden': 'true' })
   const tools = el('div', { class: 'cc-tools' }, fmtBtn, impBtn, emojiBtn, attachBtn, el('span', { class: 'cc-grow' }), send)
@@ -123,7 +124,7 @@ export function composer(o: ComposerOptions): Composer {
   }
   const format = (f: Format) => apply(applyFormat(f, input.value, input.selectionStart ?? 0, input.selectionEnd ?? 0, tr()[FORMATS.find((x) => x.f === f)!.key]!.toLowerCase()))
   for (const f of FORMATS) {
-    const b = el('button', { type: 'button', class: 'cc-fmtbtn', 'data-key': f.key }, f.glyph)
+    const b = el('button', { type: 'button', class: 'cc-fmtbtn', 'data-key': f.key }, icon(f.glyph, 16))
     b.addEventListener('click', () => format(f.f))
     fmtBar.append(b)
   }
@@ -150,14 +151,14 @@ export function composer(o: ComposerOptions): Composer {
 
   const drawImportance = () => {
     impBtn.classList.toggle('on', importance !== 'normal')
-    impBtn.textContent = importance === 'urgent' ? '‼' : '❗'
+    impBtn.replaceChildren(icon(importance === 'urgent' ? 'warning' : 'alert'))
     impBtn.setAttribute('data-importance', importance)
   }
   impBtn.addEventListener('click', () =>
     menu(impBtn, [
       { label: tr().importanceNormal, onClick: () => ((importance = 'normal'), drawImportance()) },
-      { label: '❗ ' + tr().importantLabel, onClick: () => ((importance = 'important'), drawImportance()) },
-      { label: '‼ ' + tr().urgentLabel, onClick: () => ((importance = 'urgent'), drawImportance()) },
+      { label: tr().importantLabel, onClick: () => ((importance = 'important'), drawImportance()) },
+      { label: tr().urgentLabel, onClick: () => ((importance = 'urgent'), drawImportance()) },
     ]),
   )
 
@@ -166,12 +167,12 @@ export function composer(o: ComposerOptions): Composer {
     chips.replaceChildren()
     chips.hidden = !attachments.length && !busy
     for (const a of attachments) {
-      const x = el('button', { type: 'button', class: 'cc-x', 'aria-label': sub(tr().removeFile, { n: a.name }) }, '×')
+      const x = el('button', { type: 'button', class: 'cc-x', 'aria-label': sub(tr().removeFile, { n: a.name }) }, icon('x', 14))
       x.addEventListener('click', () => {
         attachments = attachments.filter((f) => f.id !== a.id)
         drawFiles()
       })
-      chips.append(el('span', { class: 'cc-chip' }, '📎 ', el('span', { class: 'cc-chipname' }, a.name), el('span', { class: 'cc-chipsize' }, a.size ? fileSize(a.size) : ''), x))
+      chips.append(el('span', { class: 'cc-chip' }, icon('paperclip', 13), ' ', el('span', { class: 'cc-chipname' }, a.name), el('span', { class: 'cc-chipsize' }, a.size ? fileSize(a.size) : ''), x))
     }
     if (busy) chips.append(el('span', { class: 'cc-chip busy', role: 'status' }, sub(tr().uploading, { n: String(busy) })))
   }
@@ -268,7 +269,7 @@ export function composer(o: ComposerOptions): Composer {
   const drawBar = () => {
     bar.replaceChildren()
     bar.hidden = !replyTo && !editing
-    const x = el('button', { type: 'button', class: 'cc-barx', 'aria-label': tr().cancel }, '×')
+    const x = el('button', { type: 'button', class: 'cc-barx', 'aria-label': tr().cancel }, icon('x', 14))
     x.addEventListener('click', () => (editing ? edit(null) : reply(null)))
     if (editing) bar.append(el('span', {}, '✎ ', tr().editingMessage, ' — ', snippet(editing.text, 60)), x)
     else if (replyTo) bar.append(el('span', {}, sub(tr().replyingTo, { n: o.names(replyTo.author) || tr().deletedAuthor }), ' — ', snippet(replyTo.text || tr().deletedMsg, 80)), x)
