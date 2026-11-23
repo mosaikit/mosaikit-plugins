@@ -59,7 +59,7 @@ const PAGE = 40
 type Tab = 'chat' | 'files' | 'pinned'
 type Hint = { t?: string; id?: string }
 
-export function mountChats(msk: Msk, app: HTMLElement) {
+export function mountChats(msk: Msk, app: HTMLElement, opts: { nav?: HTMLElement } = {}) {
   document.documentElement.classList.add('msk-fill')
   let lang = langOf(msk.context?.lang)
   const tr = () => TEXTS[lang]!
@@ -98,8 +98,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
   const search = el('input', { type: 'search', class: 'cl-search', autocomplete: 'off' })
   const filterBar = el('div', { class: 'cl-filters', role: 'group' })
   const items = el('div', { class: 'cl-items' })
-  const chanLink = el('button', { type: 'button', class: 'cl-chan' }, '# ' + tr().channels)
-  const side = el('aside', { class: 'cl' }, el('div', { class: 'cl-head' }, title, newBtn), el('div', { class: 'cl-searchrow' }, search), filterBar, items, chanLink)
+  const side = el('aside', { class: 'cl' }, el('div', { class: 'cl-head' }, title, newBtn), ...(opts.nav ? [el('div', { class: 'cv-row' }, opts.nav)] : []), el('div', { class: 'cl-searchrow' }, search), filterBar, items)
   const head = el('header', { class: 'cr-head' })
   const tabsBar = el('div', { class: 'cr-tabs', role: 'tablist' })
   const banner = el('div', { class: 'cr-banner', role: 'status' })
@@ -1176,7 +1175,6 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     newBtn.title = tr().newChat
     search.setAttribute('aria-label', tr().searchChats)
     search.placeholder = tr().searchChats
-    chanLink.textContent = '# ' + tr().channels
     drawFilters()
     drawList()
     if (current) {
@@ -1186,7 +1184,6 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     compose.retitle()
   }
   newBtn.addEventListener('click', startNew)
-  chanLink.addEventListener('click', () => void msk.open((msk.plugin?.id ?? 'com.mosaikit.chat'), 'channels'))
   msk.onContext((ctx) => {
     if (langOf(ctx.lang) === lang) return
     lang = langOf(ctx.lang)

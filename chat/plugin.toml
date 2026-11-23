@@ -1,13 +1,13 @@
 id = "com.mosaikit.chat"
 name = "Chat"
-version = "0.4.0"
+version = "0.5.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "message-circle"
 description = "Chat like Microsoft Teams: one-to-one and group chats with presence, read receipts, reactions, mentions, files and calls"
 author = "Mosaikit"
 license = "Apache-2.0"
-details = "Talk with your colleagues the way you do in Microsoft Teams: one-to-one chats and group chats, a list with unread counts, pinned and muted chats, people online, who is typing and who has seen your message.\n\nWrite with formatting, mention people with @, mark a message Important or Urgent, reply with a quote, react with an emoji, pin a message, attach files from your device or from Documents and search what was said. The Call and Video buttons start a group call in the chat, and the call stays in the conversation with who joined and how long it lasted.\n\nA chat is private to its participants: it is shared with each of them and anyone in it can add people (with or without the earlier history). The history that a newcomer does not see is hidden by the page, not by the platform. The channels of earlier versions are still there, under Channels.\n\nWhat the plugin asks: to find people of your organisation to chat with (directory), to notify them (notifications), to show the call service (meet.jit.si) with camera and microphone, and to read and add files in Documents for attachments."
+details = "Talk with your colleagues the way you do in Microsoft Teams: one-to-one chats and group chats, a list with unread counts, pinned and muted chats, people online, who is typing and who has seen your message.\n\nWrite with formatting, mention people with @, mark a message Important or Urgent, reply with a quote, react with an emoji, pin a message, attach files from your device or from Documents and search what was said. The Call and Video buttons start a group call in the chat, and the call stays in the conversation with who joined and how long it lasted.\n\nA chat is private to its participants: it is shared with each of them and anyone in it can add people (with or without the earlier history). The history that a newcomer does not see is hidden by the page, not by the platform. The channels of earlier versions are still there: switch from Chats to Channels at the top of the list.\n\nWhat the plugin asks: to find people of your organisation to chat with (directory), to notify them (notifications), to show the call service (meet.jit.si) with camera and microphone, and to read and add files in Documents for attachments."
 screenshots = ["channel.webp", "direct.webp"]
 homepage = "https://example.org/mosaikit/plugins/chat"
 
@@ -95,16 +95,8 @@ files_read = true
 files_write = true
 resources_read = ["com.mosaikit.files"]
 
-# the pages of the app: Chats is the plugin; Channels are the channels of earlier versions
-[[nav]]
-id = "chats"
-label = "Chats"
-icon = "message-circle"
-
-[[nav]]
-id = "channels"
-label = "Channels"
-icon = "hash"
+# no [[nav]]: the app is one entry of the sidebar; Chats and Channels (the channels of earlier versions) are switched inside it,
+# and the places «chats», «channels» and `chat/<id>` still open the right view
 
 [[kpi]]
 view = "kpi_chat_activity"
@@ -125,7 +117,7 @@ data = { command = "chats.widget_unread", kind = "list", size = "m", texts = { e
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 description = "Chat come Microsoft Teams: chat singole e di gruppo con presenza, conferme di lettura, reazioni, menzioni, file e chiamate"
-details = "Parla con i colleghi come in Microsoft Teams: chat singole e di gruppo, un elenco con i messaggi non letti, chat fissate e silenziate, chi è online, chi sta scrivendo e chi ha visto il tuo messaggio.\n\nScrivi con la formattazione, menziona le persone con @, segna un messaggio Importante o Urgente, rispondi con una citazione, reagisci con una emoji, fissa un messaggio, allega file dal dispositivo o da Documenti e cerca ciò che è stato detto. I pulsanti Chiama e Video avviano una chiamata di gruppo nella chat, e la chiamata resta nella conversazione con chi è entrato e quanto è durata.\n\nUna chat è privata per chi vi partecipa: è condivisa con ciascuno e chiunque può aggiungere persone (con o senza la cronologia precedente). La cronologia che un nuovo arrivato non vede è nascosta dalla pagina, non dalla piattaforma. I canali delle versioni precedenti ci sono ancora, sotto Canali.\n\nCosa chiede il plugin: trovare le persone della tua organizzazione con cui chattare (directory), avvisarle (notifiche), mostrare il servizio di chiamata (meet.jit.si) con fotocamera e microfono, e leggere e aggiungere file in Documenti per gli allegati."
+details = "Parla con i colleghi come in Microsoft Teams: chat singole e di gruppo, un elenco con i messaggi non letti, chat fissate e silenziate, chi è online, chi sta scrivendo e chi ha visto il tuo messaggio.\n\nScrivi con la formattazione, menziona le persone con @, segna un messaggio Importante o Urgente, rispondi con una citazione, reagisci con una emoji, fissa un messaggio, allega file dal dispositivo o da Documenti e cerca ciò che è stato detto. I pulsanti Chiama e Video avviano una chiamata di gruppo nella chat, e la chiamata resta nella conversazione con chi è entrato e quanto è durata.\n\nUna chat è privata per chi vi partecipa: è condivisa con ciascuno e chiunque può aggiungere persone (con o senza la cronologia precedente). La cronologia che un nuovo arrivato non vede è nascosta dalla pagina, non dalla piattaforma. I canali delle versioni precedenti ci sono ancora: passa da Chat a Canali in cima all’elenco.\n\nCosa chiede il plugin: trovare le persone della tua organizzazione con cui chattare (directory), avvisarle (notifiche), mostrare il servizio di chiamata (meet.jit.si) con fotocamera e microfono, e leggere e aggiungere file in Documenti per gli allegati."
 name = "Chat"
 label = "Chat"
 
@@ -147,10 +139,6 @@ label = "Messaggi delle chat"
 fields = { kind = "Tipo", text = "Testo", author_id = "Autore", reply_to = "Risposta a", edited = "Modificato", deleted = "Eliminato", importance = "Importanza", mentions = "Menzioni", attachments = "File", meta = "Dettagli", pinned = "Fissato", pinned_by = "Fissato da" }
 options.kind = { message = "messaggio", system = "di sistema", call = "chiamata" }
 options.importance = { normal = "normale", important = "importante", urgent = "urgente" }
-
-[i18n.it.nav]
-chats = "Chat"
-channels = "Canali"
 
 [i18n.it.kpi.kpi_chat_activity]
 label = "Attività delle chat"

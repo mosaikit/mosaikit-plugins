@@ -11,7 +11,7 @@
 .cl-head h1 { margin: 0; font-size: 18px; font-weight: 700; }
 .cl-new { all: unset; cursor: pointer; width: 34px; height: 34px; display: grid; place-items: center; border-radius: var(--r-s); font-size: 17px; color: var(--acc); background: var(--acc-soft); }
 .cl-new:hover { background: color-mix(in srgb, var(--acc) 22%, var(--bg)); }
-.cl-new:focus-visible, .cl-row:focus-visible, .cl-more:focus-visible, .cl-filter:focus-visible, .cl-hit:focus-visible, .cl-chan:focus-visible { outline: 2px solid var(--acc); outline-offset: -2px; }
+.cl-new:focus-visible, .cl-row:focus-visible, .cl-more:focus-visible, .cl-filter:focus-visible, .cl-hit:focus-visible { outline: 2px solid var(--acc); outline-offset: -2px; }
 .cl-searchrow { padding: 0 12px 8px; }
 .cl-search { width: 100%; box-sizing: border-box; }
 .cl-filters { display: flex; gap: 6px; padding: 0 12px 8px; flex-wrap: wrap; }
@@ -52,8 +52,6 @@
 .cl-hit { all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 8px 10px; border-radius: var(--r-s); cursor: pointer; }
 .cl-hit:hover { background: var(--acc-soft); }
 .cl-none { margin: var(--sp-3); font-size: 13px; color: var(--dim); }
-.cl-chan { all: unset; cursor: pointer; margin: 0 12px 10px; padding: 6px 8px; border-radius: var(--r-s); font-size: 12px; color: var(--dim); }
-.cl-chan:hover { color: var(--acc); background: var(--acc-soft); }
 
 /* --------------------------------------------------------------------------------------------- the conversation */
 .cr { display: flex; flex-direction: column; min-width: 0; min-height: 0; position: relative; }

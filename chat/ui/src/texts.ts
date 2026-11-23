@@ -1,7 +1,7 @@
 import type { Msk } from '@mosaikit/plugin-api'
 // The texts of the Chat UI (English by default; Italian and Spanish follow the language of the host).
 const en = {
-  title: 'Chat', channels: 'Channels', newChannel: 'New channel', channelName: 'Name', channelTopic: 'Topic (optional)', create: 'Create', save: 'Save', cancel: 'Cancel', close: 'Close',
+  title: 'Chat', viewsLabel: 'Chats or channels', channels: 'Channels', newChannel: 'New channel', channelName: 'Name', channelTopic: 'Topic (optional)', create: 'Create', save: 'Save', cancel: 'Cancel', close: 'Close',
   noChannelsTitle: 'No channels yet', noChannelsText: 'Create the first channel, then share it with the people you want to talk to.', noChannelOpenTitle: 'Pick a channel', noChannelOpenText: 'Choose a channel on the left to read and write.',
   share: 'Share…', rename: 'Edit channel', remove: 'Delete channel', removeConfirm: 'Delete the channel “{n}” with all its messages?', back: 'Channels',
   placeholder: 'Write a message… (Enter sends, Shift+Enter makes a new line, Markdown works)', send: 'Send', readOnly: 'You can read this channel but not write in it.',
@@ -50,7 +50,7 @@ export type Texts = typeof en
 export type L = string
 
 const it: Texts = {
-  title: 'Chat', channels: 'Canali', newChannel: 'Nuovo canale', channelName: 'Nome', channelTopic: 'Argomento (facoltativo)', create: 'Crea', save: 'Salva', cancel: 'Annulla', close: 'Chiudi',
+  title: 'Chat', viewsLabel: 'Chat o canali', channels: 'Canali', newChannel: 'Nuovo canale', channelName: 'Nome', channelTopic: 'Argomento (facoltativo)', create: 'Crea', save: 'Salva', cancel: 'Annulla', close: 'Chiudi',
   noChannelsTitle: 'Ancora nessun canale', noChannelsText: 'Crea il primo canale, poi condividilo con le persone con cui vuoi parlare.', noChannelOpenTitle: 'Scegli un canale', noChannelOpenText: 'Scegli un canale a sinistra per leggere e scrivere.',
   share: 'Condividi…', rename: 'Modifica il canale', remove: 'Elimina il canale', removeConfirm: 'Eliminare il canale “{n}” con tutti i suoi messaggi?', back: 'Canali',
   placeholder: 'Scrivi un messaggio… (Invio manda, Maiusc+Invio va a capo, il Markdown funziona)', send: 'Invia', readOnly: 'Puoi leggere questo canale ma non scriverci.',
@@ -89,7 +89,7 @@ const it: Texts = {
   callEndedLine: 'Chiamata terminata · {d}', callJoined: '{n} hanno partecipato', callFailed: 'Impossibile avviare la chiamata: ', callPrivacy: 'La chiamata passa dal servizio Jitsi Meet: nessun video passa da Mosaikit.', callTitle: 'Chiamata', callFullscreen: 'Schermo intero',
 }
 const es: Texts = {
-  title: 'Chat', channels: 'Canales', newChannel: 'Nuevo canal', channelName: 'Nombre', channelTopic: 'Tema (opcional)', create: 'Crear', save: 'Guardar', cancel: 'Cancelar', close: 'Cerrar',
+  title: 'Chat', viewsLabel: 'Chats o canales', channels: 'Canales', newChannel: 'Nuevo canal', channelName: 'Nombre', channelTopic: 'Tema (opcional)', create: 'Crear', save: 'Guardar', cancel: 'Cancelar', close: 'Cerrar',
   noChannelsTitle: 'Todavía no hay canales', noChannelsText: 'Crea el primer canal y compártelo con las personas con las que quieres hablar.', noChannelOpenTitle: 'Elige un canal', noChannelOpenText: 'Elige un canal a la izquierda para leer y escribir.',
   share: 'Compartir…', rename: 'Editar el canal', remove: 'Eliminar el canal', removeConfirm: '¿Eliminar el canal “{n}” con todos sus mensajes?', back: 'Canales',
   placeholder: 'Escribe un mensaje… (Intro envía, Mayús+Intro hace una línea nueva, el Markdown funciona)', send: 'Enviar', readOnly: 'Puedes leer este canal pero no escribir en él.',
