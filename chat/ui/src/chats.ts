@@ -140,8 +140,16 @@ export function mountChats(msk: Msk, app: HTMLElement) {
   }
 
   // ------------------------------------------------------------------------------------------------------ presence
-  /** `available` when the person is on a channel we hold, `away` when their page says so, else nothing. */
+  /** The presence of the whole platform, when the shell publishes it (an older shell: the channels below are the only source). */
+  const platform = () => (msk.presence?.supported && msk.presence.live ? msk.presence : null)
+  /** `available` or `away` as the platform says (a person who has the shell open, in any page); without it, `available` when the
+   *  person is on a channel we hold and `away` when their page says so; else nothing. */
   const onlineState = (id: string): 'available' | 'away' | null => {
+    const p = platform()
+    if (p && id !== me) {
+      const st = p.status(id)
+      return st === 'offline' ? null : st
+    }
     let s: 'available' | 'away' | null = null
     for (const list of presence.values()) {
       for (const p of list) {
@@ -496,6 +504,11 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     typingLine.textContent = names.length === 0 ? '' : names.length === 1 ? sub(tr().typing1, { a: names[0]! }) : names.length === 2 ? sub(tr().typing2, { a: names[0]!, b: names[1]! }) : tr().typingMany
   }
   setInterval(drawTyping, 2000)
+  // somebody came online or went away anywhere in the platform: the dots change without a chat channel
+  msk.presence?.onChange(() => {
+    scheduleList()
+    drawHead()
+  })
 
   // --------------------------------------------------------------------------------------------------- messages
   const nearBottom = () => body.scrollHeight - body.scrollTop - body.clientHeight < 120
