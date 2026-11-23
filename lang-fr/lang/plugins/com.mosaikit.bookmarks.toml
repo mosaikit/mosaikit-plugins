@@ -1,11 +1,11 @@
 name = "Favoris"
-description = "Une collection partagée de liens web avec une note et des étiquettes, pour les retrouver et les partager avec des personnes et des groupes"
+description = "Une collection partagée de liens web avec une note et des étiquettes, ouverts dans un nouvel onglet ou dans la zone de contenu, pour les retrouver et les partager avec des personnes et des groupes"
 label = "Favoris"
-details = "Gardez les liens auxquels votre équipe revient souvent : chaque favori a un titre, l'adresse, une note et des étiquettes. Cherchez par n'importe lequel d'entre eux, filtrez par étiquette, marquez comme préférés ceux que vous utilisez le plus et ouvrez ou copiez un lien d'un clic.\n\nUn favori est un élément de la plateforme : partagez-le avec des personnes ou des groupes (lecture pour le voir, écriture pour le modifier) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique. Seules les adresses http et https sont acceptées, et rien n'est téléchargé depuis les sites que vous enregistrez."
+details = "Gardez les liens auxquels votre équipe revient souvent : chaque favori a un titre, l'adresse, une note et des étiquettes. Cherchez par n'importe lequel d'entre eux, filtrez par étiquette, marquez comme préférés ceux que vous utilisez le plus et ouvrez ou copiez un lien d'un clic.\n\nUn favori est un élément de la plateforme : partagez-le avec des personnes ou des groupes (lecture pour le voir, écriture pour le modifier) et tout ce que vous savez déjà sur le partage, la recherche et la corbeille s'applique. Seules les adresses http et https sont acceptées.\n\nUn favori s’ouvre dans un nouvel onglet ou dans la plateforme, dans la zone de contenu, selon votre choix pour chacun (un site qui ne peut pas être affiché dans une autre page s’ouvre dans un nouvel onglet). Quand vous enregistrez un favori, la plateforme regarde la page une fois pour compléter le titre et une image laissés vides ; rien d’autre n’est téléchargé."
 
 [resources.bookmarks]
 label = "Favoris"
-fields = { title = "Titre", url = "Adresse", note = "Note", tags = "Étiquettes", favorite = "Préféré" }
+fields = { title = "Titre", url = "Adresse", note = "Note", tags = "Étiquettes", favorite = "Préféré", open_mode = "S’ouvre dans", thumbnail = "Miniature" }
 
 [kpi.kpi_bookmarks_status]
 label = "État des favoris"

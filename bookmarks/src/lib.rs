@@ -1,6 +1,7 @@
 //! Bookmarks plugin: the rules of a saved link. The address is http or https (https is assumed when no scheme is written),
 //! the title falls back to the host name, the tags are a short list of lower-case words kept as a JSON array in the hidden
-//! field `tags`, the note is short.
+//! field `tags`, the note is short. Two more hidden fields: `open_mode` (where the link opens: `frame`, `tab` or nothing, the
+//! default of the list) and `thumbnail` (a small `data:` image of the site, found by the host when the bookmark is saved).
 
 use mosaikit_plugin_sdk::prelude::*;
 use mosaikit_plugin_sdk::serde_json;
@@ -11,6 +12,42 @@ const MAX_TITLE: usize = 160;
 const MAX_NOTE: usize = 2000;
 const MAX_TAGS: usize = 12;
 const MAX_TAG: usize = 30;
+/// Longest thumbnail kept, in characters.
+const MAX_THUMBNAIL: usize = 262_144;
+
+/// The way to open the link: `frame`, `tab` or empty (the default of the list), or a coded error.
+fn clean_open_mode(raw: &str) -> Result<String> {
+    match raw.trim() {
+        "" | "frame" | "tab" => Ok(raw.trim().to_string()),
+        _ => Err(Error::coded(
+            "bookmark_open_mode",
+            "a bookmark opens in a frame or in a new tab",
+        )),
+    }
+}
+
+/// The thumbnail: nothing, or a small `data:` image (never an address that would be fetched), or a coded error.
+fn clean_thumbnail(raw: &str) -> Result<String> {
+    let t = raw.trim();
+    if t.is_empty() {
+        return Ok(String::new());
+    }
+    let image = ["png", "jpeg", "webp", "gif"].iter().any(|k| {
+        t.strip_prefix(&format!("data:image/{k};base64,"))
+            .is_some_and(|b| {
+                !b.is_empty()
+                    && b.chars()
+                        .all(|c| c.is_ascii_alphanumeric() || matches!(c, '+' | '/' | '='))
+            })
+    });
+    if !image || t.len() > MAX_THUMBNAIL {
+        return Err(Error::coded(
+            "bookmark_thumbnail",
+            "the thumbnail is a small png, jpeg, webp or gif image",
+        ));
+    }
+    Ok(t.to_string())
+}
 
 /// The scheme written at the start of `url` (lower-case), if any. `host:8080/path` is a host with a port, not a scheme.
 fn scheme_of(url: &str) -> Option<String> {
@@ -140,6 +177,10 @@ fn bookmark(_ctx: &Ctx, hook: &Hook) -> Result<Option<Values>> {
         ));
     }
     let tags = clean_tags(&v.str("tags"))?;
+    let open_mode = clean_open_mode(&v.str("open_mode"))?;
+    let thumbnail = clean_thumbnail(&v.str("thumbnail"))?;
+    v.set("open_mode", open_mode);
+    v.set("thumbnail", thumbnail);
     v.set("url", url);
     v.set("title", title);
     v.set("note", note);
@@ -328,6 +369,47 @@ mod tests {
                 "{bad}"
             );
         }
+    }
+
+    #[test]
+    fn the_way_of_opening_is_frame_tab_or_nothing() {
+        for good in ["", "frame", "tab"] {
+            let v = ok(json!({ "title": "x", "url": "example.org", "open_mode": good }));
+            assert_eq!(v.str("open_mode"), good);
+        }
+        assert_eq!(
+            ok(json!({ "title": "x", "url": "example.org" })).str("open_mode"),
+            ""
+        );
+        let e =
+            run(json!({ "title": "x", "url": "example.org", "open_mode": "popup" })).unwrap_err();
+        assert!(e.contains("frame or in a new tab"), "{e}");
+    }
+
+    #[test]
+    fn the_thumbnail_is_a_small_data_image() {
+        let pic = "data:image/jpeg;base64,/9j/4AAQSkZJRg==";
+        assert_eq!(
+            ok(json!({ "title": "x", "url": "example.org", "thumbnail": pic })).str("thumbnail"),
+            pic
+        );
+        assert_eq!(
+            ok(json!({ "title": "x", "url": "example.org" })).str("thumbnail"),
+            ""
+        );
+        for bad in [
+            "https://example.org/x.png",
+            "data:text/html;base64,AAAA",
+            "data:image/svg+xml;base64,AAAA",
+            "data:image/png;base64,",
+            "data:image/png;base64,AA AA",
+        ] {
+            let e =
+                run(json!({ "title": "x", "url": "example.org", "thumbnail": bad })).unwrap_err();
+            assert!(e.contains("small png"), "{bad}: {e}");
+        }
+        let big = format!("data:image/png;base64,{}", "A".repeat(MAX_THUMBNAIL));
+        assert!(run(json!({ "title": "x", "url": "example.org", "thumbnail": big })).is_err());
     }
 
     #[test]

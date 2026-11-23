@@ -34,5 +34,18 @@
   "Write an address": "Введите адрес",
   "{n} shown of {t}": "Показано {n} из {t}",
   "Could not start the UI of the plugin: ": "Не удалось запустить интерфейс плагина: ",
-  "Could not load the bookmarks: ": "Не удалось загрузить закладки: "
+  "Could not load the bookmarks: ": "Не удалось загрузить закладки: ",
+  "Open links": "Открывать ссылки",
+  "Where a bookmark opens unless it says otherwise": "Где открывается закладка, если не указано иное",
+  "In the page": "На странице",
+  "New tab": "Новая вкладка",
+  "As the list: {m}": "Как в списке: {m}",
+  "Opens": "Открывается",
+  "In the page the site is shown inside Mosaikit; if it forbids that, it opens in a new tab.": "На странице сайт показывается внутри Mosaikit; если он это запрещает, он открывается в новой вкладке.",
+  "In page": "На странице",
+  "Looking at the site…": "Смотрю сайт…",
+  "Back to the bookmarks": "Назад к закладкам",
+  "Web site": "Веб-сайт",
+  "↗ New tab": "↗ Новая вкладка",
+  "This site does not allow being shown inside Mosaikit (it forbids framing). It was opened in a new tab; if nothing opened, use the button.": "Этот сайт нельзя показать внутри Mosaikit (он запрещает встраивание). Он открыт в новой вкладке; если ничего не открылось, нажмите кнопку."
 }

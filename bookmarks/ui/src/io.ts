@@ -1,6 +1,6 @@
 // Import and export of bookmarks, and duplicate detection. Pure functions, no DOM: the browser HTML format (Netscape
 // bookmark file, written by Chrome, Firefox, Edge and Safari), CSV rows, and the "same address" rule.
-import { cleanTags, type BookmarkLike } from './logic.ts'
+import { cleanTags, parseOpenMode, safeThumbnail, type BookmarkLike } from './logic.ts'
 
 /** Query parameters that only say where a click came from: they do not make another page. */
 const TRACKING = /^(utm_[a-z]+|fbclid|gclid|mc_cid|mc_eid|igshid|ref_src)$/i
@@ -134,11 +134,13 @@ export function toBrowserHtml(list: BookmarkLike[], folder = 'Bookmarks', now = 
   ].join('\n')
 }
 
-export const CSV_HEADER = ['title', 'url', 'note', 'tags', 'favorite']
+// `open` is `frame` or `tab` (empty: the default of the list); `thumbnail` is a small `data:` image (empty: none).
+// The Sites plugin writes this same format when its sites by address move to Bookmarks.
+export const CSV_HEADER = ['title', 'url', 'note', 'tags', 'favorite', 'open', 'thumbnail']
 
 /** The rows of a CSV file for the kit download. Tags are joined with `;`. */
 export function toCsvRows(list: BookmarkLike[]): string[][] {
-  return list.map((b) => [b.title, b.url, b.note, b.tags.join(';'), b.favorite ? 'yes' : 'no'])
+  return list.map((b) => [b.title, b.url, b.note, b.tags.join(';'), b.favorite ? 'yes' : 'no', b.openMode ?? '', safeThumbnail(b.thumbnail)])
 }
 
 /** Rows of values of a CSV (first row: names of the columns, in any order; `url` or `address` is required). */
@@ -152,6 +154,8 @@ export function parseCsvBookmarks(rows: string[][]): Imported[] {
   const iNote = col('note', 'notes', 'description')
   const iTags = col('tags', 'labels')
   const iFav = col('favorite', 'favourite', 'starred')
+  const iOpen = col('open', 'open_mode')
+  const iThumb = col('thumbnail', 'picture')
   const out: Imported[] = []
   for (const r of rows.slice(1)) {
     const url = (r[iUrl] ?? '').trim()
@@ -162,6 +166,8 @@ export function parseCsvBookmarks(rows: string[][]): Imported[] {
       note: iNote >= 0 ? (r[iNote] ?? '').trim() : '',
       tags: cleanTags(iTags >= 0 ? (r[iTags] ?? '').split(/[;,|]/) : []),
       favorite: iFav >= 0 && /^(1|yes|true|y|si|sì|x|★)$/i.test((r[iFav] ?? '').trim()),
+      openMode: iOpen >= 0 ? parseOpenMode((r[iOpen] ?? '').trim().toLowerCase()) : '',
+      thumbnail: iThumb >= 0 ? safeThumbnail((r[iThumb] ?? '').trim()) : '',
     })
   }
   return out

@@ -4,12 +4,19 @@
 export const MAX_TAGS = 12
 export const MAX_TAG = 30
 
+/** Where a bookmark opens: in a frame of the content area, or in a new tab. */
+export type OpenMode = 'frame' | 'tab'
+
 export interface BookmarkLike {
   title: string
   url: string
   note: string
   tags: string[]
   favorite: boolean
+  /** The choice kept on the bookmark; empty or missing: the default of the list applies. */
+  openMode?: OpenMode | ''
+  /** A small `data:` image of the site (the picture the host found, or one imported). */
+  thumbnail?: string
 }
 
 export interface Filter {
@@ -97,4 +104,36 @@ export function chunk<T>(list: T[], n: number): T[][] {
 /** How many columns of at least `min` px fit in `width` with `gap` between them (1 at least). */
 export function columnsFor(width: number, min: number, gap: number): number {
   return Math.max(1, Math.floor((width + gap) / (min + gap)))
+}
+
+/** The stored `open_mode` as a mode: anything else means "no choice kept". */
+export function parseOpenMode(raw: unknown): OpenMode | '' {
+  return raw === 'frame' || raw === 'tab' ? raw : ''
+}
+
+/** How a bookmark opens: its own choice, else the default of the list. */
+export function effectiveMode(own: OpenMode | '' | undefined, fallback: OpenMode): OpenMode {
+  return own === 'frame' || own === 'tab' ? own : fallback
+}
+
+/** The thumbnail as the page may draw it: only a small `data:` image, never an address to fetch. */
+export function safeThumbnail(raw: unknown): string {
+  const v = typeof raw === 'string' ? raw : ''
+  return /^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(v) && v.length <= MAX_THUMBNAIL ? v : ''
+}
+
+/** Longest thumbnail kept, in characters (the same limit as the hook of the plugin). */
+export const MAX_THUMBNAIL = 262144
+
+/** The address with its scheme, as the hook of the plugin stores it (https when none is written); "" if it is not http(s). */
+export function withScheme(url: string): string {
+  const u = url.trim()
+  if (!u) return ''
+  const full = /^[a-z][a-z0-9+.-]*:\/\//i.test(u) ? u : /^[a-z][a-z0-9+.-]*:(?!\d)/i.test(u) ? '' : 'https://' + u.replace(/^\/+/, '')
+  return safeHref(full)
+}
+
+/** Hue (0-359) of a name: the colour of a placeholder thumbnail, the same every time. */
+export function hueOf(text: string): number {
+  return [...text].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 360, 7)
 }

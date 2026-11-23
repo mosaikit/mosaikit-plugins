@@ -34,5 +34,18 @@
   "Write an address": "请输入地址",
   "{n} shown of {t}": "显示 {n}/{t}",
   "Could not start the UI of the plugin: ": "无法启动插件界面：",
-  "Could not load the bookmarks: ": "无法加载书签："
+  "Could not load the bookmarks: ": "无法加载书签：",
+  "Open links": "打开链接",
+  "Where a bookmark opens unless it says otherwise": "书签未另行指定时的打开位置",
+  "In the page": "在页面中",
+  "New tab": "新标签页",
+  "As the list: {m}": "与列表一致:{m}",
+  "Opens": "打开方式",
+  "In the page the site is shown inside Mosaikit; if it forbids that, it opens in a new tab.": "在页面中时,网站会显示在 Mosaikit 内;如果网站禁止,则在新标签页中打开。",
+  "In page": "页面内",
+  "Looking at the site…": "正在查看网站…",
+  "Back to the bookmarks": "返回书签",
+  "Web site": "网站",
+  "↗ New tab": "↗ 新标签页",
+  "This site does not allow being shown inside Mosaikit (it forbids framing). It was opened in a new tab; if nothing opened, use the button.": "此网站不允许显示在 Mosaikit 内(禁止嵌入)。已在新标签页中打开;如果没有打开,请使用按钮。"
 }

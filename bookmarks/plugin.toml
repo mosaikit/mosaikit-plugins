@@ -1,13 +1,13 @@
 id = "com.mosaikit.bookmarks"
 name = "Bookmarks"
-version = "0.4.0"
+version = "0.5.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "bookmark"
-description = "A shared collection of web links with a note and tags, to find again and to share with people and groups"
+description = "A shared collection of web links with a note and tags, opened in a new tab or in the content area, to find again and to share with people and groups"
 author = "Mosaikit"
 license = "Apache-2.0"
-details = "Keep the links your team comes back to: each bookmark has a title, the address, a note and tags. Search by any of them, filter by tag, mark the ones you use most as favourites and open or copy a link with one click.\n\nA bookmark is an item of the platform: share it with people or groups (read to see it, write to edit it) and everything you already know about sharing, search and the trash applies. Only http and https addresses are accepted, and nothing is fetched from the sites you save."
+details = "Keep the links your team comes back to: each bookmark has a title, the address, a note and tags. Search by any of them, filter by tag, mark the ones you use most as favourites and open or copy a link with one click.\n\nA bookmark is an item of the platform: share it with people or groups (read to see it, write to edit it) and everything you already know about sharing, search and the trash applies. Only http and https addresses are accepted.\n\nA bookmark opens in a new tab or inside the platform, in the content area, as you choose for each one (a site that does not allow being shown inside another page opens in a new tab). When you save a bookmark the platform looks at the page once to fill in the title and a picture you left empty; nothing else is fetched."
 screenshots = ["list.webp", "edit.webp"]
 homepage = "https://example.org/mosaikit/plugins/bookmarks"
 
@@ -29,6 +29,8 @@ fields = [
   { key = "note", label = "Note", kind = "text", multiline = true },
   { key = "tags", label = "Tags", kind = "text", hidden = true },
   { key = "favorite", label = "Favourite", kind = "bool" },
+  { key = "open_mode", label = "Opens in", kind = "text", hidden = true },
+  { key = "thumbnail", label = "Thumbnail", kind = "text", hidden = true },
 ]
 
 [ui]
@@ -36,6 +38,8 @@ entry = "index.html"
 
 [permissions]
 hooks = ["bookmarks"]
+# shows a bookmark in a frame and asks the host to look at the page (framing allowed? title, picture)
+web = true
 
 [[kpi]]
 view = "kpi_bookmarks_status"
@@ -49,14 +53,14 @@ data = { command = "bookmarks.widget_favorites", kind = "list", size = "m", text
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
-details = "Tieni i link a cui il tuo gruppo torna spesso: ogni segnalibro ha un titolo, l’indirizzo, una nota e delle etichette. Cerca per ciascuno di questi, filtra per etichetta, segna come preferiti quelli che usi di più e apri o copia un link con un clic.\n\nUn segnalibro è un elemento della piattaforma: condividilo con persone o gruppi (lettura per vederlo, scrittura per modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino. Sono accettati solo indirizzi http e https e dai siti che salvi non viene scaricato nulla."
+details = "Tieni i link a cui il tuo gruppo torna spesso: ogni segnalibro ha un titolo, l’indirizzo, una nota e delle etichette. Cerca per ciascuno di questi, filtra per etichetta, segna come preferiti quelli che usi di più e apri o copia un link con un clic.\n\nUn segnalibro è un elemento della piattaforma: condividilo con persone o gruppi (lettura per vederlo, scrittura per modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino. Sono accettati solo indirizzi http e https.\n\nUn segnalibro si apre in una nuova scheda o dentro la piattaforma, nell’area dei contenuti, come scegli per ciascuno (un sito che non può essere mostrato dentro un’altra pagina si apre in una nuova scheda). Quando salvi un segnalibro la piattaforma guarda la pagina una volta per completare il titolo e un’immagine che hai lasciato vuoti; nient’altro viene scaricato."
 name = "Segnalibri"
-description = "Una raccolta condivisa di link web con una nota e delle etichette, da ritrovare e da condividere con persone e gruppi"
+description = "Una raccolta condivisa di link web con una nota e delle etichette, aperti in una nuova scheda o nell’area dei contenuti, da ritrovare e da condividere con persone e gruppi"
 label = "Segnalibri"
 
 [i18n.it.resources.bookmarks]
 label = "Segnalibri"
-fields = { title = "Titolo", url = "Indirizzo", note = "Nota", tags = "Etichette", favorite = "Preferito" }
+fields = { title = "Titolo", url = "Indirizzo", note = "Nota", tags = "Etichette", favorite = "Preferito", open_mode = "Si apre in", thumbnail = "Miniatura" }
 
 [i18n.it.kpi.kpi_bookmarks_status]
 label = "Stato dei segnalibri"
