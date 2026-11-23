@@ -72,7 +72,7 @@ export function composer(o: ComposerOptions): Composer {
   bar.hidden = true
   const chips = el('div', { class: 'cc-files' })
   chips.hidden = true
-  const input = el('textarea', { class: 'cc-input', rows: '1', maxlength: '4000' })
+  const input = el('textarea', { class: 'cc-input', rows: '2', maxlength: '4000' })
   const pop = el('ul', { class: 'cc-mentions', role: 'listbox' })
   pop.hidden = true
   const fmtBar = el('div', { class: 'cc-fmt', role: 'toolbar' })
@@ -112,7 +112,7 @@ export function composer(o: ComposerOptions): Composer {
   // ------------------------------------------------------------------------------------------------------ formatting
   const grow = () => {
     input.style.height = 'auto'
-    input.style.height = Math.min(input.scrollHeight, 180) + 'px'
+    input.style.height = Math.min(input.scrollHeight, 190) + 'px'
   }
   const apply = (e: { text: string; start: number; end: number }) => {
     input.value = e.text
