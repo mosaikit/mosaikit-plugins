@@ -553,7 +553,7 @@ function mount(msk: Msk) {
     }
     const top = el('div', { class: 'apr-rowtop' }, stateChip(it.state))
     if (it.todo) top.append(el('span', { class: 'apr-turn' }, tr().yourTurn))
-    const r = el('article', { class: `apr-row s-${it.state}${it.id === selected ? ' sel' : ''}${it.todo ? ' todo' : ''}`, 'data-testid': 'request', 'data-id': it.id }, top, el('h3', {}, open), el('p', { class: 'apr-meta' }, metaOf(it)), strip)
+    const r = el('article', { class: `apr-row s-${it.state}${it.id === selected ? ' sel' : ''}${it.todo ? ' todo' : ''}`, 'data-testid': 'request', 'data-id': it.id, role: 'listitem' }, top, el('h3', {}, open), el('p', { class: 'apr-meta' }, metaOf(it)), strip)
     r.addEventListener('click', (ev) => {
       if (!(ev.target as HTMLElement).closest('button')) select(it.id)
     })
