@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { clip, findDuplicates, normalizeUrl, parseBrowserHtml, parseCsvBookmarks, parseCsvText, planImport, toBrowserHtml, toCsvRows } from './io.ts'
+import { CSV_HEADER, clip, findDuplicates, normalizeUrl, parseBrowserHtml, parseCsvBookmarks, parseCsvText, planImport, toBrowserHtml, toCsvRows } from './io.ts'
 
 describe('normalizeUrl', () => {
   it('makes the spellings of one page equal', () => {
@@ -71,11 +71,19 @@ describe('browser html', () => {
 describe('csv', () => {
   it('writes rows and reads them back, with quotes and a semicolon file', () => {
     const rows = toCsvRows([{ title: 'A, "b"', url: 'https://a.example', note: 'two\nlines', tags: ['x', 'y'], favorite: true }])
-    expect(rows[0]).toEqual(['A, "b"', 'https://a.example', 'two\nlines', 'x;y', 'yes'])
+    expect(rows[0]).toEqual(['A, "b"', 'https://a.example', 'two\nlines', 'x;y', 'yes', '', ''])
     const text = 'Title;Address;Tags;Starred\r\n"Un; titolo";https://it.example/a;uno|due;sì\r\nbroken;ftp://x;;\r\n'
     const got = parseCsvBookmarks(parseCsvText(text))
     expect(got).toHaveLength(1)
     expect(got[0]).toMatchObject({ title: 'Un; titolo', url: 'https://it.example/a', tags: ['uno', 'due'], favorite: true })
+  })
+  it('carries the way of opening and the thumbnail, and refuses a thumbnail that is not a data image', () => {
+    const pic = 'data:image/jpeg;base64,/9j/4AAQ'
+    const rows = toCsvRows([{ title: 'S', url: 'https://s.example', note: '', tags: [], favorite: false, openMode: 'frame', thumbnail: pic }])
+    expect(rows[0]!.slice(5)).toEqual(['frame', pic])
+    const back = parseCsvBookmarks([CSV_HEADER, ...rows, ['E', 'https://e.example', '', '', 'no', 'sideways', 'https://evil.example/x.png']])
+    expect(back[0]).toMatchObject({ openMode: 'frame', thumbnail: pic })
+    expect(back[1]).toMatchObject({ openMode: '', thumbnail: '' })
   })
   it('needs an address column', () => {
     expect(parseCsvBookmarks([['name'], ['x']])).toEqual([])

@@ -1,11 +1,11 @@
 name = "Bladwijzers"
-description = "Een gedeelde verzameling weblinks met een notitie en labels, om ze terug te vinden en te delen met personen en groepen"
+description = "Een gedeelde verzameling weblinks met een notitie en labels, geopend in een nieuw tabblad of in het inhoudsgebied, om ze terug te vinden en te delen met personen en groepen"
 label = "Bladwijzers"
-details = "Bewaar de links waar je team vaak naar terugkeert: elke bladwijzer heeft een titel, het adres, een notitie en labels. Zoek op een van die velden, filter op label, markeer de bladwijzers die je het vaakst gebruikt als favoriet en open of kopieer een link met één klik.\n\nEen bladwijzer is een item van het platform: deel hem met personen of groepen (lezen om hem te bekijken, schrijven om hem te bewerken) en alles wat je al weet over delen, zoeken en de prullenbak geldt ook hier. Alleen http- en https-adressen worden geaccepteerd en van de sites die je bewaart wordt niets gedownload."
+details = "Bewaar de links waar je team vaak naar terugkeert: elke bladwijzer heeft een titel, het adres, een notitie en labels. Zoek op een van die velden, filter op label, markeer de bladwijzers die je het vaakst gebruikt als favoriet en open of kopieer een link met één klik.\n\nEen bladwijzer is een item van het platform: deel hem met personen of groepen (lezen om hem te bekijken, schrijven om hem te bewerken) en alles wat je al weet over delen, zoeken en de prullenbak geldt ook hier. Alleen http- en https-adressen worden geaccepteerd.\n\nEen bladwijzer opent in een nieuw tabblad of binnen het platform, in het inhoudsgebied, zoals je voor elk kiest (een site die niet binnen een andere pagina mag worden getoond, opent in een nieuw tabblad). Bij het opslaan van een bladwijzer bekijkt het platform de pagina één keer om de titel en een afbeelding in te vullen die je leeg liet; verder wordt niets gedownload."
 
 [resources.bookmarks]
 label = "Bladwijzers"
-fields = { title = "Titel", url = "Adres", note = "Notitie", tags = "Labels", favorite = "Favoriet" }
+fields = { title = "Titel", url = "Adres", note = "Notitie", tags = "Labels", favorite = "Favoriet", open_mode = "Opent in", thumbnail = "Miniatuur" }
 
 [kpi.kpi_bookmarks_status]
 label = "Status van de bladwijzers"

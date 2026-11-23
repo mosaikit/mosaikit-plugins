@@ -1,9 +1,11 @@
 // UI of the Bookmarks plugin: a grid of cards with a search box, the tag filter with counts, the favourites toggle and the
-// form of a bookmark. Nothing is fetched from the saved sites (the avatar is a letter), and every text is a DOM text node.
+// form of a bookmark. A bookmark opens in a new tab, or in a frame of the content area (its own choice, else the default of
+// the list kept in this browser). Like the Sites plugin did for a site by address, the host looks at the page
+// (`msk.web.probe`, permission `web`): when the bookmark is saved, to fill the title and the picture that are missing, and at
+// every open in a frame, because a site that forbids framing opens in a new tab. Every text is a DOM text node.
 import '@mosaikit/plugin-api/style.css'
 import './bookmarks.css'
 import {
-  avatar,
   confirmDialog,
   connect,
   dialog,
@@ -22,12 +24,22 @@ import {
   type Msk,
   type Row,
 } from '@mosaikit/plugin-api'
-import { applyFilter, chunk, cleanTags, columnsFor, hostOf, parseTags, safeHref, tagCounts, toggleTag, type BookmarkLike, type Filter } from './logic.ts'
+import { applyFilter, chunk, cleanTags, columnsFor, effectiveMode, hostOf, hueOf, parseOpenMode, parseTags, safeHref, safeThumbnail, tagCounts, toggleTag, withScheme, type BookmarkLike, type Filter, type OpenMode } from './logic.ts'
+import { toThumbnail } from './thumb.ts'
 import { CSV_HEADER, clip, findDuplicates, normalizeUrl, parseBrowserHtml, parseCsvBookmarks, parseCsvText, planImport, toBrowserHtml, toCsvRows } from './io.ts'
 import { bindTexts, TEXTS, langOf, sub } from './texts.ts'
 
 const app = document.getElementById('app')!
 const MAX_IMPORT = 500
+const MODE_KEY = 'msk.bookmarks.openMode'
+/** The default of the list, kept in this browser; `tab` (the old behaviour) when none was chosen. */
+function savedMode(): OpenMode {
+  try {
+    return localStorage.getItem(MODE_KEY) === 'frame' ? 'frame' : 'tab'
+  } catch {
+    return 'tab'
+  }
+}
 
 interface Bookmark extends BookmarkLike {
   id: string
@@ -42,12 +54,31 @@ function mount(msk: Msk) {
   const api = msk.crud('bookmarks')
   let items: Bookmark[] = []
   const filter: Filter = { query: '', tags: [], favoritesOnly: false }
+  let defaultMode = savedMode()
+  const modeName = (m: OpenMode) => (m === 'frame' ? tr().modeFrame : tr().modeTab)
 
   const fail = (e: unknown) => toast(errText(e, msk.context?.lang), { tone: 'err', ms: 6000 })
   const head = el('header', { class: 'bk-head' })
   const bar = el('div', { class: 'bk-bar' })
   const body = el('div', { class: 'bk-body' })
-  app.replaceChildren(el('div', { class: 'bk' }, head, bar, body))
+  const listView = el('div', { class: 'bk' }, head, bar, body)
+  // the view of a bookmark opened in the content area: a slim bar and the frame under it
+  const viewTitle = el('span', { class: 'bk-vtitle' })
+  const viewHost = el('span', { class: 'bk-vhost' })
+  const viewTab = el('a', { class: 'msk-btn ghost mini', target: '_blank', rel: 'noopener noreferrer' }, tr().newTabLink)
+  const frame = el('iframe', {
+    class: 'bk-frame',
+    title: tr().frameTitle,
+    // another origin: it may keep its own scripts, forms and storage
+    sandbox: 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads',
+    referrerpolicy: 'no-referrer',
+  })
+  const noFrameLink = el('a', { class: 'msk-btn', target: '_blank', rel: 'noopener noreferrer' }, tr().newTabLink)
+  const noFrame = el('div', { class: 'bk-noframe', role: 'status' }, el('p', {}, tr().noFrame), noFrameLink)
+  noFrame.hidden = true
+  const view = el('div', { class: 'bk-view' }, el('div', { class: 'bk-vbar' }, el('div', { class: 'bk-vid' }, viewTitle, viewHost), viewTab), frame, noFrame)
+  view.hidden = true
+  app.replaceChildren(listView, view)
 
   // the search box lives across redraws, so typing never loses the focus
   const search = el('input', { type: 'search', class: 'bk-search', 'aria-label': tr().search, placeholder: tr().searchPlaceholder })
@@ -65,11 +96,13 @@ function mount(msk: Msk) {
     note: String(r.values.note ?? ''),
     tags: parseTags(r.values.tags),
     favorite: r.values.favorite === true,
+    openMode: parseOpenMode(r.values.open_mode),
+    thumbnail: safeThumbnail(r.values.thumbnail),
   })
 
   const valuesOf = (b: BookmarkLike, over: Partial<BookmarkLike> = {}) => {
     const v = { ...b, ...over }
-    return { title: v.title, url: v.url, note: v.note, tags: JSON.stringify(cleanTags(v.tags)), favorite: v.favorite }
+    return { title: v.title, url: v.url, note: v.note, tags: JSON.stringify(cleanTags(v.tags)), favorite: v.favorite, open_mode: v.openMode ?? '', thumbnail: v.thumbnail ?? '' }
   }
   const canWrite = (b: Bookmark) => b.row.my_level === 'write' || b.row.my_level === 'manage'
 
@@ -79,6 +112,13 @@ function mount(msk: Msk) {
     const url = el('input', { type: 'text', inputmode: 'url', autocapitalize: 'off', spellcheck: 'false', maxlength: '2000', 'aria-label': tr().fUrl, placeholder: 'https://' })
     const note = el('textarea', { rows: '4', maxlength: '2000', 'aria-label': tr().fNote })
     const favorite = el('input', { type: 'checkbox', id: 'bk-fav' })
+    const open = el('select', { 'aria-label': tr().fOpen, 'data-testid': 'bk-open-mode' })
+    open.append(
+      el('option', { value: '' }, sub(tr().modeDefault, { m: modeName(defaultMode) })),
+      el('option', { value: 'frame' }, tr().modeFrame),
+      el('option', { value: 'tab' }, tr().modeTab),
+    )
+    open.value = existing?.openMode ?? ''
     let tags = existing?.tags ?? []
     const tagBox = tagInput({
       label: tr().fTags,
@@ -113,6 +153,7 @@ function mount(msk: Msk) {
         field(tr().fTitle, title),
         field(tr().fNote, note),
         field(tr().fTags, tagBox.el),
+        el('div', { class: 'msk-field' }, el('label', {}, tr().fOpen), open, el('p', { class: 'bk-hint' }, tr().fOpenHint)),
         el('label', { class: 'bk-check' }, favorite, el('span', {}, tr().fFavorite)),
       ),
       actions: [no, ok],
@@ -124,8 +165,25 @@ function mount(msk: Msk) {
         return url.focus()
       }
       ok.disabled = true
-      const values = valuesOf({ title: title.value, url: url.value, note: note.value, tags: tagBox.get(), favorite: favorite.checked })
+      const base = { title: title.value, url: url.value, note: note.value, tags: tagBox.get(), favorite: favorite.checked, openMode: parseOpenMode(open.value) }
+      // the picture is kept while the address is the same; a new address looks for its own
+      const same = !!existing && normalizeUrl(existing.url) === normalizeUrl(url.value)
+      let thumbnail = same ? (existing?.thumbnail ?? '') : ''
       try {
+        // what the host sees at the address fills what is missing: the title and the picture. Saving never fails for it.
+        const address = withScheme(url.value)
+        let title2 = base.title
+        if (address && (!base.title.trim() || !thumbnail)) {
+          ok.textContent = tr().looking
+          try {
+            const p = await msk.web.probe(address, !thumbnail)
+            if (!base.title.trim() && p.title.trim()) title2 = p.title.trim().slice(0, 160)
+            if (!thumbnail && p.image) thumbnail = await toThumbnail(p.image).catch(() => '')
+          } catch {
+            /* cannot look at it from here: the bookmark is saved as it is */
+          }
+        }
+        const values = valuesOf({ ...base, title: title2, thumbnail })
         if (existing) await api.update(existing.id, values)
         else await api.create(values)
         d.close()
@@ -133,6 +191,7 @@ function mount(msk: Msk) {
       } catch (e) {
         fail(e)
         ok.disabled = false
+        ok.textContent = existing ? tr().save : tr().create
       }
     }
     ok.addEventListener('click', () => void go())
@@ -180,8 +239,54 @@ function mount(msk: Msk) {
     }
   }
 
+  // ------------------------------------------------------------------------------------- open in the content area
+  /** Back from a bookmark that was open in the frame. */
+  const closeView = () => {
+    frame.src = 'about:blank'
+    view.hidden = true
+    listView.hidden = false
+    msk.band.reset()
+  }
+
+  /** The site forbids framing: said here, with the way to open it, and opened in a new tab. */
+  const showNoFrame = (url: string) => {
+    frame.src = 'about:blank'
+    frame.hidden = true
+    noFrame.hidden = false
+    noFrameLink.href = url
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
+  /** A bookmark in a frame of the content area, or in a new tab when its site forbids being framed. The check is made at
+   *  every open: the site may have changed its mind since the bookmark was saved. */
+  const openFrame = async (b: Bookmark) => {
+    const url = safeHref(b.url)
+    if (!url) return
+    viewTitle.textContent = b.title
+    viewHost.textContent = hostOf(b.url)
+    viewTab.href = url
+    noFrame.hidden = true
+    frame.hidden = false
+    listView.hidden = true
+    view.hidden = false
+    msk.band.set({ back: { label: tr().backToList, onClick: closeView } })
+    frame.src = url
+    try {
+      const p = await msk.web.probe(url)
+      if (!p.embeddable && !view.hidden && frame.src !== 'about:blank') showNoFrame(url)
+    } catch {
+      /* cannot look at it from here: the frame shows what it can */
+    }
+  }
+
   const card = (b: Bookmark) => {
     const c = el('article', { class: 'bk-card', 'data-testid': 'bookmark' })
+    const mode = effectiveMode(b.openMode, defaultMode)
+    const href = safeHref(b.url)
+    // the picture of the site, or a placeholder in a colour of its host (the same every time)
+    const pic = b.thumbnail ? el('img', { class: 'bk-pic', src: b.thumbnail, alt: '', loading: 'lazy' }) : el('span', { class: 'bk-pic ph', 'aria-hidden': 'true', style: `--hue:${hueOf(hostOf(b.url))}` }, (b.title.trim()[0] ?? hostOf(b.url)[0] ?? '?').toUpperCase())
+    const thumb = el('div', { class: 'bk-thumb' }, pic, el('span', { class: 'bk-mode ' + mode, 'data-testid': 'bookmark-mode' }, mode === 'frame' ? tr().badgeFrame : tr().badgeTab))
+    c.append(href ? Object.assign(el('a', { class: 'bk-thumb-link', href, target: '_blank', rel: 'noopener noreferrer', 'aria-hidden': 'true', tabindex: '-1' }, thumb), { onclick: (e: MouseEvent) => (mode === 'frame' ? (e.preventDefault(), void openFrame(b)) : undefined) }) : thumb)
     const star = el(
       'button',
       { type: 'button', class: 'bk-star' + (b.favorite ? ' on' : ''), 'aria-pressed': String(b.favorite), 'aria-label': sub(b.favorite ? tr().removeFavorite : tr().addFavorite, { n: b.title }) },
@@ -193,7 +298,6 @@ function mount(msk: Msk) {
       el(
         'div',
         { class: 'bk-top' },
-        avatar((b.title.trim()[0] ?? hostOf(b.url)[0] ?? '?').toUpperCase(), true),
         el('div', { class: 'bk-id' }, el('h2', {}, b.title), el('p', { class: 'bk-host' }, hostOf(b.url))),
         star,
       ),
@@ -201,8 +305,11 @@ function mount(msk: Msk) {
     if (b.note.trim()) c.append(el('p', { class: 'bk-note' }, b.note))
     if (b.tags.length) c.append(el('div', { class: 'bk-tags' }, ...b.tags.map((t) => el('span', { class: 'bk-tag' }, t))))
     const acts = el('div', { class: 'bk-acts' })
-    const href = safeHref(b.url)
-    if (href) acts.append(el('a', { class: 'msk-btn mini', href, target: '_blank', rel: 'noopener noreferrer' }, tr().open))
+    if (href && mode === 'frame') {
+      const go = el('button', { type: 'button', class: 'msk-btn mini', 'data-testid': 'bookmark-open' }, tr().open)
+      go.addEventListener('click', () => void openFrame(b))
+      acts.append(go)
+    } else if (href) acts.append(el('a', { class: 'msk-btn mini', href, target: '_blank', rel: 'noopener noreferrer', 'data-testid': 'bookmark-open' }, tr().open))
     const copy = el('button', { type: 'button', class: 'msk-btn ghost mini' }, tr().copy)
     copy.addEventListener('click', () => void copyLink(b))
     acts.append(copy)
@@ -371,7 +478,22 @@ function mount(msk: Msk) {
     const dups = findDuplicates(items).length
     const dup = el('button', { type: 'button', class: 'msk-btn ghost' + (dups ? ' has-dups' : '') }, '⧉ ' + tr().duplicates, ...(dups ? [el('span', { class: 'bk-count' }, String(dups))] : []))
     dup.addEventListener('click', showDuplicates)
-    return [imp, exp, dup, file]
+    // the default of the list: where a bookmark opens unless it says otherwise (kept in this browser)
+    const seg = el('span', { class: 'bk-seg', role: 'group', 'aria-label': tr().openLinks, title: tr().openLinksHint })
+    for (const m of ['tab', 'frame'] as const) {
+      const b = el('button', { type: 'button', class: 'bk-seg-btn', 'aria-pressed': String(defaultMode === m), 'data-testid': 'bk-default-' + m }, modeName(m))
+      b.addEventListener('click', () => {
+        defaultMode = m
+        try {
+          localStorage.setItem(MODE_KEY, m)
+        } catch {
+          /* not kept */
+        }
+        draw()
+      })
+      seg.append(b)
+    }
+    return [seg, imp, exp, dup, file]
   }
 
   const draw = () => {
@@ -414,8 +536,8 @@ function mount(msk: Msk) {
 
   const keys = shortcuts(
     [
-      { keys: 'n', label: tr().scNew, run: (e) => (e.preventDefault(), form()), when: () => msk.can('create') },
-      { keys: '/', label: tr().scSearch, run: (e) => (e.preventDefault(), search.focus()) },
+      { keys: 'n', label: tr().scNew, run: (e) => (e.preventDefault(), form()), when: () => msk.can('create') && !!view.hidden },
+      { keys: '/', label: tr().scSearch, run: (e) => (e.preventDefault(), search.focus()), when: () => !!view.hidden },
     ],
     { labels: { title: tr().scTitle, close: tr().close, general: tr().title, then: tr().scThen } },
   )
@@ -423,6 +545,8 @@ function mount(msk: Msk) {
   msk.onContext((ctx) => {
     if (langOf(ctx.lang) === lang) return
     lang = langOf(ctx.lang)
+    viewTab.textContent = noFrameLink.textContent = tr().newTabLink
+    frame.title = tr().frameTitle
     draw()
   })
   void msk.loading(load())

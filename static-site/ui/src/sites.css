@@ -34,7 +34,6 @@
 #app.msks.show { max-width: none; padding: 0; height: 100vh; display: flex; flex-direction: column; }
 .msks.show .siteview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .msks.show .editbar { margin: 0; padding: 8px 12px; flex: none; }
-.msks.show .noframe { margin: 12px; }
 .msks.show .sframe { flex: 1; height: auto; min-height: 0; border: 0; border-radius: 0; }
 .msks .msg { color: var(--dim); font-family: var(--font-mono); font-size: 12px; margin-top: 10px; min-height: 1em; }
 .msks .msg.err { color: var(--err); }
@@ -61,12 +60,8 @@
 .msks td.thumbcell { width: 1%; padding-right: 0; }
 .msks .thumbsm { display: block; width: 56px; height: 36px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); }
 .msks .thumbsm.placeholder { font-size: 16px; }
-.msks .srcrow { display: flex; gap: 18px; }
-.msks .srcrow label.radio { display: inline-flex; align-items: center; gap: 6px; color: var(--fg); font-size: 13px; margin: 0; }
 .msks .thumbline { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .msks .thumbprev { width: 96px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); }
-.msks .noframe { max-width: 560px; margin-top: 12px; padding: 18px 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
-.msks .noframe p { margin: 0 0 12px; line-height: 1.5; }
 
 /* the list of sites fills the page under the header; the header stays */
 .msks .listview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -104,3 +99,11 @@
 @keyframes zr-grow { from { transform: scaleX(0); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .msks .drop, .msks .drop .big, .msks .zrep, .msks .zr-bar i { animation: none; transition: none; } .msks .drop.over, .msks .drop.over .big { transform: none; } }
 @media (max-width: 640px) { .msks .zr-top li { grid-template-columns: minmax(60px, 34%) 1fr; } .msks .zr-size { grid-column: 1 / -1; } }
+
+/* the sites by address of an older version: a banner that offers to move them to Bookmarks */
+.msks .movebanner { display: flex; align-items: center; gap: 16px; margin: 12px 24px 0; padding: 12px 16px; border: 1px solid var(--acc-line); border-left: 4px solid var(--acc); border-radius: var(--r-m); background: var(--acc-soft); }
+.msks .movewords { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.msks .movetext { font-weight: 600; font-size: 14px; }
+.msks .movehint { font-size: 12px; color: var(--dim); line-height: 1.45; }
+.msks .movebanner[hidden] { display: none; }
+@media (max-width: 640px) { .msks .movebanner { flex-direction: column; align-items: stretch; margin: 12px 16px 0; } }

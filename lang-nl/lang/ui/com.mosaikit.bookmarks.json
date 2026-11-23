@@ -34,5 +34,18 @@
   "Write an address": "Schrijf een adres",
   "{n} shown of {t}": "{n} getoond van {t}",
   "Could not start the UI of the plugin: ": "De interface van de plugin kon niet worden gestart:",
-  "Could not load the bookmarks: ": "De bladwijzers konden niet worden geladen:"
+  "Could not load the bookmarks: ": "De bladwijzers konden niet worden geladen:",
+  "Open links": "Links openen",
+  "Where a bookmark opens unless it says otherwise": "Waar een bladwijzer opent als hij niets anders zegt",
+  "In the page": "In de pagina",
+  "New tab": "Nieuw tabblad",
+  "As the list: {m}": "Zoals de lijst: {m}",
+  "Opens": "Opent",
+  "In the page the site is shown inside Mosaikit; if it forbids that, it opens in a new tab.": "In de pagina wordt de site binnen Mosaikit getoond; staat de site dat niet toe, dan opent hij in een nieuw tabblad.",
+  "In page": "In de pagina",
+  "Looking at the site…": "De site bekijken…",
+  "Back to the bookmarks": "Terug naar de bladwijzers",
+  "Web site": "Website",
+  "↗ New tab": "↗ Nieuw tabblad",
+  "This site does not allow being shown inside Mosaikit (it forbids framing). It was opened in a new tab; if nothing opened, use the button.": "Deze site mag niet binnen Mosaikit worden getoond (insluiten is verboden). Hij is in een nieuw tabblad geopend; als er niets openging, gebruik dan de knop."
 }

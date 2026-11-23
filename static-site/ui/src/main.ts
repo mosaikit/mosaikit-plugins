@@ -7,21 +7,20 @@
 // content, and "Open" asks with `msk.content.url(id)` for a temporary URL of the
 // start page on the origin of the contents, shown in a sandboxed iframe.
 // Deleting the row, the server deletes the files too.
-// A site is either a zip (above) or a web address: the address is shown in an iframe (it is never
-// downloaded). Before saving, and when opening, the host looks at the page (`msk.web.probe`,
-// permission `web`): a site that forbids being framed (X-Frame-Options, CSP frame-ancestors) opens in a
-// new tab instead. Every site has a thumbnail: uploaded by the person, else the picture of the page
-// (og:image or its first image, found by the host), else a placeholder. It is kept in the record as a
-// small `data:` image (`thumbnail`).
+// A site is a zip. Sites made by web address (an older version) are no longer created: they live in
+// Bookmarks now. The ones that exist stay in the list, open in a new tab, and can be downloaded in the import
+// format of Bookmarks (a banner offers it) until they are deleted. Every site has a thumbnail: uploaded by
+// the person, else a placeholder. It is kept in the record as a small `data:` image (`thumbnail`).
 // Flows: list (cards or table) / new (name + zip or address) / edit / open / share /
 // delete, respecting the `my_level` of every row
 // (read = Open; write = also Edit; manage = also Share and Delete).
 
 import '@mosaikit/plugin-api/style.css'
 import './sites.css'
-import { connect, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
+import { connect, downloadCsv, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
-import { followHost, reloadIfStale, t } from './i18n.ts'
+import { bookmarkRows, BOOKMARKS_HEADER } from './tobookmarks.ts'
+import { followHost, plural, reloadIfStale, t } from './i18n.ts'
 import { LIMITS, hasIndexHtml, inspectZip, zipEntries, zipEntryNames, type ZipReport } from './zipnames.ts'
 
 const RESOURCE = 'sites' // name of the resource in the manifest
@@ -42,6 +41,7 @@ function valOf(row: Row | undefined | null, k: string): string {
 }
 const canWrite = (r: Row) => r.my_level === 'write' || r.my_level === 'manage'
 const canManage = (r: Row) => r.my_level === 'manage'
+/** A site made by web address with an older version: it is kept, not created any more. */
 const isWeb = (r: Row) => !!valOf(r, 'url')
 const hasSite = (r: Row) => !!valOf(r, 'entry') || isWeb(r)
 const thumbOf = (r: Row) => {
@@ -146,7 +146,6 @@ function mount(msk: Msk) {
     busy: false,
     siteUrl: '',
     layout: savedView(),
-    source: 'zip' as 'zip' | 'url',
     // thumbnail of the form: undefined = as it is, null = removed, a data: address = new
     thumb: undefined as string | null | undefined,
   }
@@ -182,11 +181,22 @@ function mount(msk: Msk) {
   emptyBox.hidden = true
   const listBody = pageBody(cards, grid.el, emptyBox, listMsg)
   listBody.classList.add('msk-tablebody')
+  // the sites by address (an older version) can move to Bookmarks
+  const moveText = h('span', { class: 'movetext' })
+  const btnMove = h('button', { type: 'button', class: 'msk-btn mini', 'data-testid': 'move-to-bookmarks' }, t('⤓ Download for Bookmarks'))
+  const moveBanner = h(
+    'div',
+    { class: 'movebanner', role: 'status', 'data-testid': 'move-banner' },
+    h('div', { class: 'movewords' }, moveText, h('span', { class: 'movehint' }, t('Sites by address are now made in Bookmarks. The file keeps the name, description, address and thumbnail; sharing is not copied. In Bookmarks press Import and choose it. Here they stay, opening in a new tab, until you delete them.'))),
+    btnMove,
+  )
+  moveBanner.hidden = true
   const listView = h(
     'div',
     { class: 'listview' },
     // the header and the filter never scroll (the same header as the pages of Mosaikit); the sites do
     pageHead({ title: t('Sites'), sub: rowcount, filters: [layoutSwitch, filter], actions: [btnNew] }),
+    moveBanner,
     listBody,
   )
 
@@ -207,17 +217,9 @@ function mount(msk: Msk) {
     sub_,
   )
   const zipReq = h('b', { class: 'req' }, '*')
-  const inSrcZip = h('input', { type: 'radio', name: 'msks-src', id: 'msks-src-zip', value: 'zip', checked: true })
-  const inSrcUrl = h('input', { type: 'radio', name: 'msks-src', id: 'msks-src-url', value: 'url' })
-  const srcRow = h(
-    'div',
-    { class: 'frow srcrow', role: 'radiogroup', 'aria-label': t('Source of the site') },
-    h('label', { class: 'radio', for: 'msks-src-zip' }, inSrcZip, ' ', t('Zip archive')),
-    h('label', { class: 'radio', for: 'msks-src-url' }, inSrcUrl, ' ', t('Web address')),
-  )
-  const inUrl = h('input', { id: 'msks-url', type: 'url', placeholder: 'https://example.org/', autocomplete: 'off' })
-  const urlHint = h('div', { class: 'hint' }, t('The site is shown inside Mosaikit and never downloaded. If it does not allow it, it opens in a new tab.'))
-  const urlRow = h('div', { class: 'frow required' }, h('label', { for: 'msks-url' }, t('Address') + ' ', h('b', { class: 'req' }, '*')), inUrl, urlHint)
+  // an older site by address: its address is shown, not edited (it moves to Bookmarks)
+  const legacyAddr = h('code', {})
+  const legacyRow = h('div', { class: 'frow' }, h('label', {}, t('Address')), legacyAddr, h('div', { class: 'hint' }, t('A site by address opens in a new tab. Move it to Bookmarks to show it inside the page.')))
   const inThumb = h('input', { id: 'msks-thumb', type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif' })
   const thumbPrev = h('img', { class: 'thumbprev', alt: '' })
   const btnThumbClear = h('button', { type: 'button', class: 'msk-btn ghost mini' }, t('Remove'))
@@ -226,7 +228,7 @@ function mount(msk: Msk) {
     { class: 'frow' },
     h('label', { for: 'msks-thumb' }, t('Thumbnail')),
     h('div', { class: 'thumbline' }, thumbPrev, inThumb, btnThumbClear),
-    h('div', { class: 'hint' }, t('Optional. Without one, a site given by address shows its own picture (og:image, or its first image); otherwise a placeholder.')),
+    h('div', { class: 'hint' }, t('Optional. Without one, a placeholder is shown.')),
   )
   const zipHint = h('div', { class: 'hint' })
   // what the zip would do as a site, shown as soon as it is chosen or dropped
@@ -241,9 +243,8 @@ function mount(msk: Msk) {
     { class: 'siteform' },
     h('div', { class: 'frow required' }, h('label', { for: 'msks-name' }, t('Name') + ' ', h('b', { class: 'req' }, '*')), inName),
     h('div', { class: 'frow' }, h('label', { for: 'msks-desc' }, t('Description')), inDesc),
-    srcRow,
     zipRow,
-    urlRow,
+    legacyRow,
     thumbRow,
     h('div', { class: 'form-actions' }, btnSave, btnCancel),
     formMsg,
@@ -275,24 +276,8 @@ function mount(msk: Msk) {
     u.hash = hash
     return u.toString()
   }
-  // a site given by address is another origin: it may keep its own scripts, forms and storage
-  const webFrame = h('iframe', {
-    class: 'sframe',
-    title: t('Web site'),
-    sandbox: 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads',
-    referrerpolicy: 'no-referrer',
-  })
-  // a site that forbids being framed: said here, with the way to open it
-  const noFrameLink = h('a', { class: 'msk-btn', target: '_blank', rel: 'noopener noreferrer' }, t('↗ New tab'))
-  const noFrame = h(
-    'div',
-    { class: 'noframe', role: 'status' },
-    h('p', {}, t('This site does not allow being shown inside Mosaikit (it forbids framing). It was opened in a new tab; if nothing opened, use the button.')),
-    noFrameLink,
-  )
-
   const editbar = h('div', { class: 'editbar' }, btnBack, svTitle)
-  const siteView = h('div', { class: 'siteview' }, editbar, siteForm, sframe, webFrame, noFrame)
+  const siteView = h('div', { class: 'siteview' }, editbar, siteForm, sframe)
 
   app.classList.add('msks')
   app.replaceChildren(listView, siteView)
@@ -324,6 +309,9 @@ function mount(msk: Msk) {
         v.toLowerCase().includes(f),
       )
     })
+    const byAddress = state.rows.filter(isWeb).length
+    moveBanner.hidden = byAddress === 0
+    moveText.textContent = byAddress ? plural(byAddress, 'site by address can move to Bookmarks', 'sites by address can move to Bookmarks') : ''
     rowcount.textContent = shown.length === 1 ? t('1 site') : t('{n} sites', { n: shown.length })
     const asCards = state.layout === 'cards'
     cards.hidden = !asCards
@@ -343,7 +331,7 @@ function mount(msk: Msk) {
               filter.value = ''
               filter.dispatchEvent(new Event('input'))
             })
-          : emptyState({ art: 'apps', title: t('No sites yet'), text: t('Publish a static site from a zip, or show a web address.'), actions: btnNew.hidden ? [] : [newApp] }),
+          : emptyState({ art: 'apps', title: t('No sites yet'), text: t('Publish a static site from a zip archive.'), actions: btnNew.hidden ? [] : [newApp] }),
       )
       cards.hidden = true
       grid.el.hidden = true
@@ -434,10 +422,7 @@ function mount(msk: Msk) {
     siteView.hidden = view === 'list'
     app.classList.toggle('show', view === 'show')
     siteForm.hidden = view !== 'edit'
-    const web = view === 'show' && !!findRow(state.editId) && isWeb(findRow(state.editId)!)
-    sframe.hidden = view !== 'show' || web
-    webFrame.hidden = !web
-    noFrame.hidden = true
+    sframe.hidden = view !== 'show'
     // viewing a site: no bar of its own, the frame fills the area under the navbar; the way back is the
     // back button of the contextual band (the list row keeps Open, Edit, Share and Delete)
     editbar.hidden = view === 'show'
@@ -450,17 +435,8 @@ function mount(msk: Msk) {
     if (view !== 'show') {
       writeOpen(null)
       sframe.src = 'about:blank'
-      webFrame.src = 'about:blank'
       state.siteUrl = ''
     }
-  }
-
-  function setSource(src: 'zip' | 'url') {
-    state.source = src
-    inSrcZip.checked = src === 'zip'
-    inSrcUrl.checked = src === 'url'
-    zipRow.hidden = src !== 'zip'
-    urlRow.hidden = src !== 'url'
   }
 
   function showThumb(src: string) {
@@ -567,13 +543,14 @@ function mount(msk: Msk) {
     inZip.value = ''
     inThumb.value = ''
     void setFile(null)
-    // the source of an existing site does not change
-    setSource(row && isWeb(row) ? 'url' : 'zip')
-    inSrcZip.disabled = inSrcUrl.disabled = !!row && hasSite(row)
-    inUrl.value = row ? valOf(row, 'url') : ''
+    // a site by address (older version) keeps only its name, description and thumbnail here
+    const legacy = !!row && isWeb(row)
+    zipRow.hidden = legacy
+    legacyRow.hidden = !legacy
+    legacyAddr.textContent = row ? valOf(row, 'url') : ''
     state.thumb = undefined
     showThumb(row ? thumbOf(row) : '')
-    const current = !!row && hasSite(row) && !isWeb(row)
+    const current = !!row && hasSite(row) && !legacy
     zipReq.hidden = current
     if (current) {
       zipHint.replaceChildren(
@@ -598,41 +575,9 @@ function mount(msk: Msk) {
     inName.focus()
   }
 
-  /** A site given by address: in the frame, or in a new tab when it forbids being framed. */
-  async function openWeb(row: Row) {
-    const url = valOf(row, 'url')
-    noFrameLink.href = url
-    // known to forbid framing: straight to a new tab (the click is still the gesture that allows it)
-    if (valOf(row, 'framable') === 'no') {
-      state.editId = row.id
-      svTitle.textContent = valOf(row, 'name')
-      showView('show')
-      showNoFrame(url)
-      return
-    }
-    state.editId = row.id
-    svTitle.textContent = valOf(row, 'name')
-    showView('show')
-    state.siteUrl = url
-    webFrame.src = url
-    // looked at again: the site may have changed its mind since it was saved
-    try {
-      const p = await msk.web.probe(url)
-      if (!p.embeddable && state.editId === row.id && state.view === 'show') {
-        showNoFrame(url)
-        if (valOf(row, 'framable') !== 'no' && canWrite(row)) void crud.update(row.id, { framable: 'no' }).then(load, () => {})
-      }
-    } catch {
-      /* cannot look at it from here: the frame shows what it can */
-    }
-  }
-
-  function showNoFrame(url: string) {
-    webFrame.src = 'about:blank'
-    webFrame.hidden = true
-    noFrame.hidden = false
-    noFrameLink.href = url
-    window.open(url, '_blank', 'noopener,noreferrer')
+  /** A site made by address (older version): in a new tab, as the click is the gesture that allows it. */
+  function openWeb(row: Row) {
+    window.open(valOf(row, 'url'), '_blank', 'noopener,noreferrer')
   }
 
   async function openShow(id: string, hash = '') {
@@ -676,19 +621,9 @@ function mount(msk: Msk) {
     const description = inDesc.value
     const file = state.file
     const row = state.editId != null ? findRow(state.editId) : undefined
-    const web = state.source === 'url'
-    let address = ''
-    if (web) {
-      try {
-        const u = new URL(inUrl.value.trim())
-        if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error('scheme')
-        address = u.href
-      } catch {
-        return msg(t('enter a valid web address (http or https)'), 'form', true)
-      }
-      if (!name && !address) return msg(t('the name is required'), 'form', true)
-    } else {
-      if (!name) return msg(t('the name is required'), 'form', true)
+    const legacy = !!row && isWeb(row)
+    if (!name) return msg(t('the name is required'), 'form', true)
+    if (!legacy) {
       if (!file && !(row && hasSite(row))) return msg(t('choose the zip with the site'), 'form', true)
       if (file && !/\.zip$/i.test(file.name)) return msg(t('the file must be a .zip'), 'form', true)
       if (file && inspected?.problems.length) return msg(problemText(inspected.problems[0]!), 'form', true)
@@ -696,23 +631,13 @@ function mount(msk: Msk) {
 
     setBusy(true)
     try {
-      if (web) {
-        msg(t('looking at the site…'), 'form')
-        // what the host sees: may it be framed, its title, its picture. A thumbnail given by the person wins.
-        const needPicture = state.thumb === undefined && !(row && thumbOf(row))
-        const p = await msk.web.probe(address, needPicture)
-        const title = name || p.title || hostOf(address)
-        let thumbnail: string | undefined
-        if (state.thumb) thumbnail = state.thumb
-        else if (state.thumb === null) thumbnail = ''
-        else if (needPicture && p.image) thumbnail = await toThumbnail(p.image).catch(() => '')
-        const values: Record<string, string | number> = { name: title, description, url: address, framable: p.embeddable ? 'yes' : 'no' }
-        if (thumbnail !== undefined) values.thumbnail = thumbnail
-        if (row) await crud.update(row.id, values)
-        else await crud.create(values)
+      if (legacy) {
+        // a site by address: only the texts and the thumbnail change; the address and its sharing stay as they are
+        const pic: Record<string, string> = state.thumb === undefined ? {} : { thumbnail: state.thumb ?? '' }
+        await crud.update(row!.id, { name, description, ...pic })
         setBusy(false)
         showView('list')
-        msg(row ? t('site updated') : p.embeddable ? t('site created') : t('site created: it does not allow being shown inside Mosaikit, it opens in a new tab'))
+        msg(t('site updated'))
         await load()
         return
       }
@@ -797,10 +722,11 @@ function mount(msk: Msk) {
     if (ev.key === 'Enter') void save()
   })
   inZip.addEventListener('change', () => void setFile(inZip.files?.[0]))
-  inSrcZip.addEventListener('change', () => setSource('zip'))
-  inSrcUrl.addEventListener('change', () => setSource('url'))
-  inUrl.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Enter') void save()
+  btnMove.addEventListener('click', () => {
+    const rows = bookmarkRows(state.rows)
+    if (!rows.length) return
+    downloadCsv('sites-for-bookmarks.csv', rows, { header: BOOKMARKS_HEADER })
+    msg(t('Downloaded {n} sites for Bookmarks. In Bookmarks press Import and choose the file.', { n: rows.length }))
   })
   inThumb.addEventListener('change', () => {
     const f = inThumb.files?.[0]

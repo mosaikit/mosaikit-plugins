@@ -34,5 +34,18 @@
   "Write an address": "Saisissez une adresse",
   "{n} shown of {t}": "{n} affichés sur {t}",
   "Could not start the UI of the plugin: ": "Impossible de démarrer l'interface du plugin :",
-  "Could not load the bookmarks: ": "Impossible de charger les favoris :"
+  "Could not load the bookmarks: ": "Impossible de charger les favoris :",
+  "Open links": "Ouvrir les liens",
+  "Where a bookmark opens unless it says otherwise": "Où s’ouvre un favori s’il ne précise rien",
+  "In the page": "Dans la page",
+  "New tab": "Nouvel onglet",
+  "As the list: {m}": "Comme la liste : {m}",
+  "Opens": "S’ouvre",
+  "In the page the site is shown inside Mosaikit; if it forbids that, it opens in a new tab.": "Dans la page, le site s’affiche dans Mosaikit ; s’il l’interdit, il s’ouvre dans un nouvel onglet.",
+  "In page": "Dans la page",
+  "Looking at the site…": "Examen du site…",
+  "Back to the bookmarks": "Retour aux favoris",
+  "Web site": "Site web",
+  "↗ New tab": "↗ Nouvel onglet",
+  "This site does not allow being shown inside Mosaikit (it forbids framing). It was opened in a new tab; if nothing opened, use the button.": "Ce site ne peut pas s’afficher dans Mosaikit (il interdit l’intégration). Il a été ouvert dans un nouvel onglet ; si rien ne s’est ouvert, utilisez le bouton."
 }

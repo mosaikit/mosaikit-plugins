@@ -34,5 +34,18 @@
   "Write an address": "اكتب عنوانًا إلكترونيًا",
   "{n} shown of {t}": "عرض {n} من {t}",
   "Could not start the UI of the plugin: ": "تعذّر تشغيل واجهة الإضافة: ",
-  "Could not load the bookmarks: ": "تعذّر تحميل الإشارات المرجعية: "
+  "Could not load the bookmarks: ": "تعذّر تحميل الإشارات المرجعية: ",
+  "Open links": "فتح الروابط",
+  "Where a bookmark opens unless it says otherwise": "المكان الذي تُفتح فيه الإشارة المرجعية ما لم تُحدَّد غير ذلك",
+  "In the page": "في الصفحة",
+  "New tab": "علامة تبويب جديدة",
+  "As the list: {m}": "مثل القائمة: {m}",
+  "Opens": "تُفتح",
+  "In the page the site is shown inside Mosaikit; if it forbids that, it opens in a new tab.": "في الصفحة يُعرض الموقع داخل Mosaikit؛ وإن كان يمنع ذلك فيُفتح في علامة تبويب جديدة.",
+  "In page": "في الصفحة",
+  "Looking at the site…": "جارٍ فحص الموقع…",
+  "Back to the bookmarks": "العودة إلى الإشارات المرجعية",
+  "Web site": "موقع ويب",
+  "↗ New tab": "↗ علامة تبويب جديدة",
+  "This site does not allow being shown inside Mosaikit (it forbids framing). It was opened in a new tab; if nothing opened, use the button.": "لا يسمح هذا الموقع بعرضه داخل Mosaikit (يمنع التضمين). فُتح في علامة تبويب جديدة؛ إن لم يُفتح شيء فاستخدم الزر."
 }

@@ -1,13 +1,13 @@
 id = "com.mosaikit.static-site"
 name = "Sites"
-version = "0.10.0"
+version = "0.11.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "grid"
-description = "Publishes static sites from zip archives or shows a site by its web address, shareable and with public links"
+description = "Publishes static sites from zip archives, shareable and with public links"
 author = "Mosaikit"
 license = "Apache-2.0"
-details = "Publish a static site from a zip archive, or show an existing site by its web address inside the platform.\n\nEvery site can be shared with colleagues and groups, and opened to anyone with a public link that you can revoke at any time. Sites are served from a separate origin, so their scripts never reach the platform."
+details = "Publish a static site from a zip archive.\n\nEvery site can be shared with colleagues and groups, and opened to anyone with a public link that you can revoke at any time. Sites are served from a separate origin, so their scripts never reach the platform.\n\nA link to an outside site belongs in Bookmarks, which can show it inside the page. Sites that an earlier version made by web address stay here, open in a new tab, and can be downloaded in the import format of Bookmarks."
 screenshots = ["sites.webp", "site.webp"]
 homepage = "https://example.org/mosaikit/plugins/static-site"
 
@@ -30,6 +30,7 @@ fields = [
   { key = "entry", label = "Start page", kind = "text", hidden = true },
   { key = "files", label = "Files", kind = "number", hidden = true },
   { key = "size", label = "Size (bytes)", kind = "number", hidden = true },
+  # kept for the sites that an earlier version made by web address (no longer created)
   { key = "url", label = "Web address", kind = "text", hidden = true, search = true },
   { key = "framable", label = "May be framed", kind = "text", hidden = true },
   { key = "thumbnail", label = "Thumbnail", kind = "text", hidden = true },
@@ -40,8 +41,6 @@ entry = "index.html"
 
 [permissions]
 content = true
-# shows sites by address in a frame and asks the host to look at them (framing allowed? title, picture)
-web = true
 
 [[kpi]]
 view = "kpi_sites"
@@ -49,9 +48,9 @@ label = "Published sites"
 
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
-details = "Pubblica un sito statico da un archivio zip, oppure mostra all’interno della piattaforma un sito esistente tramite il suo indirizzo web.\n\nOgni sito può essere condiviso con colleghi e gruppi e aperto a chiunque con un link pubblico che puoi revocare in qualsiasi momento. I siti sono serviti da un’origine separata, quindi i loro script non raggiungono mai la piattaforma."
+details = "Pubblica un sito statico da un archivio zip.\n\nOgni sito può essere condiviso con colleghi e gruppi e aperto a chiunque con un link pubblico che puoi revocare in qualsiasi momento. I siti sono serviti da un’origine separata, quindi i loro script non raggiungono mai la piattaforma.\n\nUn link a un sito esterno va nei Segnalibri, che può mostrarlo dentro la pagina. I siti che una versione precedente creava da un indirizzo web restano qui, si aprono in una nuova scheda e si possono scaricare nel formato di importazione dei Segnalibri."
 name = "Siti"
-description = "Pubblica siti statici da archivi zip o mostra un sito dal suo indirizzo web, condivisibili e con link pubblici"
+description = "Pubblica siti statici da archivi zip, condivisibili e con link pubblici"
 label = "Siti"
 
 [i18n.it.resources.sites]

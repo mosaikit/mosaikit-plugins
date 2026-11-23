@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_TAG, MAX_TAGS, applyFilter, cleanTags, hostOf, normaliseTag, parseTags, safeHref, tagCounts, toggleTag } from './logic.ts'
+import { MAX_TAG, MAX_TAGS, applyFilter, cleanTags, hostOf, normaliseTag, parseTags, safeHref, tagCounts, toggleTag, effectiveMode, hueOf, parseOpenMode, safeThumbnail, withScheme } from './logic.ts'
 
 const b = (title: string, url: string, tags: string[] = [], favorite = false, note = '') => ({ title, url, note, tags, favorite })
 const list = [
@@ -96,5 +96,39 @@ describe('grid rows', () => {
   it('counts the columns that fit', () => {
     expect(columnsFor(900, 280, 16)).toBe(3)
     expect(columnsFor(0, 280, 16)).toBe(1)
+  })
+})
+
+describe('opening in a frame or in a tab', () => {
+  it('reads the stored mode and falls back to the default', () => {
+    expect(parseOpenMode('frame')).toBe('frame')
+    expect(parseOpenMode('tab')).toBe('tab')
+    expect(parseOpenMode('popup')).toBe('')
+    expect(parseOpenMode(undefined)).toBe('')
+    expect(effectiveMode('', 'tab')).toBe('tab')
+    expect(effectiveMode(undefined, 'frame')).toBe('frame')
+    expect(effectiveMode('frame', 'tab')).toBe('frame')
+    expect(effectiveMode('tab', 'frame')).toBe('tab')
+  })
+  it('gives an address its scheme the way the hook of the plugin does, and refuses the rest', () => {
+    expect(withScheme(' example.org/a ')).toBe('https://example.org/a')
+    expect(withScheme('localhost:8080/app')).toBe('https://localhost:8080/app')
+    expect(withScheme('http://example.org')).toBe('http://example.org')
+    expect(withScheme('javascript:alert(1)')).toBe('')
+    expect(withScheme('ftp://example.org')).toBe('')
+    expect(withScheme('')).toBe('')
+  })
+  it('draws only small data images as a thumbnail', () => {
+    const ok = 'data:image/jpeg;base64,/9j/4AAQ'
+    expect(safeThumbnail(ok)).toBe(ok)
+    expect(safeThumbnail('https://example.org/x.png')).toBe('')
+    expect(safeThumbnail('data:image/svg+xml;base64,AAAA')).toBe('')
+    expect(safeThumbnail('data:image/png;base64,' + 'A'.repeat(300000))).toBe('')
+    expect(safeThumbnail(7)).toBe('')
+  })
+  it('keeps one colour for one name', () => {
+    expect(hueOf('example.org')).toBe(hueOf('example.org'))
+    expect(hueOf('example.org')).toBeGreaterThanOrEqual(0)
+    expect(hueOf('example.org')).toBeLessThan(360)
   })
 })

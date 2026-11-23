@@ -14,6 +14,9 @@ const en = {
   exported: 'Exported {n} bookmarks', exportNone: 'There is nothing to export', alreadySaved: 'Already saved as “{n}”.',
   dupTitle: 'Duplicate bookmarks', dupNone: 'No duplicates: every bookmark has its own address.', dupHint: 'The same address (www, a final slash, http or https and tracking parameters do not count).', dupKeep: 'Keep “{n}”, delete the others', dupRemoved: '{n} duplicates deleted',
   scNew: 'New bookmark', scSearch: 'Search', scTitle: 'Keyboard shortcuts', scThen: 'then',
+  openLinks: 'Open links', openLinksHint: 'Where a bookmark opens unless it says otherwise', modeFrame: 'In the page', modeTab: 'New tab', modeDefault: 'As the list: {m}', fOpen: 'Opens', fOpenHint: 'In the page the site is shown inside Mosaikit; if it forbids that, it opens in a new tab.',
+  badgeFrame: 'In page', badgeTab: 'New tab', looking: 'Looking at the site…', backToList: 'Back to the bookmarks', frameTitle: 'Web site', newTabLink: '↗ New tab',
+  noFrame: 'This site does not allow being shown inside Mosaikit (it forbids framing). It was opened in a new tab; if nothing opened, use the button.',
   failed: 'Could not start the UI of the plugin: ', loadFailed: 'Could not load the bookmarks: ',
 }
 export type Texts = typeof en
@@ -33,6 +36,9 @@ const it: Texts = {
   exported: 'Esportati {n} segnalibri', exportNone: 'Non c’è niente da esportare', alreadySaved: 'Già salvato come “{n}”.',
   dupTitle: 'Segnalibri doppi', dupNone: 'Nessun doppione: ogni segnalibro ha il suo indirizzo.', dupHint: 'Lo stesso indirizzo (www, una barra finale, http o https e i parametri di tracciamento non contano).', dupKeep: 'Tieni “{n}”, elimina gli altri', dupRemoved: '{n} doppioni eliminati',
   scNew: 'Nuovo segnalibro', scSearch: 'Cerca', scTitle: 'Scorciatoie da tastiera', scThen: 'poi',
+  openLinks: 'Apri i link', openLinksHint: 'Dove si apre un segnalibro se non dice altro', modeFrame: 'Nella pagina', modeTab: 'Nuova scheda', modeDefault: 'Come l’elenco: {m}', fOpen: 'Si apre', fOpenHint: 'Nella pagina il sito è mostrato dentro Mosaikit; se non lo permette, si apre in una nuova scheda.',
+  badgeFrame: 'Nella pagina', badgeTab: 'Nuova scheda', looking: 'Guardo il sito…', backToList: 'Torna ai segnalibri', frameTitle: 'Sito web', newTabLink: '↗ Nuova scheda',
+  noFrame: 'Questo sito non può essere mostrato dentro Mosaikit (vieta l’incorporamento). È stato aperto in una nuova scheda; se non si è aperto nulla, usa il pulsante.',
   failed: 'Impossibile avviare la UI del plugin: ', loadFailed: 'Impossibile caricare i segnalibri: ',
 }
 const es: Texts = {
@@ -49,6 +55,9 @@ const es: Texts = {
   exported: 'Exportados {n} marcadores', exportNone: 'No hay nada que exportar', alreadySaved: 'Ya guardado como “{n}”.',
   dupTitle: 'Marcadores duplicados', dupNone: 'Sin duplicados: cada marcador tiene su dirección.', dupHint: 'La misma dirección (www, una barra final, http o https y los parámetros de seguimiento no cuentan).', dupKeep: 'Conservar “{n}”, eliminar los demás', dupRemoved: '{n} duplicados eliminados',
   scNew: 'Nuevo marcador', scSearch: 'Buscar', scTitle: 'Atajos de teclado', scThen: 'luego',
+  openLinks: 'Abrir enlaces', openLinksHint: 'Dónde se abre un marcador si no dice otra cosa', modeFrame: 'En la página', modeTab: 'Pestaña nueva', modeDefault: 'Como la lista: {m}', fOpen: 'Se abre', fOpenHint: 'En la página el sitio se muestra dentro de Mosaikit; si no lo permite, se abre en una pestaña nueva.',
+  badgeFrame: 'En la página', badgeTab: 'Pestaña nueva', looking: 'Mirando el sitio…', backToList: 'Volver a los marcadores', frameTitle: 'Sitio web', newTabLink: '↗ Pestaña nueva',
+  noFrame: 'Este sitio no permite mostrarse dentro de Mosaikit (prohíbe incrustarlo). Se abrió en una pestaña nueva; si no se abrió nada, usa el botón.',
   failed: 'No se pudo iniciar la interfaz del plugin: ', loadFailed: 'No se pudieron cargar los marcadores: ',
 }
 // Page texts: English, Italian and Spanish are the tables above. The other languages come from the language plugins
