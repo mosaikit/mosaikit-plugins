@@ -1,0 +1,15 @@
+# a sidebar with grouped apps under an indigo band with a centred search
+pattern = "sidebar"
+
+[band]
+brand = true
+search = "center"
+tenant = "band"
+
+[phone]
+nav = "drawer"
+
+[style]
+radius = "medium"
+density = "comfortable"
+tabs = "pill"

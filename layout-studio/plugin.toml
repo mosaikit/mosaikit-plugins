@@ -1,0 +1,26 @@
+id = "com.mosaikit.layout-studio"
+name = "Studio"
+version = "1.0.0"
+kind = "layout"
+description = "Indigo band, grey sidebar with grouped apps and 3D icons"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "An indigo band with a centred search, a grey sidebar with the apps in groups, a white work area and soft shadows. The apps get 3D icons, in light and dark mode."
+screenshots = ["layout.webp", "layout-page.webp", "layout-dark.webp"]
+homepage = "https://example.org/mosaikit/plugins/layout-studio"
+
+[requires]
+mosaikit = ">=1.0, <2"
+api = 1
+
+[contribution]
+icon = "▤"
+label = "Studio"
+
+# a layout is declarative: layout/layout.toml (the arrangement of the slots), layout/layout.css (checked at
+# install and scoped under the class of the layout) and layout/images; no code runs in the shell
+[i18n.it]
+details = "Una banda indaco con la ricerca al centro, una barra laterale grigia con le app in gruppi, un'area di lavoro bianca e ombre morbide. Le app hanno icone 3D, in modo chiaro e scuro."
+name = "Studio"
+description = "Banda indaco, barra laterale grigia con app in gruppi e icone 3D"
+label = "Studio"

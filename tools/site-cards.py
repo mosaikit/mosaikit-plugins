@@ -21,7 +21,7 @@ CAPTIONS = json.load(open(_CAPS, encoding='utf-8')) if os.path.exists(_CAPS) els
 GROUPS = [
     ('Applications', None, ['files', 'notes', 'tasks', 'contacts', 'chat', 'meet', 'announcements', 'bookmarks', 'snippets', 'polls', 'surveys', 'approvals', 'dashboard', 'forms', 'projects', 'calendar', 'whiteboard', 'maps', 'static-site']),
     ('Extensions', 'Small additions to an application.', ['note-review']),
-    ('Layouts', 'How the interface is arranged: pick one per tenant.', ['layout-project', 'layout-suite', 'layout-tabs', 'layout-workspace']),
+    ('Layouts', 'How the interface is arranged: pick one per tenant.', ['layout-project', 'layout-studio', 'layout-suite', 'layout-tabs', 'layout-workspace']),
     ('Languages', 'The interface in your language, with right-to-left support for Arabic. The Administrator installs the language and each person chooses it.',
      ['lang-es', 'lang-pt', 'lang-fr', 'lang-nl', 'lang-ar', 'lang-zh', 'lang-ru']),
 ]

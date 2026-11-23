@@ -39,6 +39,11 @@
     "layout.webp": "Project layout: the dashboard of a tenant",
     "layout-page.webp": "Project layout: a page of an app"
   },
+  "layout-studio": {
+    "layout.webp": "Studio layout: the dashboard of a tenant",
+    "layout-page.webp": "Studio layout: a page of an app",
+    "layout-dark.webp": "Studio layout in dark mode"
+  },
   "layout-suite": {
     "layout.webp": "Suite layout: the dashboard of a tenant",
     "layout-page.webp": "Suite layout: a page of an app"
