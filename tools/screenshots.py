@@ -615,7 +615,7 @@ def maps(W):
 
 def layouts(W):
     w = W['user']
-    for lid, name in [('layout-project', 'project'), ('layout-suite', 'suite'), ('layout-tabs', 'tabs'), ('layout-workspace', 'workspace')]:
+    for lid, name in [('layout-project', 'project'), ('layout-studio', 'studio'), ('layout-suite', 'suite'), ('layout-tabs', 'tabs'), ('layout-workspace', 'workspace')]:
         w.api('put', '/manage/config', {'values': {'layout': 'com.mosaikit.' + lid}, 'customizable': {}})
         pg = w.page if getattr(w, 'page', None) else w.ctx.new_page(); w.page = pg
         pg.goto(f'{B}/#/t/{T}/p/com.mosaikit.dashboard'); pg.reload(); pg.wait_for_timeout(4000); shot(pg, lid, 'layout')
@@ -631,7 +631,7 @@ ORDER = ['notes', 'notes2', 'note_review', 'announcements', 'bookmarks', 'snippe
          'surveys', 'projects', 'chat', 'meet', 'files', 'static_site', 'whiteboard', 'maps', 'dashboard', 'layouts']
 # the plugin folders each step writes
 PLUGINS = {'notes': ['notes'], 'notes2': ['notes'], 'note_review': ['note-review'], 'static_site': ['static-site'],
-           'layouts': ['layout-project', 'layout-suite', 'layout-tabs', 'layout-workspace']}
+           'layouts': ['layout-project', 'layout-studio', 'layout-suite', 'layout-tabs', 'layout-workspace']}
 
 # What the pictures show (alt text of the cards of the site). Keys: plugin folder, file stem.
 CAPTIONS = {
@@ -645,6 +645,7 @@ CAPTIONS = {
     'files': {'files': 'Documents: folders and files', 'preview': 'Documents: preview of a picture, with sharing'},
     'forms': {'form': 'Forms: a registration form with text, email, choice and number fields', 'answers': 'Forms: the answers with the counts per option'},
     'layout-project': {'layout': 'Project layout: the dashboard of a tenant', 'layout-page': 'Project layout: a page of an app'},
+    'layout-studio': {'layout': 'Studio layout: the dashboard of a tenant', 'layout-page': 'Studio layout: a page of an app', 'layout-dark': 'Studio layout in dark mode'},
     'layout-suite': {'layout': 'Suite layout: the dashboard of a tenant', 'layout-page': 'Suite layout: a page of an app'},
     'layout-tabs': {'layout': 'Tabs layout: the dashboard of a tenant', 'layout-page': 'Tabs layout: a page of an app'},
     'layout-workspace': {'layout': 'Workspace layout: the dashboard of a tenant', 'layout-page': 'Workspace layout: a page of an app'},

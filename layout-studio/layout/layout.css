@@ -1,0 +1,647 @@
+/* Studio: indigo band with a centred white search, grey sidebar with grouped apps, a white work area, soft shadows
+   and 3D icons for the apps. Light colours first, dark ones under data-mode="dark" (set by the shell on the
+   layout root). The icons are one sprite (images/icons.png, 6 columns of 96 px drawn at 24 px) because a layout may
+   carry 8 images; the shell marks each app with data-icon and each group with data-group. An icon with no rule
+   here keeps the line icon. 3D icons: 3dicons.co (CC0). */
+.msk-frame {
+  background-color: #f3f4f8;
+}
+.msk-band {
+  background-color: #44458f;
+  color: #ffffff;
+  border-bottom: 0;
+  box-shadow: 0 2px 8px rgba(27, 31, 51, 0.10);
+}
+.msk-main {
+  background-color: #ffffff;
+  color: #1b1f33;
+}
+.msk-nav {
+  background-color: #eff0f5;
+  border-right: 1px solid #e0e2ec;
+  color: #1b1f33;
+}
+.msk-nav-item {
+  color: #1b1f33;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+.msk-nav-item:hover {
+  background-color: rgba(27, 31, 51, 0.07);
+}
+.msk-nav-item[aria-current="page"] {
+  background-color: #ffffff;
+  color: #1b1f33;
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 #4a4bb0, 0 1px 3px rgba(27, 31, 51, 0.10);
+}
+.msk-navg-head {
+  color: #1b1f33;
+  font-weight: 700;
+  transition: background-color 0.15s;
+}
+.msk-navg-head:hover {
+  background-color: rgba(27, 31, 51, 0.07);
+}
+.msk-band input {
+  background-color: #ffffff;
+  color: #1b1f33;
+  border-radius: 6px;
+}
+.msk-tenant {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+/* dark */
+&[data-mode="dark"] .msk-frame {
+  background-color: #0e1120;
+}
+&[data-mode="dark"] .msk-band {
+  background-color: #2a2b5c;
+  color: #ffffff;
+  border-bottom: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+&[data-mode="dark"] .msk-main {
+  background-color: #171b2e;
+  color: #e8eaf6;
+}
+&[data-mode="dark"] .msk-nav {
+  background-color: #131728;
+  border-right: 1px solid #2a3050;
+  color: #e8eaf6;
+}
+&[data-mode="dark"] .msk-nav-item {
+  color: #e8eaf6;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+&[data-mode="dark"] .msk-nav-item:hover {
+  background-color: rgba(232, 234, 246, 0.08);
+}
+&[data-mode="dark"] .msk-nav-item[aria-current="page"] {
+  background-color: #171b2e;
+  color: #e8eaf6;
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 #9091f2, 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+&[data-mode="dark"] .msk-navg-head {
+  color: #e8eaf6;
+  font-weight: 700;
+  transition: background-color 0.15s;
+}
+&[data-mode="dark"] .msk-navg-head:hover {
+  background-color: rgba(232, 234, 246, 0.08);
+}
+&[data-mode="dark"] .msk-band input {
+  background-color: #171b2e;
+  color: #e8eaf6;
+  border-radius: 6px;
+}
+&[data-mode="dark"] .msk-tenant {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+/* 3D icons: the line icon is made transparent (it draws with currentColor) and the sprite goes behind it */
+.msk-nav-item[data-icon="megaphone"] > svg:first-child, .msk-navg-head[data-icon="megaphone"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px 0px;
+}
+.msk-nav-item[data-icon="shield-check"] > svg:first-child, .msk-navg-head[data-icon="shield-check"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px 0px;
+}
+.msk-nav-item[data-icon="bookmark"] > svg:first-child, .msk-navg-head[data-icon="bookmark"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px 0px;
+}
+.msk-nav-item[data-icon="calendar-days"] > svg:first-child, .msk-navg-head[data-icon="calendar-days"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px 0px;
+}
+.msk-nav-item[data-icon="calendar"] > svg:first-child, .msk-navg-head[data-icon="calendar"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px 0px;
+}
+.msk-nav-item[data-icon="message-circle"] > svg:first-child, .msk-navg-head[data-icon="message-circle"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -96px 0px;
+}
+.msk-nav-item[data-icon="message-square"] > svg:first-child, .msk-navg-head[data-icon="message-square"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -120px;
+}
+.msk-nav-item[data-icon="hash"] > svg:first-child, .msk-navg-head[data-icon="hash"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -120px 0px;
+}
+.msk-nav-item[data-icon="book-user"] > svg:first-child, .msk-navg-head[data-icon="book-user"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -24px;
+}
+.msk-nav-item[data-icon="users"] > svg:first-child, .msk-navg-head[data-icon="users"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -96px -48px;
+}
+.msk-nav-item[data-icon="user"] > svg:first-child, .msk-navg-head[data-icon="user"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -24px;
+}
+.msk-nav-item[data-icon="layout-dashboard"] > svg:first-child, .msk-navg-head[data-icon="layout-dashboard"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -24px;
+}
+.msk-nav-item[data-icon="chart-bar"] > svg:first-child, .msk-navg-head[data-icon="chart-bar"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -24px;
+}
+.msk-nav-item[data-icon="folder"] > svg:first-child, .msk-navg-head[data-icon="folder"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -24px;
+}
+.msk-nav-item[data-icon="file-input"] > svg:first-child, .msk-navg-head[data-icon="file-input"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px -24px;
+}
+.msk-nav-item[data-icon="file-text"] > svg:first-child, .msk-navg-head[data-icon="file-text"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -120px -72px;
+}
+.msk-nav-item[data-icon="map"] > svg:first-child, .msk-navg-head[data-icon="map"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -96px -24px;
+}
+.msk-nav-item[data-icon="map-pin"] > svg:first-child, .msk-navg-head[data-icon="map-pin"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -120px -24px;
+}
+.msk-nav-item[data-icon="video"] > svg:first-child, .msk-navg-head[data-icon="video"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -48px;
+}
+.msk-nav-item[data-icon="badge-check"] > svg:first-child, .msk-navg-head[data-icon="badge-check"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -48px;
+}
+.msk-nav-item[data-icon="clipboard-check"] > svg:first-child, .msk-navg-head[data-icon="clipboard-check"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -48px;
+}
+.msk-nav-item[data-icon="notebook-pen"] > svg:first-child, .msk-navg-head[data-icon="notebook-pen"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -48px;
+}
+.msk-nav-item[data-icon="notebook"] > svg:first-child, .msk-navg-head[data-icon="notebook"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -48px;
+}
+.msk-nav-item[data-icon="star"] > svg:first-child, .msk-navg-head[data-icon="star"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px -48px;
+}
+.msk-nav-item[data-icon="tag"] > svg:first-child, .msk-navg-head[data-icon="tag"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -120px -48px;
+}
+.msk-nav-item[data-icon="archive"] > svg:first-child, .msk-navg-head[data-icon="archive"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -72px;
+}
+.msk-nav-item[data-icon="vote"] > svg:first-child, .msk-navg-head[data-icon="vote"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -72px;
+}
+.msk-nav-item[data-icon="kanban"] > svg:first-child, .msk-navg-head[data-icon="kanban"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -72px;
+}
+.msk-nav-item[data-icon="code"] > svg:first-child, .msk-navg-head[data-icon="code"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px -72px;
+}
+.msk-nav-item[data-icon="grid"] > svg:first-child, .msk-navg-head[data-icon="grid"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -96px -72px;
+}
+.msk-nav-item[data-icon="clipboard-list"] > svg:first-child, .msk-navg-head[data-icon="clipboard-list"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -120px -72px;
+}
+.msk-nav-item[data-icon="square-check-big"] > svg:first-child, .msk-navg-head[data-icon="square-check-big"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -48px;
+}
+.msk-nav-item[data-icon="presentation"] > svg:first-child, .msk-navg-head[data-icon="presentation"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -96px;
+}
+.msk-nav-item[data-icon="settings"] > svg:first-child, .msk-navg-head[data-icon="settings"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -96px;
+}
+.msk-nav-item[data-icon="lock"] > svg:first-child, .msk-navg-head[data-icon="lock"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -96px;
+}
+.msk-nav-item[data-icon="mail"] > svg:first-child, .msk-navg-head[data-icon="mail"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px -96px;
+}
+.msk-nav-item[data-icon="overview"] > svg:first-child, .msk-navg-head[data-icon="overview"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -24px;
+}
+.msk-nav-item[data-icon="tenants"] > svg:first-child, .msk-navg-head[data-icon="tenants"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -120px -120px;
+}
+.msk-nav-item[data-icon="people"] > svg:first-child, .msk-navg-head[data-icon="people"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -24px;
+}
+.msk-nav-item[data-icon="plugins"] > svg:first-child, .msk-navg-head[data-icon="plugins"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px -72px;
+}
+.msk-nav-item[data-icon="monitoring"] > svg:first-child, .msk-navg-head[data-icon="monitoring"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -144px;
+}
+.msk-nav-item[data-icon="log"] > svg:first-child, .msk-navg-head[data-icon="log"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -96px -96px;
+}
+.msk-nav-item[data-icon="manage"] > svg:first-child, .msk-navg-head[data-icon="manage"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -96px -48px;
+}
+.msk-nav-item[data-icon="shares"] > svg:first-child, .msk-navg-head[data-icon="shares"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -120px;
+}
+.msk-nav-item[data-icon="usage"] > svg:first-child, .msk-navg-head[data-icon="usage"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -144px;
+}
+.msk-nav-item[data-icon="schedules"] > svg:first-child, .msk-navg-head[data-icon="schedules"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px 0px;
+}
+.msk-nav-item[data-icon="briefcase"] > svg:first-child, .msk-navg-head[data-icon="briefcase"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -72px;
+}
+.msk-nav-item[data-icon="database"] > svg:first-child, .msk-navg-head[data-icon="database"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -96px -72px;
+}
+.msk-nav-item[data-icon="globe"] > svg:first-child, .msk-navg-head[data-icon="globe"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -144px;
+}
+.msk-nav-item[data-icon="home"] > svg:first-child, .msk-navg-head[data-icon="home"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -72px;
+}
+.msk-nav-item[data-icon="clock"] > svg:first-child, .msk-navg-head[data-icon="clock"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -96px -96px;
+}
+.msk-nav-item[data-icon="bell"] > svg:first-child, .msk-navg-head[data-icon="bell"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -120px -96px;
+}
+.msk-nav-item[data-icon="link"] > svg:first-child, .msk-navg-head[data-icon="link"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -120px;
+}
+.msk-nav-item[data-icon="pencil"] > svg:first-child, .msk-navg-head[data-icon="pencil"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -24px -120px;
+}
+.msk-nav-item[data-icon="wrench"] > svg:first-child, .msk-navg-head[data-icon="wrench"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px -120px;
+}
+.msk-nav-item[data-icon="zap"] > svg:first-child, .msk-navg-head[data-icon="zap"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -96px -120px;
+}
+.msk-navg-head[data-group="information"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px -48px;
+}
+.msk-navg-head[data-group="work"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -72px -120px;
+}
+.msk-navg-head[data-group="com"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -120px;
+}
+.msk-navg-head[data-group="people"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: 0px -24px;
+}
