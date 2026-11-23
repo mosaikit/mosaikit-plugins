@@ -48,6 +48,7 @@ import { composer, type Composer, type Outgoing } from './composer.ts'
 import { addPeopleDialog, DOCS, docsPicker, newChatDialog, peopleDialog, type HistoryChoice } from './dialogs.ts'
 import { engineFor } from './engines.ts'
 import { typingNames } from './logic.ts'
+import { icon, type IconName } from './icons.ts'
 import { renderMessage } from './render.ts'
 import { langOf, sub, TEXTS } from './texts.ts'
 
@@ -92,7 +93,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
   let docsFolder: string | null = null
 
   // ------------------------------------------------------------------------------------------------------- skeleton
-  const newBtn = el('button', { type: 'button', class: 'cl-new' }, '✎')
+  const newBtn = el('button', { type: 'button', class: 'cl-new' }, icon('squarePen', 16))
   const title = el('h1', {}, tr().title)
   const search = el('input', { type: 'search', class: 'cl-search', autocomplete: 'off' })
   const filterBar = el('div', { class: 'cl-filters', role: 'group' })
@@ -154,8 +155,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
   }
   const dot = (id: string) => {
     const s = onlineState(id)
-    const d = el('span', { class: 'cl-dot ' + (s ?? 'off'), role: 'img', 'aria-label': s === 'available' ? tr().presenceAvailable : s === 'away' ? tr().presenceAway : '' })
-    d.hidden = !s
+    const d = el('span', { class: 'cl-dot ' + (s ?? 'off'), role: 'img', 'aria-label': s === 'available' ? tr().presenceAvailable : s === 'away' ? tr().presenceAway : tr().presenceOffline })
     return d
   }
 
@@ -199,8 +199,8 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     const ptime = listTime(parseTime(c.last_at), now(), lang, tr().yesterday)
     const badge = unread ? el('span', { class: 'cl-badge' + (c.mentions ? ' at' : '') + (c.muted ? ' muted' : ''), 'aria-label': tr().unreadCount.replace('{n}', String(c.unread || 1)) }, c.mentions ? '@' : c.unread ? (c.unread > 99 ? '99+' : String(c.unread)) : '') : null
     const flags = el('span', { class: 'cl-flags' })
-    if (c.pinned_at) flags.append(el('span', { title: tr().pinnedChat, 'aria-label': tr().pinnedChat }, '📌'))
-    if (c.muted) flags.append(el('span', { title: tr().mutedChat, 'aria-label': tr().mutedChat }, '🔕'))
+    if (c.pinned_at) flags.append(el('span', { title: tr().pinnedChat, 'aria-label': tr().pinnedChat }, icon('pin', 13)))
+    if (c.muted) flags.append(el('span', { title: tr().mutedChat, 'aria-label': tr().mutedChat }, icon('bellOff', 13)))
     const row = el(
       'button',
       { type: 'button', class: 'cl-row' + (c.id === current ? ' on' : '') + (unread ? ' unread' : ''), 'aria-current': String(c.id === current), 'data-id': c.id },
@@ -217,7 +217,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
       e.preventDefault()
       chatMenu(row, c)
     })
-    const more = el('button', { type: 'button', class: 'cl-more', 'aria-label': tr().moreActions, title: tr().moreActions }, '⋯')
+    const more = el('button', { type: 'button', class: 'cl-more', 'aria-label': tr().moreActions, title: tr().moreActions }, icon('ellipsis', 16))
     more.addEventListener('click', (e) => {
       e.stopPropagation()
       chatMenu(more, c)
@@ -417,7 +417,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     head.replaceChildren()
     const c = currentChat()
     if (!c) return
-    const back = el('button', { type: 'button', class: 'cr-back', 'aria-label': tr().backToList }, '‹')
+    const back = el('button', { type: 'button', class: 'cr-back', 'aria-label': tr().backToList }, icon('chevronLeft', 20))
     back.addEventListener('click', () => {
       root.setAttribute('data-view', 'list')
     })
@@ -426,8 +426,8 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     const sub_ = c.kind === 'group' ? sub(tr().peopleCount, { n: c.members.length }) : st === 'available' ? tr().presenceAvailable : st === 'away' ? tr().presenceAway : ''
     const titles = el('div', { class: 'cr-titles' }, el('h2', {}, title_(c)), el('p', {}, sub_))
     const acts = el('div', { class: 'cr-acts' })
-    const btn = (label: string, glyph: string, fn: () => void, cls = '') => {
-      const b = el('button', { type: 'button', class: 'cr-act ' + cls, 'aria-label': label, title: label }, glyph)
+    const btn = (label: string, glyph: IconName, fn: () => void, cls = '') => {
+      const b = el('button', { type: 'button', class: 'cr-act ' + cls, 'aria-label': label, title: label }, icon(glyph))
       b.addEventListener('click', fn)
       acts.append(b)
       return b
@@ -438,10 +438,10 @@ export function mountChats(msk: Msk, app: HTMLElement) {
       people.addEventListener('click', () => showPeople())
       acts.append(people)
     }
-    btn(tr().callVideo, '📹', () => void startCall(false), 'call')
-    btn(tr().callAudio, '📞', () => void startCall(true), 'call')
-    btn(tr().searchInChat, '🔍', () => toggleSearch())
-    btn(tr().addPeople, '👥', () => showAdd())
+    btn(tr().callVideo, 'video', () => void startCall(false), 'call')
+    btn(tr().callAudio, 'phone', () => void startCall(true), 'call')
+    btn(tr().searchInChat, 'search', () => toggleSearch())
+    btn(tr().addPeople, 'userPlus', () => showAdd())
     head.append(back, faces(c, true), titles, acts)
     if (c.kind === 'group') {
       titles.querySelector('h2')!.setAttribute('title', tr().renameChat)
@@ -501,7 +501,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
   const nearBottom = () => body.scrollHeight - body.scrollTop - body.clientHeight < 120
 
   const fileCard = (a: Attachment) => {
-    const b = el('button', { type: 'button', class: 'cb-file', title: tr().openFile }, el('span', { class: 'cb-fileic', 'aria-hidden': 'true' }, '📄'), el('span', { class: 'cb-filename' }, a.name), el('span', { class: 'cb-filesize' }, a.size ? fileSize(a.size) : ''))
+    const b = el('button', { type: 'button', class: 'cb-file', title: tr().openFile }, el('span', { class: 'cb-fileic', 'aria-hidden': 'true' }, icon('file', 18)), el('span', { class: 'cb-filename' }, a.name), el('span', { class: 'cb-filesize' }, a.size ? fileSize(a.size) : ''))
     b.addEventListener('click', () => void openFile(a))
     return b
   }
@@ -533,7 +533,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     const audio = m.meta.audio_only === true
     const starter = who(m.author)
     const card = el('div', { class: 'cm-call' + (s.live ? ' live' : ''), 'data-id': m.id })
-    card.append(el('span', { class: 'cm-callic', 'aria-hidden': 'true' }, audio ? '📞' : '📹'))
+    card.append(el('span', { class: 'cm-callic', 'aria-hidden': 'true' }, icon(audio ? 'phone' : 'video', 20)))
     const info = el('div', { class: 'cm-callinfo' }, el('strong', {}, sub(audio ? tr().startedVoice : tr().startedCall, { n: starter })))
     if (s.live) {
       info.append(el('span', {}, sub(tr().inCall, { n: s.live_people.map((p) => p.name).join(', ') })))
@@ -569,7 +569,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
       if (m.text) bub.append(renderMessage(m.text, names, c.kind === 'group'))
       for (const a of m.attachments) bub.append(fileCard(a))
       const host = linkHost(m.text)
-      if (host) bub.append(el('span', { class: 'cb-link' }, '🔗 ' + host))
+      if (host) bub.append(el('span', { class: 'cb-link' }, icon('link', 13), ' ' + host))
       if (m.edited) bub.append(el('span', { class: 'cb-edited' }, tr().edited))
     }
     col.append(bub)
@@ -585,13 +585,13 @@ export function mountChats(msk: Msk, app: HTMLElement) {
 
   const messageActions = (m: ChatMsg, own: boolean) => {
     const acts = el('div', { class: 'cb-actions', role: 'toolbar', 'aria-label': tr().react })
-    const add = (label: string, glyph: string, fn: (b: HTMLElement) => void) => {
-      const b = el('button', { type: 'button', class: 'cb-act', 'aria-label': label, title: label }, glyph)
+    const add = (label: string, glyph: string | IconName, fn: (b: HTMLElement) => void) => {
+      const b = el('button', { type: 'button', class: 'cb-act', 'aria-label': label, title: label }, glyph.length > 2 ? icon(glyph as IconName, 16) : glyph)
       b.addEventListener('click', () => fn(b))
       acts.append(b)
     }
     for (const e of QUICK) add(`${tr().react} ${e}`, e, () => void react(m, e))
-    add(tr().moreEmoji, '☺', (b) => {
+    add(tr().moreEmoji, 'smile', (b) => {
       const grid = el('div', { class: 'cc-emoji' })
       let close = () => {}
       for (const e of ['🎉', '🙏', '👀', '🔥', '✅', '👏', '💯', '🤔', '😅', '😍', '🚀', '👎']) {
@@ -604,8 +604,8 @@ export function mountChats(msk: Msk, app: HTMLElement) {
       }
       close = menuLike(b, grid)
     })
-    add(tr().reply, '↩', () => (compose.reply(m)))
-    add(tr().moreActions, '⋯', (b) =>
+    add(tr().reply, 'reply', () => (compose.reply(m)))
+    add(tr().moreActions, 'ellipsis', (b) =>
       menu(b, [
         { label: m.pinned ? tr().unpinMessage : tr().pinMessage, onClick: () => void pin(m, !m.pinned) },
         { label: tr().copyText, onClick: () => void copy(m.text) },
@@ -1041,7 +1041,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
     searchBar.hidden = false
     searchBar.replaceChildren()
     const input = el('input', { type: 'search', class: 'cr-searchinput', 'aria-label': tr().searchMessages, placeholder: tr().searchMessages })
-    const close = el('button', { type: 'button', class: 'cr-act', 'aria-label': tr().searchClose, title: tr().searchClose }, '×')
+    const close = el('button', { type: 'button', class: 'cr-act', 'aria-label': tr().searchClose, title: tr().searchClose }, icon('x'))
     close.addEventListener('click', toggleSearch)
     const results = el('div', { class: 'cr-hits' })
     input.addEventListener('keydown', async (e) => {
@@ -1138,7 +1138,7 @@ export function mountChats(msk: Msk, app: HTMLElement) {
       referrerpolicy: 'no-referrer',
     })
     const leaveBtn = el('button', { type: 'button', class: 'msk-btn danger mini' }, tr().leaveCall)
-    const big = el('button', { type: 'button', class: 'cr-act', 'aria-label': '⤢', title: '⤢' }, '⤢')
+    const big = el('button', { type: 'button', class: 'cr-act', 'aria-label': tr().callFullscreen, title: tr().callFullscreen }, icon('maximize'))
     const box = el('div', { class: 'ccall', role: 'dialog', 'aria-label': tr().callTitle }, el('div', { class: 'ccall-bar' }, el('strong', {}, engine.label), el('span', { class: 'cc-grow' }), big, leaveBtn), frame, el('p', { class: 'ccall-note' }, tr().callPrivacy))
     big.addEventListener('click', () => box.classList.toggle('big'))
     leaveBtn.addEventListener('click', () => void leaveCall())

@@ -89,3 +89,7 @@
   .cch-head, .cch-scroll, .cch-composer, .cch-typing { padding-left: 12px; padding-right: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .cch-ch, .cm-react, .cch-row { transition: none; } }
+
+/* line icons (Lucide, current colour) */
+.ci { flex: 0 0 auto; display: block; }
+.cm-act:hover .ci, .cm-act:focus-visible .ci { color: var(--fg); }

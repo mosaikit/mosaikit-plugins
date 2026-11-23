@@ -3,6 +3,7 @@
 // back what was chosen; what to do with it is the page's business.
 import { avatar, dialog, el, errText, type Msk } from '@mosaikit/plugin-api'
 import { fileSize, type Attachment, type Chat, type Member, type Person } from './chats-logic.ts'
+import { icon } from './icons.ts'
 import { sub, type Texts } from './texts.ts'
 
 export const DOCS = 'com.mosaikit.files'
@@ -199,8 +200,7 @@ export function peopleDialog(
     list.replaceChildren()
     for (const m of ms.filter((x) => !x.left)) {
       const state = online(m.id)
-      const dot = el('span', { class: 'cl-dot ' + (state ?? 'off'), role: 'img', 'aria-label': state === 'available' ? tr().presenceAvailable : state === 'away' ? tr().presenceAway : '' })
-      dot.hidden = !state
+      const dot = el('span', { class: 'cl-dot ' + (state ?? 'off'), role: 'img', 'aria-label': state === 'available' ? tr().presenceAvailable : state === 'away' ? tr().presenceAway : tr().presenceOffline })
       const row = el('li', { class: 'pp-row' }, el('span', { class: 'pp-av' }, avatar(m.name), dot), el('span', { class: 'pp-name' }, m.id === me ? sub(tr().you2, { n: m.name }) : m.name))
       if (group && m.id !== me) {
         const x = el('button', { type: 'button', class: 'msk-btn ghost mini danger-text' }, tr().removeFromChat)
@@ -299,7 +299,7 @@ export function docsPicker(msk: Msk, tr: () => Texts): Promise<Attachment[]> {
       if (!entries.length) list.append(el('li', { class: 'np-none' }, tr().docsEmpty))
       for (const f of entries.sort((a, b) => Number(b.is_dir) - Number(a.is_dir) || a.name.localeCompare(b.name))) {
         if (f.is_dir) {
-          const b = el('button', { type: 'button', class: 'dp-row' }, '📁 ', el('span', { class: 'dp-name' }, f.name))
+          const b = el('button', { type: 'button', class: 'dp-row' }, icon('folder', 15), ' ', el('span', { class: 'dp-name' }, f.name))
           b.addEventListener('click', () => {
             trail.push({ id: f.id, name: f.name })
             void load()
