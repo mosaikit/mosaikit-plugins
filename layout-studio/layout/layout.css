@@ -645,3 +645,131 @@
   background-size: 144px 168px;
   background-position: 0px -24px;
 }
+
+/* the mockup: a narrower sidebar, bigger group heads, wide search, a hero with 3D art, 3D icons on the key figures */
+.msk-nav {
+  width: 204px;
+}
+.msk-navg-head {
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.msk-navg-head > svg:first-child {
+  width: 28px;
+  height: 28px;
+}
+.msk-nav-item {
+  font-size: 13px;
+}
+.ov-hero {
+  background-image: url(images/hero.png);
+  background-size: cover;
+  background-position: center;
+  min-height: 165px;
+  border-radius: 10px;
+}
+.ov-hero h2 {
+  font-size: 32px;
+  line-height: 38px;
+}
+.ov-hero > svg {
+  opacity: 0;
+}
+.msk-navg-head[data-icon="book-open"] > svg:first-child {
+  color: transparent;
+  width: 28px;
+  height: 28px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 168px 196px;
+  background-position: -56px -56px;
+}
+.ov-card > span > svg.lucide-users {
+  color: transparent;
+  width: 40px;
+  height: 40px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 240px 280px;
+  background-position: -160px -80px;
+}
+.ov-card > span > svg.lucide-activity {
+  color: transparent;
+  width: 40px;
+  height: 40px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 240px 280px;
+  background-position: -40px -240px;
+}
+.ov-card > span > svg.lucide-folder {
+  color: transparent;
+  width: 40px;
+  height: 40px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 240px 280px;
+  background-position: -80px -40px;
+}
+.ov-card > span > svg.lucide-share-2 {
+  color: transparent;
+  width: 40px;
+  height: 40px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 240px 280px;
+  background-position: 0px -200px;
+}
+.ov-card > span > svg.lucide-user {
+  color: transparent;
+  width: 40px;
+  height: 40px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 240px 280px;
+  background-position: 0px -40px;
+}
+.ov-card > span > svg.lucide-hard-drive {
+  color: transparent;
+  width: 40px;
+  height: 40px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 240px 280px;
+  background-position: 0px -240px;
+}
+.ov-card > span > svg.lucide-building-2 {
+  color: transparent;
+  width: 40px;
+  height: 40px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 240px 280px;
+  background-position: -200px -200px;
+}
+.ov-card > span > svg.lucide-shield-check {
+  color: transparent;
+  width: 40px;
+  height: 40px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 240px 280px;
+  background-position: -40px 0px;
+}
+.ov-card > span > svg.lucide-puzzle {
+  color: transparent;
+  width: 40px;
+  height: 40px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 240px 280px;
+  background-position: -120px -120px;
+}
+.ov-card > span[aria-hidden="true"] {
+  background: transparent !important;
+  width: 44px;
+  height: 44px;
+}
+.msk-band input {
+  max-width: 430px;
+}
