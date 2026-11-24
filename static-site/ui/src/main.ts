@@ -17,7 +17,7 @@
 
 import '@mosaikit/plugin-api/style.css'
 import './sites.css'
-import { connect, downloadCsv, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
+import { connect, dialog, downloadCsv, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
 import { bookmarkRows, BOOKMARKS_HEADER } from './tobookmarks.ts'
 import { followHost, plural, reloadIfStale, t } from './i18n.ts'
@@ -246,9 +246,10 @@ function mount(msk: Msk) {
     zipRow,
     legacyRow,
     thumbRow,
-    h('div', { class: 'form-actions' }, btnSave, btnCancel),
     formMsg,
   )
+  // the form lives in a modal: the body scrolls, the buttons stay in the fixed footer
+  let editDialog: { el: HTMLDialogElement; close: () => void } | null = null
   const sframe = h('iframe', {
     class: 'sframe',
     title: t('Static site'),
@@ -277,7 +278,7 @@ function mount(msk: Msk) {
     return u.toString()
   }
   const editbar = h('div', { class: 'editbar' }, btnBack, svTitle)
-  const siteView = h('div', { class: 'siteview' }, editbar, siteForm, sframe)
+  const siteView = h('div', { class: 'siteview' }, editbar, sframe)
 
   app.classList.add('msks')
   app.replaceChildren(listView, siteView)
@@ -418,10 +419,11 @@ function mount(msk: Msk) {
 
   function showView(view: View) {
     state.view = view
-    listView.hidden = view !== 'list'
-    siteView.hidden = view === 'list'
+    // the form is a modal over the list
+    listView.hidden = view === 'show'
+    siteView.hidden = view !== 'show'
     app.classList.toggle('show', view === 'show')
-    siteForm.hidden = view !== 'edit'
+    if (view !== 'edit') editDialog?.close()
     sframe.hidden = view !== 'show'
     // viewing a site: no bar of its own, the frame fills the area under the navbar; the way back is the
     // back button of the contextual band (the list row keeps Open, Edit, Share and Delete)
@@ -572,6 +574,21 @@ function mount(msk: Msk) {
     msg('', 'form')
     setBusy(false)
     showView('edit')
+    const d = dialog({
+      title: svTitle.textContent ?? '',
+      body: siteForm,
+      actions: [btnCancel, btnSave],
+      onClose: () => {
+        if (editDialog === d) editDialog = null
+        if (state.view === 'edit') showView('list')
+      },
+    })
+    d.el.classList.add('msks-modal')
+    // Escape does not close it while an upload runs
+    d.el.addEventListener('cancel', (ev) => {
+      if (state.busy) ev.preventDefault()
+    })
+    editDialog = d
     inName.focus()
   }
 
@@ -606,6 +623,9 @@ function mount(msk: Msk) {
   function backToList() {
     if (state.busy) return
     showView('list')
+  }
+  const cancelEdit = () => {
+    if (!state.busy) editDialog?.close()
   }
 
   // ---------- actions ----------
@@ -716,7 +736,7 @@ function mount(msk: Msk) {
   })
   btnNew.addEventListener('click', () => openEdit(null))
   btnBack.addEventListener('click', backToList)
-  btnCancel.addEventListener('click', backToList)
+  btnCancel.addEventListener('click', cancelEdit)
   btnSave.addEventListener('click', () => void save())
   inName.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') void save()
