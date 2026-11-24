@@ -3,69 +3,70 @@
 /* the page has no padding of its own (the header is flush): the views that are not the list bring theirs */
 .msks > :not(.listview) { padding: 24px 28px; max-width: 1180px; }
 #app.msks.show > :not(.listview) { padding: 0; max-width: none; }
-.msks .msk-filter { width: 260px; }
-.msks td.mono { font-family: var(--font-mono); font-size: 11px; color: var(--dim); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.msks td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
-.msks td a.open { color: var(--fg); font-weight: 600; text-decoration: none; cursor: pointer; }
-.msks td a.open:hover { color: var(--acc); }
-.msks .rowacts { white-space: nowrap; width: 1%; }
-.msks .rowacts .msk-btn { margin-right: 4px; }
-.msks .editbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
-.msks .sv-title { font-size: 18px; font-weight: 700; }
-.msks .grow { flex: 1; }
-.msks [hidden] { display: none !important; }
-.msks a.msk-btn { text-decoration: none; display: inline-block; }
-.msks .siteform { max-width: 660px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px 24px; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35); }
-.msks .frow { margin-bottom: 14px; }
-.msks .frow > label { display: block; font-size: 12px; color: var(--dim); margin-bottom: 5px; }
-.msks .frow.required > label { color: var(--fg); font-weight: 600; }
-.msks .req { color: var(--err); }
-.msks .frow label.drop { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 16px; border: 1.5px dashed var(--line); border-radius: 12px; background: var(--panel2); cursor: pointer; text-align: center; transition: border-color 0.15s, background 0.15s; color: var(--fg); font-weight: 400; }
-.msks .drop:hover, .msks .drop.over { border-color: var(--acc); background: var(--acc-soft); }
-.msks .drop .big { font-size: 26px; line-height: 1; }
-.msks .drop .fname { font-family: var(--font-mono); font-size: 12px; color: var(--acc); }
-.msks .drop .sub { font-size: 12px; color: var(--dim); }
-.msks .drop input { display: none; }
-.msks .hint { font-size: 12px; color: var(--dim); margin: 6px 0 0; line-height: 1.5; }
-.msks .hint code { font-family: var(--font-mono); font-size: 11px; background: var(--panel2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; color: var(--acc); }
-.msks .form-actions { display: flex; gap: 10px; margin-top: 18px; }
-.msks .sframe { width: 100%; height: calc(100vh - 150px); min-height: 420px; border: 1px solid var(--line); border-radius: 12px; background: #fff; display: block; }
+:is(.msks, .msks-modal) .msk-filter { width: 260px; }
+:is(.msks, .msks-modal) td.mono { font-family: var(--font-mono); font-size: 11px; color: var(--dim); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:is(.msks, .msks-modal) td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+:is(.msks, .msks-modal) td a.open { color: var(--fg); font-weight: 600; text-decoration: none; cursor: pointer; }
+:is(.msks, .msks-modal) td a.open:hover { color: var(--acc); }
+:is(.msks, .msks-modal) .rowacts { white-space: nowrap; width: 1%; }
+:is(.msks, .msks-modal) .rowacts .msk-btn { margin-right: 4px; }
+:is(.msks, .msks-modal) .editbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+:is(.msks, .msks-modal) .sv-title { font-size: 18px; font-weight: 700; }
+:is(.msks, .msks-modal) .grow { flex: 1; }
+:is(.msks, .msks-modal) [hidden] { display: none !important; }
+:is(.msks, .msks-modal) a.msk-btn { text-decoration: none; display: inline-block; }
+:is(.msks, .msks-modal) .siteform { width: 100%; }
+dialog.msks-modal { width: min(680px, calc(100vw - 32px)); }
+:is(.msks, .msks-modal) .frow { margin-bottom: 14px; }
+:is(.msks, .msks-modal) .frow > label { display: block; font-size: 12px; color: var(--dim); margin-bottom: 5px; }
+:is(.msks, .msks-modal) .frow.required > label { color: var(--fg); font-weight: 600; }
+:is(.msks, .msks-modal) .req { color: var(--err); }
+:is(.msks, .msks-modal) .frow label.drop { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 16px; border: 1.5px dashed var(--line); border-radius: 12px; background: var(--panel2); cursor: pointer; text-align: center; transition: border-color 0.15s, background 0.15s; color: var(--fg); font-weight: 400; }
+:is(.msks, .msks-modal) .drop:hover, :is(.msks, .msks-modal) .drop.over { border-color: var(--acc); background: var(--acc-soft); }
+:is(.msks, .msks-modal) .drop .big { font-size: 26px; line-height: 1; }
+:is(.msks, .msks-modal) .drop .fname { font-family: var(--font-mono); font-size: 12px; color: var(--acc); }
+:is(.msks, .msks-modal) .drop .sub { font-size: 12px; color: var(--dim); }
+:is(.msks, .msks-modal) .drop input { display: none; }
+:is(.msks, .msks-modal) .hint { font-size: 12px; color: var(--dim); margin: 6px 0 0; line-height: 1.5; }
+:is(.msks, .msks-modal) .hint code { font-family: var(--font-mono); font-size: 11px; background: var(--panel2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; color: var(--acc); }
+:is(.msks, .msks-modal) .form-actions { display: flex; gap: 10px; margin-top: 18px; }
+:is(.msks, .msks-modal) .sframe { width: 100%; height: calc(100vh - 150px); min-height: 420px; border: 1px solid var(--line); border-radius: 12px; background: #fff; display: block; }
 /* viewing a site: the frame fills the whole area under the header, edge to edge and without rounded corners */
 #app.msks.show { max-width: none; padding: 0; height: 100vh; display: flex; flex-direction: column; }
 .msks.show .siteview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .msks.show .editbar { margin: 0; padding: 8px 12px; flex: none; }
 .msks.show .sframe { flex: 1; height: auto; min-height: 0; border: 0; border-radius: 0; }
-.msks .msg { color: var(--dim); font-family: var(--font-mono); font-size: 12px; margin-top: 10px; min-height: 1em; }
-.msks .msg.err { color: var(--err); }
+:is(.msks, .msks-modal) .msg { color: var(--dim); font-family: var(--font-mono); font-size: 12px; margin-top: 10px; min-height: 1em; }
+:is(.msks, .msks-modal) .msg.err { color: var(--err); }
 
 /* cards and thumbnails */
-.msks .layoutswitch { display: inline-flex; gap: 4px; }
-.msks .layoutswitch .msk-btn.on { border-color: var(--acc-line); color: var(--acc); background: var(--acc-soft); }
-.msks .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 12px; }
-.msks .card { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-.msks .card:hover { border-color: var(--acc-line); }
-.msks .cardthumb { display: block; padding: 0; border: 0; background: var(--panel2); cursor: pointer; aspect-ratio: 16 / 10; width: 100%; }
-.msks .cardthumb:disabled { cursor: default; }
-.msks .thumb { display: block; width: 100%; height: 100%; object-fit: cover; }
-.msks .thumb.placeholder, .msks .thumbsm.placeholder { display: flex; align-items: center; justify-content: center; background: hsl(var(--hue) 35% 30%); color: #fff; font-weight: 700; }
-.msks .thumb.placeholder { font-size: 44px; }
-.msks .cardbody { padding: 12px 14px 4px; flex: 1; min-width: 0; }
-.msks .cardname { margin: 0 0 4px; font-size: 15px; line-height: 1.3; }
-.msks .cardname a.open { color: var(--fg); text-decoration: none; }
-.msks .carddesc { margin: 0 0 6px; font-size: 12.5px; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
-.msks .cardmeta { margin: 0 0 6px; font-size: 11px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.msks .card .rowacts { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px 12px; white-space: normal; width: auto; }
-.msks .card .rowacts .msk-btn { margin-right: 0; padding-inline: 8px; }
-.msks .empty { color: var(--dim); padding: 18px 4px; }
-.msks td.thumbcell { width: 1%; padding-right: 0; }
-.msks .thumbsm { display: block; width: 56px; height: 36px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); }
-.msks .thumbsm.placeholder { font-size: 16px; }
-.msks .thumbline { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.msks .thumbprev { width: 96px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); }
+:is(.msks, .msks-modal) .layoutswitch { display: inline-flex; gap: 4px; }
+:is(.msks, .msks-modal) .layoutswitch .msk-btn.on { border-color: var(--acc-line); color: var(--acc); background: var(--acc-soft); }
+:is(.msks, .msks-modal) .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 12px; }
+:is(.msks, .msks-modal) .card { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+:is(.msks, .msks-modal) .card:hover { border-color: var(--acc-line); }
+:is(.msks, .msks-modal) .cardthumb { display: block; padding: 0; border: 0; background: var(--panel2); cursor: pointer; aspect-ratio: 16 / 10; width: 100%; }
+:is(.msks, .msks-modal) .cardthumb:disabled { cursor: default; }
+:is(.msks, .msks-modal) .thumb { display: block; width: 100%; height: 100%; object-fit: cover; }
+:is(.msks, .msks-modal) .thumb.placeholder, :is(.msks, .msks-modal) .thumbsm.placeholder { display: flex; align-items: center; justify-content: center; background: hsl(var(--hue) 35% 30%); color: #fff; font-weight: 700; }
+:is(.msks, .msks-modal) .thumb.placeholder { font-size: 44px; }
+:is(.msks, .msks-modal) .cardbody { padding: 12px 14px 4px; flex: 1; min-width: 0; }
+:is(.msks, .msks-modal) .cardname { margin: 0 0 4px; font-size: 15px; line-height: 1.3; }
+:is(.msks, .msks-modal) .cardname a.open { color: var(--fg); text-decoration: none; }
+:is(.msks, .msks-modal) .carddesc { margin: 0 0 6px; font-size: 12.5px; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
+:is(.msks, .msks-modal) .cardmeta { margin: 0 0 6px; font-size: 11px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:is(.msks, .msks-modal) .card .rowacts { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px 12px; white-space: normal; width: auto; }
+:is(.msks, .msks-modal) .card .rowacts .msk-btn { margin-right: 0; padding-inline: 8px; }
+:is(.msks, .msks-modal) .empty { color: var(--dim); padding: 18px 4px; }
+:is(.msks, .msks-modal) td.thumbcell { width: 1%; padding-right: 0; }
+:is(.msks, .msks-modal) .thumbsm { display: block; width: 56px; height: 36px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); }
+:is(.msks, .msks-modal) .thumbsm.placeholder { font-size: 16px; }
+:is(.msks, .msks-modal) .thumbline { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+:is(.msks, .msks-modal) .thumbprev { width: 96px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); }
 
 /* the list of sites fills the page under the header; the header stays */
-.msks .listview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.msks .listview[hidden] { display: none; }
+:is(.msks, .msks-modal) .listview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+:is(.msks, .msks-modal) .listview[hidden] { display: none; }
 
 /* the bar of the open site is the header of the page: the same as the one of the pages of Mosaikit */
 .msks.show .editbar { margin: 0; padding: 8px 24px; min-height: 57px; box-sizing: border-box; border-bottom: 1px solid var(--line); background: var(--bg); font-family: var(--msk-font, var(--font-ui)); }
@@ -73,37 +74,37 @@
 @media (max-width: 640px) { .msks.show .editbar { padding: 8px 16px; } }
 
 /* ---- the drop zone and the report of the zip: it reacts to the drag, and says what it found before anything is uploaded ---- */
-.msks .frow label.drop { position: relative; padding: 30px 16px 26px; border: 0; border-radius: 16px; background: var(--panel2); isolation: isolate; transition: background 0.2s, transform 0.2s var(--ease, ease); }
-.msks .drop::before { content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: -1; padding: 2px; background: repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px) top / 100% 2px no-repeat, repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px) bottom / 100% 2px no-repeat, repeating-linear-gradient(0deg, var(--line) 0 8px, transparent 8px 14px) left / 2px 100% no-repeat, repeating-linear-gradient(0deg, var(--line) 0 8px, transparent 8px 14px) right / 2px 100% no-repeat; transition: background 0.2s; }
-.msks .drop:hover::before, .msks .drop.over::before { background: repeating-linear-gradient(90deg, var(--acc) 0 8px, transparent 8px 14px) top / 100% 2px no-repeat, repeating-linear-gradient(90deg, var(--acc) 0 8px, transparent 8px 14px) bottom / 100% 2px no-repeat, repeating-linear-gradient(0deg, var(--acc) 0 8px, transparent 8px 14px) left / 2px 100% no-repeat, repeating-linear-gradient(0deg, var(--acc) 0 8px, transparent 8px 14px) right / 2px 100% no-repeat; }
-.msks .drop.over { transform: scale(1.012); }
-.msks .drop .big { font-size: 34px; transition: transform 0.25s var(--ease, ease); }
-.msks .drop.over .big { transform: translateY(-4px) scale(1.12); }
-.msks .drop.has .big { filter: none; }
-.msks .zrep { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; animation: zr-in 0.25s var(--ease, ease) both; }
-.msks .zr-head { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
-.msks .zr-mark { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; flex: none; color: #fff; }
-.msks .zr-head.ok .zr-mark { background: var(--ok); }
-.msks .zr-head.bad .zr-mark { background: var(--err); }
-.msks .zr-head.bad { color: var(--err); }
-.msks .zr-line { margin: 0; font-size: 12px; color: var(--dim); }
-.msks .zr-line.warn::before { content: '▲ '; color: #d19a1f; }
-.msks .zr-line.bad { color: var(--err); }
-.msks .zr-top { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.msks .zr-top li { display: grid; grid-template-columns: minmax(70px, 28%) 1fr auto; gap: 10px; align-items: center; font-size: 12px; }
-.msks .zr-name { font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.msks .zr-bar { height: 6px; border-radius: 99px; background: var(--panel2); overflow: hidden; }
-.msks .zr-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, color-mix(in srgb, var(--acc) 60%, var(--panel)), var(--acc)); animation: zr-grow 0.5s var(--ease, ease) both; transform-origin: left; }
-.msks .zr-size { color: var(--dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+:is(.msks, .msks-modal) .frow label.drop { position: relative; padding: 30px 16px 26px; border: 0; border-radius: 16px; background: var(--panel2); isolation: isolate; transition: background 0.2s, transform 0.2s var(--ease, ease); }
+:is(.msks, .msks-modal) .drop::before { content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: -1; padding: 2px; background: repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px) top / 100% 2px no-repeat, repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px) bottom / 100% 2px no-repeat, repeating-linear-gradient(0deg, var(--line) 0 8px, transparent 8px 14px) left / 2px 100% no-repeat, repeating-linear-gradient(0deg, var(--line) 0 8px, transparent 8px 14px) right / 2px 100% no-repeat; transition: background 0.2s; }
+:is(.msks, .msks-modal) .drop:hover::before, :is(.msks, .msks-modal) .drop.over::before { background: repeating-linear-gradient(90deg, var(--acc) 0 8px, transparent 8px 14px) top / 100% 2px no-repeat, repeating-linear-gradient(90deg, var(--acc) 0 8px, transparent 8px 14px) bottom / 100% 2px no-repeat, repeating-linear-gradient(0deg, var(--acc) 0 8px, transparent 8px 14px) left / 2px 100% no-repeat, repeating-linear-gradient(0deg, var(--acc) 0 8px, transparent 8px 14px) right / 2px 100% no-repeat; }
+:is(.msks, .msks-modal) .drop.over { transform: scale(1.012); }
+:is(.msks, .msks-modal) .drop .big { font-size: 34px; transition: transform 0.25s var(--ease, ease); }
+:is(.msks, .msks-modal) .drop.over .big { transform: translateY(-4px) scale(1.12); }
+:is(.msks, .msks-modal) .drop.has .big { filter: none; }
+:is(.msks, .msks-modal) .zrep { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; animation: zr-in 0.25s var(--ease, ease) both; }
+:is(.msks, .msks-modal) .zr-head { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+:is(.msks, .msks-modal) .zr-mark { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; flex: none; color: #fff; }
+:is(.msks, .msks-modal) .zr-head.ok .zr-mark { background: var(--ok); }
+:is(.msks, .msks-modal) .zr-head.bad .zr-mark { background: var(--err); }
+:is(.msks, .msks-modal) .zr-head.bad { color: var(--err); }
+:is(.msks, .msks-modal) .zr-line { margin: 0; font-size: 12px; color: var(--dim); }
+:is(.msks, .msks-modal) .zr-line.warn::before { content: '▲ '; color: #d19a1f; }
+:is(.msks, .msks-modal) .zr-line.bad { color: var(--err); }
+:is(.msks, .msks-modal) .zr-top { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+:is(.msks, .msks-modal) .zr-top li { display: grid; grid-template-columns: minmax(70px, 28%) 1fr auto; gap: 10px; align-items: center; font-size: 12px; }
+:is(.msks, .msks-modal) .zr-name { font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:is(.msks, .msks-modal) .zr-bar { height: 6px; border-radius: 99px; background: var(--panel2); overflow: hidden; }
+:is(.msks, .msks-modal) .zr-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, color-mix(in srgb, var(--acc) 60%, var(--panel)), var(--acc)); animation: zr-grow 0.5s var(--ease, ease) both; transform-origin: left; }
+:is(.msks, .msks-modal) .zr-size { color: var(--dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
 @keyframes zr-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes zr-grow { from { transform: scaleX(0); } to { transform: none; } }
-@media (prefers-reduced-motion: reduce) { .msks .drop, .msks .drop .big, .msks .zrep, .msks .zr-bar i { animation: none; transition: none; } .msks .drop.over, .msks .drop.over .big { transform: none; } }
-@media (max-width: 640px) { .msks .zr-top li { grid-template-columns: minmax(60px, 34%) 1fr; } .msks .zr-size { grid-column: 1 / -1; } }
+@media (prefers-reduced-motion: reduce) { :is(.msks, .msks-modal) .drop, :is(.msks, .msks-modal) .drop .big, :is(.msks, .msks-modal) .zrep, :is(.msks, .msks-modal) .zr-bar i { animation: none; transition: none; } :is(.msks, .msks-modal) .drop.over, :is(.msks, .msks-modal) .drop.over .big { transform: none; } }
+@media (max-width: 640px) { :is(.msks, .msks-modal) .zr-top li { grid-template-columns: minmax(60px, 34%) 1fr; } :is(.msks, .msks-modal) .zr-size { grid-column: 1 / -1; } }
 
 /* the sites by address of an older version: a banner that offers to move them to Bookmarks */
-.msks .movebanner { display: flex; align-items: center; gap: 16px; margin: 12px 24px 0; padding: 12px 16px; border: 1px solid var(--acc-line); border-left: 4px solid var(--acc); border-radius: var(--r-m); background: var(--acc-soft); }
-.msks .movewords { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.msks .movetext { font-weight: 600; font-size: 14px; }
-.msks .movehint { font-size: 12px; color: var(--dim); line-height: 1.45; }
-.msks .movebanner[hidden] { display: none; }
-@media (max-width: 640px) { .msks .movebanner { flex-direction: column; align-items: stretch; margin: 12px 16px 0; } }
+:is(.msks, .msks-modal) .movebanner { display: flex; align-items: center; gap: 16px; margin: 12px 24px 0; padding: 12px 16px; border: 1px solid var(--acc-line); border-left: 4px solid var(--acc); border-radius: var(--r-m); background: var(--acc-soft); }
+:is(.msks, .msks-modal) .movewords { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+:is(.msks, .msks-modal) .movetext { font-weight: 600; font-size: 14px; }
+:is(.msks, .msks-modal) .movehint { font-size: 12px; color: var(--dim); line-height: 1.45; }
+:is(.msks, .msks-modal) .movebanner[hidden] { display: none; }
+@media (max-width: 640px) { :is(.msks, .msks-modal) .movebanner { flex-direction: column; align-items: stretch; margin: 12px 16px 0; } }
