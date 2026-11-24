@@ -34,7 +34,7 @@
   background-color: #ffffff;
   color: #1b1f33;
   font-weight: 700;
-  box-shadow: inset 3px 0 0 #4a4bb0, 0 1px 3px rgba(27, 31, 51, 0.10);
+  box-shadow: 0 1px 3px rgba(27, 31, 51, 0.10);
 }
 .msk-navg-head {
   color: #1b1f33;
@@ -85,7 +85,7 @@
   background-color: #171b2e;
   color: #e8eaf6;
   font-weight: 700;
-  box-shadow: inset 3px 0 0 #9091f2, 0 1px 3px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 &[data-mode="dark"] .msk-navg-head {
   color: #e8eaf6;
