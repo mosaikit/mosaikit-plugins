@@ -2181,5 +2181,16 @@
   "No usage yet": "暂无使用",
   "Items show here as people create them.": "人们创建项目后会显示在这里。",
   "Here is how the platform is doing.": "平台的近况。",
-  "open items need you": "个待处理项目等您处理"
+  "open items need you": "个待处理项目等您处理",
+  "Run your portal with confidence.": "放心管理您的门户。",
+  "See who is active, what waits for your decision and how much of your plan is used.": "查看谁在活跃、什么在等待您决定，以及套餐已使用多少。",
+  "Review queue": "审核队列",
+  "Manage people": "管理人员",
+  "Reviews": "审核",
+  "{n} vs last month": "较上月 {n}",
+  "signed in over the last 30 days": "过去 30 天内登录",
+  "You are all caught up": "已全部处理",
+  "No notifications. New mentions, shares and approvals show up here.": "没有通知。新的提及、共享和审批会显示在这里。",
+  "Your activity, last 5 weeks": "您的活动，最近 5 周",
+  "{count} actions": "{count} 个操作"
 }

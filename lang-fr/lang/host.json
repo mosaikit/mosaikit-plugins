@@ -2181,5 +2181,16 @@
   "No usage yet": "Aucune utilisation pour l’instant",
   "Items show here as people create them.": "Les éléments apparaissent ici au fur et à mesure que les personnes les créent.",
   "Here is how the platform is doing.": "Voici comment va la plateforme.",
-  "open items need you": "éléments ouverts vous attendent"
+  "open items need you": "éléments ouverts vous attendent",
+  "Run your portal with confidence.": "Gérez votre portail en toute confiance.",
+  "See who is active, what waits for your decision and how much of your plan is used.": "Voyez qui est actif, ce qui attend votre décision et quelle part du forfait est utilisée.",
+  "Review queue": "File de révision",
+  "Manage people": "Gérer les personnes",
+  "Reviews": "Révisions",
+  "{n} vs last month": "{n} par rapport au mois dernier",
+  "signed in over the last 30 days": "connectées au cours des 30 derniers jours",
+  "You are all caught up": "Vous êtes à jour",
+  "No notifications. New mentions, shares and approvals show up here.": "Aucune notification. Les nouvelles mentions, partages et approbations apparaissent ici.",
+  "Your activity, last 5 weeks": "Votre activité, 5 dernières semaines",
+  "{count} actions": "{count} actions"
 }

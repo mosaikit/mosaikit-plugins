@@ -2181,5 +2181,16 @@
   "No usage yet": "لا استخدام بعد",
   "Items show here as people create them.": "تظهر العناصر هنا عندما ينشئها الأشخاص.",
   "Here is how the platform is doing.": "هذه حال المنصة.",
-  "open items need you": "عناصر مفتوحة بانتظارك"
+  "open items need you": "عناصر مفتوحة بانتظارك",
+  "Run your portal with confidence.": "أدر بوابتك بثقة.",
+  "See who is active, what waits for your decision and how much of your plan is used.": "اعرف من النشط وما ينتظر قرارك وكم استُخدم من الخطة.",
+  "Review queue": "قائمة المراجعة",
+  "Manage people": "إدارة الأشخاص",
+  "Reviews": "المراجعات",
+  "{n} vs last month": "{n} مقارنةً بالشهر الماضي",
+  "signed in over the last 30 days": "سجّلوا الدخول خلال آخر 30 يومًا",
+  "You are all caught up": "لا شيء متبقٍ",
+  "No notifications. New mentions, shares and approvals show up here.": "لا إشعارات. تظهر هنا الإشارات والمشاركات والموافقات الجديدة.",
+  "Your activity, last 5 weeks": "نشاطك، آخر 5 أسابيع",
+  "{count} actions": "{count} إجراءات"
 }

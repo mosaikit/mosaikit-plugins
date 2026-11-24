@@ -814,3 +814,130 @@
   background-size: 144px 168px;
   background-position: -48px -48px;
 }
+/* the icons of the mockup that differ from the 3dicons sprite */
+.msk-nav-item[data-icon="overview"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 144px 24px;
+  background-position: -0px 0px;
+}
+.msk-navg-head[data-icon="overview"] > svg:first-child {
+  color: transparent;
+  width: 28px;
+  height: 28px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 168px 28px;
+  background-position: -0px 0px;
+}
+.msk-nav-item[data-icon="database"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 144px 24px;
+  background-position: -24px 0px;
+}
+.msk-navg-head[data-icon="database"] > svg:first-child {
+  color: transparent;
+  width: 28px;
+  height: 28px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 168px 28px;
+  background-position: -28px 0px;
+}
+.msk-nav-item[data-icon="wrench"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 144px 24px;
+  background-position: -48px 0px;
+}
+.msk-navg-head[data-icon="wrench"] > svg:first-child {
+  color: transparent;
+  width: 28px;
+  height: 28px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 168px 28px;
+  background-position: -56px 0px;
+}
+.msk-nav-item[data-icon="notebook-pen"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 144px 24px;
+  background-position: -72px 0px;
+}
+.msk-navg-head[data-icon="notebook-pen"] > svg:first-child {
+  color: transparent;
+  width: 28px;
+  height: 28px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 168px 28px;
+  background-position: -84px 0px;
+}
+.msk-nav-item[data-icon="notebook"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 144px 24px;
+  background-position: -72px 0px;
+}
+.msk-navg-head[data-icon="notebook"] > svg:first-child {
+  color: transparent;
+  width: 28px;
+  height: 28px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 168px 28px;
+  background-position: -84px 0px;
+}
+.msk-nav-item[data-icon="code"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 144px 24px;
+  background-position: -96px 0px;
+}
+.msk-navg-head[data-icon="code"] > svg:first-child {
+  color: transparent;
+  width: 28px;
+  height: 28px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 168px 28px;
+  background-position: -112px 0px;
+}
+.msk-nav-item[data-icon="presentation"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 144px 24px;
+  background-position: -120px 0px;
+}
+.msk-navg-head[data-icon="presentation"] > svg:first-child {
+  color: transparent;
+  width: 28px;
+  height: 28px;
+  background-image: url(images/icons2.png);
+  background-repeat: no-repeat;
+  background-size: 168px 28px;
+  background-position: -140px 0px;
+}
