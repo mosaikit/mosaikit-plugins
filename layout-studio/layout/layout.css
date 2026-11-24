@@ -773,3 +773,41 @@
 .msk-band input {
   max-width: 430px;
 }
+
+.msk-band-search {
+  max-width: 430px;
+}
+.msk-navg-count {
+  background-color: #4a4bb0;
+  color: #ffffff;
+  border-radius: 999px;
+}
+[data-widget-icon] {
+  width: 28px;
+  height: 28px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 168px 196px;
+  background-position: -28px -28px;
+}
+[data-widget-title="ov-waiting"] > [data-widget-icon] {
+  background-position: -140px -112px;
+}
+[data-widget-title="ov-activity"] > [data-widget-icon] {
+  background-position: -112px -112px;
+}
+[data-widget-title="ov-notes"] > [data-widget-icon] {
+  background-position: 0px 0px;
+}
+[data-widget-title="ov-storage"] > [data-widget-icon] {
+  background-position: -0px -168px;
+}
+[data-widget-title="ov-space-apps"] > [data-widget-icon] {
+  background-position: -0px -84px;
+}
+[data-widget-title="ov-requests"] > [data-widget-icon] {
+  background-position: -112px -140px;
+}
+[data-widget-title="ov-errors"] > [data-widget-icon] {
+  background-position: -28px -140px;
+}
