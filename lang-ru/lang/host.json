@@ -2181,5 +2181,16 @@
   "No usage yet": "Пока нет использования",
   "Items show here as people create them.": "Элементы появятся здесь по мере создания.",
   "Here is how the platform is doing.": "Как дела у платформы.",
-  "open items need you": "открытых элементов ждут вас"
+  "open items need you": "открытых элементов ждут вас",
+  "Run your portal with confidence.": "Управляйте порталом уверенно.",
+  "See who is active, what waits for your decision and how much of your plan is used.": "Смотрите, кто активен, что ждёт вашего решения и какая часть плана использована.",
+  "Review queue": "Очередь проверки",
+  "Manage people": "Управление людьми",
+  "Reviews": "Проверки",
+  "{n} vs last month": "{n} к прошлому месяцу",
+  "signed in over the last 30 days": "входили за последние 30 дней",
+  "You are all caught up": "Всё прочитано",
+  "No notifications. New mentions, shares and approvals show up here.": "Нет уведомлений. Новые упоминания, общий доступ и согласования появятся здесь.",
+  "Your activity, last 5 weeks": "Ваша активность, последние 5 недель",
+  "{count} actions": "{count} действий"
 }

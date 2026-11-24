@@ -2181,5 +2181,16 @@
   "No usage yet": "Aún no hay uso",
   "Items show here as people create them.": "Los elementos aparecen aquí a medida que las personas los crean.",
   "Here is how the platform is doing.": "Así va la plataforma.",
-  "open items need you": "elementos abiertos te esperan"
+  "open items need you": "elementos abiertos te esperan",
+  "Run your portal with confidence.": "Gestiona tu portal con confianza.",
+  "See who is active, what waits for your decision and how much of your plan is used.": "Mira quién está activo, qué espera tu decisión y cuánto del plan se usa.",
+  "Review queue": "Cola de revisión",
+  "Manage people": "Gestionar personas",
+  "Reviews": "Revisiones",
+  "{n} vs last month": "{n} frente al mes pasado",
+  "signed in over the last 30 days": "accedieron en los últimos 30 días",
+  "You are all caught up": "Estás al día",
+  "No notifications. New mentions, shares and approvals show up here.": "Sin notificaciones. Las nuevas menciones, comparticiones y aprobaciones aparecen aquí.",
+  "Your activity, last 5 weeks": "Tu actividad, últimas 5 semanas",
+  "{count} actions": "{count} acciones"
 }
