@@ -1,9 +1,9 @@
-# a sidebar with grouped apps under an indigo band with a centred search
+# a sidebar with grouped apps under an indigo band with a wide search
 pattern = "sidebar"
 
 [band]
 brand = true
-search = "center"
+search = "wide"
 tenant = "band"
 
 [phone]

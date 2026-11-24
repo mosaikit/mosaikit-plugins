@@ -1,6 +1,6 @@
 id = "com.mosaikit.layout-studio"
 name = "Studio"
-version = "1.0.0"
+version = "1.1.0"
 kind = "layout"
 description = "Indigo band, grey sidebar with grouped apps and 3D icons"
 author = "Mosaikit"
@@ -10,7 +10,7 @@ screenshots = ["layout.webp", "layout-page.webp", "layout-dark.webp"]
 homepage = "https://example.org/mosaikit/plugins/layout-studio"
 
 [requires]
-mosaikit = ">=1.0, <2"
+mosaikit = ">=1.4, <2"
 api = 1
 
 [contribution]
