@@ -647,9 +647,6 @@
 }
 
 /* the mockup: a narrower sidebar, bigger group heads, wide search, a hero with 3D art, 3D icons on the key figures */
-.msk-nav {
-  width: 204px;
-}
 .msk-navg-head {
   font-size: 14px;
   letter-spacing: 0;
@@ -774,9 +771,6 @@
   max-width: 430px;
 }
 
-.msk-band-brand {
-  width: 204px;
-}
 .msk-navg-count {
   background-color: #4a4bb0;
   color: #ffffff;
@@ -810,4 +804,13 @@
 }
 [data-widget-title="ov-errors"] > [data-widget-icon] {
   background-position: -28px -140px;
+}
+.msk-nav-item[data-icon="book-open"] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: url(images/icons.png);
+  background-repeat: no-repeat;
+  background-size: 144px 168px;
+  background-position: -48px -48px;
 }
