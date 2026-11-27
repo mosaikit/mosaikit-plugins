@@ -42,6 +42,13 @@ contributions = ["com.mosaikit.dashboard.widget"]
 view = "kpi_boards_status"
 label = "Boards of the dashboard"
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_dashboards"
+description = "Lists or searches the dashboards the person can see, by name. Use q to look for words. Read only: widgets are arranged in the app."
+resource = "boards"
+action = "list"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 name = "Dashboard"

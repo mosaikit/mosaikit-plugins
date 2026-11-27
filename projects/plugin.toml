@@ -53,6 +53,28 @@ id = "active-projects"
 label = "Active projects"
 data = { command = "projects.widget_active", kind = "list", size = "m", texts = { en = { empty = "No active projects" }, it = { label = "Progetti attivi", empty = "Nessun progetto attivo" }, es = { label = "Proyectos activos", empty = "Ningún proyecto activo" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_projects"
+description = "Lists or searches the projects the person can see: name, description, status, start and end date. Use q to look for words."
+resource = "projects"
+action = "list"
+
+[[assistant_tools]]
+name = "create_project"
+description = "Creates a project with a name, an optional description, status (planned, active, on_hold, done) and start and end dates (YYYY-MM-DD)."
+resource = "projects"
+action = "create"
+
+[[assistant_tools]]
+name = "update_project"
+description = "Changes a project, for example its status, description or dates; give the id found with list_projects."
+resource = "projects"
+action = "update"
+
+[assistant]
+prompt = "A project has a status: planned (not started), active (in progress), on_hold (paused) or done (finished). Board columns, milestones and sprints are edited in the app, not here."
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Pianifica il lavoro di un rilascio, di un cantiere o di una campagna. Un progetto ha le colonne di una lavagna, le tappe con una data e gli sprint (finestre di tempo), e mostra quante delle sue attività sono fatte.\n\nLe attività restano attività: appartengono al plugin Attività, che deve essere installato, e il progetto è il nome scritto nel loro campo Progetto. Vedi e modifichi solo le attività che puoi vedere e modificare in Attività.\n\nUn progetto è un elemento della piattaforma: condividilo con persone o gruppi (lettura per seguirlo, scrittura per organizzare la lavagna) e vale tutto ciò che sai già su condivisione, ricerca e cestino."

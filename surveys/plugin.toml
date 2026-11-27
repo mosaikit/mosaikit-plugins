@@ -59,6 +59,13 @@ id = "open-surveys"
 label = "Open surveys"
 data = { command = "surveys.widget_open", kind = "number", size = "s", texts = { en = { secondary = "open in all", empty = "No open surveys" }, it = { label = "Questionari aperti", secondary = "aperti in tutto", empty = "Nessun questionario aperto" }, es = { label = "Encuestas abiertas", secondary = "abiertas en total", empty = "No hay encuestas abiertas" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_surveys"
+description = "Lists or searches the surveys and quizzes the person can see: title, introduction, closing date, closed or open. Use q to look for words. Read only: surveys are built in the app."
+resource = "surveys"
+action = "list"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Costruisci un sondaggio con fino a 40 domande (una risposta, più risposte, testo libero o una scala da 1 a 5), condividilo e guarda i risultati per domanda: una barra per ogni opzione, la media di una scala e le risposte di testo. Ognuno risponde una sola volta e i risultati si esportano in CSV. Una domanda può comparire solo se una risposta precedente corrisponde, e un questionario anonimo non conserva alcun nome insieme alle risposte.\n\nIn modalità quiz le risposte hanno un punteggio: segna le opzioni corrette e i punti di ogni domanda, imposta una soglia di superamento e ognuno vede il proprio punteggio e se ha superato la prova; le risposte giuste e sbagliate si mostrano solo dopo l’invio.\n\nUn sondaggio è un elemento della piattaforma: condividilo con persone o gruppi (lettura per rispondere, scrittura per vedere tutti i risultati e modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino."

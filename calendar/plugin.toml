@@ -66,6 +66,28 @@ id = "today"
 label = "Today in the calendar"
 data = { command = "events.widget_today", kind = "list", size = "m", texts = { en = { empty = "No events today or tomorrow" }, it = { label = "Oggi in calendario", empty = "Nessun evento oggi o domani" }, es = { label = "Hoy en el calendario", empty = "Sin eventos hoy ni mañana" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_events"
+description = "Lists or searches the calendar events the person can see: title, start and end date and time, location. Use q to look for words."
+resource = "events"
+action = "list"
+
+[[assistant_tools]]
+name = "create_event"
+description = "Creates a calendar event. Give a title and starts_on (YYYY-MM-DD); times are HH:MM text, or set all_day. Repeat can be none, daily, weekly, monthly or yearly."
+resource = "events"
+action = "create"
+
+[[assistant_tools]]
+name = "update_event"
+description = "Changes a calendar event, for example to move its date or time or set its location; give the id found with list_events."
+resource = "events"
+action = "update"
+
+[assistant]
+prompt = "Calendar dates are YYYY-MM-DD. Times (starts_time, ends_time) are HH:MM text in the event time zone. An event without ends_on ends the day it starts."
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Scrivi un evento con il giorno, l’ora e una ripetizione (ogni giorno, settimana, mese o anno), invita le persone della tua organizzazione e guarda tutto in una vista per mese, settimana o giorno. Gli invitati rispondono sì, forse o no, e tutti vedono chi partecipa. Gli orari sono orari locali, scritti esattamente come li digiti, a meno che tu non dia all’evento un fuso orario: allora compare all’ora giusta ovunque si trovi ciascuno. In una serie che si ripete puoi cambiare o eliminare una sola occorrenza.\n\nLe attività aperte con una scadenza compaiono accanto agli eventi (puoi nasconderle), così scadenze e riunioni sono nello stesso posto. Un evento è un elemento della piattaforma: condividilo con gli invitati perché lo vedano e rispondano, e scaricalo come file .ics (con gli invitati) per aggiungerlo a un altro calendario."

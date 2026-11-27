@@ -70,6 +70,13 @@ id = "answers"
 label = "Answers per form"
 data = { command = "forms.widget_answers", kind = "chart", size = "m", texts = { en = { empty = "No forms yet", categories = { answers = "Answers" } }, it = { label = "Risposte per modulo", empty = "Ancora nessun modulo", categories = { answers = "Risposte" } }, es = { label = "Respuestas por formulario", empty = "Todavía no hay formularios", categories = { answers = "Respuestas" } } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_forms"
+description = "Lists or searches the forms the person can see: title, introduction, whether it is open to answers, closing date. Use q to look for words. Read only: forms are built in the app."
+resource = "forms"
+action = "list"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 name = "Moduli"

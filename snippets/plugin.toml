@@ -48,6 +48,25 @@ id = "recent-snippets"
 label = "Recent snippets"
 data = { command = "snippets.widget_recent", kind = "list", size = "m", texts = { en = { empty = "No snippets yet" }, it = { label = "Snippet recenti", empty = "Ancora nessuno snippet" }, es = { label = "Snippets recientes", empty = "Todavía no hay snippets" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_snippets"
+description = "Lists or searches the saved snippets (reusable text, commands, queries, code): title, content, kind. Use q to look for words."
+resource = "snippets"
+action = "list"
+
+[[assistant_tools]]
+name = "create_snippet"
+description = "Saves a snippet with a title, its content and a kind (text, shell, sql, json, python, and so on)."
+resource = "snippets"
+action = "create"
+
+[[assistant_tools]]
+name = "update_snippet"
+description = "Changes a snippet, for example its content, title or kind; give the id found with list_snippets."
+resource = "snippets"
+action = "update"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Tieni a portata di mano i testi e il codice che il tuo gruppo riutilizza di continuo: un titolo, il testo o il codice, un tipo (testo semplice, shell, SQL, JSON, JavaScript, Python, Rust, Markdown) e delle etichette. Trova uno snippet con la ricerca, per tipo o per etichetta e copialo negli appunti con un clic.\n\nUno snippet è un elemento della piattaforma: condividilo con persone o gruppi (lettura per usarlo, scrittura per modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
