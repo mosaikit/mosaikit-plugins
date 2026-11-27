@@ -49,6 +49,13 @@ id = "recent"
 label = "Recent maps"
 data = { command = "maps.widget_recent", kind = "list", size = "m", texts = { en = { empty = "No maps yet" }, it = { label = "Mappe recenti", empty = "Ancora nessuna mappa" }, es = { label = "Mapas recientes", empty = "Todavía no hay mapas" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_maps"
+description = "Lists or searches the maps the person can see: name and description. Use q to look for words. Read only: maps are edited in the app."
+resource = "maps"
+action = "list"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Un catalogo di mappe costruite con GeoLibre. Ogni mappa conserva la configurazione (livelli, stili, vista) in un progetto .geolibre.json che puoi aprire, modificare e condividere.\n\nCondividi una mappa con colleghi e gruppi, o tienila privata mentre ci lavori."

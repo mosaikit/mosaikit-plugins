@@ -130,6 +130,28 @@ id = "recent-notes"
 label = "Recent notes"
 data = { command = "notes.widget_recent", kind = "list", size = "m", texts = { en = { empty = "No notes yet" }, it = { label = "Note recenti", empty = "Ancora nessuna nota" }, es = { label = "Notas recientes", empty = "Aún no hay notas" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code): the assistant searches, creates and edits notes as the person.
+[[assistant_tools]]
+name = "list_notes"
+description = "Lists or searches the notes the person can see (title and text). Use q to look for words."
+resource = "notes"
+action = "list"
+
+[[assistant_tools]]
+name = "create_note"
+description = "Creates a note with a title and a text (markdown) for the person."
+resource = "notes"
+action = "create"
+
+[[assistant_tools]]
+name = "update_note"
+description = "Changes the title or the text of an existing note; give the id found with list_notes."
+resource = "notes"
+action = "update"
+
+[assistant]
+prompt = "Notes are short markdown documents with a title, a text and tags. A note belongs to the person who made it and can be shared."
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Scrivi note in Markdown (grassetto, elenchi, liste di controllo con avanzamento) come post-it colorati con titolo, testo e tag tuoi, ridimensionali, tienile private o condividile con colleghi e gruppi.\n\nOgni nota ha il proprio livello di condivisione, un link pubblico quando serve e un posto nella ricerca della piattaforma.\n\nQuando l’Amministratore ha impostato un servizio di traduzione (Sistema > Chiavi dei servizi esterni), una nota si traduce in un’altra lingua con un clic."

@@ -52,6 +52,19 @@ id = "favorites"
 label = "Favourite links"
 data = { command = "bookmarks.widget_favorites", kind = "list", size = "m", texts = { en = { empty = "No favourite links yet" }, it = { label = "Link preferiti", empty = "Ancora nessun link preferito" }, es = { label = "Enlaces favoritos", empty = "Todavía no hay enlaces favoritos" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_bookmarks"
+description = "Lists or searches the saved web links the person can see (title, address, note). Use q to look for words."
+resource = "bookmarks"
+action = "list"
+
+[[assistant_tools]]
+name = "create_bookmark"
+description = "Saves a web link (an http or https address) with a title and an optional note."
+resource = "bookmarks"
+action = "create"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Tieni i link a cui il tuo gruppo torna spesso: ogni segnalibro ha un titolo, l’indirizzo, una nota e delle etichette. Cerca per ciascuno di questi, filtra per etichetta, segna come preferiti quelli che usi di più e apri o copia un link con un clic.\n\nUn segnalibro è un elemento della piattaforma: condividilo con persone o gruppi (lettura per vederlo, scrittura per modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino. Sono accettati solo indirizzi http e https.\n\nUn segnalibro si apre in una nuova scheda o dentro la piattaforma, nell’area dei contenuti, come scegli per ciascuno (un sito che non può essere mostrato dentro un’altra pagina si apre in una nuova scheda). Quando salvi un segnalibro la piattaforma guarda la pagina una volta per completare il titolo e un’immagine che hai lasciato vuoti; nient’altro viene scaricato."

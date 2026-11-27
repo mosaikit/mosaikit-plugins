@@ -62,6 +62,25 @@ id = "to-confirm"
 label = "Notices to confirm"
 data = { command = "notices.widget_to_confirm", kind = "number", size = "s", texts = { en = { empty = "Nothing to confirm" }, it = { label = "Avvisi da confermare", empty = "Niente da confermare" }, es = { label = "Avisos por confirmar", empty = "Nada por confirmar" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_announcements"
+description = "Lists or searches the announcements the person can see: title, text, level, validity dates, pinned. Use q to look for words."
+resource = "notices"
+action = "list"
+
+[[assistant_tools]]
+name = "create_announcement"
+description = "Creates an announcement with a title and text, a level (info, important, urgent) and optional validity dates (YYYY-MM-DD)."
+resource = "notices"
+action = "create"
+
+[[assistant_tools]]
+name = "update_announcement"
+description = "Changes an announcement, for example its text, level, validity dates or pinned flag; give the id found with list_announcements."
+resource = "notices"
+action = "update"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Pubblica un avviso per le persone con cui è condiviso: un titolo, un testo in Markdown, un livello (informazione, importante o urgente) e il periodo in cui vale. Gli avvisi urgenti e quelli fissati restano in alto.\n\nQuando un avviso chiede conferma, ogni lettore conferma con un clic e l’autore vede chi lo ha fatto e quando.\n\nUn avviso è un elemento della piattaforma: condividilo con persone o gruppi (lettura per seguirlo, scrittura per modificarlo) e vale tutto ciò che sai già su condivisione, ricerca e cestino."

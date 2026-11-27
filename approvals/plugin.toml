@@ -59,6 +59,16 @@ id = "to-decide"
 label = "To decide"
 data = { command = "requests.widget_to_decide", kind = "number", size = "s", texts = { en = { secondary = "of yours pending", empty = "Nothing to decide" }, it = { label = "Da decidere", secondary = "tue in attesa", empty = "Niente da decidere" }, es = { label = "Por decidir", secondary = "tuyas pendientes", empty = "Nada por decidir" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_approval_requests"
+description = "Lists or searches the approval requests the person can see: title, details, amount, mode, cancelled. Use q to look for words. Read only: approvers and decisions are handled in the app."
+resource = "requests"
+action = "list"
+
+[assistant]
+prompt = "An approval request is decided by its approvers. Mode any means one approval is enough, all means every approver must approve, sequence means approvers decide one after the other."
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Scrivi una richiesta, scegli le persone che devono decidere e come: basta una approvazione, devono approvare tutti, oppure uno dopo l’altro nell’ordine in cui li elenchi. Ogni approvatore approva o rifiuta con un commento, una sola volta, e la decisione è definitiva.\n\nLo stato della richiesta (in attesa, approvata, rifiutata o annullata) è sempre calcolato dalle decisioni, e tutti vedono chi ha deciso che cosa e quando. Chi deve decidere vede un contatore con le richieste che lo aspettano.\n\nUna richiesta è un elemento della piattaforma: condividila con gli approvatori (servono i diritti di lettura per decidere) e vale tutto ciò che sai già su condivisione, ricerca e cestino."

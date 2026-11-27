@@ -69,6 +69,13 @@ id = "open-polls"
 label = "Open polls"
 data = { command = "polls.widget_open", kind = "number", size = "s", texts = { en = { secondary = "open in all", empty = "No open polls" }, it = { label = "Sondaggi aperti", secondary = "aperti in tutto", empty = "Nessun sondaggio aperto" }, es = { label = "Encuestas abiertas", secondary = "abiertas en total", empty = "No hay encuestas abiertas" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_polls"
+description = "Lists or searches the polls the person can see: question, details, closing date, closed or open. Use q to look for words. Read only: polls are created and voted in the app."
+resource = "polls"
+action = "list"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 name = "Sondaggi"

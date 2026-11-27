@@ -39,6 +39,13 @@ media = true
 # who has a room open: a live channel on the room
 realtime = true
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_meeting_rooms"
+description = "Lists or searches the video meeting rooms the person can see: name and topic. Use q to look for words."
+resource = "rooms"
+action = "list"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 description = "Stanze per videoriunioni: entra con fotocamera, microfono e condivisione dello schermo, vedi chi c’è nella stanza"

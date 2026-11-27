@@ -48,6 +48,13 @@ id = "recent"
 label = "Recent whiteboards"
 data = { command = "whiteboard.widget_recent", kind = "list", size = "m", texts = { en = { empty = "No whiteboards yet" }, it = { label = "Lavagne recenti", empty = "Ancora nessuna lavagna" }, es = { label = "Pizarras recientes", empty = "Todavía no hay pizarras" } } }
 
+# Tools of the AI assistant (generic CRUD of the resource, no code).
+[[assistant_tools]]
+name = "list_whiteboards"
+description = "Lists or searches the whiteboards the person can see, by title. Use q to look for words. Read only: the drawing is made in the app."
+resource = "whiteboards"
+action = "list"
+
 # Italian translation of the texts above (missing keys fall back to English).
 [i18n.it]
 details = "Una lavagna libera per brainstorming, workshop e diagrammi disegnati insieme in una chiamata: note adesive, rettangoli, ellissi, testo, frecce, cornici che raggruppano ciò che hanno dentro e disegno a mano libera, con modelli da cui partire (kanban, SWOT, retrospettiva, brainstorming),, con una tavolozza di colori, annulla e ripeti, zoom e spostamento, ed esportazione in PNG o SVG.\n\nChiunque abbia la lavagna aperta vede in tempo reale le modifiche e i puntatori degli altri. Le modifiche vengono salvate nella lavagna da chi può modificarla; chi ha solo la lettura segue dal vivo ma non può cambiare nulla.\n\nUna lavagna è un elemento della piattaforma: condividila con persone o gruppi (lettura per guardarla, scrittura per disegnarci sopra) e vale tutto ciò che sai già su condivisione, ricerca e cestino."
