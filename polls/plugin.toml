@@ -4,6 +4,7 @@ version = "0.4.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "vote"
+icon_image = "icon.webp"
 description = "A quick question to a group: single or multiple choice, an optional deadline, named or hidden votes and live results"
 author = "Mosaikit"
 license = "Apache-2.0"

@@ -4,6 +4,7 @@ version = "0.4.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "shield-check"
+icon_image = "icon.webp"
 description = "Ask one or more people to approve or reject a request, and keep the history of who decided what and when"
 author = "Mosaikit"
 license = "Apache-2.0"

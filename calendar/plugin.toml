@@ -4,6 +4,7 @@ version = "0.4.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "calendar-days"
+icon_image = "icon.webp"
 description = "The agenda of the team: month, week and day views, events with invited people, repeats and the due dates of your tasks"
 author = "Mosaikit"
 license = "Apache-2.0"

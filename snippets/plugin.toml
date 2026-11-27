@@ -4,6 +4,7 @@ version = "0.4.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "code"
+icon_image = "icon.webp"
 description = "A shared collection of reusable texts and pieces of code with tags, copied in one click"
 author = "Mosaikit"
 license = "Apache-2.0"

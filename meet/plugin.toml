@@ -4,6 +4,7 @@ version = "0.2.1"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "video"
+icon_image = "icon.webp"
 description = "Video meeting rooms: join with camera, microphone and screen share, see who is in the room"
 author = "Mosaikit"
 license = "Apache-2.0"

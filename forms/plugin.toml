@@ -4,6 +4,7 @@ version = "0.4.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "file-input"
+icon_image = "icon.webp"
 description = "Build a form, share a public link to collect answers from anyone with no account, and read the answers in a table or a CSV"
 author = "Mosaikit"
 license = "Apache-2.0"

@@ -4,6 +4,7 @@ version = "0.4.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "clipboard-list"
+icon_image = "icon.webp"
 description = "Series of questions answered by the people a survey is shared with, with the results per question and scored quizzes"
 author = "Mosaikit"
 license = "Apache-2.0"

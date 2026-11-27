@@ -4,6 +4,7 @@ version = "0.5.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "bookmark"
+icon_image = "icon.webp"
 description = "A shared collection of web links with a note and tags, opened in a new tab or in the content area, to find again and to share with people and groups"
 author = "Mosaikit"
 license = "Apache-2.0"

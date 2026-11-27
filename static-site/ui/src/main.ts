@@ -17,7 +17,7 @@
 
 import '@mosaikit/plugin-api/style.css'
 import './sites.css'
-import { connect, dialog, downloadCsv, emptyState, filteredEmpty, gridTable, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
+import { connect, dialog, downloadCsv, emptyState, filteredEmpty, pageBody, pageHead, type Msk, type Row, type SiteInfo } from '@mosaikit/plugin-api'
 import { h, errText } from './dom.ts'
 import { bookmarkRows, BOOKMARKS_HEADER } from './tobookmarks.ts'
 import { followHost, plural, reloadIfStale, t } from './i18n.ts'
@@ -49,6 +49,14 @@ const thumbOf = (r: Row) => {
   // only an image the plugin wrote itself (a data: address) is ever shown
   return /^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(v) ? v : ''
 }
+const IMG = /^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/
+/** The logo of a site (a data: image the plugin wrote), or ''. */
+const logoOf = (r: Row) => {
+  const v = valOf(r, 'logo')
+  return IMG.test(v) ? v : ''
+}
+/** A colour for a name: the same name always gets the same hue. */
+const hueOf = (name: string) => [...name].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 360, 7)
 const hostOf = (u: string) => {
   try {
     return new URL(u).host
@@ -82,6 +90,23 @@ async function toThumbnail(src: Blob | string): Promise<string> {
   ctx.drawImage(bmp, 0, 0, w, hgt)
   bmp.close()
   return canvas.toDataURL('image/jpeg', 0.8)
+}
+
+/** A picture reduced to a logo (at most 128 px on the longer side, keeps transparency): small enough to live in the record. */
+async function toLogo(src: Blob): Promise<string> {
+  const bmp = await createImageBitmap(src)
+  const k = Math.min(1, 128 / Math.max(bmp.width, bmp.height))
+  const w = Math.max(1, Math.round(bmp.width * k))
+  const hgt = Math.max(1, Math.round(bmp.height * k))
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = hgt
+  const ctx = canvas.getContext('2d')
+  if (!ctx) throw new Error('canvas')
+  ctx.drawImage(bmp, 0, 0, w, hgt)
+  bmp.close()
+  // webp where the browser can write it (transparent and small), else png
+  return canvas.toDataURL('image/webp', 0.9)
 }
 
 const VIEW_KEY = 'msks.view'
@@ -148,6 +173,8 @@ function mount(msk: Msk) {
     layout: savedView(),
     // thumbnail of the form: undefined = as it is, null = removed, a data: address = new
     thumb: undefined as string | null | undefined,
+    // logo of the form, same convention
+    logo: undefined as string | null | undefined,
   }
 
   // ---------- DOM ----------
@@ -160,26 +187,10 @@ function mount(msk: Msk) {
   const cards = h('div', { class: 'cards' })
   const rowcount = h('span', { class: 'msk-count' })
   const listMsg = h('div', { class: 'msg', role: 'status' })
-  const grid = gridTable<Row>({
-    label: t('Sites'),
-    local: { step: 50, more: t('Load more'), of: (shown, total) => t('{shown} of {total}', { shown, total }) },
-    decorate: (_r, tr) => {
-      tr.className = 'data-row'
-    },
-    columns: [
-      { key: 'thumb', title: '', width: '4.5rem', className: 'thumbcell', cell: (r) => thumbEl(r, 'thumbsm') },
-      { key: 'name', title: t('Name'), width: 'minmax(10rem,2fr)', sort: (r) => valOf(r, 'name'), cell: (r) => nameCellOf(r) },
-      { key: 'start', title: t('Start page'), width: 'minmax(9rem,1.6fr)', sort: (r) => startOf(r), className: 'mono', cell: (r) => startOf(r) },
-      { key: 'files', title: t('Files'), width: 'minmax(5rem,.5fr)', align: 'right', sort: (r) => Number(valOf(r, 'files')) || 0, className: 'num', cell: (r) => valOf(r, 'files') || '—' },
-      { key: 'size', title: t('Size'), width: 'minmax(5rem,.6fr)', align: 'right', sort: (r) => Number(r.values.size) || 0, className: 'num', cell: (r) => (valOf(r, 'size') ? fmtSize(r.values.size) : '—') },
-      { key: 'updated', title: t('Updated'), width: 'minmax(7rem,.8fr)', align: 'right', sort: (r) => r.updated_at ?? '', className: 'num', cell: (r) => fmtDate(r.updated_at) },
-      { key: 'owner', title: t('Owner'), width: 'minmax(7rem,.8fr)', sort: (r) => r.owner_name ?? '', className: 'msk-owner', cell: (r) => r.owner_name ?? '' },
-      { key: 'actions', title: t('Actions'), width: 'minmax(15rem,auto)', className: 'rowacts', cell: (r) => actionsOf(r, h('span', {})) },
-    ],
-  })
+  const rows = h('div', { class: 'frows' })
   const emptyBox = h('div', { class: 'msk-emptybox' })
   emptyBox.hidden = true
-  const listBody = pageBody(cards, grid.el, emptyBox, listMsg)
+  const listBody = pageBody(cards, rows, emptyBox, listMsg)
   listBody.classList.add('msk-tablebody')
   // the sites by address (an older version) can move to Bookmarks
   const moveText = h('span', { class: 'movetext' })
@@ -230,6 +241,16 @@ function mount(msk: Msk) {
     h('div', { class: 'thumbline' }, thumbPrev, inThumb, btnThumbClear),
     h('div', { class: 'hint' }, t('Optional. Without one, a placeholder is shown.')),
   )
+  const inLogo = h('input', { id: 'msks-logo', type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif' })
+  const logoPrev = h('img', { class: 'logoprev', alt: '' })
+  const btnLogoClear = h('button', { type: 'button', class: 'msk-btn ghost mini' }, t('Remove'))
+  const logoRow = h(
+    'div',
+    { class: 'frow' },
+    h('label', { for: 'msks-logo' }, t('Logo')),
+    h('div', { class: 'thumbline' }, logoPrev, inLogo, btnLogoClear),
+    h('div', { class: 'hint' }, t('Optional. Shown in the top bar, with the name, while the site is open. Without one, a default logo is shown.')),
+  )
   const zipHint = h('div', { class: 'hint' })
   // what the zip would do as a site, shown as soon as it is chosen or dropped
   const zipReport = h('div', { class: 'zrep', 'aria-live': 'polite', 'data-testid': 'zip-report' })
@@ -246,6 +267,7 @@ function mount(msk: Msk) {
     zipRow,
     legacyRow,
     thumbRow,
+    logoRow,
     formMsg,
   )
   // the form lives in a modal: the body scrolls, the buttons stay in the fixed footer
@@ -297,7 +319,7 @@ function mount(msk: Msk) {
     const src = thumbOf(r)
     if (src) return h('img', { class: cls, src, alt: '', loading: 'lazy' })
     const name = valOf(r, 'name')
-    const hue = [...name].reduce((n, c) => (n * 31 + c.charCodeAt(0)) % 360, 7)
+    const hue = hueOf(name)
     const ph = h('span', { class: cls + ' placeholder', 'aria-hidden': 'true', style: `--hue: ${hue}` }, isWeb(r) ? '🌐' : (name.trim()[0] ?? '·').toUpperCase())
     return ph
   }
@@ -316,7 +338,7 @@ function mount(msk: Msk) {
     rowcount.textContent = shown.length === 1 ? t('1 site') : t('{n} sites', { n: shown.length })
     const asCards = state.layout === 'cards'
     cards.hidden = !asCards
-    grid.el.hidden = asCards
+    rows.hidden = asCards
     btnCards.setAttribute('aria-pressed', String(asCards))
     btnTable.setAttribute('aria-pressed', String(!asCards))
     btnCards.classList.toggle('on', asCards)
@@ -335,45 +357,82 @@ function mount(msk: Msk) {
           : emptyState({ art: 'apps', title: t('No sites yet'), text: t('Publish a static site from a zip archive.'), actions: btnNew.hidden ? [] : [newApp] }),
       )
       cards.hidden = true
-      grid.el.hidden = true
+      rows.hidden = true
       cards.replaceChildren()
-      grid.set([], null, '')
+      rows.replaceChildren()
       return
     }
-    cards.replaceChildren(
-      ...shown.map((r) => {
-        const open = h('button', { type: 'button', class: 'cardthumb', 'aria-label': t('Open the site') + ': ' + valOf(r, 'name'), disabled: !hasSite(r) }, thumbEl(r, 'thumb'))
-        open.addEventListener('click', () => void openShow(r.id))
-        const where = isWeb(r) ? hostOf(valOf(r, 'url')) : valOf(r, 'entry') || t('zip to upload')
-        return h(
-          'article',
-          { class: 'card', 'data-site': valOf(r, 'name') },
-          open,
-          h(
-            'div',
-            { class: 'cardbody' },
-            h('h3', { class: 'cardname' }, hasSite(r) ? nameLink(r) : valOf(r, 'name'), ...badges(r)),
-            h('p', { class: 'carddesc' }, valOf(r, 'description')),
-            h('p', { class: 'cardmeta mono' }, where),
-          ),
-          actionsOf(r, h('div', { class: 'rowacts' })),
-        )
-      }),
+    cards.replaceChildren(...shown.map((r) => spotCard(r)))
+    rows.replaceChildren(...shown.map(listRow))
+  }
+
+  /** The logo of a site, or its first letter on a colour of the name. */
+  function logoEl(r: Row, cls: string) {
+    const src = logoOf(r)
+    if (src) return h('img', { class: cls + ' logoimg', src, alt: '' })
+    const name = valOf(r, 'name')
+    return h('span', { class: cls, 'aria-hidden': 'true', style: `--hue: ${hueOf(name)}` }, (name.trim()[0] ?? '·').toUpperCase())
+  }
+
+  function openButton(r: Row) {
+    const open = h('button', { type: 'button', class: 'cardthumb', 'aria-label': t('Open the site') + ': ' + valOf(r, 'name'), disabled: !hasSite(r) }, thumbEl(r, 'thumb'))
+    open.addEventListener('click', () => void openShow(r.id))
+    return open
+  }
+  // only a site by address shows where it points; a zip site has no start page to show
+  const whereOf = (r: Row) => (isWeb(r) ? hostOf(valOf(r, 'url')) : '')
+  const tagsOf = (r: Row) => h('div', { class: 'cardtags' }, ...badges(r).filter((x) => x && !(r.shared && x.textContent === t('shared'))))
+  const descOf = (r: Row) => {
+    const desc = valOf(r, 'description').trim()
+    return desc ? h('div', { class: 'carddesc', title: desc }, desc.split('\n')[0] ?? '') : null
+  }
+
+  /** The card: the picture in a frame, the logo with the name, and a light that follows the pointer. */
+  function spotCard(r: Row) {
+    const corner = h('span', { class: 'cardcorner' }, r.shared ? h('span', { class: 'msk-badge cardvis' }, t('shared')) : null)
+    const el = h(
+      'article',
+      { class: 'card spot', 'data-site': valOf(r, 'name'), style: `--hue: ${hueOf(valOf(r, 'name'))}` },
+      h(
+        'div',
+        { class: 'spotin' },
+        h('div', { class: 'cardpic' }, openButton(r), corner),
+        h(
+          'div',
+          { class: 'cardbody' },
+          h('div', { class: 'spothead' }, logoEl(r, 'spotlogo'), h('h3', { class: 'cardname' }, hasSite(r) ? nameLink(r) : valOf(r, 'name'))),
+          whereOf(r) ? h('div', { class: 'cardmeta mono', title: whereOf(r) }, whereOf(r)) : null,
+          descOf(r),
+          tagsOf(r),
+        ),
+        h('div', { class: 'cardfoot' }, r.owner_name ? h('span', { class: 'msk-badge cardowner', title: t('Owner') }, r.owner_name) : h('span', { class: 'cardmeta' }, fmtDate(r.updated_at).slice(0, 10)), cardButtons(r)),
+      ),
     )
-
-    grid.set(shown, null, emptyText)
+    el.addEventListener('pointermove', (ev) => {
+      const b = el.getBoundingClientRect()
+      el.style.setProperty('--mx', ev.clientX - b.left + 'px')
+      el.style.setProperty('--my', ev.clientY - b.top + 'px')
+    })
+    return el
   }
 
-  function startOf(r: Row) {
-    return isWeb(r) ? valOf(r, 'url') : hasSite(r) ? valOf(r, 'entry') : t('zip to upload')
-  }
-
-  function nameCellOf(r: Row) {
-    const box = h('span', { title: valOf(r, 'description') || undefined })
-    if (hasSite(r)) box.append(nameLink(r))
-    else box.append(valOf(r, 'name'))
-    box.append(...badges(r).filter((x): x is HTMLSpanElement => !!x))
-    return box
+  /** A row of the list: logo, name, where it starts, size and date, the pills and the actions. */
+  function listRow(r: Row) {
+    const meta = [whereOf(r), valOf(r, 'size') ? fmtSize(r.values.size) : '', fmtDate(r.updated_at).slice(0, 10)].filter(Boolean).join(' · ')
+    return h(
+      'article',
+      { class: 'frow data-row', 'data-site': valOf(r, 'name') },
+      logoEl(r, 'rowlogo'),
+      h(
+        'div',
+        { class: 'rowtext' },
+        h('div', { class: 'rowname' }, h('h3', { class: 'cardname' }, hasSite(r) ? nameLink(r) : valOf(r, 'name')), ...badges(r).filter((x): x is HTMLSpanElement => !!x)),
+        valOf(r, 'description').trim() ? h('div', { class: 'rowdesc' }, valOf(r, 'description').trim().split('\n')[0] ?? '') : null,
+        h('small', { class: 'rowmeta', title: meta }, meta),
+      ),
+      r.owner_name ? h('span', { class: 'msk-badge rowowner', title: t('Owner') }, r.owner_name) : null,
+      cardButtons(r),
+    )
   }
 
   function nameLink(r: Row) {
@@ -391,20 +450,36 @@ function mount(msk: Msk) {
       r.my_level === 'read' ? h('span', { class: 'msk-badge' }, t('read only')) : null,
     ]
   }
-  function actionsOf(r: Row, wrap: HTMLElement) {
-      const btn = (label: string, cls: string, fn: () => void, disabled = false) => {
-        const b = h('button', { type: 'button', class: 'msk-btn mini ' + cls, disabled }, label)
-        b.addEventListener('click', fn)
-        wrap.append(b)
-      }
-      btn(t('👁 Open'), 'ghost', () => void openShow(r.id), !hasSite(r))
-      if (canWrite(r)) btn(t('✏ Edit'), 'ghost', () => openEdit(r.id))
-      if (canManage(r)) btn(t('👥 Share'), 'ghost', () => void share(r.id))
-      if (canManage(r)) btn(t('🗑 Delete'), 'danger', () => void del(r.id))
-      return wrap
+  // line icons (24x24, drawn with the colour of the text), made as nodes: no markup from strings
+  const ICONS: Record<string, string[]> = {
+    open: ['M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z', 'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z'],
+    edit: ['M12 20h9', 'M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z'],
+    share: ['M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2', 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z', 'M22 21v-2a4 4 0 0 0-3-3.9', 'M16 3.1a4 4 0 0 1 0 7.8'],
+    del: ['M3 6h18', 'M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2', 'M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6', 'M10 11v6', 'M14 11v6'],
   }
-
-
+  function icon(kind: string): SVGElement {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    for (const [k, v] of Object.entries({ viewBox: '0 0 24 24', width: '18', height: '18', fill: 'none', stroke: 'currentColor', 'stroke-width': '1.8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true' })) el.setAttribute(k, v)
+    for (const d of ICONS[kind] ?? []) {
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+      p.setAttribute('d', d)
+      el.append(p)
+    }
+    return el
+  }
+  /** The buttons of the foot of a card: icons only, each with its name as tooltip and accessible name. */
+  function cardButtons(r: Row): HTMLElement {
+    const wrap = h('span', { class: 'cardbtns' })
+    const btn = (kind: string, label: string, fn: () => void, disabled = false, danger = false) => {
+      const b = h('button', { type: 'button', class: 'cardico' + (danger ? ' danger' : ''), title: label, 'aria-label': label + ': ' + valOf(r, 'name'), disabled }, icon(kind))
+      b.addEventListener('click', fn)
+      wrap.append(b)
+    }
+    if (canWrite(r)) btn('edit', t('Edit'), () => openEdit(r.id))
+    if (canManage(r)) btn('share', t('Share'), () => void share(r.id))
+    if (canManage(r)) btn('del', t('Delete'), () => void del(r.id), false, true)
+    return wrap
+  }
   async function load() {
     try {
       const r = await crud.list()
@@ -429,7 +504,13 @@ function mount(msk: Msk) {
     // back button of the contextual band (the list row keeps Open, Edit, Share and Delete)
     editbar.hidden = view === 'show'
     if (view === 'show') {
-      msk.band.set({ back: { label: t('Back to the list of sites'), onClick: backToList } })
+      // the name and the logo of the site take the place of the search bar, with the back button
+      const open = state.editId ? findRow(state.editId) : undefined
+      const logo = open ? valOf(open, 'logo') : ''
+      msk.band.set({
+        back: { label: t('Back to the list of sites'), onClick: backToList },
+        identity: { name: (open && valOf(open, 'name')) || t('Static site'), ...(logo ? { logo } : {}) },
+      })
     } else {
       msk.band.reset()
     }
@@ -439,6 +520,13 @@ function mount(msk: Msk) {
       sframe.src = 'about:blank'
       state.siteUrl = ''
     }
+  }
+
+  function showLogo(src: string) {
+    logoPrev.hidden = !src
+    if (src) logoPrev.src = src
+    else logoPrev.removeAttribute('src')
+    btnLogoClear.hidden = !src
   }
 
   function showThumb(src: string) {
@@ -552,6 +640,9 @@ function mount(msk: Msk) {
     legacyAddr.textContent = row ? valOf(row, 'url') : ''
     state.thumb = undefined
     showThumb(row ? thumbOf(row) : '')
+    state.logo = undefined
+    inLogo.value = ''
+    showLogo(row ? valOf(row, 'logo') : '')
     const current = !!row && hasSite(row) && !legacy
     zipReq.hidden = current
     if (current) {
@@ -653,7 +744,10 @@ function mount(msk: Msk) {
     try {
       if (legacy) {
         // a site by address: only the texts and the thumbnail change; the address and its sharing stay as they are
-        const pic: Record<string, string> = state.thumb === undefined ? {} : { thumbnail: state.thumb ?? '' }
+        const pic: Record<string, string> = {
+          ...(state.thumb === undefined ? {} : { thumbnail: state.thumb ?? '' }),
+          ...(state.logo === undefined ? {} : { logo: state.logo ?? '' }),
+        }
         await crud.update(row!.id, { name, description, ...pic })
         setBusy(false)
         showView('list')
@@ -668,7 +762,10 @@ function mount(msk: Msk) {
         if (names && !hasIndexHtml(names)) throw new Error(NO_INDEX)
         msg(t('uploading and extracting {name}…', { name: file.name }), 'form')
       } else msg(t('saving…'), 'form')
-      const pic: Record<string, string> = state.thumb === undefined ? {} : { thumbnail: state.thumb ?? '' }
+      const pic: Record<string, string> = {
+          ...(state.thumb === undefined ? {} : { thumbnail: state.thumb ?? '' }),
+          ...(state.logo === undefined ? {} : { logo: state.logo ?? '' }),
+        }
 
       if (!row) {
         // new: first the row, then the content; if the content fails,
@@ -762,6 +859,26 @@ function mount(msk: Msk) {
         msg(t('the thumbnail must be an image (png, jpeg, webp or gif)'), 'form', true)
       },
     )
+  })
+  inLogo.addEventListener('change', () => {
+    const f = inLogo.files?.[0]
+    if (!f) return
+    toLogo(f).then(
+      (d) => {
+        state.logo = d
+        showLogo(d)
+        msg('', 'form')
+      },
+      () => {
+        inLogo.value = ''
+        msg(t('the logo must be an image (png, jpeg, webp or gif)'), 'form', true)
+      },
+    )
+  })
+  btnLogoClear.addEventListener('click', () => {
+    state.logo = null
+    inLogo.value = ''
+    showLogo('')
   })
   btnThumbClear.addEventListener('click', () => {
     state.thumb = null

@@ -1,9 +1,10 @@
 id = "com.mosaikit.static-site"
 name = "Sites"
-version = "0.11.1"
+version = "0.12.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "grid"
+icon_image = "icon.webp"
 description = "Publishes static sites from zip archives, shareable and with public links"
 author = "Mosaikit"
 license = "Apache-2.0"
@@ -34,6 +35,8 @@ fields = [
   { key = "url", label = "Web address", kind = "text", hidden = true, search = true },
   { key = "framable", label = "May be framed", kind = "text", hidden = true },
   { key = "thumbnail", label = "Thumbnail", kind = "text", hidden = true },
+  # small picture (data: address) shown in the top bar, with the name, while the site is open
+  { key = "logo", label = "Logo", kind = "text", hidden = true },
 ]
 
 [ui]
@@ -55,7 +58,7 @@ label = "Siti"
 
 [i18n.it.resources.sites]
 label = "Sito"
-fields = { name = "Nome", description = "Descrizione", zip_name = "Zip caricato", entry = "Pagina iniziale", files = "File", size = "Dimensione (byte)", url = "Indirizzo web", framable = "Incorporabile", thumbnail = "Miniatura" }
+fields = { name = "Nome", description = "Descrizione", zip_name = "Zip caricato", entry = "Pagina iniziale", files = "File", size = "Dimensione (byte)", url = "Indirizzo web", framable = "Incorporabile", thumbnail = "Miniatura", logo = "Logo" }
 
 [i18n.it.kpi.kpi_sites]
 label = "Siti pubblicati"
