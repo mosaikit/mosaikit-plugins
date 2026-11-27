@@ -1,0 +1,8 @@
+name = "Assistant IA"
+description = "Un assistant avec lequel discuter pour analyser vos données, lire les KPI, configurer la plateforme et créer des éléments dans les applications, avec des discussions enregistrées et un serveur MCP pour les clients IA externes"
+label = "Assistant IA"
+details = "Demandez avec vos propres mots : que se passe-t-il dans mon organisation, quelles tâches sont en retard, crée une note avec ce compte rendu. L’assistant utilise les outils que proposent les applications et agit toujours avec vos propres droits : il voit ce que vous voyez et peut faire ce que vous pouvez faire, rien de plus. Tout ce qui modifie des données est seulement proposé ; vous le vérifiez et la plateforme vous demande de confirmer avant de l’exécuter.\n\nVos discussions sont enregistrées comme des éléments, privés : rouvrez une discussion, renommez-la ou supprimez-la. L’assistant est aussi disponible depuis la barre supérieure sous forme de panneau latéral, sur n’importe quelle page.\n\nLes mêmes outils sont proposés aux clients IA externes (par exemple Claude Desktop) via un serveur MCP. Dans Jetons, vous créez un jeton d’accès personnel, en lecture seule sauf si vous activez l’écriture, et vous copiez les paramètres de connexion.\n\nL’administrateur définit le modèle de langage (Anthropic, OpenAI ou un serveur compatible OpenAI comme Ollama) dans Système › Assistant IA ; lorsque c’est autorisé, un gestionnaire de l’organisation peut apporter une clé propre pour l’organisation."
+
+[resources.chats]
+label = "Discussions"
+fields = { title = "Titre", messages = "Messages" }
