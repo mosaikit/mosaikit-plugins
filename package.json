@@ -21,6 +21,7 @@
     "contacts/ui",
     "maps/ui",
     "static-site/ui",
+    "ai-assistant/ui",
     "files/ui",
     "note-review/ui"
   ],

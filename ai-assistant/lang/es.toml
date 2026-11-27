@@ -1,0 +1,8 @@
+name = "Asistente de IA"
+description = "Un asistente con el que chatear para analizar tus datos, leer los KPI, configurar la plataforma y crear elementos en las apps, con chats guardados y un servidor MCP para clientes de IA externos"
+label = "Asistente de IA"
+details = "Pregunta con tus propias palabras: qué pasa en mi organización, qué tareas van con retraso, crea una nota con esta acta. El asistente usa las herramientas que ofrecen las apps y actúa siempre con tus propios derechos: ve lo que ves tú y puede hacer lo que puedes hacer tú, nada más. Todo lo que modifica datos solo se propone; tú lo revisas y la plataforma te pide confirmación antes de ejecutarlo.\n\nTus chats se guardan como elementos, privados para ti: vuelve a abrir un chat, renómbralo o elimínalo. El asistente también está disponible en la barra superior como panel lateral, en cualquier página.\n\nLas mismas herramientas se ofrecen a clientes de IA externos (por ejemplo, Claude Desktop) mediante un servidor MCP. En Tokens creas un token de acceso personal, de solo lectura salvo que actives la escritura, y copias los ajustes de conexión.\n\nEl administrador fija el modelo de lenguaje (Anthropic, OpenAI o un servidor compatible con OpenAI como Ollama) en Sistema › Asistente de IA; cuando se permite, un gestor de la organización puede aportar una clave propia para la organización."
+
+[resources.chats]
+label = "Chats"
+fields = { title = "Título", messages = "Mensajes" }

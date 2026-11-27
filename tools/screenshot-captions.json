@@ -99,5 +99,9 @@
   "whiteboard": {
     "board.webp": "Whiteboard: a retrospective with sticky notes and headings",
     "list.webp": "Whiteboard: the list of whiteboards as cards with a small picture of each"
+  },
+  "ai-assistant": {
+    "chat.webp": "The assistant in the side panel: a tool used, and a proposed note waiting to be reviewed",
+    "tokens.webp": "A personal access token for an outside AI client, with the address of the MCP server and the Claude Desktop settings"
   }
 }

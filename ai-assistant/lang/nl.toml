@@ -1,0 +1,8 @@
+name = "AI-assistent"
+description = "Een assistent waarmee u chat om uw gegevens te analyseren, de KPI’s te lezen, het platform in te stellen en items in de apps aan te maken, met opgeslagen chats en een MCP-server voor externe AI-clients"
+label = "AI-assistent"
+details = "Vraag het in uw eigen woorden: wat gebeurt er in mijn organisatie, welke taken lopen achter, maak een notitie met deze notulen. De assistent gebruikt de tools die de apps bieden en handelt altijd met uw eigen rechten: hij ziet wat u ziet en kan doen wat u kunt doen, niets meer. Alles wat gegevens wijzigt wordt alleen voorgesteld; u controleert het en het platform vraagt om bevestiging voordat het wordt uitgevoerd.\n\nUw chats worden als items opgeslagen, privé voor u: open een chat opnieuw, hernoem hem of verwijder hem. De assistent is ook beschikbaar via de bovenbalk als zijpaneel, op elke pagina.\n\nDezelfde tools worden aan externe AI-clients (bijvoorbeeld Claude Desktop) aangeboden via een MCP-server. Bij Tokens maakt u een persoonlijk toegangstoken, alleen-lezen tenzij u schrijven inschakelt, en kopieert u de verbindingsinstellingen.\n\nDe beheerder stelt het taalmodel in (Anthropic, OpenAI of een OpenAI-compatibele server zoals Ollama) bij Systeem › AI-assistent; indien toegestaan kan een organisatiebeheerder een eigen sleutel voor de organisatie meebrengen."
+
+[resources.chats]
+label = "Chats"
+fields = { title = "Titel", messages = "Berichten" }

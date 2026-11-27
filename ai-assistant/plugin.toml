@@ -1,0 +1,48 @@
+id = "com.mosaikit.ai-assistant"
+name = "AI Assistant"
+version = "0.1.0"
+kind = "app"
+# icon of the shell (Lucide); contribution.icon stays for older hosts
+icon = "sparkles"
+description = "An assistant you chat with to analyse your data, read the KPIs, configure the platform and create items in the apps, with saved chats and an MCP server for outside AI clients"
+author = "Mosaikit"
+license = "Apache-2.0"
+details = "Ask in plain words: what is going on in my tenant, which tasks are late, create a note with these minutes. The assistant uses the tools the apps offer and always acts with your own rights: it sees what you see and can do what you can do, nothing more. Anything that changes data is only proposed; you review it and the platform asks you to confirm before it runs.\n\nYour chats are saved as items, private to you: reopen a chat, rename it or delete it. The assistant is also available from the top bar as a side panel, on any page.\n\nThe same tools are offered to outside AI clients (for example Claude Desktop) through an MCP server. In Tokens you make a personal access token, read-only unless you turn writes on, and copy the connection settings.\n\nThe Administrator sets the language model (Anthropic, OpenAI or an OpenAI-compatible server such as Ollama) in System › AI assistant; when allowed, a Tenant Manager can bring a key of their own for the tenant."
+screenshots = ["chat.webp", "tokens.webp"]
+homepage = "https://example.org/mosaikit/plugins/ai-assistant"
+
+[requires]
+mosaikit = ">=1.3, <2"
+api = 1
+
+[contribution]
+icon = "✨"
+label = "AI Assistant"
+
+# the saved chats: the messages are a JSON array kept in a hidden field
+[[resources]]
+name = "chats"
+label = "Chats"
+title_field = "title"
+fields = [
+  { key = "title", label = "Title", kind = "text", required = true },
+  { key = "messages", label = "Messages", kind = "text", multiline = true, hidden = true },
+]
+
+[ui]
+entry = "index.html"
+
+# the microphone, for the commands by voice (the speech recognition of the browser)
+[permissions]
+media = true
+
+# Italian translation of the texts above (missing keys fall back to English).
+[i18n.it]
+name = "Assistente AI"
+description = "Un assistente con cui chattare per analizzare i dati, leggere i KPI, configurare la piattaforma e creare elementi nelle app, con chat salvate e un server MCP per i client AI esterni"
+label = "Assistente AI"
+details = "Chiedi a parole tue: cosa succede nel mio tenant, quali attività sono in ritardo, crea una nota con questo verbale. L’assistente usa gli strumenti che le app offrono e agisce sempre con i tuoi diritti: vede ciò che vedi tu e può fare ciò che puoi fare tu, nulla di più. Tutto ciò che modifica i dati viene solo proposto; lo controlli e la piattaforma ti chiede conferma prima di eseguirlo.\n\nLe tue chat sono salvate come elementi, privati: riapri una chat, rinominala o eliminala. L’assistente è disponibile anche dalla barra in alto come pannello laterale, in qualsiasi pagina.\n\nGli stessi strumenti sono offerti ai client AI esterni (per esempio Claude Desktop) tramite un server MCP. In Token crei un token di accesso personale, di sola lettura salvo che tu attivi la scrittura, e copi le impostazioni di connessione.\n\nL’Amministratore imposta il modello linguistico (Anthropic, OpenAI o un server compatibile OpenAI come Ollama) in Sistema › Assistente AI; se consentito, un Gestore del tenant può portare una chiave propria per il tenant."
+
+[i18n.it.resources.chats]
+label = "Chat"
+fields = { title = "Titolo", messages = "Messaggi" }
