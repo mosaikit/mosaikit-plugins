@@ -1,0 +1,12 @@
+name = "Sites"
+description = "Publica sites estáticos a partir de arquivos zip, compartilháveis e com links públicos"
+label = "Sites"
+details = "Publique um site estático a partir de um arquivo zip.\n\nCada site pode ser compartilhado com colegas e grupos e aberto a qualquer pessoa com um link público que você pode revogar a qualquer momento. Os sites são servidos a partir de uma origem separada, então seus scripts nunca chegam à plataforma."
+
+[resources.sites]
+label = "Sites"
+fields = { name = "Nome", description = "Descrição", zip_name = "Zip enviado", entry = "Página inicial", files = "Arquivos", size = "Tamanho (bytes)", url = "Endereço web", framable = "Incorporável", thumbnail = "Miniatura", logo = "Logótipo" }
+
+[kpi.kpi_sites]
+label = "Sites publicados"
+columns = { sites = "sites", files = "arquivos", bytes = "bytes" }

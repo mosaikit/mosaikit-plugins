@@ -26,13 +26,13 @@ logic depends only on the SDK (`mosaikit-plugin-sdk`), the UIs only on `@mosaiki
 | Documents | `com.mosaikit.files` | Files and folders with preview and zip |
 | Note review | `com.mosaikit.note-review` | Sample extension of Notes: the Reviewed fields, the Mark as reviewed action and a Review tab with the history of the reviews |
 | Workspace, Suite, Project, Tabs, Studio | `com.mosaikit.layout-workspace`, `-suite`, `-project`, `-tabs`, `-studio` | Layouts of the shell (`kind = "layout"`): a drawer under a top bar with a wide search; a launcher grid with the pages of the area; global areas with the sidebar of the area; apps and pages as tabs. Declarative: `layout/layout.toml`, a checked stylesheet, images |
-| Spanish | `com.mosaikit.lang-es` | Sample language plugin (`kind = "language"`): the code and name of the language, `lang/host.json` with the texts of the shell and `lang/plugins/<id>.toml` with the manifest texts of other plugins. Only data, no code |
-| Portuguese | `com.mosaikit.lang-pt` | Language plugin: the texts of the shell (`lang/host.json`) and the manifest texts of the official plugins (`lang/plugins/<id>.toml`). The pages of a plugin draw their own texts: where a plugin has no Portuguese text they stay in English. Only data, no code |
-| French | `com.mosaikit.lang-fr` | Language plugin: the texts of the shell (`lang/host.json`) and the manifest texts of the official plugins (`lang/plugins/<id>.toml`). The pages of a plugin draw their own texts: where a plugin has no French text they stay in English. Only data, no code |
-| Dutch | `com.mosaikit.lang-nl` | Language plugin: the texts of the shell (`lang/host.json`) and the manifest texts of the official plugins (`lang/plugins/<id>.toml`). The pages of a plugin draw their own texts: where a plugin has no Dutch text they stay in English. Only data, no code |
-| Arabic | `com.mosaikit.lang-ar` | Language plugin: the texts of the shell (`lang/host.json`) and the manifest texts of the official plugins (`lang/plugins/<id>.toml`) (written right to left: the page takes the direction from the language). The pages of a plugin draw their own texts: where a plugin has no Arabic text they stay in English. Only data, no code |
-| Chinese | `com.mosaikit.lang-zh` | Language plugin: the texts of the shell (`lang/host.json`) and the manifest texts of the official plugins (`lang/plugins/<id>.toml`). The pages of a plugin draw their own texts: where a plugin has no Chinese text they stay in English. Only data, no code |
-| Russian | `com.mosaikit.lang-ru` | Language plugin: the texts of the shell (`lang/host.json`) and the manifest texts of the official plugins (`lang/plugins/<id>.toml`). The pages of a plugin draw their own texts: where a plugin has no Russian text they stay in English. Only data, no code |
+| Spanish | `com.mosaikit.lang-es` | Sample language plugin (`kind = "language"`): the code and name of the language, `lang/host.json` with the texts of the shell (the plugins carry their own translations in `lang/`) |
+| Portuguese | `com.mosaikit.lang-pt` | Language plugin: the texts of the shell (`lang/host.json`) (the official plugins carry their own translations in their `lang/` folder). The pages of a plugin draw their own texts: where a plugin has no Portuguese text they stay in English. Only data, no code |
+| French | `com.mosaikit.lang-fr` | Language plugin: the texts of the shell (`lang/host.json`) (the official plugins carry their own translations in their `lang/` folder). The pages of a plugin draw their own texts: where a plugin has no French text they stay in English. Only data, no code |
+| Dutch | `com.mosaikit.lang-nl` | Language plugin: the texts of the shell (`lang/host.json`) (the official plugins carry their own translations in their `lang/` folder). The pages of a plugin draw their own texts: where a plugin has no Dutch text they stay in English. Only data, no code |
+| Arabic | `com.mosaikit.lang-ar` | Language plugin: the texts of the shell (`lang/host.json`) (the official plugins carry their own translations in their `lang/` folder) (written right to left: the page takes the direction from the language). The pages of a plugin draw their own texts: where a plugin has no Arabic text they stay in English. Only data, no code |
+| Chinese | `com.mosaikit.lang-zh` | Language plugin: the texts of the shell (`lang/host.json`) (the official plugins carry their own translations in their `lang/` folder). The pages of a plugin draw their own texts: where a plugin has no Chinese text they stay in English. Only data, no code |
+| Russian | `com.mosaikit.lang-ru` | Language plugin: the texts of the shell (`lang/host.json`) (the official plugins carry their own translations in their `lang/` folder). The pages of a plugin draw their own texts: where a plugin has no Russian text they stay in English. Only data, no code |
 
 ## Build and test
 
@@ -97,10 +97,10 @@ name = "Español"     # the name of the language in that language: what the menu
 - `lang/host.json`: the texts of the host, a flat object from the English phrase (the key the host uses,
   e.g. `"Sign in"`, or `"errors.<code>"` for a server error) to its translation, keeping the
   `{placeholders}`. Texts missing here stay in English. At most 1 MB and 6000 texts of 1000 characters.
-- `lang/plugins/<plugin id>.toml`: the texts of the manifest of another plugin in this language, in the
-  shape of its `[i18n.<code>]` table (`name`, `description`, `label`, `[resources.*]`, `[kpi.*]`…). A
-  plugin that has its own `[i18n.<code>]` keeps it.
-- The texts inside the UI of a plugin (its iframe) stay in that plugin (`ui/src/<code>.ts`).
+- The texts of a plugin (its manifest and its page) are **not** here: every plugin carries its own in its `lang/` folder,
+  `lang/<code>.toml` (the shape of its `[i18n.<code>]` table: `name`, `description`, `label`, `[resources.*]`, `[kpi.*]`…)
+  and `lang/<code>.json` (the texts inside its page, read with `msk.t`). They count while this language plugin is on.
+  So a new plugin needs no change in the language plugins; a plugin that is missing a language stays in English.
 
 Installed and on, the language is offered in every language menu; off or uninstalled, it goes away.
 `com.mosaikit.lang-es` is a starter set to copy from.
