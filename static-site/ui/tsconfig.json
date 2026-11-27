@@ -1,11 +1,7 @@
 {
   "extends": "../../../mosaikit/ui/plugin-api/tsconfig.json",
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "paths": {
-      "@mosaikit/plugin-api": ["../../../mosaikit/ui/plugin-api/src/index.ts"],
-      "@mosaikit/plugin-api/style.css": ["../../../mosaikit/ui/plugin-api/src/style.css"]
-    }
+    "allowImportingTsExtensions": true
   },
   "include": ["src"]
 }
