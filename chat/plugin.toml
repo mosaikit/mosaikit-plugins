@@ -4,6 +4,7 @@ version = "0.5.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "message-circle"
+icon_image = "icon.webp"
 description = "Chat like Microsoft Teams: one-to-one and group chats with presence, read receipts, reactions, mentions, files and calls"
 author = "Mosaikit"
 license = "Apache-2.0"

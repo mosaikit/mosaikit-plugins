@@ -1,8 +1,9 @@
 /* Studio: indigo band with a centred white search, grey sidebar with grouped apps, a white work area, soft shadows
    and 3D icons for the apps. Light colours first, dark ones under data-mode="dark" (set by the shell on the
-   layout root). The icons are one sprite (images/icons.png, 6 columns of 96 px drawn at 24 px) because a layout may
-   carry 8 images; the shell marks each app with data-icon and each group with data-group. An icon with no rule
-   here keeps the line icon. 3D icons: 3dicons.co (CC0). */
+   layout root). The icons of the apps come from the apps themselves (icon_image of the plugin: the shell marks the app with
+   data-image and publishes the address as --msk-icon-image); what is left here is one small sprite (images/icons.webp, 6
+   columns of 96 px) for the pages of the platform, the groups and the overview, because a layout may carry 8 images.
+   An icon with no rule and no image keeps the line icon. 3D icons: 3dicons.co (CC0). */
 .msk-frame {
   background-color: #f3f4f8;
 }
@@ -103,547 +104,366 @@
 &[data-mode="dark"] .msk-tenant {
   background-color: rgba(255, 255, 255, 0.14);
   color: #ffffff;
-}
-/* 3D icons: the line icon is made transparent (it draws with currentColor) and the sprite goes behind it */
-.msk-nav-item[data-icon="megaphone"] > svg:first-child, .msk-navg-head[data-icon="megaphone"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px 0px;
-}
-.msk-nav-item[data-icon="shield-check"] > svg:first-child, .msk-navg-head[data-icon="shield-check"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px 0px;
-}
-.msk-nav-item[data-icon="bookmark"] > svg:first-child, .msk-navg-head[data-icon="bookmark"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px 0px;
-}
-.msk-nav-item[data-icon="calendar-days"] > svg:first-child, .msk-navg-head[data-icon="calendar-days"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px 0px;
-}
+}/* 3D icons: the line icon is made transparent (it draws with currentColor) and the sprite goes behind it */
 .msk-nav-item[data-icon="calendar"] > svg:first-child, .msk-navg-head[data-icon="calendar"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px 0px;
-}
-.msk-nav-item[data-icon="message-circle"] > svg:first-child, .msk-navg-head[data-icon="message-circle"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -96px 0px;
+  background-size: 144px 144px;
+  background-position: 0px 0px;
 }
 .msk-nav-item[data-icon="message-square"] > svg:first-child, .msk-navg-head[data-icon="message-square"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -120px;
+  background-size: 144px 144px;
+  background-position: -24px 0px;
 }
 .msk-nav-item[data-icon="hash"] > svg:first-child, .msk-navg-head[data-icon="hash"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -120px 0px;
-}
-.msk-nav-item[data-icon="book-user"] > svg:first-child, .msk-navg-head[data-icon="book-user"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -24px;
+  background-size: 144px 144px;
+  background-position: -48px 0px;
 }
 .msk-nav-item[data-icon="users"] > svg:first-child, .msk-navg-head[data-icon="users"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -96px -48px;
+  background-size: 144px 144px;
+  background-position: -72px 0px;
 }
 .msk-nav-item[data-icon="user"] > svg:first-child, .msk-navg-head[data-icon="user"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -24px;
-}
-.msk-nav-item[data-icon="layout-dashboard"] > svg:first-child, .msk-navg-head[data-icon="layout-dashboard"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -24px;
+  background-size: 144px 144px;
+  background-position: -96px 0px;
 }
 .msk-nav-item[data-icon="chart-bar"] > svg:first-child, .msk-navg-head[data-icon="chart-bar"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -24px;
-}
-.msk-nav-item[data-icon="folder"] > svg:first-child, .msk-navg-head[data-icon="folder"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -24px;
-}
-.msk-nav-item[data-icon="file-input"] > svg:first-child, .msk-navg-head[data-icon="file-input"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px -24px;
+  background-size: 144px 144px;
+  background-position: -120px 0px;
 }
 .msk-nav-item[data-icon="file-text"] > svg:first-child, .msk-navg-head[data-icon="file-text"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -120px -72px;
-}
-.msk-nav-item[data-icon="map"] > svg:first-child, .msk-navg-head[data-icon="map"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -96px -24px;
+  background-size: 144px 144px;
+  background-position: 0px -24px;
 }
 .msk-nav-item[data-icon="map-pin"] > svg:first-child, .msk-navg-head[data-icon="map-pin"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -120px -24px;
-}
-.msk-nav-item[data-icon="video"] > svg:first-child, .msk-navg-head[data-icon="video"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -48px;
-}
-.msk-nav-item[data-icon="badge-check"] > svg:first-child, .msk-navg-head[data-icon="badge-check"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -48px;
+  background-size: 144px 144px;
+  background-position: -24px -24px;
 }
 .msk-nav-item[data-icon="clipboard-check"] > svg:first-child, .msk-navg-head[data-icon="clipboard-check"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -48px;
-}
-.msk-nav-item[data-icon="notebook-pen"] > svg:first-child, .msk-navg-head[data-icon="notebook-pen"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -48px;
+  background-size: 144px 144px;
+  background-position: -48px -24px;
 }
 .msk-nav-item[data-icon="notebook"] > svg:first-child, .msk-navg-head[data-icon="notebook"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -48px;
+  background-size: 144px 144px;
+  background-position: -72px -24px;
 }
 .msk-nav-item[data-icon="star"] > svg:first-child, .msk-navg-head[data-icon="star"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px -48px;
+  background-size: 144px 144px;
+  background-position: -96px -24px;
 }
 .msk-nav-item[data-icon="tag"] > svg:first-child, .msk-navg-head[data-icon="tag"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -120px -48px;
+  background-size: 144px 144px;
+  background-position: -120px -24px;
 }
 .msk-nav-item[data-icon="archive"] > svg:first-child, .msk-navg-head[data-icon="archive"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -72px;
-}
-.msk-nav-item[data-icon="vote"] > svg:first-child, .msk-navg-head[data-icon="vote"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -72px;
-}
-.msk-nav-item[data-icon="kanban"] > svg:first-child, .msk-navg-head[data-icon="kanban"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -72px;
-}
-.msk-nav-item[data-icon="code"] > svg:first-child, .msk-navg-head[data-icon="code"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px -72px;
-}
-.msk-nav-item[data-icon="grid"] > svg:first-child, .msk-navg-head[data-icon="grid"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -96px -72px;
-}
-.msk-nav-item[data-icon="clipboard-list"] > svg:first-child, .msk-navg-head[data-icon="clipboard-list"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -120px -72px;
-}
-.msk-nav-item[data-icon="square-check-big"] > svg:first-child, .msk-navg-head[data-icon="square-check-big"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -48px;
-}
-.msk-nav-item[data-icon="presentation"] > svg:first-child, .msk-navg-head[data-icon="presentation"] > svg:first-child {
-  color: transparent;
-  width: 24px;
-  height: 24px;
-  background-image: url(images/icons.png);
-  background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -96px;
+  background-size: 144px 144px;
+  background-position: 0px -48px;
 }
 .msk-nav-item[data-icon="settings"] > svg:first-child, .msk-navg-head[data-icon="settings"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -96px;
+  background-size: 144px 144px;
+  background-position: -24px -48px;
 }
 .msk-nav-item[data-icon="lock"] > svg:first-child, .msk-navg-head[data-icon="lock"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -96px;
+  background-size: 144px 144px;
+  background-position: -48px -48px;
 }
 .msk-nav-item[data-icon="mail"] > svg:first-child, .msk-navg-head[data-icon="mail"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px -96px;
+  background-size: 144px 144px;
+  background-position: -72px -48px;
 }
 .msk-nav-item[data-icon="overview"] > svg:first-child, .msk-navg-head[data-icon="overview"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -24px;
+  background-size: 144px 144px;
+  background-position: -120px 0px;
 }
 .msk-nav-item[data-icon="tenants"] > svg:first-child, .msk-navg-head[data-icon="tenants"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -120px -120px;
+  background-size: 144px 144px;
+  background-position: -96px -48px;
 }
 .msk-nav-item[data-icon="people"] > svg:first-child, .msk-navg-head[data-icon="people"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -24px;
+  background-size: 144px 144px;
+  background-position: -96px 0px;
 }
 .msk-nav-item[data-icon="plugins"] > svg:first-child, .msk-navg-head[data-icon="plugins"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px -72px;
+  background-size: 144px 144px;
+  background-position: -120px -48px;
 }
 .msk-nav-item[data-icon="monitoring"] > svg:first-child, .msk-navg-head[data-icon="monitoring"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -144px;
+  background-size: 144px 144px;
+  background-position: 0px -72px;
 }
 .msk-nav-item[data-icon="log"] > svg:first-child, .msk-navg-head[data-icon="log"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -96px -96px;
+  background-size: 144px 144px;
+  background-position: -24px -72px;
 }
 .msk-nav-item[data-icon="manage"] > svg:first-child, .msk-navg-head[data-icon="manage"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -96px -48px;
+  background-size: 144px 144px;
+  background-position: -72px 0px;
 }
 .msk-nav-item[data-icon="shares"] > svg:first-child, .msk-navg-head[data-icon="shares"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -120px;
+  background-size: 144px 144px;
+  background-position: -48px -72px;
 }
 .msk-nav-item[data-icon="usage"] > svg:first-child, .msk-navg-head[data-icon="usage"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -144px;
+  background-size: 144px 144px;
+  background-position: -72px -72px;
 }
 .msk-nav-item[data-icon="schedules"] > svg:first-child, .msk-navg-head[data-icon="schedules"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px 0px;
+  background-size: 144px 144px;
+  background-position: 0px 0px;
 }
 .msk-nav-item[data-icon="briefcase"] > svg:first-child, .msk-navg-head[data-icon="briefcase"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -72px;
+  background-size: 144px 144px;
+  background-position: 0px -48px;
 }
 .msk-nav-item[data-icon="database"] > svg:first-child, .msk-navg-head[data-icon="database"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
+  background-size: 144px 144px;
   background-position: -96px -72px;
 }
 .msk-nav-item[data-icon="globe"] > svg:first-child, .msk-navg-head[data-icon="globe"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -144px;
+  background-size: 144px 144px;
+  background-position: -120px -72px;
 }
 .msk-nav-item[data-icon="home"] > svg:first-child, .msk-navg-head[data-icon="home"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -72px;
+  background-size: 144px 144px;
+  background-position: 0px -96px;
 }
 .msk-nav-item[data-icon="clock"] > svg:first-child, .msk-navg-head[data-icon="clock"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -96px -96px;
+  background-size: 144px 144px;
+  background-position: -24px -72px;
 }
 .msk-nav-item[data-icon="bell"] > svg:first-child, .msk-navg-head[data-icon="bell"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -120px -96px;
+  background-size: 144px 144px;
+  background-position: -24px -96px;
 }
 .msk-nav-item[data-icon="link"] > svg:first-child, .msk-navg-head[data-icon="link"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -120px;
+  background-size: 144px 144px;
+  background-position: -48px -72px;
 }
 .msk-nav-item[data-icon="pencil"] > svg:first-child, .msk-navg-head[data-icon="pencil"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -24px -120px;
+  background-size: 144px 144px;
+  background-position: -48px -96px;
 }
 .msk-nav-item[data-icon="wrench"] > svg:first-child, .msk-navg-head[data-icon="wrench"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px -120px;
+  background-size: 144px 144px;
+  background-position: -72px -96px;
 }
 .msk-nav-item[data-icon="zap"] > svg:first-child, .msk-navg-head[data-icon="zap"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -96px -120px;
+  background-size: 144px 144px;
+  background-position: -96px -96px;
 }
 .msk-navg-head[data-group="information"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px -48px;
+  background-size: 144px 144px;
+  background-position: -96px -24px;
 }
 .msk-navg-head[data-group="work"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -72px -120px;
+  background-size: 144px 144px;
+  background-position: -72px -96px;
 }
 .msk-navg-head[data-group="com"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -120px;
+  background-size: 144px 144px;
+  background-position: -24px 0px;
 }
 .msk-navg-head[data-group="people"] > svg:first-child {
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: 0px -24px;
+  background-size: 144px 144px;
+  background-position: -96px 0px;
 }
 
 /* the mockup: a narrower sidebar, bigger group heads, wide search, a hero with 3D art, 3D icons on the key figures */
@@ -676,91 +496,91 @@
   color: transparent;
   width: 28px;
   height: 28px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 168px 196px;
-  background-position: -56px -56px;
+  background-size: 168px 168px;
+  background-position: -84px -28px;
 }
 .ov-card > span > svg.lucide-users {
   color: transparent;
   width: 40px;
   height: 40px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 240px 280px;
-  background-position: -160px -80px;
+  background-size: 240px 240px;
+  background-position: -120px 0px;
 }
 .ov-card > span > svg.lucide-activity {
   color: transparent;
   width: 40px;
   height: 40px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 240px 280px;
-  background-position: -40px -240px;
+  background-size: 240px 240px;
+  background-position: 0px -120px;
 }
 .ov-card > span > svg.lucide-folder {
   color: transparent;
   width: 40px;
   height: 40px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 240px 280px;
-  background-position: -80px -40px;
+  background-size: 240px 240px;
+  background-position: -200px -160px;
 }
 .ov-card > span > svg.lucide-share-2 {
   color: transparent;
   width: 40px;
   height: 40px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 240px 280px;
-  background-position: 0px -200px;
+  background-size: 240px 240px;
+  background-position: -80px -120px;
 }
 .ov-card > span > svg.lucide-user {
   color: transparent;
   width: 40px;
   height: 40px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 240px 280px;
-  background-position: 0px -40px;
+  background-size: 240px 240px;
+  background-position: -160px 0px;
 }
 .ov-card > span > svg.lucide-hard-drive {
   color: transparent;
   width: 40px;
   height: 40px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 240px 280px;
-  background-position: 0px -240px;
+  background-size: 240px 240px;
+  background-position: -120px -120px;
 }
 .ov-card > span > svg.lucide-building-2 {
   color: transparent;
   width: 40px;
   height: 40px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 240px 280px;
-  background-position: -200px -200px;
+  background-size: 240px 240px;
+  background-position: -160px -80px;
 }
 .ov-card > span > svg.lucide-shield-check {
   color: transparent;
   width: 40px;
   height: 40px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 240px 280px;
-  background-position: -40px 0px;
+  background-size: 240px 240px;
+  background-position: 0px -200px;
 }
 .ov-card > span > svg.lucide-puzzle {
   color: transparent;
   width: 40px;
   height: 40px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 240px 280px;
-  background-position: -120px -120px;
+  background-size: 240px 240px;
+  background-position: -200px -80px;
 }
 .ov-card > span[aria-hidden="true"] {
   background: transparent !important;
@@ -779,10 +599,10 @@
 [data-widget-icon] {
   width: 28px;
   height: 28px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 168px 196px;
-  background-position: -28px -28px;
+  background-size: 168px 168px;
+  background-position: -140px 0px;
 }
 [data-widget-title="ov-waiting"] > [data-widget-icon] {
   background-position: -140px -112px;
@@ -809,10 +629,21 @@
   color: transparent;
   width: 24px;
   height: 24px;
-  background-image: url(images/icons.png);
+  background-image: url(images/icons.webp);
   background-repeat: no-repeat;
-  background-size: 144px 168px;
-  background-position: -48px -48px;
+  background-size: 144px 144px;
+  background-position: -72px -24px;
+}
+/* An app that brings its own illustrated icon (icon_image of its manifest): the shell marks it with data-image and
+   publishes the address as --msk-icon-image; it takes the place of the line icon and of the rules above */
+.msk-nav-item[data-image] > svg:first-child, .msk-navg-head[data-image] > svg:first-child {
+  color: transparent;
+  width: 24px;
+  height: 24px;
+  background-image: var(--msk-icon-image);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 }
 /* the icons of the mockup that differ from the 3dicons sprite */
 .msk-nav-item[data-icon="overview"] > svg:first-child {

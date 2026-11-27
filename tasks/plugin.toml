@@ -4,6 +4,7 @@ version = "0.8.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "square-check-big"
+icon_image = "icon.webp"
 description = "Tasks with due date, priority, labels, projects, checklists and repetition, assigned by sharing them"
 author = "Mosaikit"
 license = "Apache-2.0"

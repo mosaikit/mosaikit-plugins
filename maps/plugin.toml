@@ -4,6 +4,7 @@ version = "0.9.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "map"
+icon_image = "icon.webp"
 description = "Catalog of GeoLibre maps: configuration saved in the .geolibre.json project"
 author = "Mosaikit"
 license = "Apache-2.0"

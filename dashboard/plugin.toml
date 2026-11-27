@@ -4,6 +4,7 @@ version = "0.3.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "layout-dashboard"
+icon_image = "icon.webp"
 description = "One page of widgets that shows what matters to you across the apps: open tasks, notices to confirm, polls to vote, requests to decide"
 author = "Mosaikit"
 license = "Apache-2.0"

@@ -4,6 +4,7 @@ version = "0.3.0"
 kind = "app"
 # icon of the shell (Lucide); contribution.icon stays for older hosts
 icon = "megaphone"
+icon_image = "icon.webp"
 description = "A notice board: publish notices with a level and a period, and see who confirmed they read them"
 author = "Mosaikit"
 license = "Apache-2.0"
